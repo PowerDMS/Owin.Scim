@@ -7,16 +7,6 @@ build
 !source/.build*
 _build
 
-#For the new front end
-source/Ids.PowerDms.Presentation.Web/[Cc]ontent
-styles.css.map
-dist
-node_modules
-.baseDir.ts
-.tscache
-tscommand-*.tmp.txt
-default.xlf
-_references.ts
 
 #Code analysis files
 _Resharper.*
@@ -24,10 +14,6 @@ StyleCop.cache
 
 #Package Files
 *.nupkg
-
-#PowerDMS files
-source/Dms/Ids.PowerDms.Presentation.Web/[Dd]ocuments
-source/Ids.PowerDms.Presentation.Web/[Dd]ocuments
 
 #Editor/IDE files
 *.swp
@@ -47,8 +33,4 @@ content_version.txt
 **.GhostDoc*
 **.jmconfig*
 **/*.crunchsolution.cache
-**/_NCrunch_PowerDMS/StoredText/**
-**/_NCrunch_Ccmp/StoredText/**
 **.sublimets
-source/Ids.PowerDms.Presentation.Web/content_version.txt
-source/Ids.PowerDms.Presentation.Web/content_version.txt
