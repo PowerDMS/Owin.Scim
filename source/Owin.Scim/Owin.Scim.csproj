@@ -30,12 +30,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=4.0.4.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\packages\AutoMapper.4.0.4\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FluentValidation, Version=5.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentValidation.5.6.2.0\lib\Net45\FluentValidation.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NContext, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NContext.3.0.0\lib\net45\NContext.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NContext.Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NContext.Common.3.0.0\lib\portable-net45+windows8+wpa\NContext.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NContext.Extensions.AutoMapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NContext.Extensions.AutoMapper.3.0.0\lib\net40\NContext.Extensions.AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -51,6 +71,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
@@ -83,7 +104,9 @@
   <ItemGroup>
     <Compile Include="CompositionRoot.cs" />
     <Compile Include="Configuration\ServiceProviderConfiguration.cs" />
+    <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
+    <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Model\Users\Address.cs" />
     <Compile Include="Model\Users\Email.cs" />
     <Compile Include="Model\Users\EnterpriseUser.cs" />
@@ -100,6 +123,9 @@
     <Compile Include="Model\Resource.cs" />
     <Compile Include="Model\Users\User.cs" />
     <Compile Include="Model\Users\X509Certificate.cs" />
+    <Compile Include="Security\IManagePasswords.cs" />
+    <Compile Include="Services\IUserService.cs" />
+    <Compile Include="Services\UserService.cs" />
     <Compile Include="Validation\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\IUserRepository.cs" />
@@ -117,9 +143,7 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Endpoints\" />
     <Folder Include="Repository\InMemory\" />
-    <Folder Include="Services\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

@@ -9,5 +9,7 @@
         Task<User> GetUser(string userId);
 
         Task<bool> IsUserNameAvailable(string userName, string userIdToExclude = null);
+
+        Task UpdateUser(User user);
     }
 }

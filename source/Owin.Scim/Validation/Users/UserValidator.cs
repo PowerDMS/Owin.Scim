@@ -8,6 +8,8 @@
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Extensions;
+
     using FluentValidation;
 
     using Model.Users;
@@ -229,6 +231,9 @@
 
                 RuleSet("update", () =>
                 {
+                    RuleFor(user => user.Id)
+                        .Immutable(() => userRecord.Value.Id, StringComparer.OrdinalIgnoreCase);
+
                     // Updating a username validation
                     When(user =>
                         !string.IsNullOrWhiteSpace(user.UserName) &&
