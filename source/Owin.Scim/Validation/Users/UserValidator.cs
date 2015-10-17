@@ -67,7 +67,7 @@
 
             private void ConfigureDefaultRuleSet()
             {
-                RuleSet(RuleSetConstants.Default, () =>
+                RuleSet("default", () =>
                 {
                     RuleFor(u => u.UserName)
                         .NotEmpty();
@@ -87,6 +87,7 @@
                                     try
                                     {
                                         CultureInfo.GetCultureInfo(locale);
+                                        return true;
                                     }
                                     catch (Exception)
                                     {
@@ -95,14 +96,6 @@
                                     return false;
                                 });
                         });
-
-                    //                    When(user => user.ProfileUrl != null,
-                    //                        () =>
-                    //                        {
-                    //                            RuleFor(user => user.ProfileUrl)
-                    //                                .Must(uri => uri.)
-                    //                        });
-
                     When(user => !string.IsNullOrWhiteSpace(user.Password),
                         () =>
                         {
@@ -140,7 +133,7 @@
                                     {
                                         {
                                             pn => pn.Value,
-                                            config => { config.NotEmpty().Must(PhoneNumbers.PhoneNumberUtil.IsViablePhoneNumber); }
+                                            config => config.NotEmpty().Must(PhoneNumbers.PhoneNumberUtil.IsViablePhoneNumber)
                                         }
                                     });
                         });
@@ -211,7 +204,7 @@
 
             private void ConfigureCreateRuleSet()
             {
-                RuleSet(RuleSetConstants.Create, () =>
+                RuleSet("create", () =>
                 {
                     RuleFor(user => user.UserName)
                         .MustAsync(async userName =>
@@ -234,7 +227,7 @@
             {
                 var userRecord = new Lazy<User>(() => GetUser().Result, LazyThreadSafetyMode.ExecutionAndPublication);
 
-                RuleSet(RuleSetConstants.Update, () =>
+                RuleSet("update", () =>
                 {
                     // Updating a username validation
                     When(user =>
@@ -253,7 +246,7 @@
                                        preparation and comparison rules described in Sections 3 and 4, 
                                        respectively, of [RFC7613], which is based on the PRECIS framework
                                        specification [RFC7564]. */
-
+                                    
                                     return await _UserRepository.IsUserNameAvailable(
                                         Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)), user.Id);
                                 })

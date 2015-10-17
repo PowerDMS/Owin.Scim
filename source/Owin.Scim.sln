@@ -3,7 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
 VisualStudioVersion = 14.0.23107.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Scim", "Owin.Scim/Owin.Scim.csproj", "{5DDB5F75-55CA-47ED-8132-03B757148275}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Scim", "Owin.Scim\Owin.Scim.csproj", "{5DDB5F75-55CA-47ED-8132-03B757148275}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".tests", ".tests", "{A24F7EA3-A8C6-4803-A5BA-331E73579DC6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Scim.Tests", "_tests\Owin.Scim.Tests\Owin.Scim.Tests.csproj", "{895DAB3B-6CAD-4857-9612-FD0A498C6EE6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,8 +19,15 @@ Global
 		{5DDB5F75-55CA-47ED-8132-03B757148275}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5DDB5F75-55CA-47ED-8132-03B757148275}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5DDB5F75-55CA-47ED-8132-03B757148275}.Release|Any CPU.Build.0 = Release|Any CPU
+		{895DAB3B-6CAD-4857-9612-FD0A498C6EE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{895DAB3B-6CAD-4857-9612-FD0A498C6EE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{895DAB3B-6CAD-4857-9612-FD0A498C6EE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{895DAB3B-6CAD-4857-9612-FD0A498C6EE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{895DAB3B-6CAD-4857-9612-FD0A498C6EE6} = {A24F7EA3-A8C6-4803-A5BA-331E73579DC6}
 	EndGlobalSection
 EndGlobal
