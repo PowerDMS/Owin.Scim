@@ -1,25 +1,13 @@
 ﻿namespace Owin.Scim.Mappings
 {
-    using System.ComponentModel.Composition;
-
     using AutoMapper;
     
     using Model.Users;
 
     using NContext.Extensions.AutoMapper.Configuration;
 
-    using Security;
-
     public class UserMapping : IConfigureAutoMapper
     {
-        private readonly IManagePasswords _PasswordManager;
-
-        [ImportingConstructor]
-        public UserMapping([Import]IManagePasswords passwordManager)
-        {
-            _PasswordManager = passwordManager;
-        }
-
         public void Configure(IConfiguration mapper)
         {
             // All below attributes are readWrite
