@@ -24,12 +24,16 @@
 
         private readonly IVerifyPasswordComplexity _PasswordComplexityVerifier;
 
+        private readonly IManagePasswords _PasswordManager;
+
         public UserValidator(
-                IUserRepository userRepository,
-                IVerifyPasswordComplexity passwordComplexityVerifier)
+            IUserRepository userRepository,
+            IVerifyPasswordComplexity passwordComplexityVerifier,
+            IManagePasswords passwordManager)
         {
-                _UserRepository = userRepository;
-                _PasswordComplexityVerifier = passwordComplexityVerifier;
+            _UserRepository = userRepository;
+            _PasswordComplexityVerifier = passwordComplexityVerifier;
+            _PasswordManager = passwordManager;
         }
 
         protected override async Task<ValidationResult> ValidateAsyncInternal(User entity, string ruleSet = RuleSetConstants.Default)
@@ -44,7 +48,7 @@
         private Task<IValidator<User>> CreateFluentValidator()
         {
             return Task.FromResult<IValidator<User>>(
-                new FluentUserValidator(_UserRepository, _PasswordComplexityVerifier));
+                new FluentUserValidator(_UserRepository, _PasswordComplexityVerifier, _PasswordManager));
         }
 
         private class FluentUserValidator : AbstractValidator<User>
@@ -53,21 +57,26 @@
 
             private readonly IVerifyPasswordComplexity _PasswordComplexityVerifier;
 
+            private readonly IManagePasswords _PasswordManager;
+
             private string _UserId;
 
             public FluentUserValidator(
                 IUserRepository userRepository,
-                IVerifyPasswordComplexity passwordComplexityVerifier)
+                IVerifyPasswordComplexity passwordComplexityVerifier,
+                IManagePasswords passwordManager)
             {
                 _UserRepository = userRepository;
                 _PasswordComplexityVerifier = passwordComplexityVerifier;
-                
-                ConfigureDefaultRuleSet();
+                _PasswordManager = passwordManager;
+
+                var userRecord = new Lazy<User>(() => GetUser().Result, LazyThreadSafetyMode.ExecutionAndPublication);
+                ConfigureDefaultRuleSet(userRecord);
                 ConfigureCreateRuleSet();
-                ConfigureUpdateRuleSet();
+                ConfigureUpdateRuleSet(userRecord);
             }
 
-            private void ConfigureDefaultRuleSet()
+            private void ConfigureDefaultRuleSet(Lazy<User> userRecord)
             {
                 RuleSet("default", () =>
                 {
@@ -97,20 +106,6 @@
 
                                     return false;
                                 });
-                        });
-                    When(user => !string.IsNullOrWhiteSpace(user.Password),
-                        () =>
-                        {
-                            /* Before comparing or evaluating the uniqueness of a "userName" or 
-                               "password" attribute, service providers MUST use the preparation, 
-                               enforcement, and comparison of internationalized strings (PRECIS) 
-                               preparation and comparison rules described in Sections 3 and 4, 
-                               respectively, of [RFC7613], which is based on the PRECIS framework
-                               specification [RFC7564]. */
-
-                            RuleFor(user => user.Password)
-                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(
-                                    Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(password))));
                         });
                     When(user => user.Emails != null && user.Emails.Any(),
                         () =>
@@ -222,13 +217,26 @@
                                 Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)));
                         })
                         .WithMessage("UserName is already in use.");
+
+                    When(user => !string.IsNullOrWhiteSpace(user.Password),
+                        () =>
+                        {
+                            /* Before comparing or evaluating the uniqueness of a "userName" or 
+                               "password" attribute, service providers MUST use the preparation, 
+                               enforcement, and comparison of internationalized strings (PRECIS) 
+                               preparation and comparison rules described in Sections 3 and 4, 
+                               respectively, of [RFC7613], which is based on the PRECIS framework
+                               specification [RFC7564]. */
+
+                            RuleFor(user => user.Password)
+                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(
+                                    Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(password))));
+                        });
                 });
             }
 
-            private void ConfigureUpdateRuleSet()
+            private void ConfigureUpdateRuleSet(Lazy<User> userRecord)
             {
-                var userRecord = new Lazy<User>(() => GetUser().Result, LazyThreadSafetyMode.ExecutionAndPublication);
-
                 RuleSet("update", () =>
                 {
                     RuleFor(user => user.Id)
@@ -256,6 +264,27 @@
                                         Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)), user.Id);
                                 })
                                 .WithMessage("UserName is already in use.");
+                        });
+
+                    // Updating a user password
+                    When(user =>
+                        !string.IsNullOrWhiteSpace(user.Password) &&
+                        (userRecord.Value.Password == null ||
+                         !_PasswordManager.VerifyHash(
+                             Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password)),
+                             Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userRecord.Value.Password)))),
+                        () =>
+                        {
+                            /* Before comparing or evaluating the uniqueness of a "userName" or 
+                               "password" attribute, service providers MUST use the preparation, 
+                               enforcement, and comparison of internationalized strings (PRECIS) 
+                               preparation and comparison rules described in Sections 3 and 4, 
+                               respectively, of [RFC7613], which is based on the PRECIS framework
+                               specification [RFC7564]. */
+
+                            RuleFor(user => user.Password)
+                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(
+                                    Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(password))));
                         });
                 });
             }

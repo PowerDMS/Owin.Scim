@@ -25,14 +25,14 @@
 
             // UserGroup is readOnly!
             mapper.CreateMap<UserGroup, UserGroup>()
-                .ForAllMembers(c => c.UseDestinationValue());
+                .ForAllMembers(c => c.Ignore());
 
             mapper.CreateMap<User, User>()
-                .ForMember(dst => dst.Id, c => c.UseDestinationValue())
-                .ForMember(dst => dst.Groups, c => c.UseDestinationValue()) // User.Groups is readOnly!
+                .ForMember(dst => dst.Id, c => c.Ignore())
+                .ForMember(dst => dst.Groups, c => c.Ignore()) // User.Groups is readOnly!
                 .ForMember(dst => dst.Password, c => c.Ignore()) // User.Password is handled in the service for validation purposes.
-                .ForMember(dst => dst.Meta, c => c.UseDestinationValue()) // User.Meta is readOnly!
-                .ForMember(dst => dst.Schemas, c => c.UseDestinationValue()); // User.Schemas is readOnly!
+                .ForMember(dst => dst.Meta, c => c.Ignore()) // User.Meta is readOnly!
+                .ForMember(dst => dst.Schemas, c => c.Ignore()); // User.Schemas is readOnly!
         }
 
         public int Priority

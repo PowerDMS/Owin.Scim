@@ -6,20 +6,32 @@ namespace Owin.Scim.Tests.Validation.Users
 
     using Model.Users;
 
-    public class with_a_valid_password : when_validating_a_new_user
+    public class with_a_valid_new_password : when_validating_an_existing_user
     {
         Establish ctx = () =>
         {
+            A.CallTo(() => UserRepository.GetUser(A<string>._))
+                .ReturnsLazily(() => new User
+                {
+                    Id = "id",
+                    UserName = "daniel",
+                    Password = "oldPass"
+                });
+
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._, A<string>._))
                 .Returns(true);
 
             A.CallTo(() => PasswordComplexityVerifier.MeetsRequirements(A<string>._))
                 .Returns(true);
 
+            A.CallTo(() => PasswordManager.VerifyHash(A<string>._, A<string>._))
+                .ReturnsLazily(c => c.Arguments[0].Equals(c.Arguments[1]));
+
             User = new User
             {
+                Id = "id",
                 UserName = "daniel",
-                Password = "secret"
+                Password = "newPass"
             };
         };
 

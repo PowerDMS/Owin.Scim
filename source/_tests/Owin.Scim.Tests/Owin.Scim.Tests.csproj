@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="AutoMapper, Version=4.0.4.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoMapper.4.0.4\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FakeItEasy, Version=1.25.3.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\FakeItEasy.1.25.3\lib\net40\FakeItEasy.dll</HintPath>
       <Private>True</Private>
@@ -46,7 +50,19 @@
       <HintPath>..\..\packages\Machine.Specifications.Should.0.8.0\lib\net45\Machine.Specifications.Should.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="NContext.Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NContext.Common.3.0.0\lib\portable-net45+windows8+wpa\NContext.Common.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="NContext.Extensions.AutoMapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NContext.Extensions.AutoMapper.3.0.0\lib\net40\NContext.Extensions.AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Collections.Immutable, Version=1.1.37.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\System.Collections.Immutable.1.1.37\lib\dotnet\System.Collections.Immutable.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -56,6 +72,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Services\UserService\when_updating_a_user.cs" />
+    <Compile Include="Services\UserService\with_a_new_password.cs" />
+    <Compile Include="Services\UserService\with_a_password.cs" />
+    <Compile Include="Services\UserService\with_client_supplied_groups.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="Validation\Users\when_validating_an_existing_user.cs" />
     <Compile Include="Validation\Users\when_validating_a_new_user.cs" />
@@ -74,6 +94,7 @@
     <Compile Include="Validation\Users\with_a_username_that_already_exists.cs" />
     <Compile Include="Validation\Users\with_a_valid_address_country_code.cs" />
     <Compile Include="Validation\Users\with_a_valid_locale.cs" />
+    <Compile Include="Validation\Users\with_a_valid_new_password.cs" />
     <Compile Include="Validation\Users\with_a_valid_password.cs" />
     <Compile Include="Validation\Users\with_a_valid_preferred_language.cs" />
     <Compile Include="Validation\Users\with_invalid_emails.cs" />

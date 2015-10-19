@@ -38,7 +38,7 @@
 
         public async Task<User> GetUser(string userId)
         {
-            throw new NotImplementedException();
+            return new User { Id = "blah" };
         }
 
         public async Task<User> UpdateUser(User user)
@@ -55,6 +55,8 @@
                     updatedUser.Password = _PasswordManager.CreateHash(
                         Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
                 }
+
+                // TODO: (DG) Canonicalize user
 
                 await _UserRepository.UpdateUser(updatedUser);
 
