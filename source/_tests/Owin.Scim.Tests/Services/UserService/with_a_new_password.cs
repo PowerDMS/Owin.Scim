@@ -1,5 +1,7 @@
 namespace Owin.Scim.Tests.Services.UserService
 {
+    using System.Threading.Tasks;
+
     using FakeItEasy;
 
     using Machine.Specifications;
@@ -15,6 +17,9 @@ namespace Owin.Scim.Tests.Services.UserService
 
             A.CallTo(() => PasswordComplexityVerifier.MeetsRequirements(A<string>._))
                 .Returns(true);
+            
+            A.CallTo(() => UserRepository.GetUser(A<string>._))
+                .ReturnsLazily(GetUserRecord);
 
             ClientUserDto = new User
             {
@@ -22,15 +27,18 @@ namespace Owin.Scim.Tests.Services.UserService
                 UserName = "name",
                 Password = "newpass"
             };
+        };
 
-            UserRecord = new User
+        It should_hash_the_new_password = () => A.CallTo(() => PasswordManager.CreateHash(A<string>._)).MustHaveHappened();
+
+        private static async Task<User> GetUserRecord()
+        {
+            return new User
             {
                 Id = "id",
                 UserName = "name",
                 Password = "pass"
             };
-        };
-
-        It should_hash_the_new_password = () => A.CallTo(() => PasswordManager.CreateHash(A<string>._)).MustHaveHappened();
+        }
     }
 }

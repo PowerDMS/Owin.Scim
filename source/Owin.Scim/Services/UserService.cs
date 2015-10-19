@@ -36,9 +36,27 @@
             _UserValidator = userValidator;
         }
 
-        public async Task<User> GetUser(string userId)
+        public async Task<User> CreateUser(User user)
         {
-            return new User { Id = "blah" };
+            var newUser = Mapper.Map(user, new User()); // Replace all userRecord metadata according to SCIM rules concerning mutability.
+
+            // TODO: (DG) Canonicalize user
+
+            var userRecord = await _UserRepository.CreateUser(user);
+
+            userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
+
+            return userRecord;
+        }
+
+        public async Task<User> RetrieveUser(string userId)
+        {
+            var userRecord = await _UserRepository.GetUser(userId);
+            if (userRecord == null) return null;
+
+            userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
+
+            return userRecord;
         }
 
         public async Task<User> UpdateUser(User user)
@@ -46,23 +64,23 @@
             var userRecord = await _UserRepository.GetUser(user.Id);
             if (userRecord == null) return null;
 
-            var updatedUser = Mapper.Map(user, userRecord);
-            var validationResult = await _UserValidator.ValidateAsync(updatedUser, RuleSetConstants.Update);
+            Mapper.Map(user, userRecord); // Replace all userRecord metadata according to SCIM rules concerning mutability.
+            var validationResult = await _UserValidator.ValidateAsync(userRecord, RuleSetConstants.Update);
             if (validationResult)
             {
-                if (!string.IsNullOrWhiteSpace(user.Password))
+                if (!string.IsNullOrWhiteSpace(userRecord.Password))
                 {
-                    updatedUser.Password = _PasswordManager.CreateHash(
+                    userRecord.Password = _PasswordManager.CreateHash(
                         Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
                 }
 
                 // TODO: (DG) Canonicalize user
 
-                await _UserRepository.UpdateUser(updatedUser);
+                await _UserRepository.UpdateUser(userRecord);
 
-                updatedUser.Password = null; // The password is writeOnly and MUST NOT be returned.
+                userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
 
-                return updatedUser;
+                return userRecord;
             }
 
             throw new Exception(string.Join(Environment.NewLine, validationResult.ErrorMessages)); // TODO: (DG) implement actual exception / error handling
@@ -70,7 +88,10 @@
 
         public async Task<Unit> DeleteUser(string userId)
         {
-            throw new System.NotImplementedException();
+            var result = await _UserRepository.DeleteUser(userId);
+            if (result == null) return null;
+
+            return result;
         }
     }
 }

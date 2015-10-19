@@ -71,12 +71,12 @@
                 _PasswordManager = passwordManager;
 
                 var userRecord = new Lazy<User>(() => GetUser().Result, LazyThreadSafetyMode.ExecutionAndPublication);
-                ConfigureDefaultRuleSet(userRecord);
+                ConfigureDefaultRuleSet();
                 ConfigureCreateRuleSet();
                 ConfigureUpdateRuleSet(userRecord);
             }
 
-            private void ConfigureDefaultRuleSet(Lazy<User> userRecord)
+            private void ConfigureDefaultRuleSet()
             {
                 RuleSet("default", () =>
                 {
@@ -261,7 +261,7 @@
                                        specification [RFC7564]. */
                                     
                                     return await _UserRepository.IsUserNameAvailable(
-                                        Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)), user.Id);
+                                        Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)));
                                 })
                                 .WithMessage("UserName is already in use.");
                         });

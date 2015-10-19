@@ -1,7 +1,5 @@
 namespace Owin.Scim.Tests.Validation.Users
 {
-    using FakeItEasy;
-
     using Machine.Specifications;
 
     using Model.Users;
@@ -10,9 +8,6 @@ namespace Owin.Scim.Tests.Validation.Users
     {
         Establish ctx = () =>
         {
-            A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._, A<string>._))
-                .Returns(true);
-
             User = new User
             {
                 UserName = "daniel"

@@ -22,6 +22,9 @@
             PasswordManager = A.Fake<IManagePasswords>();
 
             _Validator = new UserValidator(UserRepository, PasswordComplexityVerifier, PasswordManager);
+
+            A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
+                .Returns(true);
         };
 
         Because of = async () => Result = await _Validator.ValidateAsync(User, RuleSetConstants.Create).AwaitResponse().AsTask;

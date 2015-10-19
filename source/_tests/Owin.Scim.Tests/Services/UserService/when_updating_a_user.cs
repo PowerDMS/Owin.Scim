@@ -28,10 +28,7 @@
             UserRepository = A.Fake<IUserRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
             PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
-
-            A.CallTo(() => UserRepository.GetUser(A<string>._))
-                .ReturnsLazily(() => UserRecord);
-
+            
             A.CallTo(() => UserRepository.UpdateUser(A<User>._))
                 .ReturnsLazily(c => Task.FromResult((User)c.Arguments[0]));
 
@@ -52,8 +49,6 @@
         protected static IVerifyPasswordComplexity PasswordComplexityVerifier;
 
         protected static User Result;
-
-        protected static User UserRecord;
 
         private static IUserService _UserService;
     }

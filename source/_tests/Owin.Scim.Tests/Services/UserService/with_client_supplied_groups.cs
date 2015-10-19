@@ -2,6 +2,9 @@ namespace Owin.Scim.Tests.Services.UserService
 {
     using System.Collections.Generic;
     using System.Collections.Immutable;
+    using System.Threading.Tasks;
+
+    using FakeItEasy;
 
     using Machine.Specifications;
 
@@ -11,6 +14,9 @@ namespace Owin.Scim.Tests.Services.UserService
     {
         Establish context = () =>
         {
+            A.CallTo(() => UserRepository.GetUser(A<string>._))
+                .ReturnsLazily(GetUserRecord);
+
             ClientUserDto = new User
             {
                 Id = "id",
@@ -27,17 +33,20 @@ namespace Owin.Scim.Tests.Services.UserService
                 new UserGroup { Display = "Group 1", Value = "1" },
                 new UserGroup { Display = "Group 2", Value = "2" }
             }.ToImmutableList();
-
-            UserRecord = new User
-            {
-                Id = "id",
-                UserName = "name",
-                Groups = _UserRecordGroups
-            };
         };
 
         It should_ignore_client_user_groups = () => Result.Groups.ShouldContainOnly(_UserRecordGroups);
 
         private static IEnumerable<UserGroup> _UserRecordGroups;
+
+        private static async Task<User> GetUserRecord()
+        {
+            return new User
+            {
+                Id = "id",
+                UserName = "name",
+                Groups = _UserRecordGroups
+            };
+        }
     }
 }

@@ -8,7 +8,9 @@
 
     public interface IUserService
     {
-        Task<User> GetUser(string userId);
+        Task<User> CreateUser(User user);
+
+        Task<User> RetrieveUser(string userId);
 
         Task<User> UpdateUser(User user);
 

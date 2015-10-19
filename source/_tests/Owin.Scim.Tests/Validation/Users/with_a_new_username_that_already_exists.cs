@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Validation.Users
             A.CallTo(() => UserRepository.GetUser(A<string>._))
                 .Returns(new User { UserName = "daniel" });
 
-            A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._, A<string>._))
+            A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(false);
 
             User = new User

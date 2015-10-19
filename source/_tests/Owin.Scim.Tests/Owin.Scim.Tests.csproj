@@ -86,6 +86,7 @@
     <Compile Include="Validation\Users\with_an_invalid_address_country_code.cs" />
     <Compile Include="Validation\Users\with_an_invalid_locale.cs" />
     <Compile Include="Validation\Users\with_an_invalid_password.cs" />
+    <Compile Include="Validation\Users\with_an_invalid_phone_number.cs" />
     <Compile Include="Validation\Users\with_an_invalid_preferred_language.cs" />
     <Compile Include="Validation\Users\with_a_list_of_address_with_invalid_country_codes.cs" />
     <Compile Include="Validation\Users\with_a_list_of_emails_but_no_values.cs" />

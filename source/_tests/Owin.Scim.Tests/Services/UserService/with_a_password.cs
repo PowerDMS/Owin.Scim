@@ -1,5 +1,7 @@
 namespace Owin.Scim.Tests.Services.UserService
 {
+    using System.Threading.Tasks;
+
     using FakeItEasy;
 
     using Machine.Specifications;
@@ -13,22 +15,28 @@ namespace Owin.Scim.Tests.Services.UserService
             A.CallTo(() => PasswordManager.VerifyHash(A<string>._, A<string>._))
                 .ReturnsLazily(c => c.Arguments[0].Equals(c.Arguments[1]));
 
+            A.CallTo(() => UserRepository.GetUser(A<string>._))
+                .ReturnsLazily(GetUserRecord);
+
             ClientUserDto = new User
             {
                 Id = "id",
                 UserName = "name",
                 DisplayName = "Danny"
             };
+        };
 
-            UserRecord = new User
+        It should_not_return_the_password_ever = () => Result.Password.ShouldBeNull();
+
+        private static async Task<User> GetUserRecord()
+        {
+            return new User
             {
                 Id = "id",
                 UserName = "name",
                 DisplayName = "Daniel",
                 Password = "pass"
             };
-        };
-
-        It should_not_return_the_password_ever = () => Result.Password.ShouldBeNull();
+        }
     }
 }

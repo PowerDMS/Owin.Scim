@@ -19,16 +19,34 @@
             _UserService = userService;
         }
 
-        [Route("users/{userId}", Name = "GetUser")]
+        [Route("users", Name = "CreateUser")]
+        public async Task<HttpResponseMessage> Post(User user)
+        {
+            var result = await _UserService.CreateUser(user);
+            if (result == null)
+            {
+                return Request.CreateResponse(HttpStatusCode.BadRequest);
+            }
+
+            return Request.CreateResponse(HttpStatusCode.Created, result);
+        }
+
+        [Route("users/{userId}", Name = "RetrieveUser")]
         public async Task<HttpResponseMessage> Get(string userId)
         {
-            var user = await _UserService.GetUser(userId);
+            var user = await _UserService.RetrieveUser(userId);
             if (user == null)
             {
                 return Request.CreateResponse(HttpStatusCode.NotFound);
             }
 
             return Request.CreateResponse(HttpStatusCode.OK, user);
+        }
+
+        [Route("users/{userId}", Name = "UpdateUser")]
+        public async Task<HttpResponseMessage> Patch(string userId)//, PatchRequest<User> patch)
+        {
+            throw new NotImplementedException();
         }
 
         [Route("users/{userId}", Name = "ReplaceUser")]

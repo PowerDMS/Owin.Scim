@@ -17,10 +17,7 @@ namespace Owin.Scim.Tests.Validation.Users
                     UserName = "daniel",
                     Password = "oldPass"
                 });
-
-            A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._, A<string>._))
-                .Returns(true);
-
+            
             A.CallTo(() => PasswordComplexityVerifier.MeetsRequirements(A<string>._))
                 .Returns(true);
 

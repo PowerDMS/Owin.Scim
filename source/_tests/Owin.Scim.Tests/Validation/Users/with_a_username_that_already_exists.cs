@@ -10,7 +10,7 @@ namespace Owin.Scim.Tests.Validation.Users
     {
         Establish ctx = () =>
         {
-            A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._, A<string>._))
+            A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(false);
 
             User = new User
