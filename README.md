@@ -1,2 +1,2 @@
 # Owin.Scim
-OWIN SCIM v2.0 implementation
+OWIN SCIM 2.0 implementation
