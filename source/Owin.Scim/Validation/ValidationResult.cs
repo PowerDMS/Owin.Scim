@@ -9,7 +9,7 @@
 
         private readonly bool _IsValid;
 
-        public ValidationResult(IEnumerable<string> errorMessages = null)
+        public ValidationResult(int httpStatusCode = 400, IEnumerable<string> errorMessages = null)
         {
             _IsValid = errorMessages == null || !errorMessages.Any();
             _ErrorMessages = errorMessages;

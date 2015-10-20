@@ -42,7 +42,11 @@
 
             var result = await validator.ValidateAsync(entity, ruleSet: ruleSet);
             
-            return new ValidationResult(result.Errors.Any() ? result.Errors.Select(e => e.ToString()) : null);
+            return new ValidationResult(
+                errorMessages:
+                result.Errors.Any() 
+                    ? result.Errors.Select(e => e.ToString()) 
+                    : null);
         }
 
         private Task<IValidator<User>> CreateFluentValidator()
@@ -111,10 +115,25 @@
                         () =>
                         {
                             RuleFor(user => user.Emails)
+                                .Must(emails => emails.Count(e => e.Primary) <= 1)  // User can only have one primary email.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Email>
                                     {
                                         { email => email.Value, config => config.NotEmpty().EmailAddress() }
+                                    });
+                        });
+                    When(user => user.Ims != null && user.Ims.Any(),
+                        () =>
+                        {
+                            RuleFor(user => user.Ims)
+                                .Must(ims => ims.Count(im => im.Primary) <= 1)  // User can only have one primary email.
+                                .SetCollectionValidator(
+                                    new GenericExpressionValidator<InstantMessagingAddress>
+                                    {
+                                        {
+                                            im => im.Value,
+                                            config => config.NotEmpty()
+                                        }
                                     });
                         });
                     When(user => user.PhoneNumbers != null && user.PhoneNumbers.Any(),
@@ -125,6 +144,7 @@
                                in [RFC3966], e.g., 'tel:+1-201-555-0123'. */
 
                             RuleFor(user => user.PhoneNumbers)
+                                .Must(numbers => numbers.Count(n => n.Primary) <= 1)  // User can only have one primary number.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<PhoneNumber>
                                     {
@@ -138,6 +158,7 @@
                         () =>
                         {
                             RuleFor(user => user.Photos)
+                                .Must(photos => photos.Count(p => p.Primary) <= 1)  // User can only have one primary photo.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Photo>
                                     {
@@ -145,7 +166,7 @@
                                             photo => photo.Value,
                                             config =>
                                                 config.NotEmpty()
-                                                    .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.RelativeOrAbsolute))
+                                                    .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute))
                                         }
                                     });
                         });
@@ -153,6 +174,7 @@
                         () =>
                         {
                             RuleFor(user => user.Addresses)
+                                .Must(addresses => addresses.Count(a => a.Primary) <= 1)  // User can only have one primary address.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Address>
                                     {
@@ -180,6 +202,7 @@
                         () =>
                         {
                             RuleFor(user => user.Entitlements)
+                                .Must(entitlements => entitlements.Count(e => e.Primary) <= 1)  // User can only have one primary entitlement.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Entitlement>
                                     {
@@ -190,6 +213,7 @@
                         () =>
                         {
                             RuleFor(user => user.Roles)
+                                .Must(roles => roles.Count(r => r.Primary) <= 1)  // User can only have one primary role.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Role>
                                     {
@@ -216,6 +240,7 @@
                             return await _UserRepository.IsUserNameAvailable(
                                 Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)));
                         })
+                        .WithState(_ => 409)
                         .WithMessage("UserName is already in use.");
 
                     When(user => !string.IsNullOrWhiteSpace(user.Password),

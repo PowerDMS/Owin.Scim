@@ -38,12 +38,12 @@
 
         public async Task<User> CreateUser(User user)
         {
-            var newUser = Mapper.Map(user, new User()); // Replace all userRecord metadata according to SCIM rules concerning mutability.
-            var validationResult = await _UserValidator.ValidateAsync(newUser, RuleSetConstants.Create);
-            if (!validationResult) throw new Exception(); // TODO: (DG) exception handling.
-
             // TODO: (DG) Canonicalize user
 
+            var newUser = Mapper.Map(user, new User()); // Replace all new User metadata according to SCIM rules concerning mutability.
+            var validationResult = await _UserValidator.ValidateAsync(newUser, RuleSetConstants.Create);
+            if (!validationResult) throw new Exception();
+            
             var userRecord = await _UserRepository.CreateUser(user);
 
             userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
@@ -66,6 +66,8 @@
             var userRecord = await _UserRepository.GetUser(user.Id);
             if (userRecord == null) return null;
 
+            // TODO: (DG) Canonicalize user
+
             Mapper.Map(user, userRecord); // Replace all userRecord metadata according to SCIM rules concerning mutability.
             var validationResult = await _UserValidator.ValidateAsync(userRecord, RuleSetConstants.Update);
             if (!validationResult) throw new Exception(); // TODO: (DG) exception handling
@@ -75,8 +77,6 @@
                 userRecord.Password = _PasswordManager.CreateHash(
                     Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
             }
-
-            // TODO: (DG) Canonicalize user
 
             await _UserRepository.UpdateUser(userRecord);
 
