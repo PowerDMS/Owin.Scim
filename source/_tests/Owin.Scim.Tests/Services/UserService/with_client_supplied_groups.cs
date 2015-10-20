@@ -1,7 +1,7 @@
 namespace Owin.Scim.Tests.Services.UserService
 {
     using System.Collections.Generic;
-    using System.Collections.Immutable;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using FakeItEasy;
@@ -32,10 +32,14 @@ namespace Owin.Scim.Tests.Services.UserService
             {
                 new UserGroup { Display = "Group 1", Value = "1" },
                 new UserGroup { Display = "Group 2", Value = "2" }
-            }.ToImmutableList();
+            };
         };
 
-        It should_ignore_client_user_groups = () => Result.Groups.ShouldContainOnly(_UserRecordGroups);
+        It should_ignore_client_user_groups = () =>
+        {
+            Result.Groups.ShouldContainOnly(_UserRecordGroups);
+            Result.Groups.Select(g => g.Value).ShouldContainOnly("1", "2");
+        };
 
         private static IEnumerable<UserGroup> _UserRecordGroups;
 
