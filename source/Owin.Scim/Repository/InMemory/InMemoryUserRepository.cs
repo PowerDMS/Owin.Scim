@@ -3,11 +3,14 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text;
     using System.Threading.Tasks;
 
     using Microsoft.FSharp.Core;
 
     using Model.Users;
+
+    using NContext.Security.Cryptography;
 
     public class InMemoryUserRepository : IUserRepository
     {
@@ -52,7 +55,14 @@
 
         public async Task<bool> IsUserNameAvailable(string userName)
         {
-            return _Users.All(u => !u.UserName.Equals(userName));
+            /* Before comparing or evaluating the uniqueness of a "userName" or 
+               "password" attribute, service providers MUST use the preparation, 
+               enforcement, and comparison of internationalized strings (PRECIS) 
+               preparation and comparison rules described in Sections 3 and 4, 
+               respectively, of [RFC7613], which is based on the PRECIS framework
+               specification [RFC7564]. */
+
+            return _Users.All(u => !CryptographyUtility.CompareBytes(Encoding.UTF8.GetBytes(u.UserName), Encoding.UTF8.GetBytes(userName)));
         }
     }
 }

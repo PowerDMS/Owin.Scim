@@ -1,7 +1,10 @@
 ﻿namespace Owin.Scim.Extensions
 {
     using System;
+    using System.Security.Cryptography;
+    using System.IO;
     using System.Linq;
+    using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Dependencies;
 
@@ -16,6 +19,7 @@
     using NContext.EventHandling;
     using NContext.Extensions.AutoMapper.Configuration;
     using NContext.Extensions.Ninject.Configuration;
+    using NContext.Security.Cryptography;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
@@ -34,11 +38,24 @@
             }
 
             var container = new Container();
+
+            var executionDirectory = Assembly.GetEntryAssembly() == null
+                ? AppDomain.CurrentDomain.BaseDirectory
+                : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+            // Defining a composition directory just to make testing easier with ncrunch
+            var compositionDirectory = executionDirectory.Contains("_tests")
+                ? executionDirectory.Substring(0, executionDirectory.IndexOf("_tests"))
+                : executionDirectory;
+
             ApplicationConfiguration appConfig = new ApplicationConfigurationBuilder()
-                .ComposeWith(
+                .ComposeWith(new[] { compositionDirectory },
                     fileInfo => 
                     fileInfo.Name.StartsWith("Owin.Scim", StringComparison.OrdinalIgnoreCase) && 
                     (new[] { ".dll" }).Contains(fileInfo.Extension.ToLower()))
+                .RegisterComponent<IManageCryptography>()
+                    .With<CryptographyManagerBuilder>()
+                        .SetDefaults<SHA256Cng, HMACSHA256, AesCryptoServiceProvider>()
                 .RegisterComponent<DryIocManager>()
                     .With<DryIocManagerBuilder>()
                         .SetContainer(() => container)

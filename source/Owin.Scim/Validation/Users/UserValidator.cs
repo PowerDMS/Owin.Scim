@@ -230,32 +230,15 @@
                     RuleFor(user => user.UserName)
                         .MustAsync(async userName =>
                         {
-                            /* Before comparing or evaluating the uniqueness of a "userName" or 
-                               "password" attribute, service providers MUST use the preparation, 
-                               enforcement, and comparison of internationalized strings (PRECIS) 
-                               preparation and comparison rules described in Sections 3 and 4, 
-                               respectively, of [RFC7613], which is based on the PRECIS framework
-                               specification [RFC7564]. */
-
-                            return await _UserRepository.IsUserNameAvailable(
-                                Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)));
+                            return await _UserRepository.IsUserNameAvailable(userName);
                         })
-                        .WithState(_ => 409)
                         .WithMessage("UserName is already in use.");
 
                     When(user => !string.IsNullOrWhiteSpace(user.Password),
                         () =>
                         {
-                            /* Before comparing or evaluating the uniqueness of a "userName" or 
-                               "password" attribute, service providers MUST use the preparation, 
-                               enforcement, and comparison of internationalized strings (PRECIS) 
-                               preparation and comparison rules described in Sections 3 and 4, 
-                               respectively, of [RFC7613], which is based on the PRECIS framework
-                               specification [RFC7564]. */
-
                             RuleFor(user => user.Password)
-                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(
-                                    Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(password))));
+                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password));
                         });
                 });
             }
@@ -270,23 +253,13 @@
                     // Updating a username validation
                     When(user =>
                         !string.IsNullOrWhiteSpace(user.UserName) &&
-                        !Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.UserName))
-                            .Equals(Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userRecord.Value.UserName)),
-                                StringComparison.OrdinalIgnoreCase),
+                        !user.UserName.Equals(userRecord.Value.UserName, StringComparison.OrdinalIgnoreCase),
                         () =>
                         {
                             RuleFor(user => user.UserName)
                                 .MustAsync(async (user, userName) =>
                                 {
-                                    /* Before comparing or evaluating the uniqueness of a "userName" or 
-                                       "password" attribute, service providers MUST use the preparation, 
-                                       enforcement, and comparison of internationalized strings (PRECIS) 
-                                       preparation and comparison rules described in Sections 3 and 4, 
-                                       respectively, of [RFC7613], which is based on the PRECIS framework
-                                       specification [RFC7564]. */
-                                    
-                                    return await _UserRepository.IsUserNameAvailable(
-                                        Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userName)));
+                                    return await _UserRepository.IsUserNameAvailable(userName);
                                 })
                                 .WithMessage("UserName is already in use.");
                         });
@@ -295,21 +268,11 @@
                     When(user =>
                         !string.IsNullOrWhiteSpace(user.Password) &&
                         (userRecord.Value.Password == null ||
-                         !_PasswordManager.VerifyHash(
-                             Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password)),
-                             Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(userRecord.Value.Password)))),
+                         !_PasswordManager.VerifyHash(user.Password, userRecord.Value.Password)),
                         () =>
                         {
-                            /* Before comparing or evaluating the uniqueness of a "userName" or 
-                               "password" attribute, service providers MUST use the preparation, 
-                               enforcement, and comparison of internationalized strings (PRECIS) 
-                               preparation and comparison rules described in Sections 3 and 4, 
-                               respectively, of [RFC7613], which is based on the PRECIS framework
-                               specification [RFC7564]. */
-
                             RuleFor(user => user.Password)
-                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(
-                                    Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(password))));
+                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password));
                         });
                 });
             }

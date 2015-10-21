@@ -42,7 +42,7 @@
 
             var newUser = Mapper.Map(user, new User()); // Replace all new User metadata according to SCIM rules concerning mutability.
             var validationResult = await _UserValidator.ValidateAsync(newUser, RuleSetConstants.Create);
-            if (!validationResult) throw new Exception();
+            if (!validationResult) throw new Exception(); // TODO: (DG) NO EXCEPTIONS! MUST HANDLE BULK. MUST RETURN PROPER HTTP STATUS CODES.
             
             var userRecord = await _UserRepository.CreateUser(user);
 

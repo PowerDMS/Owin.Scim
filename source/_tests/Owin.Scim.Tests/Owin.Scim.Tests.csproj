@@ -100,9 +100,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Integration\TestAssembliesResolver.cs" />
-    <Compile Include="Integration\when_creating_a_user.cs" />
-    <Compile Include="Integration\when_modifying_users.cs" />
+    <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
+    <Compile Include="Integration\using_a_scim_server.cs" />
+    <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
     <Compile Include="Services\UserService\when_updating_a_user.cs" />
     <Compile Include="Services\UserService\with_a_new_password.cs" />
     <Compile Include="Services\UserService\with_a_password.cs" />
