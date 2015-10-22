@@ -14,7 +14,7 @@
         public ValidationResult(IEnumerable<ScimError> errors = null)
         {
             _IsValid = errors == null || !errors.Any();
-            _Errors = errors;
+            _Errors = errors == null ? null : errors.ToList();
         }
 
         public static implicit operator bool(ValidationResult result)

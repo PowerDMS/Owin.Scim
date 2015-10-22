@@ -7,26 +7,34 @@
 
     using Extensions;
 
+    using Machine.Specifications;
+
     using Microsoft.Owin.Testing;
 
-    public abstract class using_a_scim_server
+    public class using_a_scim_server : IAssemblyContext
     {
-        protected static TestServer Server
+        public void OnAssemblyStart()
         {
-            get { return _Server.Value; }
+            _Server = TestServer.Create(app =>
+            {
+                app.UseScimServer(
+                    new ScimServerConfiguration
+                    {
+                        RequireSsl = false
+                    });
+            });
         }
 
-        private static readonly Lazy<TestServer> _Server = 
-            new Lazy<TestServer>(() =>
-            {
-                return TestServer.Create(app =>
-                {
-                    app.UseScimServer(
-                        new ScimServerConfiguration
-                        {
-                            RequireSsl = false
-                        });
-                });
-            }, LazyThreadSafetyMode.ExecutionAndPublication);
+        public void OnAssemblyComplete()
+        {
+            _Server.Dispose();
+        }
+
+        protected static TestServer Server
+        {
+            get { return _Server; }
+        }
+        
+        private static TestServer _Server;
     }
 }

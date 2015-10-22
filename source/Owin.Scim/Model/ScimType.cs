@@ -2,11 +2,15 @@
 {
     using System;
 
+    using Newtonsoft.Json;
+
+    [JsonConverter(typeof(ScimTypeConverter))]
     public sealed class ScimType
     {
         private readonly string _Type;
 
-        private ScimType(string type)
+        [JsonConstructor]
+        internal ScimType(string type)
         {
             if (string.IsNullOrWhiteSpace(type)) throw new ArgumentNullException("type");
 

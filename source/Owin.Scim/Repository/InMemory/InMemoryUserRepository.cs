@@ -6,8 +6,6 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    using Microsoft.FSharp.Core;
-
     using Model.Users;
 
     using NContext.Security.Cryptography;

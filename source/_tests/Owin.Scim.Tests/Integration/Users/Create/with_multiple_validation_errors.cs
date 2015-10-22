@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -15,14 +16,15 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     {
         Establish context = async () =>
         {
+            var userName = UserNameUtility.GenerateUserName();
             var initialUser = new User
             {
-                UserName = "daniel"
+                UserName = userName
             };
 
             UserDto = new User
             {
-                UserName = "daniel",
+                UserName = userName,
                 PreferredLanguage = "invalidLanguage"
             };
 

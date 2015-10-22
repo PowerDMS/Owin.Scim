@@ -6,7 +6,6 @@
     using System.Linq;
     using System.Reflection;
     using System.Web.Http;
-    using System.Web.Http.Dependencies;
 
     using Configuration;
 
@@ -37,11 +36,15 @@
                 app.Use<RequireSslMiddleware>();
             }
 
-            var container = new Container(rules =>
-            {
-                return rules.WithoutThrowIfDependencyHasShorterReuseLifespan();
-            });
-
+            var httpConfig = CreateHttpConfiguration();
+            IContainer container = new Container(
+                rules =>
+                {
+                    return rules.WithoutThrowIfDependencyHasShorterReuseLifespan();
+                },
+                new AsyncExecutionFlowScopeContext())
+                .WithWebApi(httpConfig);
+            
             var executionDirectory = Assembly.GetEntryAssembly() == null
                 ? AppDomain.CurrentDomain.BaseDirectory
                 : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
@@ -68,21 +71,17 @@
                         .SetActivationProvider(() => new DryIocActivationProvider(container));
 
             Configure.Using(appConfig);
-
-            var httpConfig = CreateHttpConfiguration(new DryIocDependencyResolver(container));
-
-            container.WithWebApi(httpConfig);
+            
             app.UseWebApi(httpConfig);
 
             return app;
         }
-
-        private static HttpConfiguration CreateHttpConfiguration(IDependencyResolver dependencyResolver)
+        
+        private static HttpConfiguration CreateHttpConfiguration()
         {
             var httpConfiguration = new HttpConfiguration();
             httpConfiguration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             httpConfiguration.MapHttpAttributeRoutes();
-            httpConfiguration.DependencyResolver = dependencyResolver;
 
             var settings = httpConfiguration.Formatters.JsonFormatter.SerializerSettings;
             settings.Converters.Add(new StringEnumConverter());

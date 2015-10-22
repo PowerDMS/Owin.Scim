@@ -14,7 +14,7 @@
         {
             var existingUser = new User
             {
-                UserName = "daniel"
+                UserName = UserNameUtility.GenerateUserName()
             };
 
             // Insert the first user so there's one already in-memory.

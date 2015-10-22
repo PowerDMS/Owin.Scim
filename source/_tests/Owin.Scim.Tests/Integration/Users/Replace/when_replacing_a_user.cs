@@ -16,8 +16,6 @@
                 .PutAsync("users/" + UserId, new ObjectContent<User>(UserDto, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
-
-            var res = (await Response.Content.ReadAsStringAsync());
         };
 
         protected static User UserDto;

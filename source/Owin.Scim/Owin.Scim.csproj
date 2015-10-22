@@ -126,6 +126,7 @@
     <Compile Include="Model\ScimError.cs" />
     <Compile Include="Model\ScimResponse.cs" />
     <Compile Include="Model\ScimType.cs" />
+    <Compile Include="Model\ScimTypeConverter.cs" />
     <Compile Include="Model\Users\Address.cs" />
     <Compile Include="Model\Users\Email.cs" />
     <Compile Include="Model\Users\EnterpriseUser.cs" />

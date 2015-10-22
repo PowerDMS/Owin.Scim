@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         {
             UserDto = new User
             {
-                UserName = "daniel"
+                UserName = UserNameUtility.GenerateUserName()
             };
         };
 

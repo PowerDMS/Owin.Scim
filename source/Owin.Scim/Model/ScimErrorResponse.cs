@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Model
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     public class ScimErrorResponse<T> : ScimResponse<T>
     {
@@ -13,7 +14,7 @@
 
         public ScimErrorResponse(IEnumerable<ScimError> errors)
         {
-            _Errors = errors;
+            _Errors = errors.ToList();
         }
 
         /// <summary>

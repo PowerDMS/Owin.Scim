@@ -12,9 +12,10 @@
     {
         Establish context = async () =>
         {
+            var userName = UserNameUtility.GenerateUserName();
             var existingUser = new User
             {
-                UserName = "daniel"
+                UserName = userName
             };
 
             // Insert the first user so there's one already in-memory.
@@ -29,7 +30,7 @@
             UserDto = new User
             {
                 Id = UserId,
-                UserName = "daniel",
+                UserName = userName,
                 PreferredLanguage = "en-US"
             };
         };

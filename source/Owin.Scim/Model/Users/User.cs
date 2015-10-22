@@ -5,7 +5,7 @@
 
     public class User : Resource
     {
-        public override ISet<string> Schemas
+        public override IEnumerable<string> Schemas
         {
             get
             {

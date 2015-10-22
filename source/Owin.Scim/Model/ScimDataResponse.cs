@@ -50,15 +50,6 @@
             return _Data;
         }
 
-        /// <summary>
-        /// Gets the data.
-        /// </summary>
-        /// <value>The data.</value>
-//        public override T Data
-//        {
-//            get { return _Data; }
-//        }
-
         private static T MaterializeDataIfNeeded(T data)
         {
             if (typeof(T).GetTypeInfo().IsValueType || data == null)

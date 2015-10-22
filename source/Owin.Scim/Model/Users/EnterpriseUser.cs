@@ -4,7 +4,7 @@ namespace Owin.Scim.Model.Users
 
     public class EnterpriseUser : User
     {
-        public override ISet<string> Schemas
+        public override IEnumerable<string> Schemas
         {
             get
             {

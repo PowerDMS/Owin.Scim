@@ -38,7 +38,7 @@
             container.Register<IUserRepository, InMemoryUserRepository>(Reuse.InWebRequest);
             container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
             container.Register<IVerifyPasswordComplexity, DefaultPasswordComplexityVerifier>(Reuse.Singleton);
-            container.Register<UserValidator>(new SingletonReuse());
+            container.Register<UserValidator>(Reuse.Singleton);
             container.Register<IUserService, UserService>(Reuse.Singleton);
         }
     }
