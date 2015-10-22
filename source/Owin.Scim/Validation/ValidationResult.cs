@@ -2,17 +2,19 @@
 {
     using System.Collections.Generic;
     using System.Linq;
+    
+    using Owin.Scim.Model;
 
     public class ValidationResult
     {
-        private readonly IEnumerable<string> _ErrorMessages;
-
         private readonly bool _IsValid;
 
-        public ValidationResult(int httpStatusCode = 400, IEnumerable<string> errorMessages = null)
+        private readonly IEnumerable<ScimError> _Errors;
+
+        public ValidationResult(IEnumerable<ScimError> errors = null)
         {
-            _IsValid = errorMessages == null || !errorMessages.Any();
-            _ErrorMessages = errorMessages;
+            _IsValid = errors == null || !errors.Any();
+            _Errors = errors;
         }
 
         public static implicit operator bool(ValidationResult result)
@@ -20,9 +22,9 @@
             return result._IsValid;
         }
 
-        public IEnumerable<string> ErrorMessages
+        public IEnumerable<ScimError> Errors
         {
-            get { return _ErrorMessages; }
+            get { return _Errors; }
         }
     }
 }

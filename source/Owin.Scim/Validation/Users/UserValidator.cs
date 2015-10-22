@@ -4,14 +4,17 @@
     using System.Collections.Generic;
     using System.Globalization;
     using System.Linq;
-    using System.Text;
+    using System.Net;
     using System.Threading;
     using System.Threading.Tasks;
+
+    using ErrorHandling;
 
     using Extensions;
 
     using FluentValidation;
 
+    using Model;
     using Model.Users;
 
     using Repository;
@@ -41,11 +44,10 @@
             var validator = await CreateFluentValidator();
 
             var result = await validator.ValidateAsync(entity, ruleSet: ruleSet);
-            
+
             return new ValidationResult(
-                errorMessages:
                 result.Errors.Any() 
-                    ? result.Errors.Select(e => e.ToString()) 
+                    ? result.Errors.Select(e => (ScimError)e.CustomState) 
                     : null);
         }
 
@@ -85,13 +87,24 @@
                 RuleSet("default", () =>
                 {
                     RuleFor(u => u.UserName)
-                        .NotEmpty();
+                        .NotEmpty()
+                        .WithState(u => 
+                            new ScimError(
+                                HttpStatusCode.BadRequest, 
+                                ScimType.InvalidValue, 
+                                ErrorDetail.AttributeRequired("userName")));
 
                     When(user => !string.IsNullOrWhiteSpace(user.PreferredLanguage),
                         () =>
                         {
                             RuleFor(user => user.PreferredLanguage)
-                                .Must(ValidatePreferredLanguage);
+                                .Must(ValidatePreferredLanguage)
+                                .WithState(u =>
+                                    new ScimError(
+                                        HttpStatusCode.BadRequest,
+                                        ScimType.InvalidValue,
+                                        "The attribute 'preferredLanguage' is formatted the same " +
+                                        "as the HTTP Accept-Language header field. (e.g., da, en-gb;q=0.8, en;q=0.7)"));
                         });
                     When(user => !string.IsNullOrWhiteSpace(user.Locale),
                         () =>
@@ -109,30 +122,54 @@
                                     }
 
                                     return false;
-                                });
+                                })
+                                .WithState(u =>
+                                    new ScimError(
+                                        HttpStatusCode.BadRequest,
+                                        ScimType.InvalidValue,
+                                        "The attribute 'locale' MUST be a valid language tag as defined in [RFC5646]."));
                         });
                     When(user => user.Emails != null && user.Emails.Any(),
                         () =>
                         {
                             RuleFor(user => user.Emails)
-                                .Must(emails => emails.Count(e => e.Primary) <= 1)  // User can only have one primary email.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Email>
                                     {
-                                        { email => email.Value, config => config.NotEmpty().EmailAddress() }
+                                        {
+                                            email => email.Value,
+                                            config => config
+                                                .NotEmpty()
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        ErrorDetail.AttributeRequired("email.value")))
+                                                .EmailAddress()
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        "The attribute 'email.value' must be a valid email as defined in [RFC5321]."))
+                                        }
                                     });
                         });
                     When(user => user.Ims != null && user.Ims.Any(),
                         () =>
                         {
                             RuleFor(user => user.Ims)
-                                .Must(ims => ims.Count(im => im.Primary) <= 1)  // User can only have one primary email.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<InstantMessagingAddress>
                                     {
                                         {
                                             im => im.Value,
-                                            config => config.NotEmpty()
+                                            config => config
+                                                .NotEmpty()
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        ErrorDetail.AttributeRequired("im.value")))
                                         }
                                     });
                         });
@@ -144,13 +181,24 @@
                                in [RFC3966], e.g., 'tel:+1-201-555-0123'. */
 
                             RuleFor(user => user.PhoneNumbers)
-                                .Must(numbers => numbers.Count(n => n.Primary) <= 1)  // User can only have one primary number.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<PhoneNumber>
                                     {
                                         {
                                             pn => pn.Value,
-                                            config => config.NotEmpty().Must(PhoneNumbers.PhoneNumberUtil.IsViablePhoneNumber)
+                                            config => config
+                                                .NotEmpty()
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        ErrorDetail.AttributeRequired("phoneNumber.value")))
+                                                .Must(PhoneNumbers.PhoneNumberUtil.IsViablePhoneNumber)
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        "The attribute 'phoneNumber.value' must be a valid phone number as defined in [RFC3966]."))
                                         }
                                     });
                         });
@@ -158,15 +206,24 @@
                         () =>
                         {
                             RuleFor(user => user.Photos)
-                                .Must(photos => photos.Count(p => p.Primary) <= 1)  // User can only have one primary photo.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Photo>
                                     {
                                         {
                                             photo => photo.Value,
-                                            config =>
-                                                config.NotEmpty()
-                                                    .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                                            config => config
+                                                .NotEmpty()
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        ErrorDetail.AttributeRequired("photo.value")))
+                                                .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        "The attribute 'photo.value' must be a valid URI."))
                                         }
                                     });
                         });
@@ -174,7 +231,6 @@
                         () =>
                         {
                             RuleFor(user => user.Addresses)
-                                .Must(addresses => addresses.Count(a => a.Primary) <= 1)  // User can only have one primary address.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Address>
                                     {
@@ -194,7 +250,12 @@
                                                         }
 
                                                         return false;
-                                                    });
+                                                    })
+                                                    .WithState(u =>
+                                                        new ScimError(
+                                                            HttpStatusCode.BadRequest,
+                                                            ScimType.InvalidValue,
+                                                            "The attribute 'address.country' must be a valid country code as defined by [ISO3166-1 alpha-2]."));
                                             })
                                     });
                         });
@@ -202,22 +263,38 @@
                         () =>
                         {
                             RuleFor(user => user.Entitlements)
-                                .Must(entitlements => entitlements.Count(e => e.Primary) <= 1)  // User can only have one primary entitlement.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Entitlement>
                                     {
-                                        { entitlement => entitlement.Value, config => config.NotEmpty() }
+                                        {
+                                            entitlement => entitlement.Value,
+                                            config => config
+                                                .NotEmpty()
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        ErrorDetail.AttributeRequired("entitlement.value")))
+                                        }
                                     });
                         });
                     When(user => user.Roles != null && user.Roles.Any(),
                         () =>
                         {
                             RuleFor(user => user.Roles)
-                                .Must(roles => roles.Count(r => r.Primary) <= 1)  // User can only have one primary role.
                                 .SetCollectionValidator(
                                     new GenericExpressionValidator<Role>
                                     {
-                                        { role => role.Value, config => config.NotEmpty() }
+                                        {
+                                            role => role.Value,
+                                            config => config
+                                                .NotEmpty()
+                                                .WithState(u =>
+                                                    new ScimError(
+                                                        HttpStatusCode.BadRequest,
+                                                        ScimType.InvalidValue,
+                                                        ErrorDetail.AttributeRequired("role.value")))
+                                        }
                                     });
                         });
                 });
@@ -232,13 +309,22 @@
                         {
                             return await _UserRepository.IsUserNameAvailable(userName);
                         })
-                        .WithMessage("UserName is already in use.");
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.Conflict,
+                                ScimType.Uniqueness,
+                                ErrorDetail.AttributeUnique("userName")));
 
                     When(user => !string.IsNullOrWhiteSpace(user.Password),
                         () =>
                         {
                             RuleFor(user => user.Password)
-                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password));
+                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password))
+                                .WithState(u =>
+                                    new ScimError(
+                                        HttpStatusCode.BadRequest,
+                                        ScimType.InvalidValue,
+                                        "The attribute 'password' does not meet the security requirements set by the provider."));
                         });
                 });
             }
@@ -248,7 +334,12 @@
                 RuleSet("update", () =>
                 {
                     RuleFor(user => user.Id)
-                        .Immutable(() => userRecord.Value.Id, StringComparer.OrdinalIgnoreCase);
+                        .Immutable(() => userRecord.Value.Id, StringComparer.OrdinalIgnoreCase)
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.BadRequest,
+                                ScimType.Mutability,
+                                ErrorDetail.AttributeImmutable("id")));
 
                     // Updating a username validation
                     When(user =>
@@ -261,7 +352,11 @@
                                 {
                                     return await _UserRepository.IsUserNameAvailable(userName);
                                 })
-                                .WithMessage("UserName is already in use.");
+                                .WithState(u =>
+                                    new ScimError(
+                                        HttpStatusCode.Conflict,
+                                        ScimType.Uniqueness,
+                                        ErrorDetail.AttributeUnique("userName")));
                         });
 
                     // Updating a user password
@@ -272,7 +367,12 @@
                         () =>
                         {
                             RuleFor(user => user.Password)
-                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password));
+                                .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password))
+                                .WithState(u =>
+                                    new ScimError(
+                                        HttpStatusCode.BadRequest,
+                                        ScimType.InvalidValue,
+                                        "The attribute 'password' does not meet the security requirements set by the provider."));
                         });
                 });
             }

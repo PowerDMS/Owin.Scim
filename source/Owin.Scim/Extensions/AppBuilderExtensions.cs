@@ -37,7 +37,10 @@
                 app.Use<RequireSslMiddleware>();
             }
 
-            var container = new Container();
+            var container = new Container(rules =>
+            {
+                return rules.WithoutThrowIfDependencyHasShorterReuseLifespan();
+            });
 
             var executionDirectory = Assembly.GetEntryAssembly() == null
                 ? AppDomain.CurrentDomain.BaseDirectory

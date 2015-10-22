@@ -4,15 +4,16 @@
 
     using Microsoft.FSharp.Core;
 
+    using Model;
     using Model.Users;
 
     public interface IUserService
     {
-        Task<User> CreateUser(User user);
+        Task<IScimResponse<User>> CreateUser(User user);
 
         Task<User> RetrieveUser(string userId);
 
-        Task<User> UpdateUser(User user);
+        Task<IScimResponse<User>> UpdateUser(User user);
 
         Task<Unit> DeleteUser(string userId);
     }

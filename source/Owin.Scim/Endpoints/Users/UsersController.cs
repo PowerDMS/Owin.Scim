@@ -6,7 +6,12 @@
     using System.Threading.Tasks;
     using System.Web.Http;
 
+    using Extensions;
+
+    using Model;
     using Model.Users;
+
+    using NContext.Common;
 
     using Services;
 
@@ -22,13 +27,13 @@
         [Route("users", Name = "CreateUser")]
         public async Task<HttpResponseMessage> Post(User user)
         {
-            var result = await _UserService.CreateUser(user);
-            if (result == null)
-            {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
-            }
+            return (await PostInternal(user))
+                .ToHttpResponseMessage(Request, HttpStatusCode.Created);
+        }
 
-            return Request.CreateResponse(HttpStatusCode.Created, result);
+        internal async Task<IScimResponse<User>> PostInternal(User user)
+        {
+            return await _UserService.CreateUser(user);
         }
 
         [Route("users/{userId}", Name = "RetrieveUser")]
@@ -57,16 +62,15 @@
                 string.IsNullOrWhiteSpace(user.Id) ||
                 !user.Id.Equals(userId, StringComparison.OrdinalIgnoreCase))
             {
-                return Request.CreateResponse(HttpStatusCode.BadRequest);
+                return new ScimErrorResponse<User>(
+                    new ScimError(
+                        HttpStatusCode.BadRequest,
+                        detail: "The request path 'userId' MUST match the user.id in the request body."))
+                    .ToHttpResponseMessage(Request);
             }
 
-            var result = await _UserService.UpdateUser(user);
-            if (result == null)
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
-
-            return Request.CreateResponse(HttpStatusCode.OK, result);
+            return (await _UserService.UpdateUser(user))
+                .ToHttpResponseMessage(Request);
         }
 
         [Route("users/{userId}", Name = "DeleteUser")]

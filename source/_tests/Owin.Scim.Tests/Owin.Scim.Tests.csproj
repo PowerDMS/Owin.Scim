@@ -101,6 +101,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
+    <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
+    <Compile Include="Integration\Users\Create\with_multiple_validation_errors.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
     <Compile Include="Services\UserService\when_updating_a_user.cs" />
@@ -131,7 +133,6 @@
     <Compile Include="Validation\Users\with_a_valid_password.cs" />
     <Compile Include="Validation\Users\with_a_valid_preferred_language.cs" />
     <Compile Include="Validation\Users\with_invalid_emails.cs" />
-    <Compile Include="Validation\Users\with_multiple_primary_photos.cs" />
     <Compile Include="Validation\Users\with_no_username.cs" />
     <Compile Include="Validation\Users\with_valid_emails.cs" />
   </ItemGroup>

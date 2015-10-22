@@ -35,8 +35,7 @@
         public void ConfigureContainer(IContainer container)
         {
             container.RegisterDelegate<IProvideHashing>(r => _CryptograhyManager.HashProvider);
-
-            container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton);
+            container.Register<IUserRepository, InMemoryUserRepository>(Reuse.InWebRequest);
             container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
             container.Register<IVerifyPasswordComplexity, DefaultPasswordComplexityVerifier>(Reuse.Singleton);
             container.Register<UserValidator>(new SingletonReuse());

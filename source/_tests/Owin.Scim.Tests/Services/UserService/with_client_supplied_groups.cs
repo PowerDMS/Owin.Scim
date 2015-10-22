@@ -35,22 +35,21 @@ namespace Owin.Scim.Tests.Services.UserService
             };
         };
 
-        It should_ignore_client_user_groups = () =>
-        {
-            Result.Groups.ShouldContainOnly(_UserRecordGroups);
-            Result.Groups.Select(g => g.Value).ShouldContainOnly("1", "2");
-        };
+        It should_ignore_client_user_groups = () => Result.GetRight().Groups.ShouldContainOnly(_UserRecordGroups);
+        
+        It should_not_overwrite_references = () => Result.GetRight().Groups.Select(g => g.Value).ShouldContainOnly("1", "2");
 
         private static IEnumerable<UserGroup> _UserRecordGroups;
 
-        private static async Task<User> GetUserRecord()
+        private static Task<User> GetUserRecord()
         {
-            return new User
-            {
-                Id = "id",
-                UserName = "name",
-                Groups = _UserRecordGroups
-            };
+            return Task.FromResult(
+                new User
+                {
+                    Id = "id",
+                    UserName = "name",
+                    Groups = _UserRecordGroups
+                });
         }
     }
 }

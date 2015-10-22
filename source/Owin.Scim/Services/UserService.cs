@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -9,7 +10,10 @@
     
     using Microsoft.FSharp.Core;
 
+    using Model;
     using Model.Users;
+
+    using NContext.Common;
 
     using Repository;
 
@@ -36,19 +40,23 @@
             _UserValidator = userValidator;
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<IScimResponse<User>> CreateUser(User user)
         {
             // TODO: (DG) Canonicalize user
+            // don't forget to replace user.Locale _ underscore with hyphen!
+            // don't forget to enforce only one primary value for each multi value attribute
 
             var newUser = Mapper.Map(user, new User()); // Replace all new User metadata according to SCIM rules concerning mutability.
             var validationResult = await _UserValidator.ValidateAsync(newUser, RuleSetConstants.Create);
-            if (!validationResult) throw new Exception(); // TODO: (DG) NO EXCEPTIONS! MUST HANDLE BULK. MUST RETURN PROPER HTTP STATUS CODES.
+
+            if (!validationResult)
+                return new ScimErrorResponse<User>(validationResult.Errors);
             
             var userRecord = await _UserRepository.CreateUser(user);
 
             userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
 
-            return userRecord;
+            return new ScimDataResponse<User>(userRecord);
         }
 
         public async Task<User> RetrieveUser(string userId)
@@ -61,16 +69,20 @@
             return userRecord;
         }
 
-        public async Task<User> UpdateUser(User user)
+        public async Task<IScimResponse<User>> UpdateUser(User user)
         {
             var userRecord = await _UserRepository.GetUser(user.Id);
             if (userRecord == null) return null;
 
             // TODO: (DG) Canonicalize user
+            // don't forget to replace user.Locale _ underscore with hyphen!
+            // don't forget to enforce only one primary value for each multi value attribute
 
             Mapper.Map(user, userRecord); // Replace all userRecord metadata according to SCIM rules concerning mutability.
             var validationResult = await _UserValidator.ValidateAsync(userRecord, RuleSetConstants.Update);
-            if (!validationResult) throw new Exception(); // TODO: (DG) exception handling
+
+            if (!validationResult)
+                return new ScimErrorResponse<User>(validationResult.Errors);
 
             if (!string.IsNullOrWhiteSpace(userRecord.Password))
             {
@@ -82,7 +94,7 @@
 
             userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
 
-            return userRecord;
+            return new ScimDataResponse<User>(userRecord);
         }
 
         public async Task<Unit> DeleteUser(string userId)

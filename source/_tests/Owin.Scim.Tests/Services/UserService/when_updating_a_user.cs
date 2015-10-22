@@ -10,6 +10,7 @@
 
     using Mappings;
 
+    using Model;
     using Model.Users;
 
     using Repository;
@@ -48,7 +49,7 @@
 
         protected static IVerifyPasswordComplexity PasswordComplexityVerifier;
 
-        protected static User Result;
+        protected static IScimResponse<User> Result;
 
         private static IUserService _UserService;
     }

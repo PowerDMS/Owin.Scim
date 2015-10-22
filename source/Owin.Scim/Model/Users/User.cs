@@ -66,7 +66,7 @@
 
         /// <summary>
         /// Indicates the User's preferred written or spoken language.Generally used 
-        /// for selecting a localized user interface; e.g., 'en_US' specifies the 
+        /// for selecting a localized user interface; e.g., 'en-US' specifies the 
         /// language English and country US.
         /// </summary>
         public string PreferredLanguage { get; set; }
