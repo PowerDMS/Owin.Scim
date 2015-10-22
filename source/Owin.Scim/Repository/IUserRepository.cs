@@ -14,7 +14,7 @@
 
         Task UpdateUser(User user);
 
-        Task<Unit> DeleteUser(string userId);
+        Task<User> DeleteUser(string userId);
 
         Task<bool> IsUserNameAvailable(string userName);
     }

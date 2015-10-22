@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Tests.Integration.Users.Retrieve
+﻿namespace Owin.Scim.Tests.Integration.Users.Delete
 {
     using System.Net;
     using System.Net.Http;
@@ -8,7 +8,7 @@
 
     using Model.Users;
 
-    public class with_an_existing_userid : when_retrieving_a_user
+    public class with_an_existing_userid : when_deleting_a_user
     {
         Establish context = async () =>
         {
@@ -23,10 +23,10 @@
                 .PostAsync("users", new ObjectContent<User>(existingUser, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
-            
+
             UserId = (await Response.Content.ReadAsAsync<User>()).Id;
         };
 
-        It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
+        It should_return_no_content = () => Response.StatusCode.ShouldEqual(HttpStatusCode.NoContent);
     }
 }

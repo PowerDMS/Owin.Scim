@@ -38,19 +38,19 @@
         public async Task UpdateUser(User user)
         {
             var userRecord = _Users.SingleOrDefault(u => u.Id.Equals(user.Id));
-            if (userRecord == null) throw new Exception();
+            if (userRecord == null) return;
 
             userRecord = user;
         }
 
-        public async Task<Unit> DeleteUser(string userId)
+        public async Task<User> DeleteUser(string userId)
         {
             var userRecord = _Users.SingleOrDefault(u => u.Id.Equals(userId));
-            if (userRecord == null) throw new Exception();
+            if (userRecord == null) return null;
 
             _Users.Remove(userRecord);
 
-            return default(Unit);
+            return userRecord;
         }
 
         public async Task<bool> IsUserNameAvailable(string userName)

@@ -108,7 +108,7 @@
                         HttpStatusCode.NotFound,
                         detail: ErrorDetail.NotFound(userId)));
 
-            return new ScimDataResponse<Unit>(result);
+            return new ScimDataResponse<Unit>(default(Unit));
         }
     }
 }

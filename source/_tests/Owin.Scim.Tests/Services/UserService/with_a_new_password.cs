@@ -31,14 +31,15 @@ namespace Owin.Scim.Tests.Services.UserService
 
         It should_hash_the_new_password = () => A.CallTo(() => PasswordManager.CreateHash(A<string>._)).MustHaveHappened();
 
-        private static async Task<User> GetUserRecord()
+        private static Task<User> GetUserRecord()
         {
-            return new User
-            {
-                Id = "id",
-                UserName = "name",
-                Password = "pass"
-            };
+            return Task.FromResult(
+                new User
+                {
+                    Id = "id",
+                    UserName = "name",
+                    Password = "pass"
+                });
         }
     }
 }
