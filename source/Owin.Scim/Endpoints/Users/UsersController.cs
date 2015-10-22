@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Endpoints.Users
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -47,6 +48,7 @@
             throw new NotImplementedException();
         }
 
+        [AcceptVerbs("PUT", "OPTIONS")]
         [Route("users/{userId}", Name = "ReplaceUser")]
         public async Task<HttpResponseMessage> Put(string userId, User user)
         {
