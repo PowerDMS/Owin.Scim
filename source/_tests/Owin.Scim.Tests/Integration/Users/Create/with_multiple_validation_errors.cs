@@ -1,6 +1,5 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -40,9 +39,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_contain_two_errors = async () =>
         {
-            (await Response.Content.ReadAsAsync<IEnumerable<ScimError>>())
-                .Count()
-                .ShouldEqual(2);
+            (await Response.Content.ReadAsAsync<IEnumerable<ScimError>>()).Count().ShouldEqual(2);
         };
     }
 }

@@ -1,8 +1,5 @@
 ﻿namespace Owin.Scim.Tests.Integration
 {
-    using System;
-    using System.Threading;
-
     using Configuration;
 
     using Extensions;

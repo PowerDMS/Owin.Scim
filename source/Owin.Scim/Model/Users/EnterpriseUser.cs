@@ -4,16 +4,21 @@ namespace Owin.Scim.Model.Users
 
     public class EnterpriseUser : User
     {
-        public override IEnumerable<string> Schemas
+        private IEnumerable<string> _Schemas;
+
+        public EnterpriseUser()
         {
-            get
-            {
-                return new HashSet<string>
+            _Schemas = new List<string>
                 {
                     ScimConstants.Schemas.User,
                     ScimConstants.Schemas.UserEnterprise
                 };
-            }
+        }
+
+        public override IEnumerable<string> Schemas
+        {
+            get { return _Schemas; }
+            set { _Schemas = value; }
         }
 
         public string EmployeeNumber { get; set; }

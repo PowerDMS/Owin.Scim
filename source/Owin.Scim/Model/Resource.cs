@@ -12,7 +12,7 @@
         public string ExternalId { get; set; }
 
         [JsonProperty(Order = -10)]
-        public abstract IEnumerable<string> Schemas { get; }
+        public abstract IEnumerable<string> Schemas { get; set; }
 
         public ResourceMetadata Meta { get; set; }
     }

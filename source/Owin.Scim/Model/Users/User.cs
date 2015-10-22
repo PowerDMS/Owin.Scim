@@ -5,15 +5,20 @@
 
     public class User : Resource
     {
-        public override IEnumerable<string> Schemas
+        private IEnumerable<string> _Schemas;
+         
+        public User()
         {
-            get
-            {
-                return new HashSet<string>
+            _Schemas = new List<string>
                 {
                     ScimConstants.Schemas.User
                 };
-            }
+        }
+
+        public override IEnumerable<string> Schemas
+        {
+            get { return _Schemas; }
+            set { _Schemas = value; }
         }
 
         /// <summary>
