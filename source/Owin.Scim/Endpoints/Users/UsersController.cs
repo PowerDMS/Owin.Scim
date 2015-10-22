@@ -11,8 +11,6 @@
     using Model;
     using Model.Users;
 
-    using NContext.Common;
-
     using Services;
 
     public class UsersController : ApiController
@@ -39,13 +37,8 @@
         [Route("users/{userId}", Name = "RetrieveUser")]
         public async Task<HttpResponseMessage> Get(string userId)
         {
-            var user = await _UserService.RetrieveUser(userId);
-            if (user == null)
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
-
-            return Request.CreateResponse(HttpStatusCode.OK, user);
+            return (await _UserService.RetrieveUser(userId))
+                .ToHttpResponseMessage(Request);
         }
 
         [Route("users/{userId}", Name = "UpdateUser")]
@@ -76,13 +69,8 @@
         [Route("users/{userId}", Name = "DeleteUser")]
         public async Task<HttpResponseMessage> Delete(string userId)
         {
-            var result = await _UserService.DeleteUser(userId);
-            if (result == null)
-            {
-                return Request.CreateResponse(HttpStatusCode.NotFound);
-            }
-
-            return Request.CreateResponse(HttpStatusCode.NoContent);
+            return (await _UserService.DeleteUser(userId))
+                .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
         }
     }
 }

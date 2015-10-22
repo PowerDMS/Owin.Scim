@@ -1,19 +1,17 @@
 ﻿namespace Owin.Scim.Services
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
+    using System.Net;
     using System.Text;
     using System.Threading.Tasks;
 
     using AutoMapper;
-    
+
+    using ErrorHandling;
+
     using Microsoft.FSharp.Core;
 
     using Model;
     using Model.Users;
-
-    using NContext.Common;
 
     using Repository;
 
@@ -59,14 +57,18 @@
             return new ScimDataResponse<User>(userRecord);
         }
 
-        public async Task<User> RetrieveUser(string userId)
+        public async Task<IScimResponse<User>> RetrieveUser(string userId)
         {
             var userRecord = await _UserRepository.GetUser(userId);
-            if (userRecord == null) return null;
+            if (userRecord == null)
+                return new ScimErrorResponse<User>(
+                    new ScimError(
+                        HttpStatusCode.NotFound,
+                        detail: ErrorDetail.NotFound(userId)));
 
             userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
 
-            return userRecord;
+            return new ScimDataResponse<User>(userRecord);
         }
 
         public async Task<IScimResponse<User>> UpdateUser(User user)
@@ -97,12 +99,16 @@
             return new ScimDataResponse<User>(userRecord);
         }
 
-        public async Task<Unit> DeleteUser(string userId)
+        public async Task<IScimResponse<Unit>> DeleteUser(string userId)
         {
             var result = await _UserRepository.DeleteUser(userId);
-            if (result == null) return null;
+            if (result == null)
+                return new ScimErrorResponse<Unit>(
+                    new ScimError(
+                        HttpStatusCode.NotFound,
+                        detail: ErrorDetail.NotFound(userId)));
 
-            return result;
+            return new ScimDataResponse<Unit>(result);
         }
     }
 }

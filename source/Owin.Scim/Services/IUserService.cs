@@ -11,10 +11,10 @@
     {
         Task<IScimResponse<User>> CreateUser(User user);
 
-        Task<User> RetrieveUser(string userId);
+        Task<IScimResponse<User>> RetrieveUser(string userId);
 
         Task<IScimResponse<User>> UpdateUser(User user);
 
-        Task<Unit> DeleteUser(string userId);
+        Task<IScimResponse<Unit>> DeleteUser(string userId);
     }
 }

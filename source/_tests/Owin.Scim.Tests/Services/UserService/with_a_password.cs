@@ -28,15 +28,16 @@ namespace Owin.Scim.Tests.Services.UserService
 
         It should_not_return_the_password_ever = () => Result.GetRight().Password.ShouldBeNull();
 
-        private static async Task<User> GetUserRecord()
+        private static Task<User> GetUserRecord()
         {
-            return new User
-            {
-                Id = "id",
-                UserName = "name",
-                DisplayName = "Daniel",
-                Password = "pass"
-            };
+            return Task.FromResult(
+                new User
+                {
+                    Id = "id",
+                    UserName = "name",
+                    DisplayName = "Daniel",
+                    Password = "pass"
+                });
         }
     }
 }

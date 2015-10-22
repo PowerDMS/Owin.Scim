@@ -103,6 +103,9 @@
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
     <Compile Include="Integration\Users\Create\with_multiple_validation_errors.cs" />
+    <Compile Include="Integration\Users\Retrieve\when_retrieving_a_user.cs" />
+    <Compile Include="Integration\Users\Retrieve\with_an_existing_userid.cs" />
+    <Compile Include="Integration\Users\Retrieve\with_an_invalid_userid.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
     <Compile Include="Services\UserService\when_updating_a_user.cs" />

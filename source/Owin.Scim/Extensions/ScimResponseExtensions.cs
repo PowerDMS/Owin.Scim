@@ -45,7 +45,7 @@
             }
 
             return ShouldSetResponseContent(httpRequestMessage, responseStatusCode)
-                ? httpRequestMessage.CreateResponse(responseStatusCode, scimResponse)
+                ? httpRequestMessage.CreateResponse(responseStatusCode, scimResponse.GetContent())
                 : httpRequestMessage.CreateResponse(responseStatusCode);
         }
 
@@ -83,7 +83,7 @@
             }
 
             var response = setResponseContent && ShouldSetResponseContent(httpRequestMessage, responseStatusCode)
-                ? httpRequestMessage.CreateResponse(responseStatusCode, scimResponse)
+                ? httpRequestMessage.CreateResponse(responseStatusCode, scimResponse.GetContent())
                 : httpRequestMessage.CreateResponse(responseStatusCode);
 
             if (scimResponse.IsRight && responseBuilder != null)
@@ -92,6 +92,11 @@
             }
 
             return response;
+        }
+
+        private static Object GetContent<T>(this IScimResponse<T> response)
+        {
+            return response.IsLeft ? (Object)response.GetLeft() : (Object)response.GetRight();
         }
 
         private static HttpStatusCode GetStatusCode(IEnumerable<ScimError> errors)
