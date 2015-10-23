@@ -9,7 +9,7 @@
         public string Type { get; set; }
 
         public bool Primary { get; set; }
-
+        
         public string Display { get; set; }
 
         public string Value { get; set; }

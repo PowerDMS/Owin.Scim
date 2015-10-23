@@ -103,6 +103,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CanonicalizationRule.cs" />
     <Compile Include="Configuration\DryIocActivationProvider.cs" />
     <Compile Include="Configuration\DryIocManager.cs" />
     <Compile Include="Configuration\DryIocManagerBuilder.cs" />
@@ -116,6 +117,7 @@
     <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="ErrorHandling\ErrorDetail.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
+    <Compile Include="Extensions\MultiValuedAttributesExtensions.cs" />
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
@@ -149,6 +151,7 @@
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="Model\ScimDataResponse.cs" />
     <Compile Include="Model\ScimErrorResponse.cs" />
+    <Compile Include="Services\Canonicalization.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Validation\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

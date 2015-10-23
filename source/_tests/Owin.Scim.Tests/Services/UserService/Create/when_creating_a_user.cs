@@ -92,7 +92,7 @@
                 {
                     new Email
                     {
-                        Display = "daniel",
+                        Display = "daniel", // not allowed, will be overwritten
                         Value = "daniel.gioulakis@POWERDMS.com"
                     }
                 },
@@ -109,7 +109,7 @@
             () => Result
                 .GetRight()
                 .Emails
-                .All(email => email.Value.Substring(email.Value.IndexOf('@') + 1).ShouldBeLowercase());
+                .All(email => email.Display.Substring(email.Display.IndexOf('@') + 1).ShouldBeLowercase());
 
         It should_contain_only_one_primary = () => Result.GetRight().Photos.Count(p => p.Primary).ShouldEqual(1);
 

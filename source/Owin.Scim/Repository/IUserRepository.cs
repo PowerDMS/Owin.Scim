@@ -2,8 +2,6 @@
 {
     using System.Threading.Tasks;
 
-    using Microsoft.FSharp.Core;
-
     using Model.Users;
 
     public interface IUserRepository
