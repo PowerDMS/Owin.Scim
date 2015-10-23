@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Tests.Services.UserService
+﻿namespace Owin.Scim.Tests.Services.UserService.Update
 {
     using System.Threading.Tasks;
 

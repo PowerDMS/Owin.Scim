@@ -1,8 +1,12 @@
 ﻿namespace Owin.Scim.Services
 {
     using System;
+    using System.Collections;
+    using System.Collections.Generic;
     using System.Linq;
+    using System.Linq.Expressions;
     using System.Net;
+    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -35,6 +39,8 @@
         private readonly IManagePasswords _PasswordManager;
 
         private readonly UserValidator _UserValidator;
+        
+        protected delegate void CanonicalizationRule<in T>(T attribute, ref Object state) where T : MultiValuedAttribute;
 
         public UserService(
             ScimServerConfiguration serverConfiguration,
@@ -119,54 +125,124 @@
 
         protected virtual Task CanonicalizeUser(User user)
         {
-
-            // don't forget to enforce only one primary value for each multi value attribute
-            
             if (!string.IsNullOrWhiteSpace(user.Locale))
             {
                 user.Locale = user.Locale.Replace('_', '-'); // Supports backwards compatability
             }
 
-            if (user.Emails != null && user.Emails.Any())
-            {
-                user.Emails.ForEach(email =>
-                {
-                    if (string.IsNullOrWhiteSpace(email.Value)) return;
+            // TODO: (DG) Create generic canonicalization rule for supporting ScimServerConfig / Canon Types per attribute.
 
-                    var atIndex = email.Value.IndexOf('@') + 1;
+            // ADDRESSES
+            CanonicalizeMultiValueAttributes(user.Addresses,
+                ((Address attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
+
+            // CERTIFICATES
+            CanonicalizeMultiValueAttributes(user.X509Certificates,
+                ((X509Certificate attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
+
+            // EMAILS
+            CanonicalizeMultiValueAttributes(user.Emails,
+                ((Email attribute, ref object state) =>
+                {
+                    if (string.IsNullOrWhiteSpace(attribute.Value)) return;
+
+                    var atIndex = attribute.Value.IndexOf('@') + 1;
                     if (atIndex == 0) return; // IndexOf returned -1
 
-                    var cEmail = email.Value.Substring(0, atIndex) + email.Value.Substring(atIndex).ToLower();
-                    email.Value = cEmail;
+                    var cEmail = attribute.Value.Substring(0, atIndex) + attribute.Value.Substring(atIndex).ToLower();
+                    attribute.Value = cEmail;
 
-                    if (!string.IsNullOrWhiteSpace(email.Display))
+                    if (!string.IsNullOrWhiteSpace(attribute.Display))
                     {
-                        atIndex = email.Display.IndexOf('@') + 1;
+                        atIndex = attribute.Display.IndexOf('@') + 1;
                         if (atIndex == 0) return; // IndexOf returned -1
 
-                        cEmail = email.Display.Substring(0, atIndex) + email.Display.Substring(atIndex).ToLower();
-                        email.Value = cEmail;
+                        cEmail = attribute.Display.Substring(0, atIndex) + attribute.Display.Substring(atIndex).ToLower();
+                        attribute.Display = cEmail;
                     }
-                });
+                }),
+                ((Email attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
 
-                // TODO: (DG) support email canonical types
-            }
+            // ENTITLEMENTS
+            CanonicalizeMultiValueAttributes(user.Entitlements,
+                ((Entitlement attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
 
-            if (user.Photos != null && user.Photos.Any())
-            {
-                user.Photos.ForEach(photo =>
-                {
-                    if (string.IsNullOrWhiteSpace(photo.Value)) return;
+            // INSTANT MESSAGE ADDRESSES
+            CanonicalizeMultiValueAttributes(user.Ims,
+                ((InstantMessagingAddress attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
 
-                    photo.Value = photo.Value.ToLower();
-                });
+            // PHONE NUMBERS
+            CanonicalizeMultiValueAttributes(user.PhoneNumbers,
+                ((PhoneNumber attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
 
-                // TODO: (DG) support photo canonical types
-            }
+            // PHOTOS
+            CanonicalizeMultiValueAttributes(user.Photos,
+                ((Photo attribute, ref object state) => LowercaseCanonicalization(attribute, photo => photo.Value)),
+                ((Photo attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
 
-
-
+            // ROLES
+            CanonicalizeMultiValueAttributes(user.Roles,
+                ((Role attribute, ref object state) => EnforceSinglePrimaryAttribute(attribute, ref state)));
+            
             return Task.FromResult(0);
+        }
+
+        private void CanonicalizeMultiValueAttributes<T>(
+            IEnumerable<T> attributes, 
+            params CanonicalizationRule<T>[] canonicalizationRules)
+            where T : MultiValuedAttribute
+        {
+            if (attributes == null || !attributes.Any()) return;
+
+            var stateCache = new Dictionary<CanonicalizationRule<T>, object>();
+            attributes.ForEach(attribute =>
+            {
+                if (attribute == null) return;
+
+                canonicalizationRules.ForEach(rule =>
+                {
+                    if (!stateCache.ContainsKey(rule))
+                        stateCache[rule] = null;
+
+                    var state = stateCache[rule];
+                    rule(attribute, ref state);
+                    stateCache[rule] = state;
+                });
+            });
+        }
+
+        protected void LowercaseCanonicalization<T, TProperty>(T attribute, Expression<Func<T, TProperty>> expression)
+            where T : MultiValuedAttribute
+            where TProperty : class, IComparable, ICloneable, IConvertible, IEnumerable
+        {
+            var mE = expression.Body as MemberExpression;
+            if (mE == null) throw new InvalidOperationException("Expression body must be a MemberExpression to an attribute's string property.");
+
+            var pI = mE.Member as PropertyInfo;
+            if (pI == null) throw new InvalidOperationException("Expression body member must be an attribute's string property.");
+
+            var value = pI.GetValue(attribute) as string;
+
+            if (string.IsNullOrWhiteSpace(value)) return;
+
+            pI.SetValue(attribute, value.ToLower());
+        }
+
+        protected void EnforceSinglePrimaryAttribute(MultiValuedAttribute attribute, ref Object state)
+        {
+            bool hasPrimary = false;
+            if (state != null)
+                hasPrimary = (bool) state;
+
+            if (!hasPrimary && attribute.Primary)
+            {
+                state = true;
+            }
+
+            if (hasPrimary && attribute.Primary)
+            {
+                attribute.Primary = false;
+            }
         }
     }
 }

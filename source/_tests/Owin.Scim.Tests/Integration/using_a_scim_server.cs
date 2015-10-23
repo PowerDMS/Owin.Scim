@@ -2,11 +2,11 @@
 {
     using Configuration;
 
-    using Extensions;
-
     using Machine.Specifications;
 
     using Microsoft.Owin.Testing;
+
+    using Scim.Extensions;
 
     public class using_a_scim_server : IAssemblyContext
     {

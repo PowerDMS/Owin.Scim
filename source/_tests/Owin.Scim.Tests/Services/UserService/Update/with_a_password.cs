@@ -1,4 +1,4 @@
-namespace Owin.Scim.Tests.Services.UserService
+namespace Owin.Scim.Tests.Services.UserService.Update
 {
     using System.Threading.Tasks;
 
@@ -26,7 +26,7 @@ namespace Owin.Scim.Tests.Services.UserService
             };
         };
 
-        It should_not_return_the_password_ever = () => Result.GetRight().Password.ShouldBeNull();
+        It should_never_return_the_password = () => Result.GetRight().Password.ShouldBeNull();
 
         private static Task<User> GetUserRecord()
         {

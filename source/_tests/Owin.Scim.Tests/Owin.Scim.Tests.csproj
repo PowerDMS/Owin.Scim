@@ -100,6 +100,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\ShouldExtensions.cs" />
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
     <Compile Include="Integration\Users\Create\with_multiple_validation_errors.cs" />
@@ -114,10 +115,11 @@
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
-    <Compile Include="Services\UserService\when_updating_a_user.cs" />
-    <Compile Include="Services\UserService\with_a_new_password.cs" />
-    <Compile Include="Services\UserService\with_a_password.cs" />
-    <Compile Include="Services\UserService\with_client_supplied_groups.cs" />
+    <Compile Include="Services\UserService\Create\when_creating_a_user.cs" />
+    <Compile Include="Services\UserService\Update\when_updating_a_user.cs" />
+    <Compile Include="Services\UserService\Update\with_a_new_password.cs" />
+    <Compile Include="Services\UserService\Update\with_a_password.cs" />
+    <Compile Include="Services\UserService\Update\with_client_supplied_groups.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="Validation\Users\when_validating_an_existing_user.cs" />
     <Compile Include="Validation\Users\when_validating_a_new_user.cs" />
