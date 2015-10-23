@@ -8,5 +8,7 @@
         }
 
         public bool RequireSsl { get; set; }
+
+        public string PublicOrigin { get; set; }
     }
 }

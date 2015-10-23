@@ -4,6 +4,8 @@
 
     using AutoMapper;
 
+    using Configuration;
+
     using FakeItEasy;
 
     using Machine.Specifications;
@@ -34,6 +36,7 @@
                 .ReturnsLazily(c => Task.FromResult((User)c.Arguments[0]));
 
             _UserService = new UserService(
+                new ScimServerConfiguration(), 
                 UserRepository, 
                 PasswordManager, 
                 new UserValidator(UserRepository, PasswordComplexityVerifier, PasswordManager));

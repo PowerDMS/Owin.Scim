@@ -109,7 +109,6 @@
     <Compile Include="Configuration\DryIocManagerBuilder.cs" />
     <Compile Include="Configuration\IConfigureDryIoc.cs" />
     <Compile Include="Configuration\ScimServerConfiguration.cs" />
-    <Compile Include="Configuration\ServiceProviderConfiguration.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />
     <Compile Include="DryIoc\Owin\DryIocOwin.cs" />

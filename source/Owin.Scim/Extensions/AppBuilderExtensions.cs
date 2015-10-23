@@ -44,6 +44,8 @@
                 },
                 new AsyncExecutionFlowScopeContext())
                 .WithWebApi(httpConfig);
+
+            container.RegisterInstance<ScimServerConfiguration>(serverConfig, Reuse.Singleton);
             
             var executionDirectory = Assembly.GetEntryAssembly() == null
                 ? AppDomain.CurrentDomain.BaseDirectory

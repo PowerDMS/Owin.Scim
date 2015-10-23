@@ -106,6 +106,17 @@
                                         "The attribute 'preferredLanguage' is formatted the same " +
                                         "as the HTTP Accept-Language header field. (e.g., da, en-gb;q=0.8, en;q=0.7)"));
                         });
+                    When(user => user.ProfileUrl != null,
+                        () =>
+                        {
+                            RuleFor(user => user.ProfileUrl)
+                                .Must(uri => uri.IsAbsoluteUri)
+                                .WithState(u =>
+                                    new ScimError(
+                                        HttpStatusCode.BadRequest,
+                                        ScimType.InvalidValue,
+                                        "The attribute 'profileUrl' must be a valid absolute URI."));
+                        });
                     When(user => !string.IsNullOrWhiteSpace(user.Locale),
                         () =>
                         {
