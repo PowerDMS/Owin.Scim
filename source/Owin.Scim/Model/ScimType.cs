@@ -5,7 +5,7 @@
     using Newtonsoft.Json;
 
     [JsonConverter(typeof(ScimTypeConverter))]
-    public sealed class ScimType
+    public sealed class ScimType : IEquatable<ScimType>
     {
         private readonly string _Type;
 
@@ -114,5 +114,38 @@
         {
             return _Type;
         }
+
+        #region IEquatable Implementation
+
+        public bool Equals(ScimType other)
+        {
+            if (ReferenceEquals(null, other)) return false;
+            if (ReferenceEquals(this, other)) return true;
+            return string.Equals(_Type, other._Type);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (ReferenceEquals(null, obj)) return false;
+            if (ReferenceEquals(this, obj)) return true;
+            return obj is ScimType && Equals((ScimType) obj);
+        }
+
+        public override int GetHashCode()
+        {
+            return (_Type != null ? _Type.GetHashCode() : 0);
+        }
+
+        public static bool operator ==(ScimType left, ScimType right)
+        {
+            return Equals(left, right);
+        }
+
+        public static bool operator !=(ScimType left, ScimType right)
+        {
+            return !Equals(left, right);
+        }
+
+        #endregion
     }
 }

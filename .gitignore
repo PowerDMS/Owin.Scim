@@ -1,36 +1,32 @@
 # Build Folders (you can keep bin if you'd like, to store dlls and pdbs)
-bin
-obj
-[Pp]ackages
+**/*bin
+**/*obj
+**/*[Pp]ackages
 */_UpgradeReport_Files/*
-build
+**/*build
 !source/.build*
-_build
+**/*_build
 
 
 #Code analysis files
-_Resharper.*
-StyleCop.cache
+**/*_Resharper.*
+**/*StyleCop.cache
 
 #Package Files
-*.nupkg
+**/*.nupkg
 
 #Editor/IDE files
-*.swp
-*.user
-*.docstates
-*.suo
-.idea
-content_version.txt
-
-#Merge tool files
-*.orig
+**/*.suo
 
 #OS files
-*.DS_Store
-[Tt]humbs.db
+**/*.DS_Store
+**/*[Tt]humbs.db
 
-**.GhostDoc*
-**.jmconfig*
+**/*.GhostDoc*
+**/*.jmconfig*
 **/*.crunchsolution.cache
-**.sublimets
+**/*.crunchsolution.user
+**/*.sublimets
+source/Owin.Scim.ncrunchsolution.user
+*.suo
+*.cache

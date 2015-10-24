@@ -5,14 +5,87 @@
     using System.Linq;
     using System.Net;
     using System.Net.Http;
+    using System.Reflection;
+    using System.Threading.Tasks;
 
     using Model;
-
+    
     /// <summary>
     /// Defines extension methods for <see cref="IScimResponse{T}"/>.
     /// </summary>
     public static class ScimResponseExtensions
     {
+        public static IScimResponse<T2> Bind<T, T2>(this IScimResponse<T> scimResponse, Func<T, IScimResponse<T2>> bindingFunction)
+        {
+            if (scimResponse.IsLeft)
+            {
+                return CreateGenericErrorResponse<T, T2>(scimResponse, scimResponse.GetLeft());
+            }
+
+            return bindingFunction.Invoke(scimResponse.GetRight());
+        }
+
+        public static Task<IScimResponse<TRight2>> BindAsync<TRight, TRight2>(
+            this IScimResponse<TRight> scimResponse,
+            Func<TRight, Task<IScimResponse<TRight2>>> bindFunc)
+        {
+            if (scimResponse.IsLeft)
+            {
+                var tcs = new TaskCompletionSource<IScimResponse<TRight2>>();
+                tcs.SetResult(new ScimErrorResponse<TRight2>(scimResponse.GetLeft()));
+
+                return tcs.Task;
+            }
+
+            return bindFunc(scimResponse.GetRight());
+        }
+
+        public static IScimResponse<TRight> Let<TRight>(this IScimResponse<TRight> scimResponse, Action<TRight> action)
+        {
+            if (scimResponse.IsRight)
+            {
+                action.Invoke(scimResponse.GetRight());
+            }
+
+            return scimResponse;
+        }
+
+        internal static IScimResponse<T2> CreateGenericErrorResponse<T, T2>(IScimResponse<T> originalResponse, IEnumerable<ScimError> errors)
+        {
+            if (IsBuiltInErrorResponse(originalResponse))
+            {
+                return new ScimErrorResponse<T2>(errors);
+            }
+
+            try
+            {
+                return Activator.CreateInstance(
+                    originalResponse.GetType()
+                                    .GetGenericTypeDefinition()
+                                    .MakeGenericType(typeof(T2)),
+                    errors) as IScimResponse<T2>;
+            }
+            catch (TargetInvocationException)
+            {
+                // No supportable constructor found! Return default.
+                return new ScimErrorResponse<T2>(errors);
+            }
+        }
+
+        private static Boolean IsBuiltInDataResponse<T>(IScimResponse<T> originalResponse)
+        {
+            var typeInfo = originalResponse.GetType().GetTypeInfo();
+            return (originalResponse is ScimDataResponse<T>) ||
+                   (typeInfo.IsGenericType && typeof(ScimDataResponse<>).GetTypeInfo().IsAssignableFrom(typeInfo.GetGenericTypeDefinition().GetTypeInfo()));
+        }
+
+        private static Boolean IsBuiltInErrorResponse<T>(IScimResponse<T> originalResponse)
+        {
+            var typeInfo = originalResponse.GetType().GetTypeInfo();
+            return (originalResponse is ScimErrorResponse<T>) ||
+                   (typeInfo.IsGenericType && typeof(ScimErrorResponse<>).GetTypeInfo().IsAssignableFrom(typeInfo.GetGenericTypeDefinition().GetTypeInfo()));
+        }
+
         /// <summary>
         /// Returns a new <see cref="HttpResponseMessage"/> with the <see cref="HttpResponseMessage.Content"/> set to <paramref name="scimResponse"/>. If 
         /// <paramref name="scimResponse"/> contains an error, it will attempt to parse the <see cref="ScimError.Status"/> as an <see cref="HttpStatusCode"/> 

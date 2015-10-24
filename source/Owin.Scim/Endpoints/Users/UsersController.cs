@@ -8,6 +8,9 @@
 
     using Extensions;
 
+    using Marvin.JsonPatch;
+    using Marvin.JsonPatch.Exceptions;
+
     using Model;
     using Model.Users;
 
@@ -16,7 +19,7 @@
     public class UsersController : ApiController
     {
         private readonly IUserService _UserService;
-        
+
         public UsersController(IUserService userService)
         {
             _UserService = userService;
@@ -40,18 +43,41 @@
             return (await _UserService.RetrieveUser(userId))
                 .ToHttpResponseMessage(Request);
         }
-
+        
         [Route("users/{userId}", Name = "UpdateUser")]
-        public async Task<HttpResponseMessage> Patch(string userId)//, PatchRequest<User> patch)
+        public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<User> patchRequest)
         {
-            throw new NotImplementedException();
+            return (await (await _UserService.RetrieveUser(userId))
+                .Bind<User, User>(user =>
+                {
+                    if (patchRequest == null || patchRequest.Operations == null)
+                    {
+                        return new ScimErrorResponse<User>(
+                            new ScimError(
+                                HttpStatusCode.BadRequest,
+                                ScimType.InvalidSyntax,
+                                "The patch request body is unparsable, syntactically incorrect, or violates schema."));
+                    }
+
+                    try
+                    {
+                        patchRequest.Operations.ApplyTo(user);
+                        return new ScimDataResponse<User>(user);
+                    }
+                    catch (JsonPatchException ex)
+                    {
+                        return new ScimErrorResponse<User>(ex.ToScimError());
+                    }
+                })
+                .BindAsync(user => _UserService.UpdateUser(user)))
+                .ToHttpResponseMessage(Request);
         }
 
         [AcceptVerbs("PUT", "OPTIONS")]
         [Route("users/{userId}", Name = "ReplaceUser")]
         public async Task<HttpResponseMessage> Put(string userId, User user)
         {
-            if (String.IsNullOrWhiteSpace(userId) || 
+            if (String.IsNullOrWhiteSpace(userId) ||
                 user == null ||
                 string.IsNullOrWhiteSpace(user.Id) ||
                 !user.Id.Equals(userId, StringComparison.OrdinalIgnoreCase))
