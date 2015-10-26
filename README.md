@@ -5,7 +5,8 @@ RFC 7643
 
 RFC 7644
 
-Looking for solid contributers to expedite this effort!  email me:  daniel.gioulakis [at] powerdms [dot] com
+Looking for solid contributers to expedite this effort!
+email me:  daniel.gioulakis [at] powerdms [dot] com
 
 
 Roadmap
