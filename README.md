@@ -15,7 +15,7 @@ Roadmap
   1. [x] Create  
   2. [x] Retrieve  
   3. [x] Replace  
-  4. [ ] Update (Patch)  
+  4. [ ] Update (Patch) (IN PROGRESS)
   5. [x] Delete  
   6. [ ] Add support for custom canonical types / validation
 2. Add support for bulk processing
