@@ -7,8 +7,6 @@ namespace Owin.Scim.Patching
     using System.Collections.Generic;
     using System.Linq.Expressions;
 
-    using Adapters;
-
     using Converters;
 
     using Helpers;

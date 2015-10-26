@@ -147,7 +147,7 @@
     <Compile Include="Model\Resource.cs" />
     <Compile Include="Model\Users\User.cs" />
     <Compile Include="Model\Users\X509Certificate.cs" />
-    <Compile Include="Patching\Adapters\IObjectAdapter.cs" />
+    <Compile Include="Patching\IObjectAdapter.cs" />
     <Compile Include="Patching\Converters\JsonPatchDocumentConverter.cs" />
     <Compile Include="Patching\Converters\TypedJsonPatchDocumentConverter.cs" />
     <Compile Include="Patching\Exceptions\JsonPatchException.cs" />

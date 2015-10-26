@@ -1,16 +1,8 @@
-﻿// Any comments, input: @KevinDockx
-// Any issues, requests: https://github.com/KevinDockx/JsonPatch
-//
-// Enjoy :-)
-
-namespace Owin.Scim.Patching
+﻿namespace Owin.Scim.Patching
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Reflection;
-
-    using Adapters;
 
     using Exceptions;
 
@@ -30,7 +22,6 @@ namespace Owin.Scim.Patching
 
     public class ScimObjectAdapter<T> : IObjectAdapter where T : class
     {
-
         /// <summary>
         /// Initializes a new instance of <see cref="ObjectAdapter"/>.
         /// </summary>

@@ -5,8 +5,6 @@ namespace Owin.Scim.Patching.Operations
 {
     using System;
 
-    using Adapters;
-
     using Properties;
 
     public class Operation<TModel> : Operation where TModel : class
