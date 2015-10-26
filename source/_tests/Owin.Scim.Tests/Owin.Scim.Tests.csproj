@@ -50,10 +50,6 @@
       <HintPath>..\..\packages\Machine.Specifications.Should.0.8.0\lib\net45\Machine.Specifications.Should.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Marvin.JsonPatch, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\Marvin.JsonPatch.0.9.0\lib\portable-net40+win+wpa81\Marvin.JsonPatch.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
@@ -116,9 +112,13 @@
     <Compile Include="Integration\Users\Retrieve\when_retrieving_a_user.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_invalid_userid.cs" />
-    <Compile Include="Integration\Users\Update\when_updating_a_user.cs" />
-    <Compile Include="Integration\Users\Update\with_an_invalid_path.cs" />
-    <Compile Include="Integration\Users\Update\with_no_patch_request.cs" />
+    <Compile Include="Integration\Users\Update\add\when_updating_a_user.cs" />
+    <Compile Include="Integration\Users\Update\add\with_an_invalid_path.cs" />
+    <Compile Include="Integration\Users\Update\add\with_no_patch_request.cs" />
+    <Compile Include="Integration\Users\Update\add\with_no_path.cs" />
+    <Compile Include="Integration\Users\Update\add\without_path_existing_multivaluedattribute_values.cs" />
+    <Compile Include="Integration\Users\Update\add\without_path_null_multivaluedattribute_value.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_and_existing_multivaluedattribute_values.cs" />
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
@@ -164,7 +164,10 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Integration\Users\Update\remove\" />
+    <Folder Include="Integration\Users\Update\replace\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -1,29 +1,21 @@
-﻿namespace Owin.Scim.Tests.Integration.Users.Update
+﻿namespace Owin.Scim.Tests.Integration.Users.Update.add
 {
+    using System.Net;
     using System.Net.Http;
     using System.Net.Http.Formatting;
 
     using Machine.Specifications;
 
-    using Marvin.JsonPatch;
-
-    using Model;
     using Model.Users;
 
     public abstract class when_updating_a_user : using_a_scim_server
     {
         Establish context = async () =>
         {
-            var userName = UserNameUtility.GenerateUserName();
-            var existingUser = new User
-            {
-                UserName = userName
-            };
-
             // Insert the first user so there's one already in-memory.
             var userRecord = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(existingUser, new JsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<User>(UserToUpdate, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
@@ -32,26 +24,28 @@
 
         Because of = async () =>
         {
-            Response = await Server
+            PatchResponse = await Server
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
                         new HttpMethod("PATCH"), "users/" + _UserId)
                     {
-                        Content = new ObjectContent<PatchRequest<User>>(
-                            new PatchRequest<User>
-                            {
-                                Operations = PatchDocument
-                            }, 
-                            new JsonMediaTypeFormatter())
+                        Content = PatchContent
                     })
                 .AwaitResponse()
                 .AsTask;
+
+            if (PatchResponse.StatusCode == HttpStatusCode.OK)
+                UpdatedUser = await PatchResponse.Content.ReadAsAsync<User>();
         };
 
-        protected static JsonPatchDocument<User> PatchDocument;
+        protected static User UserToUpdate;
 
-        protected static HttpResponseMessage Response;
+        protected static HttpContent PatchContent;
+
+        protected static HttpResponseMessage PatchResponse;
+
+        protected static User UpdatedUser;
 
         private static string _UserId;
     }

@@ -2,11 +2,11 @@
 {
     using System;
     using System.Net;
-
-    using Marvin.JsonPatch.Exceptions;
-    using Marvin.JsonPatch.Operations;
-
+    
     using Model;
+
+    using Patching.Exceptions;
+    using Patching.Operations;
 
     public static class JsonPatchExceptionExtensions
     {

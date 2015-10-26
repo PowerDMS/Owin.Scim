@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
 
-    using Marvin.JsonPatch;
+    using Patching;
 
     public class PatchRequest<T> where T : Resource
     {

@@ -8,11 +8,13 @@
 
     using Extensions;
 
-    using Marvin.JsonPatch;
-    using Marvin.JsonPatch.Exceptions;
-
     using Model;
     using Model.Users;
+
+    using Newtonsoft.Json.Serialization;
+
+    using Patching;
+    using Patching.Exceptions;
 
     using Services;
 
@@ -61,7 +63,11 @@
 
                     try
                     {
-                        patchRequest.Operations.ApplyTo(user);
+                        patchRequest.Operations.ApplyTo(
+                            user, 
+                            new ScimObjectAdapter<User>(
+                                new CamelCasePropertyNamesContractResolver(),
+                                e => { throw new JsonPatchException(e); }));
                         return new ScimDataResponse<User>(user);
                     }
                     catch (JsonPatchException ex)

@@ -42,10 +42,6 @@
       <HintPath>..\packages\FSharp.Core.4.0.0.1\lib\net40\FSharp.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="Marvin.JsonPatch, Version=0.9.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\Marvin.JsonPatch.0.9.0\lib\portable-net40+win+wpa81\Marvin.JsonPatch.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="Microsoft.Owin, Version=3.0.1.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
@@ -121,10 +117,12 @@
     <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="ErrorHandling\ErrorDetail.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
+    <Compile Include="Extensions\IListExtensions.cs" />
     <Compile Include="Extensions\JsonPatchExceptionExtensions.cs" />
     <Compile Include="Extensions\MultiValuedAttributesExtensions.cs" />
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
+    <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Middleware\RequireSslMiddleware.cs" />
     <Compile Include="Model\BulkRequest.cs" />
@@ -149,6 +147,34 @@
     <Compile Include="Model\Resource.cs" />
     <Compile Include="Model\Users\User.cs" />
     <Compile Include="Model\Users\X509Certificate.cs" />
+    <Compile Include="Patching\Adapters\IObjectAdapter.cs" />
+    <Compile Include="Patching\Converters\JsonPatchDocumentConverter.cs" />
+    <Compile Include="Patching\Converters\TypedJsonPatchDocumentConverter.cs" />
+    <Compile Include="Patching\Exceptions\JsonPatchException.cs" />
+    <Compile Include="Patching\Helpers\ActualPropertyPathResult.cs" />
+    <Compile Include="Patching\Helpers\ConversionResult.cs" />
+    <Compile Include="Patching\Helpers\ExpandoObjectDictionaryExtensions.cs" />
+    <Compile Include="Patching\Helpers\ExpressionHelpers.cs" />
+    <Compile Include="Patching\Helpers\GetValueResult.cs" />
+    <Compile Include="Patching\Helpers\JsonPatchProperty.cs" />
+    <Compile Include="Patching\Helpers\ObjectTreeAnalyisResult.cs" />
+    <Compile Include="Patching\Helpers\PathHelpers.cs" />
+    <Compile Include="Patching\Helpers\RemovedPropertyTypeResult.cs" />
+    <Compile Include="Patching\IJsonPatchDocument.cs" />
+    <Compile Include="Patching\JsonPatchDocument.cs" />
+    <Compile Include="Patching\JsonPatchDocumentOfT.cs" />
+    <Compile Include="Patching\JsonPatchError.cs" />
+    <Compile Include="Patching\Operations\Operation.cs" />
+    <Compile Include="Patching\Operations\OperationBase.cs" />
+    <Compile Include="Patching\Operations\OperationOfT.cs" />
+    <Compile Include="Patching\Operations\OperationType.cs" />
+    <Compile Include="Patching\ScimObjectAdapter.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\ResourcesPartial.cs" />
     <Compile Include="Registry\Registry.cs" />
     <Compile Include="Repository\InMemory\InMemoryUserRepository.cs" />
     <Compile Include="Security\DefaultPasswordManager.cs" />
@@ -174,6 +200,12 @@
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
