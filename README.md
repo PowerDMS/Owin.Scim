@@ -23,5 +23,10 @@ Roadmap
 3. Add scim server configuration endpoints
 4. Add groups endpoints
 5. Add support for querying
+  1. [ ] Filtering (IN PROGRESS)
+  2. [ ] Sorting
+  3. [ ] Ordering
+  4. [ ] Pagination
+  5. [ ] Projection
 6. Add more extensiblity options
 7. Add authN / authZ
