@@ -28,7 +28,7 @@ namespace Owin.Scim.Patching.Converters
         {
             if (objectType != typeof(JsonPatchDocument))
             {
-                throw new ArgumentException(Resources.FormatParameterMustMatchType("objectType", "JsonPatchDocument"), "objectType");
+                throw new ArgumentException(ResourceHelper.FormatParameterMustMatchType("objectType", "JsonPatchDocument"), "objectType");
             }
 
             try
@@ -62,7 +62,7 @@ namespace Owin.Scim.Patching.Converters
             }
             catch (Exception ex)
             {
-                throw new JsonPatchException(Resources.FormatInvalidJsonPatchDocument(objectType.Name), ex);
+                throw new JsonPatchException(ResourceHelper.FormatInvalidJsonPatchDocument(objectType.Name), ex);
             }
         }
 

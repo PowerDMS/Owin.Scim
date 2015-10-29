@@ -29,7 +29,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                              ""Operations"":[
                                {
                                    ""op"":""add"",
-                                   ""path"":""/preferred"",
+                                   ""path"":""preferred"",
                                    ""value"": ""en-US""
                                }]
                            }",

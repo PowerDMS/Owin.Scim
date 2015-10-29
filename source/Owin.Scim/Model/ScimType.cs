@@ -84,7 +84,7 @@
         }
 
         /// <summary>
-        /// A required value was missing, or the value specified was not compatible with the operation 
+        /// A required value was missing, or the _Value specified was not compatible with the operation 
         /// or attribute type or resource schema.
         /// </summary>
         public static ScimType InvalidValue

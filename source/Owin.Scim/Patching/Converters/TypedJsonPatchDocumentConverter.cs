@@ -62,7 +62,7 @@ namespace Owin.Scim.Patching.Converters
             }
             catch (Exception ex)
             {
-                throw new JsonPatchException(Resources.FormatInvalidJsonPatchDocument(objectType.Name), ex);
+                throw new JsonPatchException(ResourceHelper.FormatInvalidJsonPatchDocument(objectType.Name), ex);
             }
         }
     }

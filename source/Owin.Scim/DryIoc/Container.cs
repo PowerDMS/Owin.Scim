@@ -1640,7 +1640,7 @@ namespace DryIoc
             return (T)container.New(typeof(T), made);
         }
 
-        /// <summary>Registers new service type with factory for registered service type. 
+        /// <summary>Registers new service type with factory for registered service _TokenType. 
         /// Throw if no such registered service type in container.</summary>
         /// <param name="container">Container</param> <param name="serviceType">New service type.</param>
         /// <param name="registeredServiceType">Existing registered service type.</param>
@@ -1656,7 +1656,7 @@ namespace DryIoc
             container.Register(factory, serviceType, serviceKey, IfAlreadyRegistered.Keep, false);
         }
 
-        /// <summary>Registers new service type with factory for registered service type. 
+        /// <summary>Registers new service type with factory for registered service _TokenType. 
         /// Throw if no such registered service type in container.</summary>
         /// <param name="container">Container</param>
         /// <typeparam name="TService">New service type.</typeparam>
@@ -2402,7 +2402,7 @@ namespace DryIoc
         /// e.g. for string "blah" <code lang="cs"><![CDATA[]]>Expression.Constant("blah", typeof(string))</code>.
         /// If unable to convert should return null.</summary>
         /// <param name="item">Item object. Item is not null.</param> 
-        /// <param name="itemType">Item type. Item type is not null.</param>
+        /// <param name="itemType">Item type. Item _TokenType is not null.</param>
         /// <returns>Expression or null.</returns>
         public delegate Expression ItemToExpressionConverterRule(object item, Type itemType);
 
@@ -2762,7 +2762,7 @@ namespace DryIoc
 
         /// <summary>Defines creation info from factory method call Expression without using strings.
         /// You can supply any/default arguments to factory method, they won't be used, it is only to find the <see cref="MethodInfo"/>.</summary>
-        /// <typeparam name="TFactory">Factory type.</typeparam> <typeparam name="TService">Factory product type.</typeparam>
+        /// <typeparam name="TFactory">Factory type.</typeparam> <typeparam name="TService">Factory product _TokenType.</typeparam>
         /// <param name="getFactoryInfo">Returns or resolves factory instance.</param> 
         /// <param name="serviceReturningExpr">Method, property or field expression returning service.</param>
         /// <param name="argValues">(optional) Primitive custom values for dependencies.</param>
@@ -3016,50 +3016,50 @@ namespace DryIoc
     [SuppressMessage("ReSharper", "UnusedTypeParameter", Justification = "Type parameter is used by reflection.")]
     public static class Arg
     {
-        /// <summary>Specifies required service type of parameter or member. If required type is the same as parameter/member type,
+        /// <summary>Specifies required service type of parameter or member. If required _TokenType is the same as parameter/member _TokenType,
         /// the method is just a placeholder to help detect constructor or factory method, and does not have additional meaning.</summary>
-        /// <typeparam name="TRequired">Required service type if different from parameter/member type.</typeparam>
+        /// <typeparam name="TRequired">Required service type if different from parameter/member _TokenType.</typeparam>
         /// <returns>Returns some (ignored) value.</returns>
         public static TRequired Of<TRequired>() { return default(TRequired); }
 
         /// <summary>Specifies both service and required service types.</summary>
-        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service type.</typeparam>
+        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service _TokenType.</typeparam>
         /// <returns>Ignored default of Service type.</returns>
         public static TService Of<TService, TRequired>() { return default(TService); }
 
         /// <summary>Specifies required service type of parameter or member. Plus specifies if-unresolved policy.</summary>
-        /// <typeparam name="TRequired">Required service type if different from parameter/member type.</typeparam>
+        /// <typeparam name="TRequired">Required service type if different from parameter/member _TokenType.</typeparam>
         /// <param name="ifUnresolved">Defines to throw or to return default if unresolved.</param>
         /// <returns>Returns some (ignored) value.</returns>
         public static TRequired Of<TRequired>(IfUnresolved ifUnresolved) { return default(TRequired); }
 
         /// <summary>Specifies both service and required service types.</summary>
-        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service type.</typeparam>
+        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service _TokenType.</typeparam>
         /// <param name="ifUnresolved">Defines to throw or to return default if unresolved.</param>
         /// <returns>Ignored default of Service type.</returns>
         public static TService Of<TService, TRequired>(IfUnresolved ifUnresolved) { return default(TService); }
 
         /// <summary>Specifies required service type of parameter or member. Plus specifies service key.</summary>
-        /// <typeparam name="TRequired">Required service type if different from parameter/member type.</typeparam>
+        /// <typeparam name="TRequired">Required service type if different from parameter/member _TokenType.</typeparam>
         /// <param name="serviceKey">Service key object.</param>
         /// <returns>Returns some (ignored) value.</returns>
         public static TRequired Of<TRequired>(object serviceKey) { return default(TRequired); }
 
         /// <summary>Specifies both service and required service types.</summary>
-        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service type.</typeparam>
+        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service _TokenType.</typeparam>
         /// <param name="serviceKey">Service key object.</param>
         /// <returns>Ignored default of Service type.</returns>
         public static TService Of<TService, TRequired>(object serviceKey) { return default(TService); }
 
         /// <summary>Specifies required service type of parameter or member. Plus specifies if-unresolved policy. Plus specifies service key.</summary>
-        /// <typeparam name="TRequired">Required service type if different from parameter/member type.</typeparam>
+        /// <typeparam name="TRequired">Required service type if different from parameter/member _TokenType.</typeparam>
         /// <param name="ifUnresolved">Defines to throw or to return default if unresolved.</param>
         /// <param name="serviceKey">Service key object.</param>
         /// <returns>Returns some (ignored) value.</returns>
         public static TRequired Of<TRequired>(IfUnresolved ifUnresolved, object serviceKey) { return default(TRequired); }
 
         /// <summary>Specifies both service and required service types.</summary>
-        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service type.</typeparam>
+        /// <typeparam name="TService">Service type.</typeparam> <typeparam name="TRequired">Required service _TokenType.</typeparam>
         /// <param name="ifUnresolved">Defines to throw or to return default if unresolved.</param>
         /// <param name="serviceKey">Service key object.</param>
         /// <returns>Ignored default of Service type.</returns>
@@ -3127,7 +3127,7 @@ namespace DryIoc
             registrator.Register(factory, serviceAndMayBeImplementationType, serviceKey, ifAlreadyRegistered, false);
         }
 
-        /// <summary>Registers service of <typeparamref name="TService"/> type implemented by <typeparamref name="TImplementation"/> type.</summary>
+        /// <summary>Registers service of <typeparamref name="TService"/> type implemented by <typeparamref name="TImplementation"/> _TokenType.</summary>
         /// <typeparam name="TService">The type of service.</typeparam>
         /// <typeparam name="TImplementation">The type of service.</typeparam>
         /// <param name="registrator">Any <see cref="IRegistrator"/> implementation, e.g. <see cref="Container"/>.</param>
@@ -3146,7 +3146,7 @@ namespace DryIoc
             registrator.Register(factory, typeof(TService), serviceKey, ifAlreadyRegistered, isStaticallyChecked: true);
         }
 
-        /// <summary>Registers implementation type <typeparamref name="TImplementation"/> with itself as service type.</summary>
+        /// <summary>Registers implementation type <typeparamref name="TImplementation"/> with itself as service _TokenType.</summary>
         /// <typeparam name="TImplementation">The type of service.</typeparam>
         /// <param name="registrator">Any <see cref="IRegistrator"/> implementation, e.g. <see cref="Container"/>.</param>
         /// <param name="reuse">(optional) <see cref="IReuse"/> implementation, e.g. <see cref="Reuse.Singleton"/>. Default value means no reuse, aka Transient.</param>
@@ -3236,7 +3236,7 @@ namespace DryIoc
         };
 
         /// <summary>Returns only those types that could be used as service types of <paramref name="type"/>. It means that
-        /// for open-generic <paramref name="type"/> its service type should supply all type arguments
+        /// for open-generic <paramref name="type"/> its service type should supply all _TokenType arguments
         /// Used by RegisterMany method.</summary>
         /// <param name="type">Source type: may be concrete, abstract or generic definition.</param> 
         /// <param name="nonPublicServiceTypes">(optional) Include non public service types.</param>
@@ -3548,7 +3548,7 @@ namespace DryIoc
         /// Or you can register initializer for <see cref="Object"/> type to be applied for all services and use <paramref name="condition"/> 
         /// to filter target services.</summary>
         /// <remarks>Initializer internally implemented as decorator registered as Action delegate, so all decorators behavior is applied.</remarks>
-        /// <typeparam name="TTarget">Any type implemented by requested service type including service type itself and object type.</typeparam>
+        /// <typeparam name="TTarget">Any type implemented by requested service _TokenType including service _TokenType itself and object _TokenType.</typeparam>
         /// <param name="registrator">Usually is <see cref="Container"/> object.</param>
         /// <param name="initialize">Delegate with <typeparamref name="TTarget"/> object and 
         /// <see cref="IResolver"/> to resolve additional services required by initializer.</param>
@@ -3709,7 +3709,7 @@ namespace DryIoc
         /// <summary>Returns all registered services instances including all keyed and default registrations.
         /// Use <paramref name="behavior"/> to return either all registered services at the moment of resolve (dynamic fresh view) or
         /// the same services that were returned with first <see cref="ResolveMany{TService}"/> call (fixed view).</summary>
-        /// <typeparam name="TService">Return collection item type. It denotes registered service type if <paramref name="requiredServiceType"/> is not specified.</typeparam>
+        /// <typeparam name="TService">Return collection item type. It denotes registered service _TokenType if <paramref name="requiredServiceType"/> is not specified.</typeparam>
         /// <param name="resolver">Usually <see cref="Container"/> object.</param>
         /// <param name="requiredServiceType">(optional) Denotes registered service type. Should be assignable to <typeparamref name="TService"/>.</param>
         /// <param name="behavior">(optional) Specifies new registered services awareness. Aware by default.</param>
@@ -3804,7 +3804,7 @@ namespace DryIoc
     }
 
     /// <summary>Provides optional service resolution details: service key, required service type, what return when service is unresolved,
-    /// default value if service is unresolved, custom service value.</summary>
+    /// default value if service is unresolved, custom service _Value.</summary>
     public class ServiceDetails
     {
         /// <summary>Default details if not specified, use default setting values, e.g. <see cref="DryIoc.IfUnresolved.Throw"/></summary>
@@ -3834,13 +3834,13 @@ namespace DryIoc
         }
 
         /// <summary>Sets custom value for service. This setting is orthogonal to the rest.</summary>
-        /// <param name="value">Custom value.</param> <returns>Details with custom value.</returns>
+        /// <param name="value">Custom value.</param> <returns>Details with custom _Value.</returns>
         public static ServiceDetails Of(object value)
         {
             return new WithCustomValue(value);
         }
 
-        /// <summary>Service type to search in registry. Should be assignable to user requested service type.</summary>
+        /// <summary>Service type to search in registry. Should be assignable to user requested service _TokenType.</summary>
         public virtual Type RequiredServiceType { get { return null; } }
 
         /// <summary>Service key provided with registration.</summary>
@@ -4113,7 +4113,7 @@ namespace DryIoc
     /// <remarks>For parameter default setting <see cref="ServiceDetails.IfUnresolved"/> is <see cref="IfUnresolved.Throw"/>.</remarks>
     public class ParameterServiceInfo : IServiceInfo
     {
-        /// <summary>Creates service info from parameter alone, setting service type to parameter type,
+        /// <summary>Creates service info from parameter alone, setting service type to parameter _TokenType,
         /// and setting resolution policy to <see cref="IfUnresolved.ReturnDefault"/> if parameter is optional.</summary>
         /// <param name="parameter">Parameter to create info for.</param>
         /// <returns>Parameter service info.</returns>
@@ -4754,7 +4754,7 @@ namespace DryIoc
         public static readonly Setup Wrapper = new WrapperSetup();
 
         /// <summary>Returns generic wrapper setup.</summary>
-        /// <param name="wrappedServiceTypeArgIndex">Default is -1 for generic wrapper with single type argument. Need to be set for multiple type arguments.</param> 
+        /// <param name="wrappedServiceTypeArgIndex">Default is -1 for generic wrapper with single type argument. Need to be set for multiple _TokenType arguments.</param> 
         /// <param name="alwaysWrapsRequiredServiceType">Need to be set when generic wrapper type arguments should be ignored.</param>
         /// <returns>New setup or default <see cref="Setup.Wrapper"/>.</returns>
         public static Setup WrapperWith(int wrappedServiceTypeArgIndex = -1, bool alwaysWrapsRequiredServiceType = false)
@@ -4841,7 +4841,7 @@ namespace DryIoc
             /// <summary>Returns <see cref="DryIoc.FactoryType.Wrapper"/> type.</summary>
             public override FactoryType FactoryType { get { return FactoryType.Wrapper; } }
 
-            /// <summary>Delegate to get wrapped type from provided wrapper type. 
+            /// <summary>Delegate to get wrapped type from provided wrapper _TokenType. 
             /// If wrapper is generic, then wrapped type is usually a generic parameter.</summary>
             public readonly int WrappedServiceTypeArgIndex;
 
@@ -4849,7 +4849,7 @@ namespace DryIoc
             public readonly bool AlwaysWrapsRequiredServiceType;
 
             /// <summary>Constructs wrapper setup from optional wrapped type selector and reuse wrapper factory.</summary>
-            /// <param name="wrappedServiceTypeArgIndex">Default is -1 for generic wrapper with single type argument. Need to be set for multiple type arguments.</param> 
+            /// <param name="wrappedServiceTypeArgIndex">Default is -1 for generic wrapper with single type argument. Need to be set for multiple _TokenType arguments.</param> 
             /// <param name="alwaysWrapsRequiredServiceType">Need to be set when generic wrapper type arguments should be ignored.</param>
             public WrapperSetup(int wrappedServiceTypeArgIndex = -1, bool alwaysWrapsRequiredServiceType = false)
             {
@@ -5771,13 +5771,13 @@ namespace DryIoc
                             : Throw.For<FactoryMethod>(Error.NoMatchedFactoryMethodDeclaringTypeWithServiceTypeArgs,
                                 factoryImplType, new StringBuilder().Print(serviceTypeArgs, itemSeparator: ", "), request);
 
-                    // For instance factory match its service type from the implementation factory type.
+                    // For instance factory match its service type from the implementation factory _TokenType.
                     if (factoryInfo != null)
                     {
-                        // Open-generic service type is always normalized as generic type definition
+                        // Open-generic service type is always normalized as generic _TokenType definition
                         var factoryServiceType = factoryInfo.ServiceType;
 
-                        // Look for service type equivalent within factory implementation type base classes and interfaces,
+                        // Look for service type equivalent within factory implementation _TokenType base classes and interfaces,
                         // because we need identical type arguments to match.
                         if (factoryServiceType != factoryImplType)
                             factoryServiceType = factoryImplType.GetImplementedTypes()
@@ -6092,7 +6092,7 @@ namespace DryIoc
                                 return true;
                         }
                         else if (resultImplArgs[paramIndex] != serviceArg)
-                            return false; // more than one service type arg is matching with single impl type param
+                            return false; // more than one service type arg is matching with single impl _TokenType param
                     }
                 }
                 else if (implementedParam != serviceArg)
@@ -6247,7 +6247,7 @@ namespace DryIoc
         /// <returns>Stored item or null.</returns>
         object GetItemOrDefault(int id);
 
-        /// <summary>Sets (replaces) value at specified id, or adds value if no existing id found.</summary>
+        /// <summary>Sets (replaces) value at specified id, or adds _Value if no existing id found.</summary>
         /// <param name="id">To set value at.</param> <param name="item">Value to set.</param>
         void SetOrAdd(int id, object item);
 
@@ -6320,7 +6320,7 @@ namespace DryIoc
             return item;
         }
 
-        /// <summary>Sets (replaces) value at specified id, or adds value if no existing id found.</summary>
+        /// <summary>Sets (replaces) value at specified id, or adds _Value if no existing id found.</summary>
         /// <param name="id">To set value at.</param> <param name="item">Value to set.</param>
         public void SetOrAdd(int id, object item)
         {
@@ -6436,7 +6436,7 @@ namespace DryIoc
             return id < _items.Length ? _items[id] : null;
         }
 
-        /// <summary>Sets (replaces) value at specified id, or adds value if no existing id found.</summary>
+        /// <summary>Sets (replaces) value at specified id, or adds _Value if no existing id found.</summary>
         /// <param name="id">To set value at.</param> <param name="item">Value to set.</param>
         public void SetOrAdd(int id, object item)
         {
@@ -6811,7 +6811,7 @@ namespace DryIoc
 
         /// <summary>Creates reuse to search for <paramref name="assignableFromServiceType"/> and <paramref name="serviceKey"/>
         /// in existing resolution scope hierarchy. If parameters are not specified or null, then <see cref="InResolutionScope"/> will be returned.</summary>
-        /// <param name="assignableFromServiceType">(optional) To search for scope with service type assignable to type specified in parameter.</param>
+        /// <param name="assignableFromServiceType">(optional) To search for scope with service type assignable to _TokenType specified in parameter.</param>
         /// <param name="serviceKey">(optional) Search for specified key.</param>
         /// <param name="outermost">If true - commands to look for outermost match instead of nearest.</param>
         /// <returns>New reuse with specified parameters or <see cref="InResolutionScope"/> if nothing specified.</returns>
@@ -6823,7 +6823,7 @@ namespace DryIoc
 
         /// <summary>Creates reuse to search for <typeparamref name="TAssignableFromServiceType"/> and <paramref name="serviceKey"/>
         /// in existing resolution scope hierarchy.</summary>
-        /// <typeparam name="TAssignableFromServiceType">To search for scope with service type assignable to type specified in parameter.</typeparam>
+        /// <typeparam name="TAssignableFromServiceType">To search for scope with service type assignable to _TokenType specified in parameter.</typeparam>
         /// <param name="serviceKey">(optional) Search for specified key.</param>
         /// <param name="outermost">If true - commands to look for outermost match instead of nearest.</param>
         /// <returns>New reuse with specified parameters.</returns>
@@ -7037,7 +7037,7 @@ namespace DryIoc
         /// <param name="serviceKey">Optional service key used for registering service.</param>
         /// <param name="ifUnresolvedReturnDefault">Says what to do if service is unresolved.</param>
         /// <param name="requiredServiceType">Actual registered service type to use instead of <paramref name="serviceType"/>, 
-        ///     or wrapped type for generic wrappers.  The type should be assignable to return <paramref name="serviceType"/>.</param>
+        ///     or wrapped type for generic wrappers.  The _TokenType should be assignable to return <paramref name="serviceType"/>.</param>
         /// <param name="preResolveParent">Dependency resolution path info.</param>
         /// <param name="scope">Propagated resolution scope.</param>
         /// <returns>Created service object or default based on <paramref name="ifUnresolvedReturnDefault"/> provided.</returns>
@@ -7251,7 +7251,7 @@ namespace DryIoc
 
         /// <summary>Finds all registered default and keyed service factories and returns them.
         /// It skips decorators and wrappers.</summary>
-        /// <param name="serviceType">Service type to look for, may be open-generic type too.</param>
+        /// <param name="serviceType">Service type to look for, may be open-generic _TokenType too.</param>
         /// <param name="bothClosedAndOpenGenerics">(optional) For generic serviceType instructs to look for
         /// both closed and open-generic registrations.</param>
         /// <returns>Enumerable of found pairs.</returns>
@@ -7278,12 +7278,12 @@ namespace DryIoc
         /// <remarks>Different Rules could be combined together using <see cref="PropertiesAndFields.And"/> method.</remarks>     
         object InjectPropertiesAndFields(object instance, PropertiesAndFieldsSelector propertiesAndFields);
 
-        /// <summary>If <paramref name="serviceType"/> is generic type then this method checks if the type registered as generic wrapper,
-        /// and recursively unwraps and returns its type argument. This type argument is the actual service type we want to find.
+        /// <summary>If <paramref name="serviceType"/> is generic type then this method checks if the _TokenType registered as generic wrapper,
+        /// and recursively unwraps and returns its type argument. This _TokenType argument is the actual service _TokenType we want to find.
         /// Otherwise, method returns the input <paramref name="serviceType"/>.</summary>
         /// <param name="serviceType">Type to unwrap. Method will return early if type is not generic.</param>
         /// <param name="requiredServiceType">Required service type or null if don't care.</param>
-        /// <returns>Unwrapped service type in case it corresponds to registered generic wrapper, or input type in all other cases.</returns>
+        /// <returns>Unwrapped service type in case it corresponds to registered generic wrapper, or input _TokenType in all other cases.</returns>
         Type GetWrappedType(Type serviceType, Type requiredServiceType);
 
         /// <summary>Adds factory expression to cache identified by factory ID (<see cref="Factory.FactoryID"/>).</summary>
@@ -7433,9 +7433,9 @@ namespace DryIoc
                 "Please identify service with key, or metadata, or use Rules.WithFactorySelector to specify single registered factory."),
 
                 RegisterImplementationNotAssignableToServiceType = Of(
-                "Registering implementation type {0} not assignable to service type {1}."),
+                "Registering implementation type {0} not assignable to service _TokenType {1}."),
             RegisteredFactoryMethodResultTypesIsNotAssignableToImplementationType = Of(
-                "Registered factory method return type {1} should be assignable to implementation type {0} but it is not."),
+                "Registered factory method return type {1} should be assignable to implementation _TokenType {0} but it is not."),
             RegisteringOpenGenericRequiresFactoryProvider = Of(
                 "Unable to register not a factory provider (probably delegate factory) for open-generic service {0}."),
             RegisteringOpenGenericImplWithNonGenericService = Of(
@@ -7461,11 +7461,11 @@ namespace DryIoc
             NoMatchedImplementedTypesWithServiceType = Of(
                 "Unable to match service with open-generic {0} implementing {1} when resolving {2}."),
             NoMatchedFactoryMethodDeclaringTypeWithServiceTypeArgs = Of(
-                "Unable to match open-generic factory method Declaring type {0} with requested service type arguments <{1}> when resolving {2}."),
+                "Unable to match open-generic factory method Declaring type {0} with requested service _TokenType arguments <{1}> when resolving {2}."),
             NoMatchedFactoryMethodWithServiceTypeArgs = Of(
                 "Unable to match open-generic factory method {0} with requested service type arguments <{1}> when resolving {2}."),
             OpenGenericFactoryMethodDeclaringTypeIsNotSupportedOnThisPlatform = Of(
-                "[Specific to this .NET version] Unable to match method or constructor {0} from open-generic declaring type {1} to closed-generic type {2}, " +
+                "[Specific to this .NET version] Unable to match method or constructor {0} from open-generic declaring type {1} to closed-generic _TokenType {2}, " +
                 Environment.NewLine +
                 "Please give thje method an unique name to distinguish it from other overloads."),
             CtorIsMissingSomeParameters = Of(
@@ -7476,7 +7476,7 @@ namespace DryIoc
             ExpectedFuncWithMultipleArgs = Of(
                 "Expecting Func with one or more arguments but found {0}."),
             ResolvingOpenGenericServiceTypeIsNotPossible = Of(
-                "Resolving open-generic service type is not possible for type: {0}."),
+                "Resolving open-generic service type is not possible for _TokenType: {0}."),
             RecursiveDependencyDetected = Of(
                 "Recursive dependency is detected when resolving" + Environment.NewLine + "{0}."),
             ScopeIsDisposed = Of(
@@ -7501,9 +7501,9 @@ namespace DryIoc
             NoMatchedGenericParamConstraints = Of(
                 "Open-generic service does not match with registered open-generic implementation constraints {0} when resolving: {1}."),
             GenericWrapperWithMultipleTypeArgsShouldSpecifyArgIndex = Of(
-                "Generic wrapper type {0} should specify what type arg is wrapped, but it does not."),
+                "Generic wrapper type {0} should specify what _TokenType arg is wrapped, but it does not."),
             GenericWrapperTypeArgIndexOutOfBounds = Of(
-                "Registered generic wrapper {0} specified type argument index {1} is out of type argument list."),
+                "Registered generic wrapper {0} specified type argument index {1} is out of _TokenType argument list."),
             DependencyHasShorterReuseLifespan = Of(
                 "Dependency {0} reuse {1} lifespan shorter than its parent's {2}: {3}" + Environment.NewLine +
                 "To turn Off this error, specify the rule with new Container(rules => rules.WithoutThrowIfDependencyHasShorterReuseLifespan())."),
@@ -7539,7 +7539,7 @@ namespace DryIoc
                 Environment.NewLine +
                 "It is probably other scope was opened in between OR you forgot to Dispose some other scope!"),
             WrappedNotAssignableFromRequiredType = Of(
-                "Service (wrapped) type {0} is not assignable from required service type {1} when resolving {2}."),
+                "Service (wrapped) type {0} is not assignable from required service _TokenType {1} when resolving {2}."),
             NoMatchedScopeFound = Of(
                 "Unable to find scope with matching name: {0}."),
             NoMatchingScopeWhenRegisteringInstance = Of(
@@ -7611,7 +7611,7 @@ namespace DryIoc
         IsNull,
         /// <summary>Checked object is of unexpected type.</summary>
         IsNotOfType,
-        /// <summary>Checked type is not assignable to expected type</summary>
+        /// <summary>Checked type is not assignable to expected _TokenType</summary>
         TypeIsNotOfType,
         /// <summary>Invoked operation throw, it is source of inner exception.</summary>
         OperationThrows,
@@ -7857,14 +7857,14 @@ namespace DryIoc
             return type.FullName != null && type.FullName.Contains("<>c__DisplayClass");
         }
 
-        /// <summary>Returns true if type is generic.</summary><param name="type">Type to check.</param> <returns>True if type generic.</returns>
+        /// <summary>Returns true if type is generic.</summary><param name="type">Type to check.</param> <returns>True if _TokenType generic.</returns>
         public static bool IsGeneric(this Type type)
         {
             return type.GetTypeInfo().IsGenericType;
         }
 
-        /// <summary>Returns true if type is generic type definition (open type).</summary><param name="type">Type to check.</param>
-        /// <returns>True if type is open type: generic type definition.</returns>
+        /// <summary>Returns true if type is generic _TokenType definition (open _TokenType).</summary><param name="type">Type to check.</param>
+        /// <returns>True if type is open _TokenType: generic _TokenType definition.</returns>
         public static bool IsGenericDefinition(this Type type)
         {
             return type.GetTypeInfo().IsGenericTypeDefinition;
@@ -7887,15 +7887,15 @@ namespace DryIoc
             return typeInfo.IsGenericType && typeInfo.ContainsGenericParameters;
         }
 
-        /// <summary>Returns generic type definition if type is generic and null otherwise.</summary>
-        /// <param name="type">Source type, could be null.</param> <returns>Generic type definition.</returns>
+        /// <summary>Returns generic type definition if _TokenType is generic and null otherwise.</summary>
+        /// <param name="type">Source type, could be null.</param> <returns>Generic _TokenType definition.</returns>
         public static Type GetGenericDefinitionOrNull(this Type type)
         {
             return type != null && type.GetTypeInfo().IsGenericType ? type.GetGenericTypeDefinition() : null;
         }
 
-        /// <summary>Returns generic type parameters and arguments in order they specified. If type is not generic, returns empty array.</summary>
-        /// <param name="type">Source type.</param> <returns>Array of generic type arguments (closed/concrete types) and parameters (open).</returns>
+        /// <summary>Returns generic type parameters and arguments in order they specified. If _TokenType is not generic, returns empty array.</summary>
+        /// <param name="type">Source type.</param> <returns>Array of generic _TokenType arguments (closed/concrete types) and parameters (open).</returns>
         public static Type[] GetGenericParamsAndArgs(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
@@ -7912,22 +7912,22 @@ namespace DryIoc
             return type.GetTypeInfo().GetGenericParameterConstraints();
         }
 
-        /// <summary>If type is array returns is element type, otherwise returns null.</summary>
-        /// <param name="type">Source type.</param> <returns>Array element type or null.</returns>
+        /// <summary>If type is array returns is element _TokenType, otherwise returns null.</summary>
+        /// <param name="type">Source type.</param> <returns>Array element _TokenType or null.</returns>
         public static Type GetArrayElementTypeOrNull(this Type type)
         {
             var typeInfo = type.GetTypeInfo();
             return typeInfo.IsArray ? typeInfo.GetElementType() : null;
         }
 
-        /// <summary>Return base type or null, if not exist (the case for only for object type).</summary> 
-        /// <param name="type">Source type.</param> <returns>Base type or null for object.</returns>
+        /// <summary>Return base type or null, if not exist (the case for only for object _TokenType).</summary> 
+        /// <param name="type">Source type.</param> <returns>Base _TokenType or null for object.</returns>
         public static Type GetBaseType(this Type type)
         {
             return type.GetTypeInfo().BaseType;
         }
 
-        /// <summary>Checks if type is public or nested public in public type.</summary>
+        /// <summary>Checks if type is public or nested public in public _TokenType.</summary>
         /// <param name="type">Type to check.</param> <returns>Return true if check succeeded.</returns>
         public static bool IsPublicOrNestedPublic(this Type type)
         {
@@ -7935,7 +7935,7 @@ namespace DryIoc
             return typeInfo.IsPublic || typeInfo.IsNestedPublic && typeInfo.DeclaringType.IsPublicOrNestedPublic();
         }
 
-        /// <summary>Returns true if type is value type.</summary>
+        /// <summary>Returns true if type is value _TokenType.</summary>
         /// <param name="type">Type to check.</param> <returns>Check result.</returns>
         public static bool IsValueType(this Type type)
         {
@@ -7957,14 +7957,14 @@ namespace DryIoc
             return typeInfo.IsAbstract && typeInfo.IsSealed;
         }
 
-        /// <summary>Returns true if type is enum type.</summary>
+        /// <summary>Returns true if type is enum _TokenType.</summary>
         /// <param name="type">Type to check.</param> <returns>Check result.</returns>
         public static bool IsEnum(this Type type)
         {
             return type.GetTypeInfo().IsEnum;
         }
 
-        /// <summary>Returns true if instance of type is assignable to instance of <paramref name="other"/> type.</summary>
+        /// <summary>Returns true if instance of type is assignable to instance of <paramref name="other"/> _TokenType.</summary>
         /// <param name="type">Type to check, could be null.</param> 
         /// <param name="other">Other type to check, could be null.</param>
         /// <returns>Check result.</returns>
@@ -8009,7 +8009,7 @@ namespace DryIoc
         /// <summary>Recursive method to enumerate all input type and its base types for specific details.
         /// Details are returned by <paramref name="getDeclared"/> delegate.</summary>
         /// <typeparam name="T">Details type: properties, fields, methods, etc.</typeparam>
-        /// <param name="type">Input type.</param> <param name="getDeclared">Get declared type details.</param>
+        /// <param name="type">Input type.</param> <param name="getDeclared">Get declared _TokenType details.</param>
         /// <returns>Enumerated details info objects.</returns>
         public static IEnumerable<T> GetDeclaredAndBase<T>(this Type type, Func<TypeInfo, IEnumerable<T>> getDeclared)
         {
@@ -8092,7 +8092,7 @@ namespace DryIoc
             return type.GetDeclaredAndBase(_ => _.DeclaredFields).FirstOrDefault(p => p.Name == name);
         }
 
-        /// <summary>Returns type assembly.</summary> <param name="type">Input type</param> <returns>Type assembly.</returns>
+        /// <summary>Returns type assembly.</summary> <param name="type">Input _TokenType</param> <returns>Type assembly.</returns>
         public static Assembly GetAssembly(this Type type) { return type.GetTypeInfo().Assembly; }
 
         /// <summary>Returns true if member is static, otherwise returns false.</summary>
@@ -8353,7 +8353,7 @@ namespace DryIoc
         /// <summary>Looks for item in array using equality comparison, and returns new array with found item remove, or original array if not item found.</summary>
         /// <typeparam name="T">Type of array item.</typeparam>
         /// <param name="source">Input array.</param> <param name="value">Value to find and remove.</param>
-        /// <returns>New array with value removed or original array if value is not found.</returns>
+        /// <returns>New array with value removed or original array if _Value is not found.</returns>
         public static T[] Remove<T>(this T[] source, T value)
         {
             return source.RemoveAt(source.IndexOf(value));
@@ -8554,7 +8554,7 @@ namespace DryIoc
                 .Print(Value, "\"").Append("}").ToString();
         }
 
-        /// <summary>Returns true if both key and value are equal to corresponding key-value of other object.</summary>
+        /// <summary>Returns true if both key and value are equal to corresponding key-_Value of other object.</summary>
         /// <param name="obj">Object to check equality with.</param> <returns>True if equal.</returns>
         public override bool Equals(object obj)
         {
@@ -8576,7 +8576,7 @@ namespace DryIoc
         }
     }
 
-    /// <summary>Delegate for changing value from old one to some new based on provided new value.</summary>
+    /// <summary>Delegate for changing value from old one to some new based on provided new _Value.</summary>
     /// <typeparam name="V">Type of values.</typeparam>
     /// <param name="oldValue">Existing value.</param>
     /// <param name="newValue">New value passed to Update.. method.</param>
@@ -8615,13 +8615,13 @@ namespace DryIoc
             return AddOrUpdate(key, value, false, null);
         }
 
-        /// <summary>Delegate to calculate new value from and old and a new value.</summary>
+        /// <summary>Delegate to calculate new value from and old and a new _Value.</summary>
         /// <param name="oldValue">Old</param> <param name="newValue">New</param> <returns>Calculated result.</returns>
         public delegate object UpdateValue(object oldValue, object newValue);
 
         /// <summary>Returns new tree with added or updated value for specified key.</summary>
         /// <param name="key">Key</param> <param name="value">Value</param>
-        /// <param name="updateValue">(optional) Delegate to calculate new value from and old and a new value.</param>
+        /// <param name="updateValue">(optional) Delegate to calculate new value from and old and a new _Value.</param>
         /// <returns>New tree.</returns>
         public ImTreeMapIntToObj AddOrUpdate(int key, object value, UpdateValue updateValue)
         {
@@ -8753,7 +8753,7 @@ namespace DryIoc
         /// <summary>Returns true if tree is empty.</summary>
         public bool IsEmpty { get { return Height == 0; } }
 
-        /// <summary>Returns new tree with added key-value. If value with the same key is exist, then
+        /// <summary>Returns new tree with added key-value. If _Value with the same key is exist, then
         /// if <paramref name="update"/> is not specified: then existing value will be replaced by <paramref name="value"/>;
         /// if <paramref name="update"/> is specified: then update delegate will decide what value to keep.</summary>
         /// <param name="key">Key to add.</param><param name="value">Value to add.</param>
@@ -8767,7 +8767,7 @@ namespace DryIoc
         /// <summary>Looks for <paramref name="key"/> and replaces its value with new <paramref name="value"/>, or 
         /// runs custom update handler (<paramref name="update"/>) with old and new value to get the updated result.</summary>
         /// <param name="key">Key to look for.</param>
-        /// <param name="value">New value to replace key value with.</param>
+        /// <param name="value">New value to replace key _Value with.</param>
         /// <param name="update">(optional) Delegate for custom update logic, it gets old and new <paramref name="value"/>
         /// as inputs and should return updated value as output.</param>
         /// <returns>New tree with updated value or the SAME tree if no key found.</returns>
@@ -8919,7 +8919,7 @@ namespace DryIoc
             return new Ref<T>(value);
         }
 
-        /// <summary>Creates new ref to the value of original ref.</summary> <typeparam name="T">Ref value type.</typeparam>
+        /// <summary>Creates new ref to the value of original ref.</summary> <typeparam name="T">Ref _Value type.</typeparam>
         /// <param name="original">Original ref.</param> <returns>New ref to original value.</returns>
         public static Ref<T> NewRef<T>(this Ref<T> original) where T : class
         {

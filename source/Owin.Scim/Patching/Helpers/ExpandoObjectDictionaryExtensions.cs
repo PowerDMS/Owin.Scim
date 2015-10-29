@@ -58,7 +58,7 @@ namespace Owin.Scim.Patching.Helpers
                 }
             }
 
-            throw new ArgumentException(Resources.FormatDictionaryKeyNotFound(key));
+            throw new ArgumentException(ResourceHelper.FormatDictionaryKeyNotFound(key));
         }
 
         internal static bool ContainsCaseInsensitiveKey(

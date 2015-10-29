@@ -26,7 +26,7 @@
         /// <summary>
         /// Gets the is left.
         /// </summary>
-        /// <value>The is left.</value>
+        /// <value>The is left.</_Value>
         public override Boolean IsLeft
         {
             get { return false; }

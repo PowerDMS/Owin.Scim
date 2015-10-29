@@ -1,6 +1,5 @@
 namespace Owin.Scim.Tests.Integration.Users.Update.add
 {
-    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
@@ -10,17 +9,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_and_existing_multivaluedattribute_values : when_updating_a_user
+    public class with_path_null_existing_multivaluedattribute_value : when_updating_a_user
     {
-        static with_path_and_existing_multivaluedattribute_values()
+        static with_path_null_existing_multivaluedattribute_value()
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName(),
-                Emails = new List<Email>
-                {
-                    new Email { Value = "user@corp.com", Type = "work" }
-                }
+                Emails = null
             };
         }
 
@@ -45,19 +41,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_add_the_new_values = () => UpdatedUser
+        It should_replace_the_attribute_value = () => UpdatedUser
             .Emails
             .Where(e => e.Value.Equals("babs@jensen.org"))
             .ShouldNotBeEmpty();
 
-        It should_contain_the_existing_values = () => UpdatedUser
-            .Emails
-            .Where(e => e.Value.Equals("user@corp.com"))
-            .ShouldNotBeEmpty();
-
-        It should_append_the_new_attribute_values = () => UpdatedUser
+        It should_only_have_the_one_value = () => UpdatedUser
             .Emails
             .Count()
-            .ShouldEqual(2);
+            .ShouldEqual(1);
     }
 }

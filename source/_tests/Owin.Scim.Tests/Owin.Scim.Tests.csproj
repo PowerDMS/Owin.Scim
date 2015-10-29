@@ -30,6 +30,10 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Antlr4.Runtime.net45, Version=4.3.0.0, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="AutoMapper, Version=4.0.4.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
       <HintPath>..\..\packages\AutoMapper.4.0.4\lib\net45\AutoMapper.dll</HintPath>
       <Private>True</Private>
@@ -78,6 +82,9 @@
       <HintPath>..\..\packages\Owin.1.0\lib\net40\Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Owin.Scim.Antlr">
+      <HintPath>..\..\lib\Owin.Scim.Antlr.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -118,11 +125,16 @@
     <Compile Include="Integration\Users\Update\add\with_no_path.cs" />
     <Compile Include="Integration\Users\Update\add\without_path_existing_multivaluedattribute_values.cs" />
     <Compile Include="Integration\Users\Update\add\without_path_null_multivaluedattribute_value.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_and_complex_attribute.cs" />
     <Compile Include="Integration\Users\Update\add\with_path_and_existing_multivaluedattribute_values.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_and_filter.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_null_existing_multivaluedattribute_value.cs" />
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
+    <Compile Include="Querying\Filtering\when_parsing_a_filter_expression.cs" />
     <Compile Include="Services\UserService\Create\when_creating_a_user.cs" />
+    <Compile Include="Services\UserService\Create\with_non_canonicalized_attributes.cs" />
     <Compile Include="Services\UserService\Update\when_updating_a_user.cs" />
     <Compile Include="Services\UserService\Update\with_a_new_password.cs" />
     <Compile Include="Services\UserService\Update\with_a_password.cs" />

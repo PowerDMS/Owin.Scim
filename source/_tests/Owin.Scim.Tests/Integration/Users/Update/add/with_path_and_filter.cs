@@ -10,9 +10,9 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_and_existing_multivaluedattribute_values : when_updating_a_user
+    public class with_path_and_filter : when_updating_a_user
     {
-        static with_path_and_existing_multivaluedattribute_values()
+        static with_path_and_filter()
         {
             UserToUpdate = new User
             {
@@ -32,32 +32,20 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
                             ""op"": ""add"",
-                            ""path"": ""emails"",
-                            ""value"": [{
-                                ""value"": ""babs@jensen.org"",
-                                ""type"": ""home""
-                            }]
+                            ""path"": ""emails[type eq \""work\""]._TokenType"",
+                            ""value"": ""home""
                         }]
                     }",
                 Encoding.UTF8,
                 "application/json");
         };
 
-        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
-
-        It should_add_the_new_values = () => UpdatedUser
+//        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
+        
+        It should_replace_the_existing_value = () => UpdatedUser
             .Emails
-            .Where(e => e.Value.Equals("babs@jensen.org"))
-            .ShouldNotBeEmpty();
-
-        It should_contain_the_existing_values = () => UpdatedUser
-            .Emails
-            .Where(e => e.Value.Equals("user@corp.com"))
-            .ShouldNotBeEmpty();
-
-        It should_append_the_new_attribute_values = () => UpdatedUser
-            .Emails
-            .Count()
-            .ShouldEqual(2);
+            .Single(e => e.Value.Equals("user@corp.com"))
+            .Type
+            .ShouldEqual("home");
     }
 }

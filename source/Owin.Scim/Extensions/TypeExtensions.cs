@@ -12,13 +12,12 @@
             if (type == null) return false;
 
             return type != typeof(string) &&
-            (type.IsGenericType && type.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ||
+            ((type.IsGenericType && type.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ||
                 type.GetInterfaces()
                     .Any(
                         interfaceType =>
-                            (interfaceType.IsGenericType &&
-                             interfaceType.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ||
-                            (interfaceType == typeof (IEnumerable)));
+                            (interfaceType.IsGenericType && interfaceType.GetGenericTypeDefinition() == typeof (IEnumerable<>)) ||
+                            (interfaceType == typeof (IEnumerable))));
         }
 
         public static Type GetEnumerableType(this Type type)

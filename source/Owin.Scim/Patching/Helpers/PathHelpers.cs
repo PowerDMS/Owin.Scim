@@ -17,7 +17,7 @@ namespace Owin.Scim.Patching.Helpers
 
             if (path.Contains(".") || path.Contains("//") || path.Contains(" ") || path.Contains("\\"))
             {
-                throw new JsonPatchException(Resources.FormatInvalidValueForPath(path), null); 
+                throw new JsonPatchException(ResourceHelper.FormatInvalidValueForPath(path), null); 
             }
 
             if (!(path.StartsWith("/")))

@@ -8,6 +8,8 @@ namespace Owin.Scim.Patching.Helpers
     using System.Collections.Generic;
     using System.Linq;
 
+    using Filtering;
+
     using Newtonsoft.Json.Serialization;
 
     internal class ObjectTreeAnalysisResult
@@ -37,13 +39,21 @@ namespace Owin.Scim.Patching.Helpers
             // split the propertypath, and if necessary, remove the first 
             // empty item (that's the case when it starts with a "/")
             var propertyPathTree = propertyPath.Split(
-                new char[] { '/' },
-                StringSplitOptions.RemoveEmptyEntries);
+                new char[] { '/', '.' },
+                StringSplitOptions.RemoveEmptyEntries)
+                .Select(pp =>
+                {
+                    var bracketIndex = pp.IndexOf('[');
+                    if (bracketIndex == -1) return new Tuple<string, string>(pp, null);
+
+                    return new Tuple<string, string>(pp.Substring(0, bracketIndex), pp);
+                })
+                .ToList();
 
             // we've now got a split up property tree "base/property/otherproperty/..."
             int lastPosition = 0;
             object targetObject = objectToSearch;
-            for (int i = 0; i < propertyPathTree.Length; i++)
+            for (int i = 0; i < propertyPathTree.Count; i++)
             {
                 lastPosition = i;
 
@@ -53,13 +63,13 @@ namespace Owin.Scim.Patching.Helpers
                 if (dictionary != null)
                 {
                     // find the value in the dictionary                   
-                    if (dictionary.ContainsCaseInsensitiveKey(propertyPathTree[i]))
+                    if (dictionary.ContainsCaseInsensitiveKey(propertyPathTree[i].Item1))
                     {
-                        var possibleNewTargetObject = dictionary.GetValueForCaseInsensitiveKey(propertyPathTree[i]);
+                        var possibleNewTargetObject = dictionary.GetValueForCaseInsensitiveKey(propertyPathTree[i].Item1);
 
                         // unless we're at the last item, we should set the targetobject
                         // to the new object.  If we're at the last item, we need to stop
-                        if (i != propertyPathTree.Length - 1)
+                        if (i != propertyPathTree.Count - 1)
                         {
                             targetObject = possibleNewTargetObject;
                         }
@@ -71,53 +81,40 @@ namespace Owin.Scim.Patching.Helpers
                 }
                 else
                 {
-                    // if the current part of the path is numeric, this means we're trying
-                    // to get the propertyInfo of a specific object in an array.  To allow
-                    // for this, the previous value (targetObject) must be an IEnumerable, and
-                    // the position must exist.
+                    var jsonContract = (JsonObjectContract) contractResolver.ResolveContract(targetObject.GetType());
 
-                    int numericValue = -1;
-                    if (int.TryParse(propertyPathTree[i], out numericValue))
+                    // does the property exist?
+                    var attemptedProperty = jsonContract
+                        .Properties
+                        .FirstOrDefault(
+                            p =>
+                                string.Equals(p.PropertyName, propertyPathTree[i].Item1,
+                                    StringComparison.OrdinalIgnoreCase));
+
+                    if (attemptedProperty == null)
                     {
-                        var element = GetElementAtFromObject(targetObject, numericValue);
-                        if (element != null)
-                        {
-                            targetObject = element;
-                        }
-                        else
-                        {
-                            break;
-                        }
+                        // property cannot be found, and we're not working with dynamics.  
+                        // Stop, and return invalid path.
+                        break;
                     }
-                    else
+
+                    if (propertyPathTree[i].Item2 != null)
                     {
-                        var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(targetObject.GetType());
+                        // we have a filter!
+                        // TODO: (DG) Parse filter string
+                        var filter = new ScimFilter(attemptedProperty, propertyPathTree[i].Item2);
+                    }
 
-                        // does the property exist?
-                        var attemptedProperty = jsonContract
-                            .Properties
-                            .FirstOrDefault(p => string.Equals(p.PropertyName, propertyPathTree[i], StringComparison.OrdinalIgnoreCase));
-
-                        if (attemptedProperty != null)
-                        {
-                            // unless we're at the last item, we should continue searching.
-                            // If we're at the last item, we need to stop
-                            if ((i != propertyPathTree.Length - 1))
-                            {
-                                targetObject = attemptedProperty.ValueProvider.GetValue(targetObject);
-                            }
-                        }
-                        else
-                        {
-                            // property cannot be found, and we're not working with dynamics.  
-                            // Stop, and return invalid path.
-                            break;
-                        }
+                    // unless we're at the last item, we should continue searching.
+                    // If we're at the last item, we need to stop
+                    if ((i != propertyPathTree.Count - 1))
+                    {
+                        targetObject = attemptedProperty.ValueProvider.GetValue(targetObject);
                     }
                 }
             }
 
-            if (propertyPathTree.Length - lastPosition != 1)
+            if (propertyPathTree.Count - lastPosition != 1)
             {
                 IsValidPathForAdd = false;
                 IsValidPathForRemove = false;
@@ -135,7 +132,7 @@ namespace Owin.Scim.Patching.Helpers
 
                 Container = (IDictionary<string, object>)targetObject;
                 IsValidPathForAdd = true;
-                PropertyPathInParent = propertyPathTree[propertyPathTree.Length - 1];
+                PropertyPathInParent = propertyPathTree[propertyPathTree.Count - 1].Item1;
 
                 // to be able to remove this property, it must exist
                 IsValidPathForRemove = Container.ContainsCaseInsensitiveKey(PropertyPathInParent);
@@ -146,7 +143,7 @@ namespace Owin.Scim.Patching.Helpers
                 UseDynamicLogic = false;
 
                 int index;
-                if (!Int32.TryParse(propertyPathTree[propertyPathTree.Length - 1], out index))
+                if (!Int32.TryParse(propertyPathTree[propertyPathTree.Count - 1].Item1, out index))
                 {
                     // We only support indexing into a list
                     IsValidPathForAdd = false;
@@ -156,13 +153,13 @@ namespace Owin.Scim.Patching.Helpers
 
                 IsValidPathForAdd = true;
                 IsValidPathForRemove = ((IList)targetObject).Count > index;
-                PropertyPathInParent = propertyPathTree[propertyPathTree.Length - 1];
+                PropertyPathInParent = propertyPathTree[propertyPathTree.Count - 1].Item1;
             }
             else
             {
                 UseDynamicLogic = false;
 
-                var property = propertyPathTree[propertyPathTree.Length - 1];
+                var property = propertyPathTree[propertyPathTree.Count - 1].Item1;
                 var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(targetObject.GetType());
                 var attemptedProperty = jsonContract
                     .Properties

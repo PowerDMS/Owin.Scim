@@ -59,6 +59,140 @@ namespace Owin.Scim.Properties {
                 resourceCulture = value;
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type of the property at path &apos;{0}&apos; could not be determined..
+        /// </summary>
+        internal static string CannotDeterminePropertyType {
+            get {
+                return ResourceManager.GetString("CannotDeterminePropertyType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property at &apos;{0}&apos; could not be read..
+        /// </summary>
+        internal static string CannotReadProperty {
+            get {
+                return ResourceManager.GetString("CannotReadProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property at path &apos;{0}&apos; could not be updated..
+        /// </summary>
+        internal static string CannotUpdateProperty {
+            get {
+                return ResourceManager.GetString("CannotUpdateProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The key &apos;{0}&apos; was not found..
+        /// </summary>
+        internal static string DictionaryKeyNotFound {
+            get {
+                return ResourceManager.GetString("DictionaryKeyNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For operation &apos;{0}&apos; on array property at path &apos;{1}&apos;, the index is larger than the array size..
+        /// </summary>
+        internal static string InvalidIndexForArrayProperty {
+            get {
+                return ResourceManager.GetString("InvalidIndexForArrayProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The type &apos;{0}&apos; was malformed and could not be parsed..
+        /// </summary>
+        internal static string InvalidJsonPatchDocument {
+            get {
+                return ResourceManager.GetString("InvalidJsonPatchDocument", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For operation &apos;{0}&apos;, the provided path is invalid for array property at path &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidPathForArrayProperty {
+            get {
+                return ResourceManager.GetString("InvalidPathForArrayProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The provided string &apos;{0}&apos; is an invalid path..
+        /// </summary>
+        internal static string InvalidValueForPath {
+            get {
+                return ResourceManager.GetString("InvalidValueForPath", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The value &apos;{0}&apos; is invalid for property at path &apos;{1}&apos;..
+        /// </summary>
+        internal static string InvalidValueForProperty {
+            get {
+                return ResourceManager.GetString("InvalidValueForProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to For operation &apos;{0}&apos; on array property at path &apos;{1}&apos;, the index is negative..
+        /// </summary>
+        internal static string NegativeIndexForArrayProperty {
+            get {
+                return ResourceManager.GetString("NegativeIndexForArrayProperty", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to &apos;{0}&apos; must be of type &apos;{1}&apos;..
+        /// </summary>
+        internal static string ParameterMustMatchType {
+            get {
+                return ResourceManager.GetString("ParameterMustMatchType", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property at path &apos;{0}&apos; could not be added..
+        /// </summary>
+        internal static string PropertyCannotBeAdded {
+            get {
+                return ResourceManager.GetString("PropertyCannotBeAdded", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The property at path &apos;{0}&apos; could not be removed..
+        /// </summary>
+        internal static string PropertyCannotBeRemoved {
+            get {
+                return ResourceManager.GetString("PropertyCannotBeRemoved", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Property does not exist at path &apos;{0}&apos;..
+        /// </summary>
+        internal static string PropertyDoesNotExist {
+            get {
+                return ResourceManager.GetString("PropertyDoesNotExist", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The test operation is not supported..
+        /// </summary>
+        internal static string TestOperationNotSupported {
+            get {
+                return ResourceManager.GetString("TestOperationNotSupported", resourceCulture);
+            }
+        }
     }
 }
-// <auto-generated />

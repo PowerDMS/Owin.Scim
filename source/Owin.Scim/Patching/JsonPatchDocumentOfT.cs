@@ -16,7 +16,7 @@ namespace Owin.Scim.Patching
 
     using Operations;
 
-    // Implementation details: the purpose of this type of patch document is to ensure we can do type-checking
+    // Implementation details: the purpose of this type of patch document is to ensure we can do _TokenType-checking
     // when producing a JsonPatchDocument.  However, we cannot send this "typed" over the wire, as that would require
     // including type data in the JsonPatchDocument serialized as JSON (to allow for correct deserialization) - that's
     // not according to RFC 6902, and would thus break cross-platform compatibility.

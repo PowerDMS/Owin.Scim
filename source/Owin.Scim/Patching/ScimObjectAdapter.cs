@@ -145,8 +145,6 @@
                 throw new ArgumentNullException(nameof(operationToReport));
             }
 
-            #region Scim Edit
-
             // With SCIM 2.0, path is only required for the remove operation:
 
             // If omitted (path), the target location is assumed to be the resource
@@ -209,23 +207,22 @@
                 }
             }
 
-            #endregion
-
             // first up: if the path ends in a numeric value, we're inserting in a list and
             // that value represents the position; if the path ends in "-", we're appending
             // to the list.
 
             // get path result
-            var pathResult = GetActualPropertyPath(
-                path,
-                objectToApplyTo,
-                operationToReport);
+//            var pathResult = GetActualPropertyPath(
+//                path,
+//                objectToApplyTo,
+//                operationToReport);
 
-            if (pathResult == null)
-            {
-                return;
-            }
-            var actualPathToProperty = pathResult.PathToProperty;
+//            if (pathResult == null)
+//            {
+//                return;
+//            }
+
+            var actualPathToProperty = path; //pathResult.PathToProperty;
 
             var treeAnalysisResult = new ObjectTreeAnalysisResult(
                 objectToApplyTo,
@@ -237,7 +234,7 @@
                 LogError(new JsonPatchError(
                     objectToApplyTo,
                     operationToReport,
-                    Resources.FormatPropertyCannotBeAdded(path)));
+                    ResourceHelper.FormatPropertyCannotBeAdded(path)));
                 return;
             }
             
@@ -256,7 +253,7 @@
                         LogError(new JsonPatchError(
                             objectToApplyTo,
                             operationToReport,
-                            Resources.FormatInvalidValueForProperty(conversionResult.ConvertedInstance, path)));
+                            ResourceHelper.FormatInvalidValueForProperty(conversionResult.ConvertedInstance, path)));
                         return;
                     }
 
@@ -265,7 +262,7 @@
                         LogError(new JsonPatchError(
                             objectToApplyTo,
                             operationToReport,
-                            Resources.FormatCannotReadProperty(path)));
+                            ResourceHelper.FormatCannotReadProperty(path)));
                         return;
                     }
 
@@ -288,7 +285,7 @@
                         LogError(new JsonPatchError(
                             objectToApplyTo,
                             operationToReport,
-                            Resources.FormatInvalidValueForProperty(value, path)));
+                            ResourceHelper.FormatInvalidValueForProperty(value, path)));
                         return;
                     }
 
@@ -297,7 +294,7 @@
                         LogError(new JsonPatchError(
                             objectToApplyTo,
                             operationToReport,
-                            Resources.FormatCannotUpdateProperty(path)));
+                            ResourceHelper.FormatCannotUpdateProperty(path)));
                         return;
                     }
 
@@ -328,7 +325,7 @@
                             LogError(new JsonPatchError(
                                 objectToApplyTo,
                                 operationToReport,
-                                Resources.FormatInvalidIndexForArrayProperty(operationToReport.op, path)));
+                                ResourceHelper.FormatInvalidIndexForArrayProperty(operationToReport.op, path)));
                             return;
                         }
 
@@ -340,7 +337,7 @@
                             LogError(new JsonPatchError(
                                 objectToApplyTo,
                                 operationToReport,
-                                Resources.FormatInvalidValueForProperty(value, path)));
+                                ResourceHelper.FormatInvalidValueForProperty(value, path)));
                             return;
                         }
 
@@ -371,7 +368,7 @@
                             LogError(new JsonPatchError(
                                 objectToApplyTo,
                                 operationToReport,
-                                Resources.FormatInvalidValueForProperty(conversionResult.ConvertedInstance, path)));
+                                ResourceHelper.FormatInvalidValueForProperty(conversionResult.ConvertedInstance, path)));
                             return;
                         }
                     }
