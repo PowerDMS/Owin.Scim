@@ -191,7 +191,7 @@
 
                     foreach (var kvp in resourcePatch)
                     {
-                        Add("/" + kvp.Key, kvp.Value, objectToApplyTo, operationToReport);
+                        Add(kvp.Key, kvp.Value, objectToApplyTo, operationToReport);
                     }
 
                     return;
@@ -224,7 +224,7 @@
 
             var actualPathToProperty = path; //pathResult.PathToProperty;
 
-            var treeAnalysisResult = new ObjectTreeAnalysisResult(
+            var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
                 objectToApplyTo,
                 actualPathToProperty,
                 ContractResolver);

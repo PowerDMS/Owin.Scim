@@ -19,7 +19,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                 UserName = UserNameUtility.GenerateUserName(),
                 Emails = new List<Email>
                 {
-                    new Email { Value = "user@corp.com", Type = "work" }
+                    new Email { Value = "user@corp.com", Type = "work" },
+                    new Email { Value = "user@gmail.com", Type = "personal" }
                 }
             };
         }
@@ -32,7 +33,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
                             ""op"": ""add"",
-                            ""path"": ""emails[type eq \""work\""]._TokenType"",
+                            ""path"": ""emails[type eq \""work\""].type"",
                             ""value"": ""home""
                         }]
                     }",
@@ -40,7 +41,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                 "application/json");
         };
 
-//        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
+        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
         
         It should_replace_the_existing_value = () => UpdatedUser
             .Emails

@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Querying
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -8,9 +9,25 @@
 
     using Antlr;
 
-    public class ScimFilterVisitor<TResource> : ScimFilterBaseVisitor<Expression<Func<TResource, bool>>>
+    using Antlr4.Runtime.Tree;
+
+    using Extensions;
+
+    using NContext.Common;
+
+    public interface IScimFilterVisitor
     {
-        public override Expression<Func<TResource, bool>> VisitAndExp(ScimFilterParser.AndExpContext context)
+        LambdaExpression VisitExpression(IParseTree tree);
+    }
+
+    public class ScimFilterVisitor<TResource> : ScimFilterBaseVisitor<LambdaExpression>, IScimFilterVisitor
+    {
+        public LambdaExpression VisitExpression(IParseTree tree)
+        {
+            return Visit(tree);
+        }
+
+        public override LambdaExpression VisitAndExp(ScimFilterParser.AndExpContext context)
         {
             var left = Visit(context.expression(0));
             var right = Visit(context.expression(1));
@@ -18,24 +35,47 @@
             return CombineWithAnd(left, right);
         }
 
-        public override Expression<Func<TResource, bool>> VisitBraceExp(ScimFilterParser.BraceExpContext context)
+        public override LambdaExpression VisitBraceExp(ScimFilterParser.BraceExpContext context)
         {
             return Visit(context.expression());
         }
 
-        public override Expression<Func<TResource, bool>> VisitBracketExp(ScimFilterParser.BracketExpContext context)
+        public override LambdaExpression VisitBracketExp(ScimFilterParser.BracketExpContext context)
         {
-            return base.VisitBracketExp(context);
+            // brackets change the TResource (field) and the expression within should be visited in context of the new field's type
+
+            var propertyNameToken = context.FIELD().GetText();
+            var property = typeof(TResource)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField)
+                .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
+
+            if (property == null) throw new Exception("ERROR"); // TODO: (DG) make proper error
+
+            if (property.PropertyType != typeof (TResource))
+            {
+                Type childFilterType = property.PropertyType;
+                if (childFilterType.IsNonStringEnumerable())
+                {
+                    childFilterType = childFilterType.GetGenericArguments()[0];
+                }
+
+                var childVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(childFilterType);
+                var childVisitor = (IScimFilterVisitor) childVisitorType.CreateInstance();
+                
+                return childVisitor.VisitExpression(context.expression());
+            }
+
+            return Visit(context.expression());
         }
 
-        public override Expression<Func<TResource, bool>> VisitNotExp(ScimFilterParser.NotExpContext context)
+        public override LambdaExpression VisitNotExp(ScimFilterParser.NotExpContext context)
         {
             var predicate = Visit(context.expression());
 
             return CombineWithNot(predicate);
         }
 
-        public override Expression<Func<TResource, bool>> VisitOperatorExp(ScimFilterParser.OperatorExpContext context)
+        public override LambdaExpression VisitOperatorExp(ScimFilterParser.OperatorExpContext context)
         {
             var propertyNameToken = context.FIELD().GetText();
             var operatorToken = context.OPERATOR().GetText().ToLower();
@@ -170,7 +210,7 @@
             throw new Exception("Invalid filter operator for a binary expression.");
         }
 
-        public override Expression<Func<TResource, bool>> VisitOrExp(ScimFilterParser.OrExpContext context)
+        public override LambdaExpression VisitOrExp(ScimFilterParser.OrExpContext context)
         {
             var left = Visit(context.expression(0));
             var right = Visit(context.expression(1));
@@ -178,7 +218,7 @@
             return CombineWithOr(left, right);
         }
 
-        public override Expression<Func<TResource, bool>> VisitPresentExp(ScimFilterParser.PresentExpContext context)
+        public override LambdaExpression VisitPresentExp(ScimFilterParser.PresentExpContext context)
         {
             var propertyNameToken = context.FIELD().GetText();
 
@@ -188,36 +228,66 @@
 
             if (property == null) throw new Exception("eeeerrrooorrr"); // TODO: (DG) proper error handling
             if (property.GetGetMethod() == null) throw new Exception("error");
+            
+            var argument = Expression.Parameter(typeof(TResource));
+            var predicate = Expression.Lambda<Func<TResource, bool>>(
+                Expression.Call(
+                    GetType().GetMethod("IsPresent", BindingFlags.NonPublic | BindingFlags.Static, 
+                            null,
+                            new[] { typeof(TResource), typeof(PropertyInfo) },
+                            new ParameterModifier[0]),
+                        new List<Expression>
+                        {
+                            argument,
+                            Expression.Constant(property)
+                        }),
+                argument);
 
-            //            var propertyValue = property.GetValue()
-
-            //            var argument = Expression.Parameter(typeof(TResource));
-            //            var predicate = Expression.Lambda<Func<TResource, bool>>(
-            //                Expression.Call(),
-            //                argument);
-
-            return null;
+            return predicate;
         }
 
-        private Expression<Func<TResource, bool>> CombineWithOr(Expression<Func<TResource, bool>> left, Expression<Func<TResource, bool>> right)
+        private LambdaExpression CombineWithOr(LambdaExpression left, LambdaExpression right)
         {
             var parameter = Expression.Parameter(typeof(TResource), "x");
             var resultBody = Expression.Or(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
             return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
         }
 
-        private Expression<Func<TResource, bool>> CombineWithAnd(Expression<Func<TResource, bool>> left, Expression<Func<TResource, bool>> right)
+        private LambdaExpression CombineWithAnd(LambdaExpression left, LambdaExpression right)
         {
             var parameter = Expression.Parameter(typeof(TResource), "x");
             var resultBody = Expression.And(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
             return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
         }
 
-        private Expression<Func<TResource, bool>> CombineWithNot(Expression<Func<TResource, bool>> predicate)
+        private LambdaExpression CombineWithNot(LambdaExpression predicate)
         {
             var parameter = Expression.Parameter(typeof(TResource), "x");
             var resultBody = Expression.Not(Expression.Invoke(predicate, parameter));
             return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
+        }
+
+        internal static bool IsPresent(TResource resource, PropertyInfo property)
+        {
+            if (resource == null || property == null) return false;
+
+            var value = property.GetValue(resource);
+            if (value == null) return false;
+
+            var valueType = value.GetType();
+            if (valueType == typeof (String))
+            {
+                return !string.IsNullOrWhiteSpace(value as string);
+            }
+
+            if (valueType.IsNonStringEnumerable())
+            {
+                var enumerable = (IEnumerable) value;
+                var enumerator = enumerable.GetEnumerator();
+                return enumerator.MoveNext();
+            }
+
+            return true;
         }
     }
 }

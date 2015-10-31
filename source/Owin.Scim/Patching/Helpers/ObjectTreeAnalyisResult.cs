@@ -1,4 +1,8 @@
-﻿// Copyright (c) .NET Foundation. All rights reserved.
+﻿// This code borrows from Microsoft's JsonPatch ObjectTreeAnalysisResult.cs
+// This has been extended and heavily modifies to add support for IEnumerable instead of IList as
+// support SCIM's filters.
+
+// Copyright (c) .NET Foundation. All rights reserved.
 // Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
 
 namespace Owin.Scim.Patching.Helpers
@@ -8,11 +12,19 @@ namespace Owin.Scim.Patching.Helpers
     using System.Collections.Generic;
     using System.Linq;
 
-    using Filtering;
+    using Antlr;
+
+    using Antlr4.Runtime;
+
+    using Extensions;
+
+    using NContext.Common;
 
     using Newtonsoft.Json.Serialization;
 
-    internal class ObjectTreeAnalysisResult
+    using Querying;
+
+    public class ScimObjectTreeAnalysisResult
     {
         // either the property is part of the container dictionary,
         // or we have a direct reference to a JsonPatchProperty instance
@@ -29,7 +41,7 @@ namespace Owin.Scim.Patching.Helpers
 
         public JsonPatchProperty JsonPatchProperty { get; private set; }
 
-        public ObjectTreeAnalysisResult(
+        public ScimObjectTreeAnalysisResult(
             object objectToSearch,
             string propertyPath,
             IContractResolver contractResolver)
@@ -46,7 +58,7 @@ namespace Owin.Scim.Patching.Helpers
                     var bracketIndex = pp.IndexOf('[');
                     if (bracketIndex == -1) return new Tuple<string, string>(pp, null);
 
-                    return new Tuple<string, string>(pp.Substring(0, bracketIndex), pp);
+                    return new Tuple<string, string>(pp.Substring(0, bracketIndex), pp);//.Substring(bracketIndex + 1, pp.Length - bracketIndex - 2));
                 })
                 .ToList();
 
@@ -100,16 +112,41 @@ namespace Owin.Scim.Patching.Helpers
 
                     if (propertyPathTree[i].Item2 != null)
                     {
-                        // we have a filter!
-                        // TODO: (DG) Parse filter string
-                        var filter = new ScimFilter(attemptedProperty, propertyPathTree[i].Item2);
-                    }
+                        // we can only filter enumerable types
+                        if (!attemptedProperty.PropertyType.IsNonStringEnumerable())
+                            break;
 
-                    // unless we're at the last item, we should continue searching.
-                    // If we're at the last item, we need to stop
-                    if ((i != propertyPathTree.Count - 1))
+                        // can't filter null
+                        var enumerable = attemptedProperty.ValueProvider.GetValue(targetObject) as IEnumerable;
+                        if (enumerable == null)
+                            break;
+
+                        // parse our filter into an expression tree
+                        var lexer = new ScimFilterLexer(new AntlrInputStream(propertyPathTree[i].Item2));
+                        var parser = new ScimFilterParser(new CommonTokenStream(lexer));
+
+                        var filterVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(targetObject.GetType());//attemptedProperty.PropertyType.GetGenericArguments()[0]);
+                        var filterVisitor = (IScimFilterVisitor) filterVisitorType.CreateInstance();
+                        var predicate = filterVisitor.VisitExpression(parser.parse()).Compile();
+
+                        var enumerator = enumerable.GetEnumerator();
+                        while (enumerator.MoveNext())
+                        {
+                            if ((bool) predicate.DynamicInvoke(enumerator.Current))
+                            {
+                                targetObject = enumerator.Current;
+                                break; // UNSURE ABOUT THIS. This acts like Single() and will only affect the first positive case
+                            }
+                        }
+                    }
+                    else
                     {
-                        targetObject = attemptedProperty.ValueProvider.GetValue(targetObject);
+                        // unless we're at the last item, we should continue searching.
+                        // If we're at the last item, we need to stop
+                        if ((i != propertyPathTree.Count - 1))
+                        {
+                            targetObject = attemptedProperty.ValueProvider.GetValue(targetObject);
+                        }
                     }
                 }
             }
@@ -137,22 +174,11 @@ namespace Owin.Scim.Patching.Helpers
                 // to be able to remove this property, it must exist
                 IsValidPathForRemove = Container.ContainsCaseInsensitiveKey(PropertyPathInParent);
             }
-            else if (targetObject is IList)
+            else if (targetObject is IEnumerable)
             {
-                System.Diagnostics.Debugger.Launch();
                 UseDynamicLogic = false;
-
-                int index;
-                if (!Int32.TryParse(propertyPathTree[propertyPathTree.Count - 1].Item1, out index))
-                {
-                    // We only support indexing into a list
-                    IsValidPathForAdd = false;
-                    IsValidPathForRemove = false;
-                    return;
-                }
-
                 IsValidPathForAdd = true;
-                IsValidPathForRemove = ((IList)targetObject).Count > index;
+                IsValidPathForRemove = true;
                 PropertyPathInParent = propertyPathTree[propertyPathTree.Count - 1].Item1;
             }
             else
@@ -179,30 +205,5 @@ namespace Owin.Scim.Patching.Helpers
                 }
             }
         }
-
-        private object GetElementAtFromObject(object targetObject, int numericValue)
-        {
-            if (numericValue > -1)
-            {
-                // Check if the targetobject is an IEnumerable,
-                // and if the position is valid.
-                if (targetObject is IEnumerable)
-                {
-                    var indexable = ((IEnumerable)targetObject).Cast<object>();
-
-                    if (indexable.Count() >= numericValue)
-                    {
-                        return indexable.ElementAt(numericValue);
-                    }
-                    else { return null; }
-                }
-                else { return null; }
-            }
-            else
-            {
-                return null;
-            }
-        }
-
     }
 }
