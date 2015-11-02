@@ -32,7 +32,10 @@
             var left = Visit(context.expression(0));
             var right = Visit(context.expression(1));
 
-            return CombineWithAnd(left, right);
+            var parameter = Expression.Parameter(typeof(TResource));
+            var resultBody = Expression.And(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
+
+            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
         }
 
         public override LambdaExpression VisitBraceExp(ScimFilterParser.BraceExpContext context)
@@ -42,7 +45,8 @@
 
         public override LambdaExpression VisitBracketExp(ScimFilterParser.BracketExpContext context)
         {
-            // brackets change the TResource (field) and the expression within should be visited in context of the new field's type
+            // brackets MAY change the field type (TResource) thus, the expression within the brackets 
+            // should be visited in context of the new field's type
 
             var propertyNameToken = context.FIELD().GetText();
             var property = typeof(TResource)
@@ -59,20 +63,37 @@
                     childFilterType = childFilterType.GetGenericArguments()[0];
                 }
 
+                var argument = Expression.Parameter(typeof(TResource));
                 var childVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(childFilterType);
                 var childVisitor = (IScimFilterVisitor) childVisitorType.CreateInstance();
-                
-                return childVisitor.VisitExpression(context.expression());
+                var childLambda = childVisitor.VisitExpression(context.expression()); // Visit the nested filter expression.
+                var childLambdaArgument = Expression.TryCatch(
+                    Expression.Block(Expression.Property(argument, property)),
+                    Expression.Catch(typeof (Exception), Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
+                    );
+
+                return Expression.Lambda(
+                    Expression.Invoke(
+                        childLambda,
+                        new List<Expression>
+                        {
+                            Expression.TypeAs(childLambdaArgument, childFilterType)
+                        }),
+                    argument);
+
             }
 
-            return Visit(context.expression());
+            return Visit(context.expression()); // This is probably incorrect if the property is nested and the same type as its parent. We'll most likely still need a childLambda.
         }
 
         public override LambdaExpression VisitNotExp(ScimFilterParser.NotExpContext context)
         {
             var predicate = Visit(context.expression());
 
-            return CombineWithNot(predicate);
+            var parameter = Expression.Parameter(typeof(TResource));
+            var resultBody = Expression.Not(Expression.Invoke(predicate, parameter));
+
+            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
         }
 
         public override LambdaExpression VisitOperatorExp(ScimFilterParser.OperatorExpContext context)
@@ -86,20 +107,62 @@
                 .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
 
             if (property == null) throw new Exception("ERROR"); // TODO: (DG) make proper error
-
-
+            
             var argument = Expression.Parameter(typeof(TResource));
+
+            var left = Expression.TryCatch(
+                Expression.Block(Expression.Property(argument, property)),
+                Expression.Catch(typeof(Exception), Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
+                );
+
             var predicate = Expression.Lambda<Func<TResource, bool>>(
-                GetBinaryExpression(operatorToken, argument, property, valueToken),
+                CreateBinaryExpression(left, property, operatorToken, valueToken),
                 argument);
 
             return predicate;
         }
 
-        private static Expression GetBinaryExpression(string operatorToken, ParameterExpression argument, PropertyInfo property, string valueToken)
+        public override LambdaExpression VisitOrExp(ScimFilterParser.OrExpContext context)
         {
-            var left = Expression.Property(argument, property);
+            var left = Visit(context.expression(0));
+            var right = Visit(context.expression(1));
 
+            var parameter = Expression.Parameter(typeof(TResource));
+            var resultBody = Expression.Or(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
+
+            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
+        }
+
+        public override LambdaExpression VisitPresentExp(ScimFilterParser.PresentExpContext context)
+        {
+            var propertyNameToken = context.FIELD().GetText();
+
+            var property = typeof(TResource)
+                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
+
+            if (property == null) throw new Exception("eeeerrrooorrr"); // TODO: (DG) proper error handling
+            if (property.GetGetMethod() == null) throw new Exception("error");
+            
+            var argument = Expression.Parameter(typeof(TResource));
+            var predicate = Expression.Lambda<Func<TResource, bool>>(
+                Expression.Call(
+                    GetType().GetMethod("IsPresent", BindingFlags.NonPublic | BindingFlags.Static, 
+                            null,
+                            new[] { typeof(TResource), typeof(PropertyInfo) },
+                            new ParameterModifier[0]),
+                        new List<Expression>
+                        {
+                            argument,
+                            Expression.Constant(property)
+                        }),
+                argument);
+
+            return predicate;
+        }
+
+        private static Expression CreateBinaryExpression(Expression left, PropertyInfo property, string operatorToken, string valueToken)
+        {
             // Equal
             if (operatorToken.Equals("eq"))
             {
@@ -122,15 +185,15 @@
                 }
 
                 return Expression.Call(
-                        typeof(string).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static, null,
-                            new[] { typeof(string), typeof(string), typeof(StringComparison) },
-                            new ParameterModifier[0]),
-                        new List<Expression>
-                        {
-                            left,
-                            Expression.Constant(valueToken),
-                            Expression.Constant(StringComparison.OrdinalIgnoreCase)
-                        });
+                    typeof(string).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static, null,
+                        new[] { typeof(string), typeof(string), typeof(StringComparison) },
+                        new ParameterModifier[0]),
+                    new List<Expression>
+                    {
+                        left,
+                        Expression.Constant(valueToken),
+                        Expression.Constant(StringComparison.OrdinalIgnoreCase)
+                    });
             }
 
             // Not Equal
@@ -210,64 +273,7 @@
             throw new Exception("Invalid filter operator for a binary expression.");
         }
 
-        public override LambdaExpression VisitOrExp(ScimFilterParser.OrExpContext context)
-        {
-            var left = Visit(context.expression(0));
-            var right = Visit(context.expression(1));
-
-            return CombineWithOr(left, right);
-        }
-
-        public override LambdaExpression VisitPresentExp(ScimFilterParser.PresentExpContext context)
-        {
-            var propertyNameToken = context.FIELD().GetText();
-
-            var property = typeof(TResource)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
-
-            if (property == null) throw new Exception("eeeerrrooorrr"); // TODO: (DG) proper error handling
-            if (property.GetGetMethod() == null) throw new Exception("error");
-            
-            var argument = Expression.Parameter(typeof(TResource));
-            var predicate = Expression.Lambda<Func<TResource, bool>>(
-                Expression.Call(
-                    GetType().GetMethod("IsPresent", BindingFlags.NonPublic | BindingFlags.Static, 
-                            null,
-                            new[] { typeof(TResource), typeof(PropertyInfo) },
-                            new ParameterModifier[0]),
-                        new List<Expression>
-                        {
-                            argument,
-                            Expression.Constant(property)
-                        }),
-                argument);
-
-            return predicate;
-        }
-
-        private LambdaExpression CombineWithOr(LambdaExpression left, LambdaExpression right)
-        {
-            var parameter = Expression.Parameter(typeof(TResource), "x");
-            var resultBody = Expression.Or(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
-            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
-        }
-
-        private LambdaExpression CombineWithAnd(LambdaExpression left, LambdaExpression right)
-        {
-            var parameter = Expression.Parameter(typeof(TResource), "x");
-            var resultBody = Expression.And(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
-            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
-        }
-
-        private LambdaExpression CombineWithNot(LambdaExpression predicate)
-        {
-            var parameter = Expression.Parameter(typeof(TResource), "x");
-            var resultBody = Expression.Not(Expression.Invoke(predicate, parameter));
-            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
-        }
-
-        internal static bool IsPresent(TResource resource, PropertyInfo property)
+        protected internal static bool IsPresent(TResource resource, PropertyInfo property)
         {
             if (resource == null || property == null) return false;
 
@@ -275,7 +281,7 @@
             if (value == null) return false;
 
             var valueType = value.GetType();
-            if (valueType == typeof (String))
+            if (valueType == typeof (string))
             {
                 return !string.IsNullOrWhiteSpace(value as string);
             }
@@ -288,6 +294,13 @@
             }
 
             return true;
+        }
+
+        private static object GetDefaultValue(Type type)
+        {
+            return type.IsValueType
+                ? Activator.CreateInstance(type)
+                : null;
         }
     }
 }

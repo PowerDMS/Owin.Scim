@@ -169,7 +169,7 @@
     <Compile Include="Patching\Helpers\ExpressionHelpers.cs" />
     <Compile Include="Patching\Helpers\GetValueResult.cs" />
     <Compile Include="Patching\Helpers\JsonPatchProperty.cs" />
-    <Compile Include="Patching\Helpers\ObjectTreeAnalyisResult.cs" />
+    <Compile Include="Patching\Helpers\ScimObjectTreeAnalysisResult.cs" />
     <Compile Include="Patching\Helpers\PathHelpers.cs" />
     <Compile Include="Patching\Helpers\RemovedPropertyTypeResult.cs" />
     <Compile Include="Patching\IJsonPatchDocument.cs" />

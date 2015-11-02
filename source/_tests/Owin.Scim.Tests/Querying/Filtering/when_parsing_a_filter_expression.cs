@@ -13,6 +13,7 @@
     using Model.Users;
 
     using Scim.Extensions;
+    using Scim.Filtering;
     using Scim.Querying;
 
     public abstract class when_parsing_a_filter_expression<TResource>
@@ -40,35 +41,35 @@
 
         protected static IEnumerable<User> Users;
 
-        protected static string FilterExpression;
+        protected static ScimFilter FilterExpression;
 
         protected static Func<User, bool> Predicate;
     }
 
     public class with_string_equality_comparison : when_parsing_a_filter_expression<User>
     {
-        Establish context = () => FilterExpression = "userName eq \"bjensen\"";
+        Establish context = () => FilterExpression = new ScimFilter("userName eq \"bjensen\"");
 
         It should_filter = () => Users.SingleOrDefault(Predicate).ShouldNotBeNull();
     }
 
     public class with_boolean_equality_comparison : when_parsing_a_filter_expression<User>
     {
-        Establish context = () => FilterExpression = "active eq \"true\"";
+        Establish context = () => FilterExpression = new ScimFilter("active eq \"true\"");
 
         It should_filter = () => Users.Where(Predicate).ShouldNotBeEmpty();
     }
 
     public class with_complex_property_comparison : when_parsing_a_filter_expression<User>
     {
-        Establish context = () => FilterExpression = "name.familyName eq \"O'Malley\"";
+        Establish context = () => FilterExpression = new ScimFilter("name.familyName eq \"O'Malley\"");
 
         It should_filter = () => Users.SingleOrDefault(Predicate).ShouldNotBeNull();
     }
 
     public class with_enumerable_present : when_parsing_a_filter_expression<User>
     {
-        Establish context = () => FilterExpression = "emails pr";
+        Establish context = () => FilterExpression = new ScimFilter("emails pr");
 
         It should_filter = () => Users.Where(Predicate).ShouldNotBeEmpty();
     }

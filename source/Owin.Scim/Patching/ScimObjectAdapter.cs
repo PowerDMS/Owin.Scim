@@ -8,6 +8,8 @@
 
     using Extensions;
 
+    using Filtering;
+
     using Helpers;
 
     using NContext.Common;
@@ -206,27 +208,10 @@
                             ""));
                 }
             }
-
-            // first up: if the path ends in a numeric value, we're inserting in a list and
-            // that value represents the position; if the path ends in "-", we're appending
-            // to the list.
-
-            // get path result
-//            var pathResult = GetActualPropertyPath(
-//                path,
-//                objectToApplyTo,
-//                operationToReport);
-
-//            if (pathResult == null)
-//            {
-//                return;
-//            }
-
-            var actualPathToProperty = path; //pathResult.PathToProperty;
-
+            
             var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
                 objectToApplyTo,
-                actualPathToProperty,
+                path, 
                 ContractResolver);
             
             if (!treeAnalysisResult.IsValidPathForAdd)

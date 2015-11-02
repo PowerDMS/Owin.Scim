@@ -18,6 +18,8 @@ namespace Owin.Scim.Patching.Helpers
 
     using Extensions;
 
+    using Filtering;
+
     using NContext.Common;
 
     using Newtonsoft.Json.Serialization;
@@ -43,26 +45,20 @@ namespace Owin.Scim.Patching.Helpers
 
         public ScimObjectTreeAnalysisResult(
             object objectToSearch,
-            string propertyPath,
+            string filter,
             IContractResolver contractResolver)
         {
-            // construct the analysis result.
-
-            // split the propertypath, and if necessary, remove the first 
-            // empty item (that's the case when it starts with a "/")
-            var propertyPathTree = propertyPath.Split(
-                new char[] { '/', '.' },
-                StringSplitOptions.RemoveEmptyEntries)
+            var propertyPathTree = new ScimFilter(filter)
+                .Paths
                 .Select(pp =>
                 {
                     var bracketIndex = pp.IndexOf('[');
                     if (bracketIndex == -1) return new Tuple<string, string>(pp, null);
 
-                    return new Tuple<string, string>(pp.Substring(0, bracketIndex), pp);//.Substring(bracketIndex + 1, pp.Length - bracketIndex - 2));
+                    return new Tuple<string, string>(pp.Substring(0, bracketIndex), pp.Substring(bracketIndex + 1, pp.Length - bracketIndex - 2));
                 })
                 .ToList();
-
-            // we've now got a split up property tree "base/property/otherproperty/..."
+            
             int lastPosition = 0;
             object targetObject = objectToSearch;
             for (int i = 0; i < propertyPathTree.Count; i++)
@@ -77,6 +73,7 @@ namespace Owin.Scim.Patching.Helpers
                     // find the value in the dictionary                   
                     if (dictionary.ContainsCaseInsensitiveKey(propertyPathTree[i].Item1))
                     {
+                        // TODO: (DG) This (Item1) needs to support complex property paths (ie. name.familyName)
                         var possibleNewTargetObject = dictionary.GetValueForCaseInsensitiveKey(propertyPathTree[i].Item1);
 
                         // unless we're at the last item, we should set the targetobject
@@ -124,8 +121,7 @@ namespace Owin.Scim.Patching.Helpers
                         // parse our filter into an expression tree
                         var lexer = new ScimFilterLexer(new AntlrInputStream(propertyPathTree[i].Item2));
                         var parser = new ScimFilterParser(new CommonTokenStream(lexer));
-
-                        var filterVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(targetObject.GetType());//attemptedProperty.PropertyType.GetGenericArguments()[0]);
+                        var filterVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(attemptedProperty.PropertyType.GetGenericArguments()[0]);
                         var filterVisitor = (IScimFilterVisitor) filterVisitorType.CreateInstance();
                         var predicate = filterVisitor.VisitExpression(parser.parse()).Compile();
 
