@@ -145,13 +145,13 @@
                 throw new ArgumentNullException(nameof(operationToReport));
             }
 
-            // With SCIM 2.0, path is only required for the remove operation:
-
-            // If omitted (path), the target location is assumed to be the resource
-            // itself. The "value" parameter contains a set of attributes to be
-            // added to the resource.
-
             /*
+            With SCIM 2.0, path is only required for the remove operation:
+            
+                   o  If omitted, the target location is assumed to be the resource
+                      itself.  The "value" parameter contains a set of attributes to be
+                      added to the resource.
+
             PATCH /Users/2819c223-7f76-453a-919d-413861904646
             Host: example.com
             Accept: application/scim+json
@@ -184,17 +184,15 @@
 
             if (string.IsNullOrWhiteSpace(path))
             {
-                JObject resourcePatch;
                 try
                 {
-                    resourcePatch = JObject.Parse(value.ToString());
-
+                    var resourcePatch = JObject.Parse(value.ToString());
                     foreach (var kvp in resourcePatch)
                     {
                         Add(kvp.Key, kvp.Value, objectToApplyTo, operationToReport);
                     }
 
-                    return;
+                    return; // our patch operation had no path, so it was recursively handled above.
                 }
                 catch (Exception)
                 {
@@ -206,7 +204,21 @@
                             ""));
                 }
             }
-            
+
+            /* 
+                ScimObjectTreeAnalysisResult will handle resolving the actual 
+                path and parsing any filters including, 
+
+                    o  If the target location specifies a complex attribute, a set of
+                       sub-attributes SHALL be specified in the "value" parameter.
+
+                Examples:
+                "path":"members"
+                "path":"name.familyName"
+                "path":"addresses[type eq \"work\"]"
+                "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"]"
+                "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"].displayName"
+            */
             var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
                 objectToApplyTo,
                 path, 
@@ -220,15 +232,63 @@
                     ResourceHelper.FormatPropertyCannotBeAdded(path)));
                 return;
             }
+
+            /*
+            TODO: (DG) Is dynamiclogic used for:
             
+                   o  If the target location specifies an attribute that does not exist
+                      (has no value), the attribute is added with the new value.
+            */
+
             if (!treeAnalysisResult.UseDynamicLogic)
             {
                 var patchProperty = treeAnalysisResult.JsonPatchProperty;
-
-                // If it's null or not an array, replace. Else, add to the array.
                 var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
-                if (instanceValue != null && patchProperty.Property.PropertyType.IsNonStringEnumerable())
+                if (instanceValue == null || !patchProperty.Property.PropertyType.IsNonStringEnumerable())
                 {
+                    /*
+                        Here we are going to be setting or replacing a current value:
+                            o  If the target location does not exist, the attribute and value are added.
+                               (instanceValue == null)
+                            o  If the target location specifies a single-valued attribute, the existing value is replaced. 
+                               (!patchProperty.Property.PropertyType.IsNonStringEnumerable())
+                            o  If the target location exists, the value is replaced.
+                               (!patchProperty.Property.PropertyType.IsNonStringEnumerable())
+                    */
+
+                    var conversionResultTuple = ConvertToActualType(
+                        patchProperty.Property.PropertyType,
+                        value);
+
+                    if (!conversionResultTuple.CanBeConverted)
+                    {
+                        LogError(new JsonPatchError(
+                            objectToApplyTo,
+                            operationToReport,
+                            ResourceHelper.FormatInvalidValueForProperty(value, path)));
+                        return;
+                    }
+
+                    if (!patchProperty.Property.Writable)
+                    {
+                        LogError(new JsonPatchError(
+                            objectToApplyTo,
+                            operationToReport,
+                            ResourceHelper.FormatCannotUpdateProperty(path)));
+                        return;
+                    }
+
+                    patchProperty.Property.ValueProvider.SetValue(
+                        patchProperty.Parent,
+                        conversionResultTuple.ConvertedInstance);
+                }
+                else
+                {
+                    /*
+                        Here we are going to be modifying an existing enumerable:
+                           o  If the target location specifies a multi-valued attribute, a new
+                              value is added to the attribute.
+                    */
                     var genericTypeOfArray = patchProperty.Property.PropertyType.GetEnumerableType();
                     var conversionResult = ConvertToActualType(genericTypeOfArray, value);
                     if (!conversionResult.CanBeConverted)
@@ -257,37 +317,12 @@
                         patchProperty.Parent,
                         array);
                 }
-                else
-                {
-                    var conversionResultTuple = ConvertToActualType(
-                        patchProperty.Property.PropertyType,
-                        value);
-
-                    if (!conversionResultTuple.CanBeConverted)
-                    {
-                        LogError(new JsonPatchError(
-                            objectToApplyTo,
-                            operationToReport,
-                            ResourceHelper.FormatInvalidValueForProperty(value, path)));
-                        return;
-                    }
-
-                    if (!patchProperty.Property.Writable)
-                    {
-                        LogError(new JsonPatchError(
-                            objectToApplyTo,
-                            operationToReport,
-                            ResourceHelper.FormatCannotUpdateProperty(path)));
-                        return;
-                    }
-
-                    patchProperty.Property.ValueProvider.SetValue(
-                        patchProperty.Parent,
-                        conversionResultTuple.ConvertedInstance);
-                }
             }
             else
             {
+                // TODO: (DG) NOT SURE IF THIS IS EVER NEEDED!
+                // possibly with resource extensions like enterpriseuser support
+
                 var container = treeAnalysisResult.Container;
                 if (container.ContainsCaseInsensitiveKey(treeAnalysisResult.PropertyPathInParent))
                 {
@@ -352,7 +387,6 @@
                                 objectToApplyTo,
                                 operationToReport,
                                 ResourceHelper.FormatInvalidValueForProperty(conversionResult.ConvertedInstance, path)));
-                            return;
                         }
                     }
                 }
