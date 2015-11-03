@@ -63,8 +63,6 @@
 
             The second example there shows that we'd have TWO paths instead of ONE + filter. The approach taken here
             normalizes the second expression into: meta[lastModified gt "2011-05-13T04:42:34Z]"
-
-            userType eq \"Employee\" and (emails co \"example.com\" or emails.value co \"example.org\")
             */
 
             var pathList = new List<string>();

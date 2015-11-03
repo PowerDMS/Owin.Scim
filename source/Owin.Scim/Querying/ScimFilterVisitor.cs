@@ -193,11 +193,9 @@
                  return Expression.Lambda(anyPredicate, argument);
             }
             
-            var predicate = Expression.Lambda<Func<TResource, bool>>(
+            return Expression.Lambda<Func<TResource, bool>>(
                 CreateBinaryExpression(left, property, operatorToken, valueToken),
                 argument);
-
-            return predicate;
         }
 
         public override LambdaExpression VisitOrExp(ScimFilterParser.OrExpContext context)
