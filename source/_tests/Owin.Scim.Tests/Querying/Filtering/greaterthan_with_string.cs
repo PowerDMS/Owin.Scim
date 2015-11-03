@@ -23,6 +23,6 @@
             FilterExpression = new ScimFilter("addresses.postalCode gt \"20000\"");
         };
 
-        It should_filter = () => Users.SingleOrDefault(Predicate).ShouldNotBeNull();
+        It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("ROMalley");
     }
 }

@@ -9,7 +9,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Scim.Querying;
 
-    public class equals_with_boolean_comparison : when_parsing_a_filter_expression<User>
+    public class equals_with_boolean : when_parsing_a_filter_expression<User>
     {
         Establish context = () =>
         {

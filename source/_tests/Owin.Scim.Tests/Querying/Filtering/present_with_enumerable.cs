@@ -5,6 +5,7 @@
 
     using Machine.Specifications;
 
+    using Model;
     using Model.Users;
 
     using Scim.Querying;

@@ -15,14 +15,27 @@
 
     using NContext.Common;
 
+    using Newtonsoft.Json;
+    using Newtonsoft.Json.Linq;
+    using Newtonsoft.Json.Serialization;
+
     public class ScimFilterVisitor<TResource> : ScimFilterBaseVisitor<LambdaExpression>, IScimFilterVisitor
     {
         private static MethodInfo _Any;
+
+        private static JsonSerializer _JsonSerializer;
 
         static ScimFilterVisitor()
         {
             _Any = typeof (Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
                 .Single(mi => mi.Name.Equals("Any") && mi.GetParameters().Length == 2);
+
+            _JsonSerializer = new JsonSerializer
+            {
+                ContractResolver = new CamelCasePropertyNamesContractResolver(),
+                DateFormatHandling = DateFormatHandling.IsoDateFormat,
+                DateTimeZoneHandling = DateTimeZoneHandling.Utc
+            };
         }
 
         public LambdaExpression VisitExpression(IParseTree tree)
@@ -203,11 +216,10 @@
                 {
                     return Expression.Equal(left, Expression.Constant(boolValue));
                 }
-
-                DateTime dateTimeValue;
-                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                
+                if (property.PropertyType == typeof(DateTime))
                 {
-                    return Expression.Equal(left, Expression.Constant(dateTimeValue));
+                    return Expression.Equal(left, Expression.Constant(ParseDateTime(valueToken)));
                 }
 
                 if (property.PropertyType != typeof(string))
@@ -244,11 +256,10 @@
                 {
                     return Expression.NotEqual(left, Expression.Constant(boolValue));
                 }
-
-                DateTime dateTimeValue;
-                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                
+                if (property.PropertyType == typeof(DateTime))
                 {
-                    return Expression.NotEqual(left, Expression.Constant(dateTimeValue));
+                    return Expression.NotEqual(left, Expression.Constant(ParseDateTime(valueToken)));
                 }
 
                 if (property.PropertyType != typeof(string))
@@ -343,11 +354,10 @@
                 {
                     return Expression.GreaterThan(left, Expression.Constant(boolValue));
                 }
-
-                DateTime dateTimeValue;
-                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                
+                if (property.PropertyType == typeof(DateTime))
                 {
-                    return Expression.GreaterThan(left, Expression.Constant(dateTimeValue));
+                    return Expression.GreaterThan(left, Expression.Constant(ParseDateTime(valueToken)));
                 }
                 
                 if (property.PropertyType == typeof(string))
@@ -376,11 +386,10 @@
                 {
                     return Expression.GreaterThanOrEqual(left, Expression.Constant(boolValue));
                 }
-
-                DateTime dateTimeValue;
-                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                
+                if (property.PropertyType == typeof(DateTime))
                 {
-                    return Expression.GreaterThanOrEqual(left, Expression.Constant(dateTimeValue));
+                    return Expression.GreaterThanOrEqual(left, Expression.Constant(ParseDateTime(valueToken)));
                 }
                 
                 if (property.PropertyType == typeof(string))
@@ -409,11 +418,10 @@
                 {
                     return Expression.LessThan(left, Expression.Constant(boolValue));
                 }
-
-                DateTime dateTimeValue;
-                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                
+                if (property.PropertyType == typeof(DateTime))
                 {
-                    return Expression.LessThan(left, Expression.Constant(dateTimeValue));
+                    return Expression.LessThan(left, Expression.Constant(ParseDateTime(valueToken)));
                 }
 
                 if (property.PropertyType == typeof(string))
@@ -442,11 +450,10 @@
                 {
                     return Expression.LessThanOrEqual(left, Expression.Constant(boolValue));
                 }
-
-                DateTime dateTimeValue;
-                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                
+                if (property.PropertyType == typeof(DateTime))
                 {
-                    return Expression.LessThanOrEqual(left, Expression.Constant(dateTimeValue));
+                    return Expression.LessThanOrEqual(left, Expression.Constant(ParseDateTime(valueToken)));
                 }
 
                 if (property.PropertyType == typeof(string))
@@ -464,28 +471,28 @@
             throw new Exception("Invalid filter operator for a binary expression.");
         }
 
-        protected internal static bool StartsWith(string haystack, string needle)
+        protected static bool StartsWith(string haystack, string needle)
         {
             if (haystack == null || needle == null) return false;
 
             return haystack.StartsWith(needle, StringComparison.OrdinalIgnoreCase);
         }
 
-        protected internal static bool EndsWith(string haystack, string needle)
+        protected static bool EndsWith(string haystack, string needle)
         {
             if (haystack == null || needle == null) return false;
 
-            return haystack.StartsWith(needle, StringComparison.OrdinalIgnoreCase);
+            return haystack.EndsWith(needle, StringComparison.OrdinalIgnoreCase);
         }
 
-        protected internal static bool Contains(string haystack, string needle)
+        protected static bool Contains(string haystack, string needle)
         {
             if (haystack == null || needle == null) return false;
 
             return haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase) > -1;
         }
 
-        protected internal static bool IsPresent(TResource resource, PropertyInfo property)
+        protected static bool IsPresent(TResource resource, PropertyInfo property)
         {
             if (resource == null || property == null) return false;
 
@@ -508,11 +515,16 @@
             return true;
         }
 
-        private static object GetDefaultValue(Type type)
+        protected static object GetDefaultValue(Type type)
         {
             return type.IsValueType
                 ? Activator.CreateInstance(type)
                 : null;
+        }
+
+        protected static DateTime ParseDateTime(string valueToken)
+        {
+            return JValue.Parse("\"" + valueToken + "\"").ToObject<DateTime>(_JsonSerializer);
         }
     }
 }
