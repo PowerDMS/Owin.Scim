@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Querying
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
 
     public class ScimFilter
@@ -62,16 +63,25 @@
 
             The second example there shows that we'd have TWO paths instead of ONE + filter. The approach taken here
             normalizes the second expression into: meta[lastModified gt "2011-05-13T04:42:34Z]"
+
+            userType eq \"Employee\" and (emails co \"example.com\" or emails.value co \"example.org\")
             */
 
             var pathList = new List<string>();
             var pathBuilder = new StringBuilder();
             var openQuoteFound = false;
+            var closing = false;
             var separatorIndex = -1;
             for (int index = 0; index < filterExpression.Length; index++)
             {
                 var pathChar = filterExpression[index];
-                if (pathChar == '.' && filterExpression[index - 1] != ']')
+                var isQuote = pathChar == '"';
+                if (isQuote && openQuoteFound)
+                {
+                    closing = true;
+                }
+
+                if (pathChar == '.' && filterExpression[index - 1] != ']' && !openQuoteFound)
                 {
                     // we are most likely parsing a query filter, not PATCH path filter
                     separatorIndex = index;
@@ -79,20 +89,17 @@
                 }
                 else
                 {
-                    pathBuilder.Append(pathChar);
-                    
-                    if (separatorIndex > -1)
+                    if (pathChar != '.' || (pathChar == '.' && openQuoteFound))
                     {
-                        // if we're at the end of a filter expression value (end quote) OR 
-                        // if we're filtering with the 'pr' operator
-                        // then let's close out our sub-attribute filter expression and reset
-                        if (pathChar == '"' || (pathChar == 'r' && filterExpression[index - 1] == 'p'))
+                        pathBuilder.Append(pathChar);
+
+                        if (separatorIndex > -1)
                         {
-                            if (pathChar == '"' && !openQuoteFound)
-                            {
-                                openQuoteFound = true; // set marker
-                            }
-                            else
+                            // if we're at the end of a filter expression value (end quote) OR 
+                            // if we're filtering with the 'pr' operator
+                            // then let's close out our sub-attribute filter expression and reset
+                            if ((isQuote && openQuoteFound) ||
+                                (pathChar == 'r' && filterExpression[index - 1] == 'p'))
                             {
                                 pathBuilder.Replace('/', '[', separatorIndex, 1);
                                 pathBuilder.Append(']');
@@ -100,16 +107,32 @@
 
                                 // reset
                                 pathBuilder.Clear();
-                                openQuoteFound = false;
                                 separatorIndex = -1;
                             }
                         }
+
+                        if (isQuote)
+                        {
+                            if (!openQuoteFound)
+                            {
+                                openQuoteFound = true; // set marker
+                            }
+                            else if (closing)
+                            {
+                                openQuoteFound = false; // reset
+                                closing = false;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        pathBuilder.Append('/');
                     }
                 }
             }
 
             if (pathBuilder.Length > 0)
-                pathList.AddRange(pathBuilder.ToString().Split('/', '.'));
+                pathList.AddRange(pathBuilder.ToString().Split('/'));
 
             _NormalizedFilterExpression = string.Concat(pathList);
             _Paths = pathList;

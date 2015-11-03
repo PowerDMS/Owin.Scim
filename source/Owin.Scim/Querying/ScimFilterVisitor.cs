@@ -13,6 +13,8 @@
 
     using Extensions;
 
+    using Model;
+
     using NContext.Common;
 
     using Newtonsoft.Json;
@@ -144,16 +146,53 @@
                 .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
 
             if (property == null) throw new Exception("ERROR"); // TODO: (DG) make proper error
-            
+
+            var isEnumerable = property.PropertyType.IsNonStringEnumerable();
             var argument = Expression.Parameter(typeof(TResource));
 
             var left = Expression.TryCatch(
                 Expression.Block(Expression.Property(argument, property)),
                 Expression.Catch(
-                    typeof(NullReferenceException), 
+                    typeof(NullReferenceException),
                     Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
                 );
 
+            if (isEnumerable && 
+                property.PropertyType.IsGenericType && 
+                typeof(MultiValuedAttribute).IsAssignableFrom(property.PropertyType.GetGenericArguments()[0]))
+            {
+                // we're filtering an enumerable of multivaluedattribute without a sub-attribute
+                // therefore, we default to evaluating the .Value member
+
+                var multiValuedAttributeType = property.PropertyType.GetGenericArguments()[0];
+                var multiValuedAttribute = Expression.Parameter(multiValuedAttributeType);
+                var valueAttribute = multiValuedAttributeType.GetProperty("Value", BindingFlags.Public | BindingFlags.Instance);
+                var valueExpression = Expression.TryCatch(
+                    Expression.Block(Expression.Property(multiValuedAttribute, valueAttribute)),
+                    Expression.Catch(
+                        typeof (NullReferenceException),
+                        Expression.Constant(GetDefaultValue(valueAttribute.PropertyType), valueAttribute.PropertyType))
+                    );
+
+                var valueLambda = Expression.Lambda(
+                    CreateBinaryExpression(valueExpression, valueAttribute, operatorToken, valueToken),
+                    multiValuedAttribute);
+
+                var anyMethod = _Any.MakeGenericMethod(multiValuedAttributeType);
+                var anyPredicate = Expression.TryCatch(
+                        Expression.Block(
+                            Expression.Call(
+                                anyMethod,
+                                new List<Expression>
+                                {
+                                    left,
+                                    valueLambda
+                                })),
+                        Expression.Catch(typeof(ArgumentNullException), Expression.Constant(false)));
+
+                 return Expression.Lambda(anyPredicate, argument);
+            }
+            
             var predicate = Expression.Lambda<Func<TResource, bool>>(
                 CreateBinaryExpression(left, property, operatorToken, valueToken),
                 argument);
@@ -290,14 +329,14 @@
 
                 return Expression.Call(
                     GetType().GetMethod("Contains", BindingFlags.NonPublic | BindingFlags.Static,
-                            null,
-                            new[] { typeof(string), typeof(string) },
-                            new ParameterModifier[0]),
-                        new List<Expression>
-                        {
-                            left,
-                            Expression.Constant(valueToken)
-                        });
+                        null,
+                        new[] { typeof (string), typeof (string) },
+                        new ParameterModifier[0]),
+                    new List<Expression>
+                    {
+                        left,
+                        Expression.Constant(valueToken)
+                    });
             }
 
             // Starts With

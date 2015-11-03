@@ -133,6 +133,8 @@
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
     <Compile Include="Querying\Filtering\and_present_equals.cs" />
+    <Compile Include="Querying\Filtering\contains_with_multivaluedattribute.cs" />
+    <Compile Include="Querying\Filtering\contains_with_multivaluedattribute_value.cs" />
     <Compile Include="Querying\Filtering\contains_with_string.cs" />
     <Compile Include="Querying\Filtering\endswith.cs" />
     <Compile Include="Querying\Filtering\greaterthanorequal_with_datetime.cs" />
