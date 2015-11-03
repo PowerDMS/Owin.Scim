@@ -17,13 +17,14 @@ Roadmap
   2. [x] Retrieve  
   3. [x] Replace  
   4. [ ] Update (Patch) (IN PROGRESS)
+    1. [x] Support for path filters
   5. [x] Delete  
   6. [ ] Add support for custom canonical types / validation
 2. Add support for bulk processing
 3. Add scim server configuration endpoints
 4. Add groups endpoints
 5. Add support for querying
-  1. [ ] Filtering (IN PROGRESS)
+  1. [ ] Filtering
   2. [ ] Sorting
   3. [ ] Ordering
   4. [ ] Pagination
