@@ -134,6 +134,7 @@
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
+    <Compile Include="Querying\FilterHelpers.cs" />
     <Compile Include="Querying\ScimFilter.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Middleware\RequireSslMiddleware.cs" />
@@ -163,7 +164,6 @@
     <Compile Include="Patching\Converters\JsonPatchDocumentConverter.cs" />
     <Compile Include="Patching\Converters\TypedJsonPatchDocumentConverter.cs" />
     <Compile Include="Patching\Exceptions\JsonPatchException.cs" />
-    <Compile Include="Patching\Helpers\ActualPropertyPathResult.cs" />
     <Compile Include="Patching\Helpers\ConversionResult.cs" />
     <Compile Include="Patching\Helpers\ExpandoObjectDictionaryExtensions.cs" />
     <Compile Include="Patching\Helpers\ExpressionHelpers.cs" />

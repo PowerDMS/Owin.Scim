@@ -10,7 +10,7 @@
     using Scim.Querying;
 
     [Subject(typeof(ScimFilterVisitor<>))]
-    public class contains_with_multivaluedattribute : when_parsing_a_filter_expression<User>
+    public class and_equals_contains_brackets : when_parsing_a_filter_expression<User>
     {
         Establish context = () =>
         {
@@ -20,7 +20,7 @@
                 new User
                 {
                     UserName = "ROMalley",
-                    UserType = "employee",
+                    UserType = "manager",
                     Emails = new List<Email>
                     {
                         new Email { Value = "user@example.com", Type = "work" }
@@ -29,18 +29,19 @@
                 new User
                 {
                     UserName = "DGioulakis",
+                    UserType = "employee",
                     Emails = new List<Email>
                     {
-                        new Email { Value = "user@corp.com", Type = "work" },
-                        new Email { Value = "user2@example.com", Type = "home" }
+                        new Email { Value = "user2@mymail.com", Type = "home" },
+                        new Email { Value = "user@example.com", Type = "work" }
                     }
                 }
             };
 
             FilterExpression = new ScimFilter(
-                "userType eq \"Employee\" and (emails co \"example.com\" or emails.value co \"example.org\")");
+                "userType eq \"Employee\" and emails[type eq \"work\" and value co \"@example.com\"]");
         };
 
-        It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("ROMalley");
+        It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("DGioulakis");
     }
 }

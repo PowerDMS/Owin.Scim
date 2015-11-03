@@ -132,6 +132,8 @@
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
+    <Compile Include="Querying\Filtering\and_equals_braces.cs" />
+    <Compile Include="Querying\Filtering\and_equals_contains_brackets.cs" />
     <Compile Include="Querying\Filtering\and_present_equals.cs" />
     <Compile Include="Querying\Filtering\contains_with_multivaluedattribute.cs" />
     <Compile Include="Querying\Filtering\contains_with_multivaluedattribute_value.cs" />
@@ -143,6 +145,7 @@
     <Compile Include="Querying\Filtering\lessthanorequal_with_datetime.cs" />
     <Compile Include="Querying\Filtering\lessthan_with_datetime.cs" />
     <Compile Include="Querying\Filtering\lessthan_with_string.cs" />
+    <Compile Include="Querying\Filtering\or_brackets_equals_and_contains.cs" />
     <Compile Include="Querying\Filtering\or_present_equals.cs" />
     <Compile Include="Querying\Filtering\startswith.cs" />
     <Compile Include="Querying\Filtering\when_parsing_a_filter_expression.cs" />

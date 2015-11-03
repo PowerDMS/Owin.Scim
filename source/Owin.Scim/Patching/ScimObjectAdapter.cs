@@ -409,34 +409,5 @@
                 throw new JsonPatchException(jsonPatchError);
             }
         }
-
-        private ActualPropertyPathResult GetActualPropertyPath(
-            string propertyPath,
-            object objectToApplyTo,
-            Operation operationToReport)
-        {
-            if (propertyPath == null)
-            {
-                throw new ArgumentNullException(nameof(propertyPath));
-            }
-
-            if (objectToApplyTo == null)
-            {
-                throw new ArgumentNullException(nameof(objectToApplyTo));
-            }
-
-            if (operationToReport == null)
-            {
-                throw new ArgumentNullException(nameof(operationToReport));
-            }
-
-            if (propertyPath.Contains("["))
-            {
-                // TOOD: (DG) Support filters
-                throw new NotSupportedException("Filters are currently not supported.");
-            }
-
-            return new ActualPropertyPathResult(-1, propertyPath, true);
-        }
     }
 }

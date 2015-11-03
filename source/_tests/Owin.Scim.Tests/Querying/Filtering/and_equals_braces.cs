@@ -10,7 +10,7 @@
     using Scim.Querying;
 
     [Subject(typeof(ScimFilterVisitor<>))]
-    public class contains_with_multivaluedattribute : when_parsing_a_filter_expression<User>
+    public class and_equals_braces : when_parsing_a_filter_expression<User>
     {
         Establish context = () =>
         {
@@ -38,7 +38,7 @@
             };
 
             FilterExpression = new ScimFilter(
-                "userType eq \"Employee\" and (emails co \"example.com\" or emails.value co \"example.org\")");
+                "userType eq \"Employee\" and (emails.type eq \"work\")");
         };
 
         It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("ROMalley");

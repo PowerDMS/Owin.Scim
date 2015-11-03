@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Tests.Querying.Filtering
+namespace Owin.Scim.Tests.Querying.Filtering
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -10,7 +10,7 @@
     using Scim.Querying;
 
     [Subject(typeof(ScimFilterVisitor<>))]
-    public class contains_with_multivaluedattribute : when_parsing_a_filter_expression<User>
+    public class or_brackets_equals_and_contains : when_parsing_a_filter_expression<User>
     {
         Establish context = () =>
         {
@@ -23,7 +23,11 @@
                     UserType = "employee",
                     Emails = new List<Email>
                     {
-                        new Email { Value = "user@example.com", Type = "work" }
+                        new Email { Value = "user@example.com", Type = "home" }
+                    },
+                    Ims = new List<InstantMessagingAddress>
+                    {
+                        new InstantMessagingAddress { Value = "romalley@foo.com", Type = "xmpp" }
                     }
                 },
                 new User
@@ -31,16 +35,16 @@
                     UserName = "DGioulakis",
                     Emails = new List<Email>
                     {
-                        new Email { Value = "user@corp.com", Type = "work" },
+                        new Email { Value = "user@example.com", Type = "work" },
                         new Email { Value = "user2@example.com", Type = "home" }
                     }
                 }
             };
 
             FilterExpression = new ScimFilter(
-                "userType eq \"Employee\" and (emails co \"example.com\" or emails.value co \"example.org\")");
+                "emails[type eq \"work\" and value co \"@example.com\"] or ims[type eq \"xmpp\" and value co \"@foo.com\"]");
         };
 
-        It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("ROMalley");
+        It should_filter = () => Users.Where(Predicate).Select(u => u.UserName).ShouldContainOnly("ROMalley", "DGioulakis");
     }
 }

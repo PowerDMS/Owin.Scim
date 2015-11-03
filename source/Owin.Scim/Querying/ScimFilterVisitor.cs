@@ -1,7 +1,7 @@
 ﻿namespace Owin.Scim.Querying
 {
     using System;
-    using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
     using System.Linq.Expressions;
@@ -23,21 +23,32 @@
 
     public class ScimFilterVisitor<TResource> : ScimFilterBaseVisitor<LambdaExpression>, IScimFilterVisitor
     {
-        private static MethodInfo _Any;
+        private static readonly ConcurrentDictionary<Type, IDictionary<string, PropertyInfo>> _PropertyCache = 
+            new ConcurrentDictionary<Type, IDictionary<string, PropertyInfo>>();
 
-        private static JsonSerializer _JsonSerializer;
+        private static readonly Lazy<IDictionary<string, MethodInfo>> _MethodCache =
+            new Lazy<IDictionary<string, MethodInfo>>(CreateMethodCache);
+
+        private static readonly JsonSerializer _JsonSerializer;
 
         static ScimFilterVisitor()
         {
-            _Any = typeof (Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
-                .Single(mi => mi.Name.Equals("Any") && mi.GetParameters().Length == 2);
-
             _JsonSerializer = new JsonSerializer
             {
                 ContractResolver = new CamelCasePropertyNamesContractResolver(),
                 DateFormatHandling = DateFormatHandling.IsoDateFormat,
                 DateTimeZoneHandling = DateTimeZoneHandling.Utc
             };
+        }
+
+        protected static IDictionary<string, MethodInfo> MethodCache
+        {
+            get { return _MethodCache.Value; }
+        }
+
+        protected static ConcurrentDictionary<Type, IDictionary<string, PropertyInfo>> PropertyCache
+        {
+            get { return _PropertyCache; }
         }
 
         public LambdaExpression VisitExpression(IParseTree tree)
@@ -67,9 +78,12 @@
             // should be visited in context of the new field's type
 
             var propertyNameToken = context.FIELD().GetText();
-            var property = typeof(TResource)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField)
-                .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
+            var property = PropertyCache
+                .GetOrAdd(
+                    typeof(TResource), 
+                    type => 
+                    type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .ToDictionary(pi => pi.Name, pi => pi, StringComparer.OrdinalIgnoreCase))[propertyNameToken];
 
             if (property == null) throw new Exception("ERROR"); // TODO: (DG) make proper error
 
@@ -97,7 +111,7 @@
                     // if we have an enumerable, then we need to see if any of its elements satisfy the childLambda
                     // to accomplish this, let's just make use of .NET's Any<TSource>(enumerable, predicate)
 
-                    var anyMethod = _Any.MakeGenericMethod(childFilterType);
+                    var anyMethod = MethodCache["any"].MakeGenericMethod(childFilterType);
                     var anyPredicate = Expression.TryCatch(
                         Expression.Block(
                             Expression.Call(
@@ -141,15 +155,17 @@
             var operatorToken = context.OPERATOR().GetText().ToLower();
             var valueToken = context.VALUE().GetText().Trim('"');
 
-            var property = typeof(TResource)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance | BindingFlags.GetField)
-                .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
+            var property = PropertyCache
+                .GetOrAdd(
+                    typeof(TResource),
+                    type =>
+                    type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .ToDictionary(pi => pi.Name, pi => pi, StringComparer.OrdinalIgnoreCase))[propertyNameToken];
 
             if (property == null) throw new Exception("ERROR"); // TODO: (DG) make proper error
 
             var isEnumerable = property.PropertyType.IsNonStringEnumerable();
             var argument = Expression.Parameter(typeof(TResource));
-
             var left = Expression.TryCatch(
                 Expression.Block(Expression.Property(argument, property)),
                 Expression.Catch(
@@ -178,7 +194,7 @@
                     CreateBinaryExpression(valueExpression, valueAttribute, operatorToken, valueToken),
                     multiValuedAttribute);
 
-                var anyMethod = _Any.MakeGenericMethod(multiValuedAttributeType);
+                var anyMethod = MethodCache["any"].MakeGenericMethod(multiValuedAttributeType);
                 var anyPredicate = Expression.TryCatch(
                         Expression.Block(
                             Expression.Call(
@@ -213,9 +229,12 @@
         {
             var propertyNameToken = context.FIELD().GetText();
 
-            var property = typeof(TResource)
-                .GetProperties(BindingFlags.Public | BindingFlags.Instance)
-                .SingleOrDefault(pi => pi.Name.Equals(propertyNameToken, StringComparison.OrdinalIgnoreCase));
+            var property = PropertyCache
+                .GetOrAdd(
+                    typeof(TResource),
+                    type =>
+                    type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .ToDictionary(pi => pi.Name, pi => pi, StringComparer.OrdinalIgnoreCase))[propertyNameToken];
 
             if (property == null) throw new Exception("eeeerrrooorrr"); // TODO: (DG) proper error handling
             if (property.GetGetMethod() == null) throw new Exception("error");
@@ -223,10 +242,8 @@
             var argument = Expression.Parameter(typeof(TResource));
             var predicate = Expression.Lambda<Func<TResource, bool>>(
                 Expression.Call(
-                    GetType().GetMethod("IsPresent", BindingFlags.NonPublic | BindingFlags.Static, 
-                            null,
-                            new[] { typeof(TResource), typeof(PropertyInfo) },
-                            new ParameterModifier[0]),
+                    MethodCache["pr"]
+                    .MakeGenericMethod(typeof(TResource)),
                         new List<Expression>
                         {
                             argument,
@@ -265,12 +282,7 @@
                 }
 
                 return Expression.Call(
-                    typeof (string).GetMethod(
-                        "Equals",
-                        BindingFlags.Public | BindingFlags.Static,
-                        null,
-                        new[] { typeof (string), typeof (string), typeof (StringComparison) },
-                        new ParameterModifier[0]),
+                    MethodCache["eq"],
                     new List<Expression>
                     {
                         left,
@@ -306,9 +318,7 @@
 
                 return Expression.IsFalse(
                     Expression.Call(
-                        typeof (string).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static, null,
-                            new[] { typeof (string), typeof (string), typeof (StringComparison) },
-                            new ParameterModifier[0]),
+                        MethodCache["eq"],
                         new List<Expression>
                         {
                             left,
@@ -326,10 +336,7 @@
                 }
 
                 return Expression.Call(
-                    GetType().GetMethod("Contains", BindingFlags.NonPublic | BindingFlags.Static,
-                        null,
-                        new[] { typeof (string), typeof (string) },
-                        new ParameterModifier[0]),
+                    MethodCache["co"],
                     new List<Expression>
                     {
                         left,
@@ -346,15 +353,12 @@
                 }
 
                 return Expression.Call(
-                    GetType().GetMethod("StartsWith", BindingFlags.NonPublic | BindingFlags.Static,
-                            null,
-                            new[] { typeof(string), typeof(string) },
-                            new ParameterModifier[0]),
-                        new List<Expression>
-                        {
-                            left,
-                            Expression.Constant(valueToken)
-                        });
+                    MethodCache["sw"],
+                    new List<Expression>
+                    {
+                        left,
+                        Expression.Constant(valueToken)
+                    });
             }
 
             // Ends With
@@ -366,10 +370,7 @@
                 }
 
                 return Expression.Call(
-                    GetType().GetMethod("EndsWith", BindingFlags.NonPublic | BindingFlags.Static,
-                            null,
-                            new[] { typeof(string), typeof(string) },
-                            new ParameterModifier[0]),
+                    MethodCache["ew"],
                         new List<Expression>
                         {
                             left,
@@ -399,7 +400,7 @@
                 
                 if (property.PropertyType == typeof(string))
                 {
-                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var method = MethodCache["compareto"];
                     var result = Expression.Call(left, method, Expression.Constant(valueToken));
                     var zero = Expression.Constant(0);
 
@@ -431,7 +432,7 @@
                 
                 if (property.PropertyType == typeof(string))
                 {
-                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var method = MethodCache["compareto"];
                     var result = Expression.Call(left, method, Expression.Constant(valueToken));
                     var zero = Expression.Constant(0);
 
@@ -463,7 +464,7 @@
 
                 if (property.PropertyType == typeof(string))
                 {
-                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var method = MethodCache["compareto"];
                     var result = Expression.Call(left, method, Expression.Constant(valueToken));
                     var zero = Expression.Constant(0);
 
@@ -495,7 +496,7 @@
 
                 if (property.PropertyType == typeof(string))
                 {
-                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var method = MethodCache["compareto"];
                     var result = Expression.Call(left, method, Expression.Constant(valueToken));
                     var zero = Expression.Constant(0);
 
@@ -508,50 +509,6 @@
             throw new Exception("Invalid filter operator for a binary expression.");
         }
 
-        protected static bool StartsWith(string haystack, string needle)
-        {
-            if (haystack == null || needle == null) return false;
-
-            return haystack.StartsWith(needle, StringComparison.OrdinalIgnoreCase);
-        }
-
-        protected static bool EndsWith(string haystack, string needle)
-        {
-            if (haystack == null || needle == null) return false;
-
-            return haystack.EndsWith(needle, StringComparison.OrdinalIgnoreCase);
-        }
-
-        protected static bool Contains(string haystack, string needle)
-        {
-            if (haystack == null || needle == null) return false;
-
-            return haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase) > -1;
-        }
-
-        protected static bool IsPresent(TResource resource, PropertyInfo property)
-        {
-            if (resource == null || property == null) return false;
-
-            var value = property.GetValue(resource);
-            if (value == null) return false;
-
-            var valueType = value.GetType();
-            if (valueType == typeof (string))
-            {
-                return !string.IsNullOrWhiteSpace(value as string);
-            }
-
-            if (valueType.IsNonStringEnumerable())
-            {
-                var enumerable = (IEnumerable) value;
-                var enumerator = enumerable.GetEnumerator();
-                return enumerator.MoveNext();
-            }
-
-            return true;
-        }
-
         protected static object GetDefaultValue(Type type)
         {
             return type.IsValueType
@@ -561,7 +518,45 @@
 
         protected static DateTime ParseDateTime(string valueToken)
         {
-            return JValue.Parse("\"" + valueToken + "\"").ToObject<DateTime>(_JsonSerializer);
+            return JToken.Parse("\"" + valueToken + "\"").ToObject<DateTime>(_JsonSerializer);
+        }
+        
+        private static IDictionary<string, MethodInfo> CreateMethodCache()
+        {
+            var methodCache = new Dictionary<string, MethodInfo>();
+
+            methodCache.Add("eq",
+                typeof(string).GetMethod(
+                    "Equals",
+                    BindingFlags.Public | BindingFlags.Static,
+                    null,
+                    new[] { typeof(string), typeof(string), typeof(StringComparison) },
+                    new ParameterModifier[0]));
+            methodCache.Add("compareto",
+                typeof(string).GetMethod("CompareTo", new[] { typeof(string) }));
+            methodCache.Add("any",
+                typeof(Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .Single(mi => mi.Name.Equals("Any") && mi.GetParameters().Length == 2));
+            methodCache.Add("sw",
+                typeof(FilterHelpers).GetMethod("StartsWith", BindingFlags.Public | BindingFlags.Static,
+                    null,
+                    new[] { typeof(string), typeof(string) },
+                    new ParameterModifier[0]));
+            methodCache.Add("ew",
+                typeof(FilterHelpers).GetMethod("EndsWith", BindingFlags.Public | BindingFlags.Static,
+                    null,
+                    new[] { typeof(string), typeof(string) },
+                    new ParameterModifier[0]));
+            methodCache.Add("co",
+                typeof(FilterHelpers).GetMethod("Contains", BindingFlags.Public | BindingFlags.Static,
+                    null,
+                    new[] { typeof(string), typeof(string) },
+                    new ParameterModifier[0]));
+            methodCache.Add("pr",
+                typeof (FilterHelpers).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .Single(mi => mi.Name.Equals("IsPresent")));
+
+            return methodCache;
         }
     }
 }
