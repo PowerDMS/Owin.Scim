@@ -363,17 +363,7 @@
                 }
             }
         }
-
-        public void Copy(Operation operation, object objectToApplyTo)
-        {
-            throw new NotSupportedException();
-        }
-
-        public void Move(Operation operation, object objectToApplyTo)
-        {
-            throw new NotSupportedException();
-        }
-
+        
         public void Remove(Operation operation, object objectToApplyTo)
         {
             throw new NotImplementedException();

@@ -1,6 +1,3 @@
-// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
-
 namespace Owin.Scim.Patching
 {
     using Operations;
@@ -11,9 +8,9 @@ namespace Owin.Scim.Patching
     public interface IObjectAdapter    
     {
         void Add(Operation operation, object objectToApplyTo);
-        void Copy(Operation operation, object objectToApplyTo);
-        void Move(Operation operation, object objectToApplyTo);
+
         void Remove(Operation operation, object objectToApplyTo);
+
         void Replace(Operation operation, object objectToApplyTo);
     }
 }

@@ -51,8 +51,7 @@ namespace Owin.Scim.Patching.Operations
 
         public bool ShouldSerializefrom()
         {
-            return (OperationType == OperationType.Move
-                || OperationType == OperationType.Copy);
+            return false;
         }
     }
 }

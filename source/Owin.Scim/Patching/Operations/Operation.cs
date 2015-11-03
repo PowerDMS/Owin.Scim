@@ -7,8 +7,6 @@ namespace Owin.Scim.Patching.Operations
 
     using Newtonsoft.Json;
 
-    using Properties;
-
     public class Operation : OperationBase
     {
         [JsonProperty("value")]
@@ -53,24 +51,12 @@ namespace Owin.Scim.Patching.Operations
                 case OperationType.Replace:
                     adapter.Replace(this, objectToApplyTo);
                     break;
-                case OperationType.Move:
-                    adapter.Move(this, objectToApplyTo);
-                    break;
-                case OperationType.Copy:
-                    adapter.Copy(this, objectToApplyTo);
-                    break;
-                case OperationType.Test:
-                    throw new NotSupportedException(Resources.TestOperationNotSupported);
-                default:
-                    break;
             }
         }
 
         public bool ShouldSerializevalue()
         {
-            return (OperationType == OperationType.Add
-                || OperationType == OperationType.Replace
-                || OperationType == OperationType.Test);
+            return (OperationType == OperationType.Add || OperationType == OperationType.Replace);
         }
     }
 }

@@ -100,53 +100,7 @@ namespace Owin.Scim.Patching
             Operations.Add(new Operation("replace", PathHelpers.NormalizePath(path), null, value));
             return this;
         }
-
-        /// <summary>
-        /// Removes value at specified location and add it to the target location.  Will result in, for example:
-        /// { "op": "move", "from": "/a/b/c", "path": "/a/b/d" }
-        /// </summary>
-        /// <param name="from">source location</param>
-        /// <param name="path">target location</param>
-        /// <returns></returns>
-        public JsonPatchDocument Move(string from, string path)
-        {
-            if (from == null)
-            {
-                throw new ArgumentNullException(nameof(from));
-            }
-
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            Operations.Add(new Operation("move", PathHelpers.NormalizePath(path), PathHelpers.NormalizePath(from)));
-            return this;
-        }
-
-        /// <summary>
-        /// Copy the value at specified location to the target location.  Willr esult in, for example:
-        /// { "op": "copy", "from": "/a/b/c", "path": "/a/b/e" }
-        /// </summary>
-        /// <param name="from">source location</param>
-        /// <param name="path">target location</param>
-        /// <returns></returns>
-        public JsonPatchDocument Copy(string from, string path)
-        {
-            if (from == null)
-            {
-                throw new ArgumentNullException(nameof(from));
-            }
-
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            Operations.Add(new Operation("copy", PathHelpers.NormalizePath(path), PathHelpers.NormalizePath(from)));
-            return this;
-        }
-
+        
         /// <summary>
         /// Apply this JsonPatchDocument  
         /// </summary>

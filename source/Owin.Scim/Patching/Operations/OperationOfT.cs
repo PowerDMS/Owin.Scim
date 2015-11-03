@@ -5,8 +5,6 @@ namespace Owin.Scim.Patching.Operations
 {
     using System;
 
-    using Properties;
-
     public class Operation<TModel> : Operation where TModel : class
     {
         public Operation()
@@ -67,18 +65,7 @@ namespace Owin.Scim.Patching.Operations
                 case OperationType.Replace:
                     adapter.Replace(this, objectToApplyTo);
                     break;
-                case OperationType.Move:
-                    adapter.Move(this, objectToApplyTo);
-                    break;
-                case OperationType.Copy:
-                    adapter.Copy(this, objectToApplyTo);
-                    break;
-                case OperationType.Test:
-                    throw new NotSupportedException(Resources.TestOperationNotSupported);
-                default:
-                    break;
             }
         }
-
     }
 }

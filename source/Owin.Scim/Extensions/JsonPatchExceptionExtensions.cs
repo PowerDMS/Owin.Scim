@@ -35,12 +35,6 @@
                     break;
                 case OperationType.Replace:
                     break;
-                case OperationType.Move:
-                    break;
-                case OperationType.Copy:
-                    break;
-                case OperationType.Test:
-                    break;
                 default:
                     throw new ArgumentOutOfRangeException();
             }

@@ -136,7 +136,9 @@
                     argument);
             }
 
-            return Visit(context.expression()); // This is probably incorrect if the property is nested and the same type as its parent. We'll most likely still need a childLambda.
+            // TODO: (DG) This is probably incorrect if the property is nested and the same type as its parent.
+            // We'll most likely still need a childLambda.
+            return Visit(context.expression());
         }
 
         public override LambdaExpression VisitNotExp(ScimFilterParser.NotExpContext context)
