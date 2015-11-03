@@ -8,8 +8,6 @@
 
     using Extensions;
 
-    using Filtering;
-
     using Helpers;
 
     using NContext.Common;

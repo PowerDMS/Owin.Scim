@@ -18,8 +18,6 @@ namespace Owin.Scim.Patching.Helpers
 
     using Extensions;
 
-    using Filtering;
-
     using NContext.Common;
 
     using Newtonsoft.Json.Serialization;

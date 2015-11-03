@@ -134,7 +134,7 @@
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
-    <Compile Include="Filtering\ScimFilter.cs" />
+    <Compile Include="Querying\ScimFilter.cs" />
     <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Middleware\RequireSslMiddleware.cs" />
     <Compile Include="Model\BulkRequest.cs" />
@@ -187,6 +187,7 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Properties\ResourceHelper.cs" />
+    <Compile Include="Querying\IScimFilterVisitor.cs" />
     <Compile Include="Querying\ScimFilterVisitor.cs" />
     <Compile Include="Registry\Registry.cs" />
     <Compile Include="Repository\InMemory\InMemoryUserRepository.cs" />

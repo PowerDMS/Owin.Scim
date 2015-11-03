@@ -132,7 +132,15 @@
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
+    <Compile Include="Querying\Filtering\contains_with_string.cs" />
+    <Compile Include="Querying\Filtering\greaterthanorequal_with_datetime.cs" />
+    <Compile Include="Querying\Filtering\greaterthan_with_datetime.cs" />
+    <Compile Include="Querying\Filtering\greaterthan_with_string.cs" />
     <Compile Include="Querying\Filtering\when_parsing_a_filter_expression.cs" />
+    <Compile Include="Querying\Filtering\equals_with_boolean_comparison.cs" />
+    <Compile Include="Querying\Filtering\equals_with_complex_property_comparison.cs" />
+    <Compile Include="Querying\Filtering\present_with_enumerable.cs" />
+    <Compile Include="Querying\Filtering\equals_with_string_comparison.cs" />
     <Compile Include="Services\UserService\Create\when_creating_a_user.cs" />
     <Compile Include="Services\UserService\Create\with_non_canonicalized_attributes.cs" />
     <Compile Include="Services\UserService\Update\when_updating_a_user.cs" />

@@ -1,0 +1,29 @@
+﻿namespace Owin.Scim.Tests.Querying.Filtering
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using Machine.Specifications;
+
+    using Model;
+    using Model.Users;
+
+    using Scim.Querying;
+
+    public class greaterthan_with_datetime : when_parsing_a_filter_expression<User>
+    {
+        Establish context = () =>
+        {
+            Users = new List<User>
+            {
+                new User { UserName = "BJensen", Meta = new ResourceMetadata { LastModified = new DateTime(2015, 01, 01, 0, 0, 0, DateTimeKind.Utc) } },
+                new User { UserName = "ROMalley", Meta = new ResourceMetadata { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
+            };
+
+            FilterExpression = new ScimFilter("meta.lastModified gt \"2014-05-13T04:42:34Z\"");
+        };
+
+        It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("BJensen");
+    }
+}

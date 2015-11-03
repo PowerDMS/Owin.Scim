@@ -2,9 +2,9 @@
 {
     using System;
 
-    public abstract class ResourceMetadata
+    public sealed class ResourceMetadata
     {
-        public abstract string ResourceType { get; set; }
+        public string ResourceType { get; set; }
 
         public DateTime Created { get; set; }
 

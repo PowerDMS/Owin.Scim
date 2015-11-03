@@ -15,13 +15,16 @@
 
     using NContext.Common;
 
-    public interface IScimFilterVisitor
-    {
-        LambdaExpression VisitExpression(IParseTree tree);
-    }
-
     public class ScimFilterVisitor<TResource> : ScimFilterBaseVisitor<LambdaExpression>, IScimFilterVisitor
     {
+        private static MethodInfo _Any;
+
+        static ScimFilterVisitor()
+        {
+            _Any = typeof (Enumerable).GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .Single(mi => mi.Name.Equals("Any") && mi.GetParameters().Length == 2);
+        }
+
         public LambdaExpression VisitExpression(IParseTree tree)
         {
             return Visit(tree);
@@ -57,10 +60,11 @@
 
             if (property.PropertyType != typeof (TResource))
             {
+                bool isEnumerable = property.PropertyType.IsNonStringEnumerable();
                 Type childFilterType = property.PropertyType;
-                if (childFilterType.IsNonStringEnumerable())
+                if (isEnumerable)
                 {
-                    childFilterType = childFilterType.GetGenericArguments()[0];
+                    childFilterType = childFilterType.GetGenericArguments()[0]; // set childFilterType to enumerable type argument
                 }
 
                 var argument = Expression.Parameter(typeof(TResource));
@@ -69,8 +73,29 @@
                 var childLambda = childVisitor.VisitExpression(context.expression()); // Visit the nested filter expression.
                 var childLambdaArgument = Expression.TryCatch(
                     Expression.Block(Expression.Property(argument, property)),
-                    Expression.Catch(typeof (Exception), Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
+                    Expression.Catch(typeof (Exception),
+                        Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
                     );
+
+                if (isEnumerable)
+                {
+                    // if we have an enumerable, then we need to see if any of its elements satisfy the childLambda
+                    // to accomplish this, let's just make use of .NET's Any<TSource>(enumerable, predicate)
+
+                    var anyMethod = _Any.MakeGenericMethod(childFilterType);
+                    var anyPredicate = Expression.TryCatch(
+                        Expression.Block(
+                            Expression.Call(
+                                anyMethod,
+                                new List<Expression>
+                                {
+                                    childLambdaArgument,
+                                    childLambda
+                                })),
+                        Expression.Catch(typeof (ArgumentNullException), Expression.Constant(false)));
+
+                    return Expression.Lambda(anyPredicate, argument);
+                }
 
                 return Expression.Lambda(
                     Expression.Invoke(
@@ -80,7 +105,6 @@
                             Expression.TypeAs(childLambdaArgument, childFilterType)
                         }),
                     argument);
-
             }
 
             return Visit(context.expression()); // This is probably incorrect if the property is nested and the same type as its parent. We'll most likely still need a childLambda.
@@ -112,7 +136,9 @@
 
             var left = Expression.TryCatch(
                 Expression.Block(Expression.Property(argument, property)),
-                Expression.Catch(typeof(Exception), Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
+                Expression.Catch(
+                    typeof(NullReferenceException), 
+                    Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
                 );
 
             var predicate = Expression.Lambda<Func<TResource, bool>>(
@@ -161,7 +187,7 @@
             return predicate;
         }
 
-        private static Expression CreateBinaryExpression(Expression left, PropertyInfo property, string operatorToken, string valueToken)
+        private Expression CreateBinaryExpression(Expression left, PropertyInfo property, string operatorToken, string valueToken)
         {
             // Equal
             if (operatorToken.Equals("eq"))
@@ -171,7 +197,7 @@
                 {
                     return Expression.Equal(left, Expression.Constant(intValue));
                 }
-                
+
                 bool boolValue;
                 if (property.PropertyType == typeof(bool) && bool.TryParse(valueToken, out boolValue))
                 {
@@ -184,9 +210,17 @@
                     return Expression.Equal(left, Expression.Constant(dateTimeValue));
                 }
 
+                if (property.PropertyType != typeof(string))
+                {
+                    return Expression.Equal(left, Expression.Constant(valueToken));
+                }
+
                 return Expression.Call(
-                    typeof(string).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static, null,
-                        new[] { typeof(string), typeof(string), typeof(StringComparison) },
+                    typeof (string).GetMethod(
+                        "Equals",
+                        BindingFlags.Public | BindingFlags.Static,
+                        null,
+                        new[] { typeof (string), typeof (string), typeof (StringComparison) },
                         new ParameterModifier[0]),
                     new List<Expression>
                     {
@@ -199,21 +233,6 @@
             // Not Equal
             if (operatorToken.Equals("ne"))
             {
-                if (valueToken.StartsWith("\""))
-                {
-                    return Expression.IsFalse(
-                        Expression.Call(
-                            typeof (string).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static, null,
-                                new[] { typeof (string), typeof (string), typeof (StringComparison) },
-                                new ParameterModifier[0]),
-                            new List<Expression>
-                            {
-                                left,
-                                Expression.Constant(valueToken.Trim('"')),
-                                Expression.Constant(StringComparison.OrdinalIgnoreCase)
-                            }));
-                }
-
                 int intValue;
                 if (property.PropertyType == typeof(int) && int.TryParse(valueToken, out intValue))
                 {
@@ -232,45 +251,238 @@
                     return Expression.NotEqual(left, Expression.Constant(dateTimeValue));
                 }
 
-                return Expression.NotEqual(left, Expression.Constant(valueToken));
+                if (property.PropertyType != typeof(string))
+                {
+                    return Expression.NotEqual(left, Expression.Constant(valueToken));
+                }
+
+                return Expression.IsFalse(
+                    Expression.Call(
+                        typeof (string).GetMethod("Equals", BindingFlags.Public | BindingFlags.Static, null,
+                            new[] { typeof (string), typeof (string), typeof (StringComparison) },
+                            new ParameterModifier[0]),
+                        new List<Expression>
+                        {
+                            left,
+                            Expression.Constant(valueToken),
+                            Expression.Constant(StringComparison.OrdinalIgnoreCase)
+                        }));
             }
 
             // Contains
             if (operatorToken.Equals("co"))
             {
+                if (property.PropertyType != typeof(string))
+                {
+                    throw new InvalidOperationException("co only works on strings");
+                }
+
+                return Expression.Call(
+                    GetType().GetMethod("Contains", BindingFlags.NonPublic | BindingFlags.Static,
+                            null,
+                            new[] { typeof(string), typeof(string) },
+                            new ParameterModifier[0]),
+                        new List<Expression>
+                        {
+                            left,
+                            Expression.Constant(valueToken)
+                        });
             }
 
             // Starts With
             if (operatorToken.Equals("sw"))
             {
+                if (property.PropertyType != typeof (string))
+                {
+                    throw new InvalidOperationException("sw only works with strings");
+                }
+
+                return Expression.Call(
+                    GetType().GetMethod("StartsWith", BindingFlags.NonPublic | BindingFlags.Static,
+                            null,
+                            new[] { typeof(string), typeof(string) },
+                            new ParameterModifier[0]),
+                        new List<Expression>
+                        {
+                            left,
+                            Expression.Constant(valueToken)
+                        });
             }
 
             // Ends With
             if (operatorToken.Equals("ew"))
             {
+                if (property.PropertyType != typeof (string))
+                {
+                    throw new InvalidOperationException("ew only works with strings");
+                }
+
+                return Expression.Call(
+                    GetType().GetMethod("EndsWith", BindingFlags.NonPublic | BindingFlags.Static,
+                            null,
+                            new[] { typeof(string), typeof(string) },
+                            new ParameterModifier[0]),
+                        new List<Expression>
+                        {
+                            left,
+                            Expression.Constant(valueToken)
+                        });
             }
 
             // Greater Than
             if (operatorToken.Equals("gt"))
             {
+                int intValue;
+                if (property.PropertyType == typeof(int) && int.TryParse(valueToken, out intValue))
+                {
+                    return Expression.GreaterThan(left, Expression.Constant(intValue));
+                }
+
+                bool boolValue;
+                if (property.PropertyType == typeof(bool) && bool.TryParse(valueToken, out boolValue))
+                {
+                    return Expression.GreaterThan(left, Expression.Constant(boolValue));
+                }
+
+                DateTime dateTimeValue;
+                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                {
+                    return Expression.GreaterThan(left, Expression.Constant(dateTimeValue));
+                }
+                
+                if (property.PropertyType == typeof(string))
+                {
+                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var result = Expression.Call(left, method, Expression.Constant(valueToken));
+                    var zero = Expression.Constant(0);
+
+                    return Expression.MakeBinary(ExpressionType.GreaterThan, result, zero);
+                }
+
+                return Expression.MakeBinary(ExpressionType.GreaterThan, left, Expression.Constant(valueToken));
             }
 
             // Greater Than or Equal
             if (operatorToken.Equals("ge"))
             {
+                int intValue;
+                if (property.PropertyType == typeof(int) && int.TryParse(valueToken, out intValue))
+                {
+                    return Expression.GreaterThanOrEqual(left, Expression.Constant(intValue));
+                }
+
+                bool boolValue;
+                if (property.PropertyType == typeof(bool) && bool.TryParse(valueToken, out boolValue))
+                {
+                    return Expression.GreaterThanOrEqual(left, Expression.Constant(boolValue));
+                }
+
+                DateTime dateTimeValue;
+                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                {
+                    return Expression.GreaterThanOrEqual(left, Expression.Constant(dateTimeValue));
+                }
+                
+                if (property.PropertyType == typeof(string))
+                {
+                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var result = Expression.Call(left, method, Expression.Constant(valueToken));
+                    var zero = Expression.Constant(0);
+
+                    return Expression.MakeBinary(ExpressionType.GreaterThanOrEqual, result, zero);
+                }
+
+                return Expression.MakeBinary(ExpressionType.GreaterThanOrEqual, left, Expression.Constant(valueToken));
             }
 
             // Less Than
             if (operatorToken.Equals("lt"))
             {
+                int intValue;
+                if (property.PropertyType == typeof(int) && int.TryParse(valueToken, out intValue))
+                {
+                    return Expression.LessThan(left, Expression.Constant(intValue));
+                }
+
+                bool boolValue;
+                if (property.PropertyType == typeof(bool) && bool.TryParse(valueToken, out boolValue))
+                {
+                    return Expression.LessThan(left, Expression.Constant(boolValue));
+                }
+
+                DateTime dateTimeValue;
+                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                {
+                    return Expression.LessThan(left, Expression.Constant(dateTimeValue));
+                }
+
+                if (property.PropertyType == typeof(string))
+                {
+                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var result = Expression.Call(left, method, Expression.Constant(valueToken));
+                    var zero = Expression.Constant(0);
+
+                    return Expression.MakeBinary(ExpressionType.LessThan, result, zero);
+                }
+
+                return Expression.MakeBinary(ExpressionType.LessThan, left, Expression.Constant(valueToken));
             }
 
             // Less Than or Equal
             if (operatorToken.Equals("le"))
             {
+                int intValue;
+                if (property.PropertyType == typeof(int) && int.TryParse(valueToken, out intValue))
+                {
+                    return Expression.LessThanOrEqual(left, Expression.Constant(intValue));
+                }
+
+                bool boolValue;
+                if (property.PropertyType == typeof(bool) && bool.TryParse(valueToken, out boolValue))
+                {
+                    return Expression.LessThanOrEqual(left, Expression.Constant(boolValue));
+                }
+
+                DateTime dateTimeValue;
+                if (property.PropertyType == typeof(DateTime) && DateTime.TryParse(valueToken, out dateTimeValue))
+                {
+                    return Expression.LessThanOrEqual(left, Expression.Constant(dateTimeValue));
+                }
+
+                if (property.PropertyType == typeof(string))
+                {
+                    var method = property.PropertyType.GetMethod("CompareTo", new[] { typeof(string) });
+                    var result = Expression.Call(left, method, Expression.Constant(valueToken));
+                    var zero = Expression.Constant(0);
+
+                    return Expression.MakeBinary(ExpressionType.LessThanOrEqual, result, zero);
+                }
+
+                return Expression.MakeBinary(ExpressionType.LessThanOrEqual, left, Expression.Constant(valueToken));
             }
 
             throw new Exception("Invalid filter operator for a binary expression.");
+        }
+
+        protected internal static bool StartsWith(string haystack, string needle)
+        {
+            if (haystack == null || needle == null) return false;
+
+            return haystack.StartsWith(needle, StringComparison.OrdinalIgnoreCase);
+        }
+
+        protected internal static bool EndsWith(string haystack, string needle)
+        {
+            if (haystack == null || needle == null) return false;
+
+            return haystack.StartsWith(needle, StringComparison.OrdinalIgnoreCase);
+        }
+
+        protected internal static bool Contains(string haystack, string needle)
+        {
+            if (haystack == null || needle == null) return false;
+
+            return haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase) > -1;
         }
 
         protected internal static bool IsPresent(TResource resource, PropertyInfo property)
