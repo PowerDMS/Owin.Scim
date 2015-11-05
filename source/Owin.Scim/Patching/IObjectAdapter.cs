@@ -1,5 +1,7 @@
 namespace Owin.Scim.Patching
 {
+    using System.Collections.Generic;
+
     using Operations;
 
     /// <summary>
@@ -7,10 +9,10 @@ namespace Owin.Scim.Patching
     /// </summary>  
     public interface IObjectAdapter    
     {
-        void Add(Operation operation, object objectToApplyTo);
+        IEnumerable<PatchOperation> Add(Operation operation, object objectToApplyTo);
 
-        void Remove(Operation operation, object objectToApplyTo);
+        IEnumerable<PatchOperation> Remove(Operation operation, object objectToApplyTo);
 
-        void Replace(Operation operation, object objectToApplyTo);
+        IEnumerable<PatchOperation> Replace(Operation operation, object objectToApplyTo);
     }
 }

@@ -10,7 +10,7 @@
 
     public static class JsonPatchExceptionExtensions
     {
-        public static ScimError ToScimError(this JsonPatchException exception)
+        public static ScimError ToScimError(this ScimPatchException exception)
         {
             return new ScimError(
                 GetStatusCode(exception),
@@ -18,14 +18,14 @@
                 GetDetail(exception));
         }
 
-        private static HttpStatusCode GetStatusCode(JsonPatchException exception)
+        private static HttpStatusCode GetStatusCode(ScimPatchException exception)
         {
             return HttpStatusCode.BadRequest;
         }
 
-        private static ScimType GetScimType(JsonPatchException exception)
+        private static ScimErrorType GetScimType(ScimPatchException exception)
         {
-            return ScimType.InvalidPath;
+            return ScimErrorType.InvalidPath;
 
             switch (exception.FailedOperation.OperationType)
             {
@@ -40,7 +40,7 @@
             }
         }
 
-        private static string GetDetail(JsonPatchException exception)
+        private static string GetDetail(ScimPatchException exception)
         {
             return null;
         }

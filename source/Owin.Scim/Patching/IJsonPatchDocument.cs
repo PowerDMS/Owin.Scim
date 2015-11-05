@@ -13,6 +13,6 @@ namespace Owin.Scim.Patching
     {
         IContractResolver ContractResolver { get; set; }
 
-        IList<Operation> GetOperations();
+        IEnumerable<Operation> GetOperations();
     }
 }

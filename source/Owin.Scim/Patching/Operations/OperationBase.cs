@@ -24,15 +24,11 @@ namespace Owin.Scim.Patching.Operations
         [JsonProperty("op")]
         public string op { get; set; }
 
-        [JsonProperty("from")]
-        public string from { get; set; }
-
         public OperationBase()
         {
-
         }
 
-        public OperationBase(string op, string path, string from)
+        public OperationBase(string op, string path)
         {
             if (op == null)
             {
@@ -46,12 +42,6 @@ namespace Owin.Scim.Patching.Operations
 
             this.op = op;
             this.path = path;
-            this.from = from;
-        }
-
-        public bool ShouldSerializefrom()
-        {
-            return false;
         }
     }
 }

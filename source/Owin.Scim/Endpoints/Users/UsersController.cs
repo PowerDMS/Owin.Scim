@@ -57,20 +57,20 @@
                         return new ScimErrorResponse<User>(
                             new ScimError(
                                 HttpStatusCode.BadRequest,
-                                ScimType.InvalidSyntax,
+                                ScimErrorType.InvalidSyntax,
                                 "The patch request body is unparsable, syntactically incorrect, or violates schema."));
                     }
 
                     try
                     {
-                        patchRequest.Operations.ApplyTo(
-                            user, 
+                        var result = patchRequest.Operations.ApplyTo(
+                            user,
                             new ScimObjectAdapter<User>(
-                                new CamelCasePropertyNamesContractResolver(),
-                                e => { throw new JsonPatchException(e); }));
+                                new CamelCasePropertyNamesContractResolver()));
+
                         return new ScimDataResponse<User>(user);
                     }
-                    catch (JsonPatchException ex)
+                    catch (ScimPatchException ex)
                     {
                         return new ScimErrorResponse<User>(ex.ToScimError());
                     }

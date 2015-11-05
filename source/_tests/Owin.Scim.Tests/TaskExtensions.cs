@@ -12,7 +12,7 @@
         {
             try
             {
-                responseTask.Wait();
+                responseTask.Wait(TimeSpan.FromHours(1)); // Debugging
             }
             catch (AggregateException ex)
             {

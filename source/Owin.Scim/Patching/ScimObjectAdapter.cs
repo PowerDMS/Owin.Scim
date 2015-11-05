@@ -10,6 +10,8 @@
 
     using Helpers;
 
+    using Model;
+
     using NContext.Common;
 
     using Newtonsoft.Json;
@@ -18,8 +20,6 @@
 
     using Operations;
 
-    using Properties;
-
     public class ScimObjectAdapter<T> : IObjectAdapter where T : class
     {
         /// <summary>
@@ -27,9 +27,7 @@
         /// </summary>
         /// <param name="contractResolver">The <see cref="IContractResolver"/>.</param>
         /// <param name="logErrorAction">The <see cref="Action"/> for logging <see cref="JsonPatchError"/>.</param>
-        public ScimObjectAdapter(
-            IContractResolver contractResolver,
-            Action<JsonPatchError> logErrorAction)
+        public ScimObjectAdapter(IContractResolver contractResolver)
         {
             if (contractResolver == null)
             {
@@ -37,18 +35,12 @@
             }
 
             ContractResolver = contractResolver;
-            LogErrorAction = logErrorAction;
         }
 
         /// <summary>
         /// Gets or sets the <see cref="IContractResolver"/>.
         /// </summary>
         public IContractResolver ContractResolver { get; }
-
-        /// <summary>
-        /// Action for logging <see cref="JsonPatchError"/>.
-        /// </summary>
-        public Action<JsonPatchError> LogErrorAction { get; }
 
         /// <summary>
         /// The "add" operation performs one of the following functions,
@@ -110,7 +102,7 @@
         /// </summary>
         /// <param name="operation">The add operation.</param>
         /// <param name="objectToApplyTo">Object to apply the operation to.</param>
-        public void Add(Operation operation, object objectToApplyTo)
+        public IEnumerable<PatchOperation> Add(Operation operation, object objectToApplyTo)
         {
             if (operation == null)
             {
@@ -121,30 +113,7 @@
             {
                 throw new ArgumentNullException(nameof(objectToApplyTo));
             }
-
-            Add(operation.path, operation.value, objectToApplyTo, operation);
-        }
-        
-        /// <summary>
-        /// Add is used by various operations (eg: add, copy, ...), yet through different operations;
-        /// This method allows code reuse yet reporting the correct operation on error
-        /// </summary>
-        private void Add(
-            string path,
-            object value,
-            object objectToApplyTo,
-            Operation operationToReport)
-        {
-            if (objectToApplyTo == null)
-            {
-                throw new ArgumentNullException(nameof(objectToApplyTo));
-            }
-
-            if (operationToReport == null)
-            {
-                throw new ArgumentNullException(nameof(operationToReport));
-            }
-
+            
             /*
             With SCIM 2.0, path is only required for the remove operation:
             
@@ -182,27 +151,42 @@
             above for single-valued attributes.
             */
 
-            if (string.IsNullOrWhiteSpace(path))
+            if (string.IsNullOrWhiteSpace(operation.path))
             {
-                try
+                var operations = new List<PatchOperation>();
+                var resourcePatch = JObject.Parse(operation.value.ToString());
+                foreach (var kvp in resourcePatch)
                 {
-                    var resourcePatch = JObject.Parse(value.ToString());
-                    foreach (var kvp in resourcePatch)
-                    {
-                        Add(kvp.Key, kvp.Value, objectToApplyTo, operationToReport);
-                    }
+                    operations.Add(Add(kvp.Key, kvp.Value, objectToApplyTo, operation));
+                }
 
-                    return; // our patch operation had no path, so it was recursively handled above.
-                }
-                catch (Exception)
-                {
-                    // TODO: (DG) FINISH
-                    throw new JsonPatchException(
-                        new JsonPatchError(
-                            objectToApplyTo,
-                            operationToReport,
-                            ""));
-                }
+                return operations;
+            }
+
+            return new List<PatchOperation>
+            {
+                Add(operation.path, operation.value, objectToApplyTo, operation)
+            };
+        }
+        
+        /// <summary>
+        /// Add is used by various operations (eg: add, copy, ...), yet through different operations;
+        /// This method allows code reuse yet reporting the correct operation on error
+        /// </summary>
+        private PatchOperation Add(
+            string path,
+            object value,
+            object objectToApplyTo,
+            Operation operation)
+        {
+            if (objectToApplyTo == null)
+            {
+                throw new ArgumentNullException(nameof(objectToApplyTo));
+            }
+
+            if (operation == null)
+            {
+                throw new ArgumentNullException(nameof(operation));
             }
 
             /* 
@@ -223,14 +207,12 @@
                 objectToApplyTo,
                 path, 
                 ContractResolver);
-            
-            if (!treeAnalysisResult.IsValidPathForAdd)
+
+            if (treeAnalysisResult.ErrorType != null)
             {
-                LogError(new JsonPatchError(
-                    objectToApplyTo,
-                    operationToReport,
-                    ResourceHelper.FormatPropertyCannotBeAdded(path)));
-                return;
+                throw new ScimPatchException(
+                    treeAnalysisResult.ErrorType,
+                    operation);
             }
 
             /*
@@ -239,14 +221,15 @@
                    o  If the target location specifies an attribute that does not exist
                       (has no value), the attribute is added with the new value.
             */
-
-            if (!treeAnalysisResult.UseDynamicLogic)
+            foreach (var patchMember in treeAnalysisResult.PatchMembers)
             {
-                var patchProperty = treeAnalysisResult.JsonPatchProperty;
-                var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
-                if (instanceValue == null || !patchProperty.Property.PropertyType.IsNonStringEnumerable())
+                if (!treeAnalysisResult.UseDynamicLogic)
                 {
-                    /*
+                    var patchProperty = patchMember.JsonPatchProperty;
+                    var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
+                    if (instanceValue == null || !patchProperty.Property.PropertyType.IsNonStringEnumerable())
+                    {
+                        /*
                         Here we are going to be setting or replacing a current value:
                             o  If the target location does not exist, the attribute and value are added.
                                (instanceValue == null)
@@ -256,154 +239,145 @@
                                (!patchProperty.Property.PropertyType.IsNonStringEnumerable())
                     */
 
-                    var conversionResultTuple = ConvertToActualType(
-                        patchProperty.Property.PropertyType,
-                        value);
+                        var conversionResultTuple = ConvertToActualType(
+                            patchProperty.Property.PropertyType,
+                            value);
 
-                    if (!conversionResultTuple.CanBeConverted)
-                    {
-                        LogError(new JsonPatchError(
-                            objectToApplyTo,
-                            operationToReport,
-                            ResourceHelper.FormatInvalidValueForProperty(value, path)));
-                        return;
+                        if (!conversionResultTuple.CanBeConverted)
+                        {
+                            throw new ScimPatchException(
+                                ScimErrorType.InvalidValue,
+                                operation);
+                        }
+
+                        if (!patchProperty.Property.Writable)
+                        {
+                            throw new Exception(); // TODO: (DG) This is int server error.
+                        }
+
+                        patchProperty.Property.ValueProvider.SetValue(
+                            patchProperty.Parent,
+                            conversionResultTuple.ConvertedInstance);
                     }
-
-                    if (!patchProperty.Property.Writable)
+                    else
                     {
-                        LogError(new JsonPatchError(
-                            objectToApplyTo,
-                            operationToReport,
-                            ResourceHelper.FormatCannotUpdateProperty(path)));
-                        return;
-                    }
-
-                    patchProperty.Property.ValueProvider.SetValue(
-                        patchProperty.Parent,
-                        conversionResultTuple.ConvertedInstance);
-                }
-                else
-                {
-                    /*
+                        /*
                         Here we are going to be modifying an existing enumerable:
                            o  If the target location specifies a multi-valued attribute, a new
                               value is added to the attribute.
                     */
-                    var genericTypeOfArray = patchProperty.Property.PropertyType.GetEnumerableType();
-                    var conversionResult = ConvertToActualType(genericTypeOfArray, value);
-                    if (!conversionResult.CanBeConverted)
-                    {
-                        LogError(new JsonPatchError(
-                            objectToApplyTo,
-                            operationToReport,
-                            ResourceHelper.FormatInvalidValueForProperty(conversionResult.ConvertedInstance, path)));
-                        return;
-                    }
 
-                    if (!patchProperty.Property.Readable)
-                    {
-                        LogError(new JsonPatchError(
-                            objectToApplyTo,
-                            operationToReport,
-                            ResourceHelper.FormatCannotReadProperty(path)));
-                        return;
-                    }
+                        /*
+                        TODO: (DG) Handle case when:
 
-                    var listType = typeof (List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
-                    var array = (IList) listType.CreateInstance(instanceValue);
-                    array.AddPossibleRange(conversionResult.ConvertedInstance);
+                            o  If the target location already contains the value specified, no
+                              changes SHOULD be made to the resource, and a success response
+                              SHOULD be returned.  Unless other operations change the resource,
+                              this operation SHALL NOT change the modify timestamp of the
+                              resource.
+                    */
 
-                    patchProperty.Property.ValueProvider.SetValue(
-                        patchProperty.Parent,
-                        array);
-                }
-            }
-            else
-            {
-                // TODO: (DG) NOT SURE IF THIS IS EVER NEEDED!
-                // possibly with resource extensions like enterpriseuser support
-
-                var container = treeAnalysisResult.Container;
-                if (container.ContainsCaseInsensitiveKey(treeAnalysisResult.PropertyPathInParent))
-                {
-                    // Existing property.  
-                    // If it's not an array, we need to check if the value fits the property type
-                    // 
-                    // If it's an array, we need to check if the value fits in that array type,
-                    // and add it at the correct position (if allowed).
-                    if (treeAnalysisResult.JsonPatchProperty.Property.PropertyType.IsNonStringEnumerable())
-                    {
-                        // get the actual type
-                        var propertyValue =
-                            container.GetValueForCaseInsensitiveKey(treeAnalysisResult.PropertyPathInParent);
-                        var typeOfPathProperty = propertyValue.GetType();
-
-                        if (!typeOfPathProperty.IsNonStringEnumerable())
-                        {
-                            LogError(new JsonPatchError(
-                                objectToApplyTo,
-                                operationToReport,
-                                ResourceHelper.FormatInvalidIndexForArrayProperty(operationToReport.op, path)));
-                            return;
-                        }
-
-                        // now, get the generic type of the enumerable
-                        var genericTypeOfArray = typeOfPathProperty.GetEnumerableType();
+                        var genericTypeOfArray = patchProperty.Property.PropertyType.GetEnumerableType();
                         var conversionResult = ConvertToActualType(genericTypeOfArray, value);
                         if (!conversionResult.CanBeConverted)
                         {
-                            LogError(new JsonPatchError(
-                                objectToApplyTo,
-                                operationToReport,
-                                ResourceHelper.FormatInvalidValueForProperty(value, path)));
-                            return;
+                            throw new ScimPatchException(
+                                ScimErrorType.InvalidValue,
+                                operation);
                         }
 
-                        // get value (it can be cast, we just checked that) 
-                        var array = treeAnalysisResult.Container.GetValueForCaseInsensitiveKey(
-                            treeAnalysisResult.PropertyPathInParent) as IList;
-
-                        array.Add(conversionResult.ConvertedInstance);
-                        treeAnalysisResult.Container.SetValueForCaseInsensitiveKey(
-                            treeAnalysisResult.PropertyPathInParent, array);
-                    }
-                    else
-                    {
-                        // get the actual type
-                        var typeOfPathProperty = treeAnalysisResult.Container
-                            .GetValueForCaseInsensitiveKey(treeAnalysisResult.PropertyPathInParent).GetType();
-
-                        // can the value be converted to the actual type?
-                        var conversionResult = ConvertToActualType(typeOfPathProperty, value);
-                        if (conversionResult.CanBeConverted)
+                        if (!patchProperty.Property.Readable)
                         {
-                            treeAnalysisResult.Container.SetValueForCaseInsensitiveKey(
-                                treeAnalysisResult.PropertyPathInParent,
-                                conversionResult.ConvertedInstance);
+                            throw new Exception(); // TODO: (DG) This is int server error.
                         }
-                        else
-                        {
-                            LogError(new JsonPatchError(
-                                objectToApplyTo,
-                                operationToReport,
-                                ResourceHelper.FormatInvalidValueForProperty(conversionResult.ConvertedInstance, path)));
-                        }
+
+                        var listType = typeof (List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
+                        var array = (IList) listType.CreateInstance(instanceValue);
+                        array.AddPossibleRange(conversionResult.ConvertedInstance);
+
+                        patchProperty.Property.ValueProvider.SetValue(
+                            patchProperty.Parent,
+                            array);
                     }
                 }
                 else
                 {
-                    // New property - add it.  
-                    treeAnalysisResult.Container.Add(treeAnalysisResult.PropertyPathInParent, value);
+                    // TODO: (DG) NOT SURE IF THIS IS EVER NEEDED!
+                    // possibly with resource extensions like enterpriseuser support
+
+                    var container = treeAnalysisResult.Container;
+                    if (container.ContainsCaseInsensitiveKey(patchMember.PropertyPathInParent))
+                    {
+                        // Existing property.  
+                        // If it's not an array, we need to check if the value fits the property type
+                        // 
+                        // If it's an array, we need to check if the value fits in that array type,
+                        // and add it at the correct position (if allowed).
+                        if (patchMember.JsonPatchProperty.Property.PropertyType.IsNonStringEnumerable())
+                        {
+                            // get the actual type
+                            var propertyValue =
+                                container.GetValueForCaseInsensitiveKey(patchMember.PropertyPathInParent);
+                            var typeOfPathProperty = propertyValue.GetType();
+
+                            if (!typeOfPathProperty.IsNonStringEnumerable())
+                            {
+                                throw new Exception();
+                            }
+
+                            // now, get the generic type of the enumerable
+                            var genericTypeOfArray = typeOfPathProperty.GetEnumerableType();
+                            var conversionResult = ConvertToActualType(genericTypeOfArray, value);
+                            if (!conversionResult.CanBeConverted)
+                            {
+                                throw new Exception();
+                            }
+
+                            // get value (it can be cast, we just checked that) 
+                            var array = treeAnalysisResult.Container.GetValueForCaseInsensitiveKey(
+                                patchMember.PropertyPathInParent) as IList;
+
+                            array.Add(conversionResult.ConvertedInstance);
+                            treeAnalysisResult.Container.SetValueForCaseInsensitiveKey(
+                                patchMember.PropertyPathInParent, array);
+                        }
+                        else
+                        {
+                            // get the actual type
+                            var typeOfPathProperty = treeAnalysisResult.Container
+                                .GetValueForCaseInsensitiveKey(patchMember.PropertyPathInParent).GetType();
+
+                            // can the value be converted to the actual type?
+                            var conversionResult = ConvertToActualType(typeOfPathProperty, value);
+                            if (conversionResult.CanBeConverted)
+                            {
+                                treeAnalysisResult.Container.SetValueForCaseInsensitiveKey(
+                                    patchMember.PropertyPathInParent,
+                                    conversionResult.ConvertedInstance);
+                            }
+                            else
+                            {
+                                throw new Exception();
+                            }
+                        }
+                    }
+                    else
+                    {
+                        // New property - add it.  
+                        treeAnalysisResult.Container.Add(patchMember.PropertyPathInParent, value);
+                    }
                 }
             }
+
+            return null;
         }
         
-        public void Remove(Operation operation, object objectToApplyTo)
+        public IEnumerable<PatchOperation> Remove(Operation operation, object objectToApplyTo)
         {
             throw new NotImplementedException();
         }
 
-        public void Replace(Operation operation, object objectToApplyTo)
+        public IEnumerable<PatchOperation> Replace(Operation operation, object objectToApplyTo)
         {
             throw new NotImplementedException();
         }
@@ -419,18 +393,6 @@
             catch (Exception)
             {
                 return new ConversionResult(false, null);
-            }
-        }
-
-        private void LogError(JsonPatchError jsonPatchError)
-        {
-            if (LogErrorAction != null)
-            {
-                LogErrorAction(jsonPatchError);
-            }
-            else
-            {
-                throw new JsonPatchException(jsonPatchError);
             }
         }
     }

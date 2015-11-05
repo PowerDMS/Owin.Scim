@@ -13,12 +13,17 @@ namespace Owin.Scim.Model
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
-            return new ScimType((string)reader.Value);
+            throw new NotSupportedException();
         }
 
         public override bool CanConvert(Type objectType)
         {
             return objectType == typeof (string);
+        }
+
+        public override bool CanRead
+        {
+            get { return false; }
         }
     }
 }

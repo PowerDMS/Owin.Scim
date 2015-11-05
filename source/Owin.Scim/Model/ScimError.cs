@@ -3,9 +3,8 @@
     using System.Collections.Generic;
     using System.Net;
 
-    using DryIoc;
-
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     public class ScimError
     {
@@ -14,12 +13,12 @@
         [JsonConstructor]
         public ScimError(
             HttpStatusCode status, 
-            ScimType scimType = null,
+            ScimErrorType scimErrorType = null,
             string detail = null)
         {
             _Schemas = new[] { ScimConstants.Messages.Error };
             Status = status;
-            ScimType = scimType;
+            ScimErrorType = scimErrorType;
             Detail = detail;
         }
         
@@ -29,10 +28,10 @@
             set { _Schemas = value; }
         }
 
-        [JsonProperty(ItemConverterType = typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
+        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
         public HttpStatusCode Status { get; private set; }
 
-        public ScimType ScimType { get; set; }
+        public ScimErrorType ScimErrorType { get; set; }
 
         public string Detail { get; set; }
     }

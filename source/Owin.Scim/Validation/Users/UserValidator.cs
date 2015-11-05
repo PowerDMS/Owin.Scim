@@ -91,7 +91,7 @@
                         .WithState(u => 
                             new ScimError(
                                 HttpStatusCode.BadRequest, 
-                                ScimType.InvalidValue, 
+                                ScimErrorType.InvalidValue, 
                                 ErrorDetail.AttributeRequired("userName")));
 
                     When(user => !string.IsNullOrWhiteSpace(user.PreferredLanguage),
@@ -102,7 +102,7 @@
                                 .WithState(u =>
                                     new ScimError(
                                         HttpStatusCode.BadRequest,
-                                        ScimType.InvalidValue,
+                                        ScimErrorType.InvalidValue,
                                         "The attribute 'preferredLanguage' is formatted the same " +
                                         "as the HTTP Accept-Language header field. (e.g., da, en-gb;q=0.8, en;q=0.7)"));
                         });
@@ -114,7 +114,7 @@
                                 .WithState(u =>
                                     new ScimError(
                                         HttpStatusCode.BadRequest,
-                                        ScimType.InvalidValue,
+                                        ScimErrorType.InvalidValue,
                                         "The attribute 'profileUrl' must be a valid absolute URI."));
                         });
                     When(user => !string.IsNullOrWhiteSpace(user.Locale),
@@ -137,7 +137,7 @@
                                 .WithState(u =>
                                     new ScimError(
                                         HttpStatusCode.BadRequest,
-                                        ScimType.InvalidValue,
+                                        ScimErrorType.InvalidValue,
                                         "The attribute 'locale' MUST be a valid language tag as defined in [RFC5646]."));
                         });
                     When(user => user.Emails != null && user.Emails.Any(),
@@ -154,13 +154,13 @@
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         ErrorDetail.AttributeRequired("email.value")))
                                                 .EmailAddress()
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         "The attribute 'email.value' must be a valid email as defined in [RFC5321]."))
                                         }
                                     });
@@ -179,7 +179,7 @@
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         ErrorDetail.AttributeRequired("im.value")))
                                         }
                                     });
@@ -202,13 +202,13 @@
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         ErrorDetail.AttributeRequired("phoneNumber.value")))
                                                 .Must(PhoneNumbers.PhoneNumberUtil.IsViablePhoneNumber)
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         "The attribute 'phoneNumber.value' must be a valid phone number as defined in [RFC3966]."))
                                         }
                                     });
@@ -227,13 +227,13 @@
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         ErrorDetail.AttributeRequired("photo.value")))
                                                 .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute))
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         "The attribute 'photo.value' must be a valid URI."))
                                         }
                                     });
@@ -265,7 +265,7 @@
                                                     .WithState(u =>
                                                         new ScimError(
                                                             HttpStatusCode.BadRequest,
-                                                            ScimType.InvalidValue,
+                                                            ScimErrorType.InvalidValue,
                                                             "The attribute 'address.country' must be a valid country code as defined by [ISO3166-1 alpha-2]."));
                                             })
                                     });
@@ -284,7 +284,7 @@
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         ErrorDetail.AttributeRequired("entitlement.value")))
                                         }
                                     });
@@ -303,7 +303,7 @@
                                                 .WithState(u =>
                                                     new ScimError(
                                                         HttpStatusCode.BadRequest,
-                                                        ScimType.InvalidValue,
+                                                        ScimErrorType.InvalidValue,
                                                         ErrorDetail.AttributeRequired("role.value")))
                                         }
                                     });
@@ -323,7 +323,7 @@
                         .WithState(u =>
                             new ScimError(
                                 HttpStatusCode.Conflict,
-                                ScimType.Uniqueness,
+                                ScimErrorType.Uniqueness,
                                 ErrorDetail.AttributeUnique("userName")));
 
                     When(user => !string.IsNullOrWhiteSpace(user.Password),
@@ -334,7 +334,7 @@
                                 .WithState(u =>
                                     new ScimError(
                                         HttpStatusCode.BadRequest,
-                                        ScimType.InvalidValue,
+                                        ScimErrorType.InvalidValue,
                                         "The attribute 'password' does not meet the security requirements set by the provider."));
                         });
                 });
@@ -349,7 +349,7 @@
                         .WithState(u =>
                             new ScimError(
                                 HttpStatusCode.BadRequest,
-                                ScimType.Mutability,
+                                ScimErrorType.Mutability,
                                 ErrorDetail.AttributeImmutable("id")));
 
                     // Updating a username validation
@@ -366,7 +366,7 @@
                                 .WithState(u =>
                                     new ScimError(
                                         HttpStatusCode.Conflict,
-                                        ScimType.Uniqueness,
+                                        ScimErrorType.Uniqueness,
                                         ErrorDetail.AttributeUnique("userName")));
                         });
 
@@ -382,7 +382,7 @@
                                 .WithState(u =>
                                     new ScimError(
                                         HttpStatusCode.BadRequest,
-                                        ScimType.InvalidValue,
+                                        ScimErrorType.InvalidValue,
                                         "The attribute 'password' does not meet the security requirements set by the provider."));
                         });
                 });

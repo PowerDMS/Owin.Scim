@@ -8,6 +8,8 @@ namespace Owin.Scim.Patching.Converters
 
     using Exceptions;
 
+    using Model;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     using Newtonsoft.Json.Serialization;
@@ -16,8 +18,13 @@ namespace Owin.Scim.Patching.Converters
 
     using Properties;
 
-    public class TypedJsonPatchDocumentConverter : JsonPatchDocumentConverter
+    public class TypedJsonPatchDocumentConverter : JsonConverter
     {
+        public override bool CanConvert(Type objectType)
+        {
+            return true;
+        }
+
         public override object ReadJson(
             JsonReader reader,
             Type objectType,
@@ -62,7 +69,21 @@ namespace Owin.Scim.Patching.Converters
             }
             catch (Exception ex)
             {
-                throw new JsonPatchException(ResourceHelper.FormatInvalidJsonPatchDocument(objectType.Name), ex);
+                throw new ScimPatchException(
+                    ScimErrorType.InvalidSyntax, 
+                    null);
+            }
+        }
+        
+        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        {
+            if (value is IJsonPatchDocument)
+            {
+                var jsonPatchDoc = (IJsonPatchDocument)value;
+                var lst = jsonPatchDoc.GetOperations();
+
+                // write out the operations, no envelope
+                serializer.Serialize(writer, lst);
             }
         }
     }

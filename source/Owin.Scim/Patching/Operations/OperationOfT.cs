@@ -4,6 +4,7 @@
 namespace Owin.Scim.Patching.Operations
 {
     using System;
+    using System.Collections.Generic;
 
     public class Operation<TModel> : Operation where TModel : class
     {
@@ -12,8 +13,8 @@ namespace Owin.Scim.Patching.Operations
 
         }
 
-        public Operation(string op, string path, string from, object value)
-            : base(op, path, from)
+        public Operation(string op, string path, object value)
+            : base(op, path)
         {
             if (op == null)
             {
@@ -28,13 +29,14 @@ namespace Owin.Scim.Patching.Operations
             this.value = value;
         }
 
-        public Operation(string op, string path, string from)
-            : base(op, path, from)
+        public Operation(string op, string path)
+            : base(op, path)
         {
             if (op == null)
             {
                 throw new ArgumentNullException(nameof(op));
             }
+
             if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
@@ -42,7 +44,7 @@ namespace Owin.Scim.Patching.Operations
 
         }
 
-        public void Apply(TModel objectToApplyTo, IObjectAdapter adapter)
+        public IEnumerable<PatchOperation> Apply(TModel objectToApplyTo, IObjectAdapter adapter)
         {
             if (objectToApplyTo == null)
             {
@@ -57,14 +59,13 @@ namespace Owin.Scim.Patching.Operations
             switch (OperationType)
             {
                 case OperationType.Add:
-                    adapter.Add(this, objectToApplyTo);
-                    break;
+                    return adapter.Add(this, objectToApplyTo);
                 case OperationType.Remove:
-                    adapter.Remove(this, objectToApplyTo);
-                    break;
+                    return adapter.Remove(this, objectToApplyTo);
                 case OperationType.Replace:
-                    adapter.Replace(this, objectToApplyTo);
-                    break;
+                    return adapter.Replace(this, objectToApplyTo);
+                default:
+                    throw new InvalidOperationException(string.Format("Patch operation type '{0}' is invalid.", OperationType));
             }
         }
     }

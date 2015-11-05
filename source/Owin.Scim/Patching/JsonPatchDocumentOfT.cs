@@ -52,8 +52,7 @@ namespace Owin.Scim.Patching
         }
 
         /// <summary>
-        /// Add operation.  Will result in, for example,
-        /// { "op": "add", "path": "/a/b/c", "value": [ "foo", "bar" ] }
+        /// Add the specified value to the attribute.
         /// </summary>
         /// <typeparam name="TProp">value type</typeparam>
         /// <param name="path">target location</param>
@@ -69,14 +68,13 @@ namespace Owin.Scim.Patching
             Operations.Add(new Operation<TModel>(
                 "add",
                 ExpressionHelpers.GetPath(path).ToLowerInvariant(),
-                @from: null,
                 value: value));
 
             return this;
         }
 
         /// <summary>
-        /// At value at end of list
+        /// Add the specified value to the enumeable attribute.
         /// </summary>
         /// <typeparam name="TProp">value type</typeparam>
         /// <param name="path">target location</param>
@@ -92,15 +90,13 @@ namespace Owin.Scim.Patching
             Operations.Add(new Operation<TModel>(
                 "add",
                 ExpressionHelpers.GetPath(path).ToLowerInvariant(),
-                @from: null,
                 value: value));
 
             return this;
         }
 
         /// <summary>
-        /// Remove value at target location.  Will result in, for example,
-        /// { "op": "remove", "path": "/a/b/c" }
+        /// Remove value at target location.
         /// </summary>
         /// <param name="path">target location</param>
         /// <returns></returns>
@@ -111,19 +107,18 @@ namespace Owin.Scim.Patching
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Operations.Add(new Operation<TModel>("remove", ExpressionHelpers.GetPath(path).ToLowerInvariant(), @from: null));
+            Operations.Add(new Operation<TModel>("remove", ExpressionHelpers.GetPath(path).ToLowerInvariant()));
 
             return this;
         }
 
         /// <summary>
-        /// Remove value from list at given position
+        /// Removes the entire enumerable attribute.
         /// </summary>
         /// <typeparam name="TProp">value type</typeparam>
         /// <param name="path">target location</param>
-        /// <param name="position">position</param>
         /// <returns></returns>
-        public JsonPatchDocument<TModel> Remove<TProp>(Expression<Func<TModel, IList<TProp>>> path, int position)
+        public JsonPatchDocument<TModel> Remove<TProp>(Expression<Func<TModel, IEnumerable<TProp>>> path)
         {
             if (path == null)
             {
@@ -132,36 +127,13 @@ namespace Owin.Scim.Patching
 
             Operations.Add(new Operation<TModel>(
                 "remove",
-                ExpressionHelpers.GetPath(path).ToLowerInvariant() + "/" + position,
-                @from: null));
+                ExpressionHelpers.GetPath(path).ToLowerInvariant()));
 
             return this;
         }
 
         /// <summary>
-        /// Remove value from end of list
-        /// </summary>
-        /// <typeparam name="TProp">value type</typeparam>
-        /// <param name="path">target location</param>
-        /// <returns></returns>
-        public JsonPatchDocument<TModel> Remove<TProp>(Expression<Func<TModel, IList<TProp>>> path)
-        {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            Operations.Add(new Operation<TModel>(
-                "remove",
-                ExpressionHelpers.GetPath(path).ToLowerInvariant() + "/-",
-                @from: null));
-
-            return this;
-        }
-
-        /// <summary>
-        /// Replace value.  Will result in, for example,
-        /// { "op": "replace", "path": "/a/b/c", "value": 42 }
+        /// Replaces the value at the specified location.
         /// </summary>
         /// <param name="path">target location</param>
         /// <param name="value">value</param>
@@ -176,22 +148,19 @@ namespace Owin.Scim.Patching
             Operations.Add(new Operation<TModel>(
                 "replace",
                 ExpressionHelpers.GetPath(path).ToLowerInvariant(),
-                @from: null,
                 value: value));
 
             return this;
         }
-
+        
         /// <summary>
-        /// Replace value in a list at given position
+        /// Replaces the entire enumerable at the specified location.
         /// </summary>
         /// <typeparam name="TProp">value type</typeparam>
         /// <param name="path">target location</param>
         /// <param name="value">value</param>
-        /// <param name="position">position</param>
         /// <returns></returns>
-        public JsonPatchDocument<TModel> Replace<TProp>(Expression<Func<TModel, IList<TProp>>> path,
-            TProp value, int position)
+        public JsonPatchDocument<TModel> Replace<TProp>(Expression<Func<TModel, IEnumerable<TProp>>> path, TProp value)
         {
             if (path == null)
             {
@@ -200,31 +169,7 @@ namespace Owin.Scim.Patching
 
             Operations.Add(new Operation<TModel>(
                 "replace",
-                ExpressionHelpers.GetPath(path).ToLowerInvariant() + "/" + position,
-                @from: null,
-                value: value));
-
-            return this;
-        }
-
-        /// <summary>
-        /// Replace value at end of a list
-        /// </summary>
-        /// <typeparam name="TProp">value type</typeparam>
-        /// <param name="path">target location</param>
-        /// <param name="value">value</param>
-        /// <returns></returns>
-        public JsonPatchDocument<TModel> Replace<TProp>(Expression<Func<TModel, IList<TProp>>> path, TProp value)
-        {
-            if (path == null)
-            {
-                throw new ArgumentNullException(nameof(path));
-            }
-
-            Operations.Add(new Operation<TModel>(
-                "replace",
-                ExpressionHelpers.GetPath(path).ToLowerInvariant() + "/-",
-                @from: null,
+                ExpressionHelpers.GetPath(path).ToLowerInvariant(),
                 value: value));
 
             return this;
@@ -235,7 +180,7 @@ namespace Owin.Scim.Patching
         /// </summary>
         /// <param name="objectToApplyTo">Object to apply the JsonPatchDocument to</param>
         /// <param name="adapter">IObjectAdapter instance to use when applying</param>
-        public void ApplyTo(TModel objectToApplyTo, IObjectAdapter adapter)
+        public PatchResult ApplyTo(TModel objectToApplyTo, IObjectAdapter adapter)
         {
             if (objectToApplyTo == null)
             {
@@ -247,33 +192,34 @@ namespace Owin.Scim.Patching
                 throw new ArgumentNullException(nameof(adapter));
             }
 
-            // apply each operation in order
+            var patchResult = new PatchResult();
             foreach (var op in Operations)
             {
-                op.Apply(objectToApplyTo, adapter);
+                patchResult.AddRange(op.Apply(objectToApplyTo, adapter));
             }
+
+            return patchResult;
         }
 
-        IList<Operation> IJsonPatchDocument.GetOperations()
+        public IEnumerable<Operation> GetOperations()
         {
-            var allOps = new List<Operation>();
-
+            var operations = new List<Operation>();
             if (Operations != null)
             {
                 foreach (var op in Operations)
                 {
-                    var untypedOp = new Operation();
+                    var untypedOp = new Operation
+                    {
+                        op = op.op,
+                        value = op.value,
+                        path = op.path
+                    };
 
-                    untypedOp.op = op.op;
-                    untypedOp.value = op.value;
-                    untypedOp.path = op.path;
-                    untypedOp.from = op.from;
-
-                    allOps.Add(untypedOp);
+                    operations.Add(untypedOp);
                 }
             }
 
-            return allOps;
+            return operations;
         }
     }
 }

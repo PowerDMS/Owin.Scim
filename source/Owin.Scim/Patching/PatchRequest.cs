@@ -1,8 +1,8 @@
-﻿namespace Owin.Scim.Model
+﻿namespace Owin.Scim.Patching
 {
     using System.Collections.Generic;
 
-    using Patching;
+    using Model;
 
     public class PatchRequest<T> where T : Resource
     {
