@@ -8,11 +8,10 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
     using Machine.Specifications;
 
     using Model.Users;
-
-    [Tags("no_path")]
-    public class without_path_null_multivaluedattribute_value : when_updating_a_user
+    
+    public class without_path_and_null_multivaluedattribute : when_updating_a_user
     {
-        static without_path_null_multivaluedattribute_value()
+        static without_path_and_null_multivaluedattribute()
         {
             UserToUpdate = new User
             {
@@ -45,8 +44,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_add_the_email = () => UpdatedUser
             .Emails
-            .Where(e => e.Value.Equals("babs@jensen.org"))
-            .ShouldNotBeEmpty();
+            .SingleOrDefault(e => e.Value.Equals("babs@jensen.org"))
+            .ShouldNotBeNull();
         
         It should_replace_the_attribute_value = () => UpdatedUser
             .Emails

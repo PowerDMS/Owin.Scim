@@ -47,13 +47,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_add_the_new_values = () => UpdatedUser
             .Emails
-            .Where(e => e.Value.Equals("babs@jensen.org"))
-            .ShouldNotBeEmpty();
+            .SingleOrDefault(e => e.Value.Equals("babs@jensen.org"))
+            .ShouldNotBeNull();
 
         It should_contain_the_existing_values = () => UpdatedUser
             .Emails
-            .Where(e => e.Value.Equals("user@corp.com"))
-            .ShouldNotBeEmpty();
+            .SingleOrDefault(e => e.Value.Equals("user@corp.com"))
+            .ShouldNotBeNull();
 
         It should_append_the_new_attribute_values = () => UpdatedUser
             .Emails

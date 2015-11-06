@@ -1,5 +1,7 @@
 namespace Owin.Scim.Tests.Integration.Users.Update.add
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -8,17 +10,17 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_and_complex_attribute : when_updating_a_user
+    public class with_path_and_filter_with_no_subattribute : when_updating_a_user
     {
-        static with_path_and_complex_attribute()
+        static with_path_and_filter_with_no_subattribute()
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName(),
-                Name = new Name
+                Emails = new List<Email>
                 {
-                    FamilyName = "Smith",
-                    GivenName = "John"
+                    new Email { Value = "user@corp.com", Type = "work" },
+                    new Email { Value = "user@gmail.com", Type = "home", Primary = true }
                 }
             };
         }
@@ -31,8 +33,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
                             ""op"": ""add"",
-                            ""path"": ""name.givenName"",
-                            ""value"": ""Daniel""
+                            ""path"": ""emails[type eq \""work\"" or primary eq \""true\""]"",
+                            ""value"": { ""value"": ""romalley@email.com"" }
                         }]
                     }",
                 Encoding.UTF8,
@@ -41,6 +43,9 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_replace_the_attribute_value = () => UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
+        It should_replace_the_existing_value = () => UpdatedUser
+            .Emails
+            .Select(e => e.Value)
+            .ShouldContainOnly("romalley@email.com", "romalley@email.com");
     }
 }

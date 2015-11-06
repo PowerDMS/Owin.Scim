@@ -9,11 +9,10 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
     using Machine.Specifications;
 
     using Model.Users;
-
-	[Tags("no_path")]
-    public class without_path_existing_multivaluedattribute_values : when_updating_a_user
+    
+    public class without_path_and_existing_multivaluedattribute_values : when_updating_a_user
     {
-        static without_path_existing_multivaluedattribute_values()
+        static without_path_and_existing_multivaluedattribute_values()
         {
             UserToUpdate = new User
             {

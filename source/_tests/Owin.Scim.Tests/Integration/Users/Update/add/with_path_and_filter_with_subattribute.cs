@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Update.add
 {
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
@@ -9,14 +10,18 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_null_existing_multivaluedattribute_value : when_updating_a_user
+    public class with_path_and_filter_with_subattribute : when_updating_a_user
     {
-        static with_path_null_existing_multivaluedattribute_value()
+        static with_path_and_filter_with_subattribute()
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName(),
-                Emails = null
+                Emails = new List<Email>
+                {
+                    new Email { Value = "user@corp.com", Type = "work" },
+                    new Email { Value = "user@gmail.com", Type = "personal" }
+                }
             };
         }
 
@@ -28,11 +33,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
                             ""op"": ""add"",
-                            ""path"": ""emails"",
-                            ""value"": [{
-                                ""value"": ""babs@jensen.org"",
-                                ""type"": ""home""
-                            }]
+                            ""path"": ""emails[type eq \""work\""].type"",
+                            ""value"": ""home""
                         }]
                     }",
                 Encoding.UTF8,
@@ -40,15 +42,11 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
         };
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
-
-        It should_replace_the_attribute_value = () => UpdatedUser
+        
+        It should_replace_the_existing_value = () => UpdatedUser
             .Emails
-            .Where(e => e.Value.Equals("babs@jensen.org"))
-            .ShouldNotBeEmpty();
-
-        It should_only_have_the_one_value = () => UpdatedUser
-            .Emails
-            .Count()
-            .ShouldEqual(1);
+            .Single(e => e.Value.Equals("user@corp.com"))
+            .Type
+            .ShouldEqual("home");
     }
 }

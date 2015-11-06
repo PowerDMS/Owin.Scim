@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Update.add
 {
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -8,18 +9,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_and_complex_attribute : when_updating_a_user
+    public class with_path_and_null_multivaluedattribute : when_updating_a_user
     {
-        static with_path_and_complex_attribute()
+        static with_path_and_null_multivaluedattribute()
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName(),
-                Name = new Name
-                {
-                    FamilyName = "Smith",
-                    GivenName = "John"
-                }
+                Emails = null
             };
         }
 
@@ -31,8 +28,11 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
                             ""op"": ""add"",
-                            ""path"": ""name.givenName"",
-                            ""value"": ""Daniel""
+                            ""path"": ""emails"",
+                            ""value"": [{
+                                ""value"": ""babs@jensen.org"",
+                                ""type"": ""home""
+                            }]
                         }]
                     }",
                 Encoding.UTF8,
@@ -41,6 +41,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_replace_the_attribute_value = () => UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
+        It should_add_attribute_value = () => UpdatedUser
+            .Emails
+            .SingleOrDefault(e => e.Value.Equals("babs@jensen.org"))
+            .ShouldNotBeNull();
+
+        It should_only_have_the_one_value = () => UpdatedUser
+            .Emails
+            .Count()
+            .ShouldEqual(1);
     }
 }

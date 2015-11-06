@@ -1,12 +1,6 @@
-﻿// This code borrows from Microsoft's (Microsoft.AspNet.JsonPatch) ObjectTreeAnalysisResult.cs
-// This has been extended and heavily modified to add support for IEnumerable types (not restricted to IList)
-// as well as support for SCIM query filters.
-
-// Copyright (c) PowerDMS Inc.
-// Licensed under the MIT License.
-
-// Copyright (c) .NET Foundation. All rights reserved.
-// Licensed under the Apache License, Version 2.0. See License.txt in the project root for license information.
+﻿// This code is based on ideas from Microsoft's (Microsoft.AspNet.JsonPatch) ObjectTreeAnalysisResult.cs
+// Pretty much all the original code is gone, however, and this has been heavily modified to add support 
+// for IEnumerable, SCIM query filters, and observe the rules surrounding SCIM Patch.
 
 namespace Owin.Scim.Patching.Helpers
 {
@@ -31,13 +25,14 @@ namespace Owin.Scim.Patching.Helpers
 
     public class ScimObjectTreeAnalysisResult
     {
-        public ScimObjectTreeAnalysisResult(
-            object objectToSearch,
-            string filter,
-            IContractResolver contractResolver)
+        private readonly IContractResolver _ContractResolver;
+
+        public ScimObjectTreeAnalysisResult(object objectToSearch, string filter, IContractResolver contractResolver)
         {
+            _ContractResolver = contractResolver;
+
             /* 
-                ScimFilter will handle normalizing the actual path string. 
+                ScimFilter.cs will handle normalizing the actual path string. 
                 
                 Examples:
                 "path":"members"
@@ -48,32 +43,27 @@ namespace Owin.Scim.Patching.Helpers
 
                 Once normalized, associate each resource member with its filter (if present). -> Tuple<memberName, memberFilter>
             */
-            var propertyPathTree = new ScimFilter(filter)
+            var pathTree = new ScimFilter(filter)
                 .Paths
                 .Select(pp =>
                 {
                     var bracketIndex = pp.IndexOf('[');
-                    if (bracketIndex == -1) return new Tuple<string, string>(pp, null);
+                    if (bracketIndex == -1) return new PathMember(pp);
 
-                    return new Tuple<string, string>(pp.Substring(0, bracketIndex), pp.Substring(bracketIndex + 1, pp.Length - bracketIndex - 2));
+                    return new PathMember(pp.Substring(0, bracketIndex), pp.Substring(bracketIndex + 1, pp.Length - bracketIndex - 2));
                 })
                 .ToList();
 
             var lastPosition = 0;
-            var nodes = GetAffectedMembers(contractResolver, propertyPathTree, ref lastPosition, new Node(objectToSearch, null));
+            var nodes = GetAffectedMembers(pathTree, ref lastPosition, new Node(objectToSearch, null));
             
-            if ((propertyPathTree.Count - lastPosition) > 1)
+            if ((pathTree.Count - lastPosition) > 1)
             {
                 IsValidPathForAdd = false;
                 IsValidPathForRemove = false;
                 return;
             }
 
-            // two things can happen now.  The targetproperty can be an IDictionary - in that
-            // case, it's valid for add if there's 1 item left in the propertyPathTree.
-            //
-            // it can also be a property info.  In that case, if there's nothing left in the path
-            // tree we're at the end, if there's one left we can try and set that.
             PatchMembers = new List<PatchMember>();
             foreach (var node in nodes)
             {
@@ -84,23 +74,23 @@ namespace Owin.Scim.Patching.Helpers
                     Container = (IDictionary<string, object>)node.Target;
                     IsValidPathForAdd = true;
 
-                    var member = new PatchMember(propertyPathTree[propertyPathTree.Count - 1].Item1, null);
+                    var member = new PatchMember(pathTree[pathTree.Count - 1].Path, null);
                     IsValidPathForRemove = Container.ContainsCaseInsensitiveKey(member.PropertyPathInParent);
 
                     PatchMembers.Add(member);
                 }
                 else if (node.Target is IEnumerable)
                 {
+                    // REMOVE THIS CONDITIONAL
                     UseDynamicLogic = false;
                     IsValidPathForAdd = true;
                     IsValidPathForRemove = true;
 
-                    PatchMembers.Add(new PatchMember(propertyPathTree[propertyPathTree.Count - 1].Item1, null));
+                    PatchMembers.Add(new PatchMember(pathTree[pathTree.Count - 1].Path, null));
                 }
                 else if (node.Target is MultiValuedAttribute && 
                     PathIsMultiValuedEnumerable(
-                        contractResolver,
-                        propertyPathTree[propertyPathTree.Count - 1].Item1, 
+                        pathTree[pathTree.Count - 1].Path, 
                         node))
                 {
                     /* This handles the case when no sub-attribute has been specified. Meaning, the
@@ -108,25 +98,31 @@ namespace Owin.Scim.Patching.Helpers
                        (e.g. "path":"addresses[type eq \"work\"]")
 
                        This kind of filter can return us multiple elements of an enumerable that 
-                       need to be modified.  Since the client did not specify a sub-attribute, SCIM
-                       uses the Value property for assignment and we should therefore add that to the
-                       PatchMembers.
+                       need to be modified.
                     */
-                    var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Target.GetType());
+                    var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Parent.GetType());
                     var attemptedProperty = jsonContract
                         .Properties
-                        .SingleOrDefault(p => p.PropertyName.Equals("Value", StringComparison.OrdinalIgnoreCase));
+                        .SingleOrDefault(
+                        p => 
+                        p.PropertyName.Equals(
+                            pathTree[pathTree.Count - 1].Path, 
+                            StringComparison.OrdinalIgnoreCase));
 
                     UseDynamicLogic = false;
                     IsValidPathForAdd = true;
                     IsValidPathForRemove = true;
-                    PatchMembers.Add(new PatchMember("Value", new JsonPatchProperty(attemptedProperty, node.Target)));
+                    PatchMembers.Add(
+                        new PatchMember(
+                            pathTree[pathTree.Count - 1].Path, 
+                            new JsonPatchProperty(attemptedProperty, node.Parent),
+                            node.Target));
                 }
                 else
                 {
                     UseDynamicLogic = false;
 
-                    var property = propertyPathTree[propertyPathTree.Count - 1].Item1;
+                    var property = pathTree[pathTree.Count - 1].Path;
                     var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Target.GetType());
                     var attemptedProperty = jsonContract
                         .Properties
@@ -149,9 +145,9 @@ namespace Owin.Scim.Patching.Helpers
             }
         }
 
-        private bool PathIsMultiValuedEnumerable(IContractResolver contractResolver, string property, Node node)
+        private bool PathIsMultiValuedEnumerable(string property, Node node)
         {
-            var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Parent.GetType());
+            var jsonContract = (JsonObjectContract)_ContractResolver.ResolveContract(node.Parent.GetType());
             var attemptedProperty = jsonContract
                 .Properties
                 .SingleOrDefault(p => p.PropertyName.Equals(property, StringComparison.OrdinalIgnoreCase));
@@ -162,29 +158,31 @@ namespace Owin.Scim.Patching.Helpers
                    attemptedProperty.PropertyType.GetGenericArguments()[0] == node.Target.GetType();
         }
 
-        private IEnumerable<Node> GetAffectedMembers(
-            IContractResolver contractResolver, 
-            List<Tuple<string, string>> propertyPathTree, 
+        private IEnumerable<Node> GetAffectedMembers( 
+            List<PathMember> pathTree, 
             ref int lastPosition,
             Node node)
         {
-            for (int i = lastPosition; i < propertyPathTree.Count; i++)
+            for (int i = lastPosition; i < pathTree.Count; i++)
             {
-                lastPosition = i;
+                // seems absurd, but this MAY be called recursively, OR simply
+                // interated via the for loop - 
+                lastPosition = i; 
+
                 // if the current target object is an ExpandoObject (IDictionary<string, object>),
                 // we cannot use the ContractResolver.
                 var dictionary = node.Target as IDictionary<string, object>;
                 if (dictionary != null)
                 {
                     // find the value in the dictionary                   
-                    if (dictionary.ContainsCaseInsensitiveKey(propertyPathTree[i].Item1))
+                    if (dictionary.ContainsCaseInsensitiveKey(pathTree[i].Path))
                     {
-                        // TODO: (DG) This (Item1) needs to support complex property paths (ie. name.familyName)
-                        var possibleNewTargetObject = dictionary.GetValueForCaseInsensitiveKey(propertyPathTree[i].Item1);
+                        // TODO: (DG) This (Path) needs to support complex property paths (ie. name.familyName)
+                        var possibleNewTargetObject = dictionary.GetValueForCaseInsensitiveKey(pathTree[i].Path);
 
                         // unless we're at the last item, we should set the targetobject
                         // to the new object.  If we're at the last item, we need to stop
-                        if (i != propertyPathTree.Count - 1)
+                        if (i != pathTree.Count - 1)
                         {
                             node = new Node(possibleNewTargetObject, node.Target);
                         }
@@ -196,12 +194,12 @@ namespace Owin.Scim.Patching.Helpers
                 }
                 else
                 {
-                    var jsonContract = (JsonObjectContract) contractResolver.ResolveContract(node.Target.GetType());
+                    var jsonContract = (JsonObjectContract)_ContractResolver.ResolveContract(node.Target.GetType());
 
                     var attemptedProperty = jsonContract
                         .Properties
                         .FirstOrDefault(
-                            p => string.Equals(p.PropertyName, propertyPathTree[i].Item1, StringComparison.OrdinalIgnoreCase));
+                            p => string.Equals(p.PropertyName, pathTree[i].Path, StringComparison.OrdinalIgnoreCase));
 
                     if (attemptedProperty == null)
                     {
@@ -211,13 +209,15 @@ namespace Owin.Scim.Patching.Helpers
                     }
 
                     // if there's nothing to filter and we're not yet at the last path entry, continue
-                    if (propertyPathTree[i].Item2 == null && i != propertyPathTree.Count - 1)
+                    if (pathTree[i].Filter == null && i != pathTree.Count - 1)
                     {
+                        // the Target becomes the Target's child property value
+                        // the Parent becomes the current Target
                         node = new Node(attemptedProperty.ValueProvider.GetValue(node.Target), node.Target);
-                        continue;
+                        continue; // keep traversing the path tree
                     }
-
-                    if (propertyPathTree[i].Item2 != null)
+                    
+                    if (pathTree[i].Filter != null)
                     {
                         // we can only filter enumerable types
                         if (!attemptedProperty.PropertyType.IsNonStringEnumerable())
@@ -240,11 +240,12 @@ namespace Owin.Scim.Patching.Helpers
                         try
                         {
                             // parse our filter into an expression tree
-                            var lexer = new ScimFilterLexer(new AntlrInputStream(propertyPathTree[i].Item2));
+                            var lexer = new ScimFilterLexer(new AntlrInputStream(pathTree[i].Filter));
                             var parser = new ScimFilterParser(new CommonTokenStream(lexer));
-                            var filterVisitorType =
-                                typeof (ScimFilterVisitor<>).MakeGenericType(
-                                    attemptedProperty.PropertyType.GetGenericArguments()[0]);
+
+                            // create a visitor for the type of enumerable generic argument
+                            var enumerableType = attemptedProperty.PropertyType.GetGenericArguments()[0];
+                            var filterVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(enumerableType);
                             var filterVisitor = (IScimFilterVisitor) filterVisitorType.CreateInstance();
                             predicate = filterVisitor.VisitExpression(parser.parse()).Compile();
                         }
@@ -254,17 +255,19 @@ namespace Owin.Scim.Patching.Helpers
                             break;
                         }
 
+                        // we have an enumerable and a filter predicate
+                        // for each element in the enumerable that satisfies the predicate, 
+                        // visit that element as part of the path tree
                         var filteredNodes = new List<Node>();
                         var enumerator = enumerable.GetEnumerator();
-                        lastPosition = i + 1;
+                        lastPosition = i + 1; // increase the position in the tree
                         while (enumerator.MoveNext())
                         {
                             if ((bool) predicate.DynamicInvoke(enumerator.Current))
                             {
                                 filteredNodes.AddRange(
                                     GetAffectedMembers(
-                                        contractResolver,
-                                        propertyPathTree,
+                                        pathTree,
                                         ref lastPosition,
                                         new Node(enumerator.Current, node.Target)));
                             }
@@ -292,8 +295,14 @@ namespace Owin.Scim.Patching.Helpers
 
         public class PatchMember
         {
-            public PatchMember(string propertyPathInParent, JsonPatchProperty jsonPatchProperty)
+            private readonly object _Target;
+
+            public PatchMember(
+                string propertyPathInParent, 
+                JsonPatchProperty jsonPatchProperty,
+                object target = null)
             {
+                _Target = target;
                 PropertyPathInParent = propertyPathInParent;
                 JsonPatchProperty = jsonPatchProperty;
             }
@@ -301,6 +310,11 @@ namespace Owin.Scim.Patching.Helpers
             public string PropertyPathInParent { get; private set; }
 
             public JsonPatchProperty JsonPatchProperty { get; private set; }
+
+            public object Target
+            {
+                get { return _Target; }
+            }
         }
 
         private class Node
@@ -314,6 +328,19 @@ namespace Owin.Scim.Patching.Helpers
             public object Target { get; private set; }
 
             public object Parent { get; private set; }
+        }
+        
+        private class PathMember
+        {
+            public PathMember(string path, string filter = null)
+            {
+                Path = path;
+                Filter = filter;
+            }
+
+            public string Path { get; private set; }
+
+            public string Filter { get; private set; }
         }
     }
 }

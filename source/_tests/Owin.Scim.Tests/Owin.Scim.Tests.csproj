@@ -123,12 +123,13 @@
     <Compile Include="Integration\Users\Update\add\with_an_invalid_path.cs" />
     <Compile Include="Integration\Users\Update\add\with_no_patch_request.cs" />
     <Compile Include="Integration\Users\Update\add\with_no_path.cs" />
-    <Compile Include="Integration\Users\Update\add\without_path_existing_multivaluedattribute_values.cs" />
-    <Compile Include="Integration\Users\Update\add\without_path_null_multivaluedattribute_value.cs" />
+    <Compile Include="Integration\Users\Update\add\without_path_and_existing_multivaluedattribute_values.cs" />
+    <Compile Include="Integration\Users\Update\add\without_path_and_null_multivaluedattribute.cs" />
     <Compile Include="Integration\Users\Update\add\with_path_and_complex_attribute.cs" />
     <Compile Include="Integration\Users\Update\add\with_path_and_existing_multivaluedattribute_values.cs" />
-    <Compile Include="Integration\Users\Update\add\with_path_and_filter_attribute.cs" />
-    <Compile Include="Integration\Users\Update\add\with_path_null_existing_multivaluedattribute_value.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_and_filter_with_subattribute.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_and_filter_with_no_subattribute.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_and_null_multivaluedattribute.cs" />
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
