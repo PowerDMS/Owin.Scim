@@ -18,6 +18,9 @@ Roadmap
   3. [x] Replace  
   4. [ ] Update (Patch) (IN PROGRESS)
     1. [x] Support for path filters
+    2. [x] Add
+    3. [ ] Replace
+    4. [ ] Remove
   5. [x] Delete  
   6. [ ] Add support for custom canonical types / validation
 2. Add groups endpoints
