@@ -6,6 +6,7 @@ namespace Owin.Scim.Patching.Helpers
 {
     using System;
     using System.Collections;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -79,83 +80,69 @@ namespace Owin.Scim.Patching.Helpers
 
                     PatchMembers.Add(member);
                 }
-                else if (node.Target is IEnumerable)
-                {
-                    // REMOVE THIS CONDITIONAL
-                    UseDynamicLogic = false;
-                    IsValidPathForAdd = true;
-                    IsValidPathForRemove = true;
-
-                    PatchMembers.Add(new PatchMember(pathTree[pathTree.Count - 1].Path, null));
-                }
-                else if (node.Target is MultiValuedAttribute && 
-                    PathIsMultiValuedEnumerable(
-                        pathTree[pathTree.Count - 1].Path, 
-                        node))
-                {
-                    /* This handles the case when no sub-attribute has been specified. Meaning, the
-                       filter used on a multiValuedAttribute had no sub-path.
-                       (e.g. "path":"addresses[type eq \"work\"]")
-
-                       This kind of filter can return us multiple elements of an enumerable that 
-                       need to be modified.
-                    */
-                    var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Parent.GetType());
-                    var attemptedProperty = jsonContract
-                        .Properties
-                        .SingleOrDefault(
-                        p => 
-                        p.PropertyName.Equals(
-                            pathTree[pathTree.Count - 1].Path, 
-                            StringComparison.OrdinalIgnoreCase));
-
-                    UseDynamicLogic = false;
-                    IsValidPathForAdd = true;
-                    IsValidPathForRemove = true;
-                    PatchMembers.Add(
-                        new PatchMember(
-                            pathTree[pathTree.Count - 1].Path, 
-                            new JsonPatchProperty(attemptedProperty, node.Parent),
-                            node.Target));
-                }
                 else
                 {
-                    UseDynamicLogic = false;
-
-                    var property = pathTree[pathTree.Count - 1].Path;
-                    var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Target.GetType());
-                    var attemptedProperty = jsonContract
-                        .Properties
-                        .FirstOrDefault(p => string.Equals(p.PropertyName, property, StringComparison.OrdinalIgnoreCase));
-
-                    if (attemptedProperty == null)
+                    var attribute = node.Target as MultiValuedAttribute;
+                    JsonProperty attemptedProperty;
+                    if (attribute != null && PathIsMultiValuedEnumerable(pathTree[pathTree.Count - 1].Path, node, out attemptedProperty))
                     {
-                        IsValidPathForAdd = false;
-                        IsValidPathForRemove = false;
-                    }
-                    else
-                    {
+                        /* Check if we're at a MultiValuedAttribute.
+                           If so, then we'll return a special PatchMember.  This is because our actual target is 
+                           an element within an enumerable. (e.g. User->Emails[element])
+                           So a PatchMember must have three pieces of information: (following the example above)
+                           > Parent (User)
+                           > PropertyPath (emails)
+                           > Actual Target (email instance/element)
+                        */
+
+                        UseDynamicLogic = false;
                         IsValidPathForAdd = true;
                         IsValidPathForRemove = true;
                         PatchMembers.Add(
                             new PatchMember(
-                                property, new JsonPatchProperty(attemptedProperty, node.Target)));
+                                pathTree[pathTree.Count - 1].Path, 
+                                new JsonPatchProperty(attemptedProperty, node.Parent),
+                                node.Target));
+                    }
+                    else
+                    {
+                        UseDynamicLogic = false;
+                        
+                        var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Target.GetType());
+                        attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(pathTree[pathTree.Count - 1].Path);
+                        if (attemptedProperty == null)
+                        {
+                            IsValidPathForAdd = false;
+                            IsValidPathForRemove = false;
+                        }
+                        else
+                        {
+                            IsValidPathForAdd = true;
+                            IsValidPathForRemove = true;
+                            PatchMembers.Add(
+                                new PatchMember(
+                                    pathTree[pathTree.Count - 1].Path, 
+                                    new JsonPatchProperty(attemptedProperty, node.Target)));
+                        }
                     }
                 }
             }
         }
 
-        private bool PathIsMultiValuedEnumerable(string property, Node node)
+        private bool PathIsMultiValuedEnumerable(string propertyName, Node node, out JsonProperty attemptedProperty)
         {
             var jsonContract = (JsonObjectContract)_ContractResolver.ResolveContract(node.Parent.GetType());
-            var attemptedProperty = jsonContract
-                .Properties
-                .SingleOrDefault(p => p.PropertyName.Equals(property, StringComparison.OrdinalIgnoreCase));
+            attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(propertyName);
 
-            return attemptedProperty != null &&
-                   attemptedProperty.PropertyType.IsNonStringEnumerable() &&
-                   attemptedProperty.PropertyType.IsGenericType &&
-                   attemptedProperty.PropertyType.GetGenericArguments()[0] == node.Target.GetType();
+            if (attemptedProperty != null &&
+                attemptedProperty.PropertyType.IsNonStringEnumerable() &&
+                attemptedProperty.PropertyType.IsGenericType &&
+                attemptedProperty.PropertyType.GetGenericArguments()[0] == node.Target.GetType())
+            {
+                return true;
+            }
+
+            return false;
         }
 
         private IEnumerable<Node> GetAffectedMembers( 
@@ -195,12 +182,7 @@ namespace Owin.Scim.Patching.Helpers
                 else
                 {
                     var jsonContract = (JsonObjectContract)_ContractResolver.ResolveContract(node.Target.GetType());
-
-                    var attemptedProperty = jsonContract
-                        .Properties
-                        .FirstOrDefault(
-                            p => string.Equals(p.PropertyName, pathTree[i].Path, StringComparison.OrdinalIgnoreCase));
-
+                    var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(pathTree[i].Path);
                     if (attemptedProperty == null)
                     {
                         // property cannot be found, and we're not working with dynamics.
@@ -292,30 +274,6 @@ namespace Owin.Scim.Patching.Helpers
         public IList<PatchMember> PatchMembers { get; private set; } 
 
         public ScimErrorType ErrorType { get; set; }
-
-        public class PatchMember
-        {
-            private readonly object _Target;
-
-            public PatchMember(
-                string propertyPathInParent, 
-                JsonPatchProperty jsonPatchProperty,
-                object target = null)
-            {
-                _Target = target;
-                PropertyPathInParent = propertyPathInParent;
-                JsonPatchProperty = jsonPatchProperty;
-            }
-
-            public string PropertyPathInParent { get; private set; }
-
-            public JsonPatchProperty JsonPatchProperty { get; private set; }
-
-            public object Target
-            {
-                get { return _Target; }
-            }
-        }
 
         private class Node
         {

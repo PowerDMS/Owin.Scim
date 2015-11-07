@@ -9,10 +9,10 @@ namespace Owin.Scim.Patching
     /// </summary>  
     public interface IObjectAdapter    
     {
-        IEnumerable<PatchOperation> Add(Operation operation, object objectToApplyTo);
+        IEnumerable<PatchOperationResult> Add(Operation operation, object objectToApplyTo);
 
-        IEnumerable<PatchOperation> Remove(Operation operation, object objectToApplyTo);
+        IEnumerable<PatchOperationResult> Remove(Operation operation, object objectToApplyTo);
 
-        IEnumerable<PatchOperation> Replace(Operation operation, object objectToApplyTo);
+        IEnumerable<PatchOperationResult> Replace(Operation operation, object objectToApplyTo);
     }
 }

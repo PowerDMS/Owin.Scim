@@ -44,7 +44,7 @@ namespace Owin.Scim.Patching.Operations
 
         }
 
-        public IEnumerable<PatchOperation> Apply(TModel objectToApplyTo, IObjectAdapter adapter)
+        public IEnumerable<PatchOperationResult> Apply(TModel objectToApplyTo, IObjectAdapter adapter)
         {
             if (objectToApplyTo == null)
             {

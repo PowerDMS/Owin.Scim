@@ -47,7 +47,7 @@
         /// </summary>
         /// <param name="operation">The add operation.</param>
         /// <param name="objectToApplyTo">Object to apply the operation to.</param>
-        public IEnumerable<PatchOperation> Add(Operation operation, object objectToApplyTo)
+        public IEnumerable<PatchOperationResult> Add(Operation operation, object objectToApplyTo)
         {
             if (operation == null)
             {
@@ -100,7 +100,7 @@
             // treating each property on the object as a patch operation.
             if (string.IsNullOrWhiteSpace(operation.path))
             {
-                var operations = new List<PatchOperation>();
+                var operations = new List<PatchOperationResult>();
                 var resourcePatch = JObject.Parse(operation.value.ToString());
                 foreach (var kvp in resourcePatch)
                 {
@@ -113,7 +113,7 @@
             return Add(operation.path, operation.value, objectToApplyTo, operation);
         }
         
-        private IEnumerable<PatchOperation> Add(
+        private IEnumerable<PatchOperationResult> Add(
             string path,
             object value,
             object objectToApplyTo,
@@ -152,19 +152,19 @@
                     operation);
             }
             
-            var operations = new List<PatchOperation>();
+            var operations = new List<PatchOperationResult>();
             foreach (var patchMember in treeAnalysisResult.PatchMembers)
             {
                 if (treeAnalysisResult.UseDynamicLogic)
-                    operations.Add(AddDynamic(value, treeAnalysisResult, patchMember));
+                    operations.AddRange(AddDynamic(value, treeAnalysisResult, patchMember));
                 else
-                    operations.Add(AddNonDynamic(value, operation, patchMember));
+                    operations.AddRange(AddNonDynamic(value, operation, patchMember));
             }
 
-            return operations; // TODO: (DG) Return operation
+            return operations;
         }
 
-        private PatchOperation AddNonDynamic(object value, Operation operation, ScimObjectTreeAnalysisResult.PatchMember patchMember)
+        private IEnumerable<PatchOperationResult> AddNonDynamic(object value, Operation operation, PatchMember patchMember)
         {
             var patchProperty = patchMember.JsonPatchProperty;
             var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
@@ -195,14 +195,23 @@
                 {
                     throw new Exception(); // TODO: (DG) This is int server error.
                 }
-
+                
                 patchProperty.Property.ValueProvider.SetValue(
                     patchProperty.Parent,
                     conversionResultTuple.ConvertedInstance);
+
+                return new[]
+                {
+                    new PatchOperationResult(
+                        patchProperty,
+                        instanceValue,
+                        conversionResultTuple.ConvertedInstance)
+                };
             }
-            else
-            {
-                /*
+
+            // Here we are going to be modifying an existing enumerable:
+
+            /*
                     TODO: (DG) Handle case when:
 
                         o  If the target location already contains the value specified, no
@@ -211,70 +220,70 @@
                             this operation SHALL NOT change the modify timestamp of the
                             resource.
                 */
-
-                // Here we are going to be modifying an existing enumerable:
-
-
-                // The first case below handles the following SCIM rule:
-                // o  If the target location specifies a complex attribute, a set of
-                //    sub - attributes SHALL be specified in the "value" parameter.
-                if (patchMember.Target is MultiValuedAttribute)
+                
+            // The first case below handles the following SCIM rule:
+            // o  If the target location specifies a complex attribute, a set of
+            //    sub - attributes SHALL be specified in the "value" parameter.
+            if (patchMember.Target is MultiValuedAttribute)
+            {
+                // value should be an object composed of sub-attributes of the parent, a MultiValuedAttribute
+                var operations = new List<PatchOperationResult>();
+                var resourcePatch = JObject.Parse(operation.value.ToString());
+                var jsonContract = (JsonObjectContract)ContractResolver.ResolveContract(patchMember.Target.GetType());
+                foreach (var kvp in resourcePatch)
                 {
-                    var operations = new List<PatchOperation>();
-
-                    // value should be an object composed of sub-attributes of the parent, a MultiValuedAttribute
-                    var resourcePatch = JObject.Parse(operation.value.ToString());
-                    var jsonContract = (JsonObjectContract)ContractResolver.ResolveContract(patchMember.Target.GetType());
-                    foreach (var kvp in resourcePatch)
-                    {
-                        var attemptedProperty = jsonContract
-                            .Properties
-                            .SingleOrDefault(
+                    var attemptedProperty = jsonContract
+                        .Properties
+                        .SingleOrDefault(
                             p =>
-                            p.PropertyName.Equals(
-                                kvp.Key,
-                                StringComparison.OrdinalIgnoreCase));
-                        var patch = new ScimObjectTreeAnalysisResult.PatchMember(
-                            kvp.Key,
-                            new JsonPatchProperty(attemptedProperty, patchMember.Target));
-                        AddNonDynamic(kvp.Value, operation, patch);
-                    }
+                                p.PropertyName.Equals(
+                                    kvp.Key,
+                                    StringComparison.OrdinalIgnoreCase));
 
-                    return new PatchOperation(null, null, null);
-                    //return operations;
+                    var patch = new PatchMember(kvp.Key, new JsonPatchProperty(attemptedProperty, patchMember.Target));
+                    operations.AddRange(
+                        AddNonDynamic(
+                            kvp.Value, 
+                            new Operation(operation.op, kvp.Key, kvp.Value), 
+                            patch));
                 }
-
-                // The second case handles the following SCIM rule:
-                // o If the target location specifies a multi-valued attribute, a new
-                //   value is added to the attribute.
-
-                var genericTypeOfArray = patchProperty.Property.PropertyType.GetEnumerableType();
-                var conversionResult = ConvertToActualType(genericTypeOfArray, value);
-                if (!conversionResult.CanBeConverted)
-                {
-                    throw new ScimPatchException(
-                        ScimErrorType.InvalidValue,
-                        operation);
-                }
-
-                if (!patchProperty.Property.Readable)
-                {
-                    throw new Exception(); // TODO: (DG) This is int server error.
-                }
-
-                var listType = typeof (List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
-                var array = (IList) listType.CreateInstance(instanceValue);
-                array.AddPossibleRange(conversionResult.ConvertedInstance);
-
-                patchProperty.Property.ValueProvider.SetValue(
-                    patchProperty.Parent,
-                    array);
+                    
+                return operations;
             }
 
-            return new PatchOperation(null, null, null);
+            // The second case handles the following SCIM rule:
+            // o If the target location specifies a multi-valued attribute, a new
+            //   value is added to the attribute.
+            var genericTypeOfArray = patchProperty.Property.PropertyType.GetEnumerableType();
+            var conversionResult = ConvertToActualType(genericTypeOfArray, value);
+            if (!conversionResult.CanBeConverted)
+            {
+                throw new ScimPatchException(ScimErrorType.InvalidValue, operation);
+            }
+
+            if (!patchProperty.Property.Readable)
+            {
+                throw new Exception(); // TODO: (DG) This is int server error.
+            }
+
+            var listType = typeof (List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
+            var array = (IList) listType.CreateInstance(instanceValue);
+            array.AddPossibleRange(conversionResult.ConvertedInstance);
+
+            patchProperty.Property.ValueProvider.SetValue(
+                patchProperty.Parent,
+                array);
+
+            return new[]
+            {
+                new PatchOperationResult(
+                    patchProperty,
+                    instanceValue,
+                    array)
+            };
         }
 
-        private PatchOperation AddDynamic(object value, ScimObjectTreeAnalysisResult treeAnalysisResult, ScimObjectTreeAnalysisResult.PatchMember patchMember)
+        private IEnumerable<PatchOperationResult> AddDynamic(object value, ScimObjectTreeAnalysisResult treeAnalysisResult, PatchMember patchMember)
         {
             // TODO: (DG) NOT SURE IF THIS IS EVER NEEDED!
             /*
@@ -348,12 +357,12 @@
             return null;
         }
 
-        public IEnumerable<PatchOperation> Remove(Operation operation, object objectToApplyTo)
+        public IEnumerable<PatchOperationResult> Remove(Operation operation, object objectToApplyTo)
         {
             throw new NotImplementedException();
         }
 
-        public IEnumerable<PatchOperation> Replace(Operation operation, object objectToApplyTo)
+        public IEnumerable<PatchOperationResult> Replace(Operation operation, object objectToApplyTo)
         {
             throw new NotImplementedException();
         }

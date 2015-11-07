@@ -3,7 +3,11 @@
     using System.Collections.Generic;
     using System.Linq.Expressions;
 
-    public class PatchResult : List<PatchOperation>
+    using Helpers;
+
+    using Newtonsoft.Json.Serialization;
+
+    public class PatchResult : List<PatchOperationResult>
     {
         public int HttpStatusCode
         {
@@ -19,9 +23,9 @@
         }
     }
 
-    public class PatchOperation
+    public class PatchOperationResult
     {
-        public PatchOperation(Expression path, object oldValue, object  newValue)
+        public PatchOperationResult(JsonPatchProperty property, object oldValue, object  newValue)
         {
             
         }
