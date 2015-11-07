@@ -21,6 +21,7 @@ Roadmap
     2. [x] Add
     3. [ ] Replace
     4. [ ] Remove
+    5. [ ] Error Handling / Rule Processing
   5. [x] Delete  
   6. [ ] Add support for custom canonical types / validation
 2. Add groups endpoints
