@@ -30,3 +30,4 @@
 source/Owin.Scim.ncrunchsolution.user
 *.suo
 *.cache
+*.user

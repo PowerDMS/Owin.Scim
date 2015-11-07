@@ -1,12 +1,7 @@
-﻿// This code is based on ideas from Microsoft's (Microsoft.AspNet.JsonPatch) ObjectTreeAnalysisResult.cs
-// Pretty much all the original code is gone, however, and this has been heavily modified to add support 
-// for IEnumerable, SCIM query filters, and observe the rules surrounding SCIM Patch.
-
-namespace Owin.Scim.Patching.Helpers
+﻿namespace Owin.Scim.Patching.Helpers
 {
     using System;
     using System.Collections;
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -24,6 +19,9 @@ namespace Owin.Scim.Patching.Helpers
 
     using Querying;
 
+    // This code is based on ideas from Microsoft's (Microsoft.AspNet.JsonPatch) ObjectTreeAnalysisResult.cs
+    // Pretty much all the original code is gone, however, and this has been heavily modified to add support 
+    // for IEnumerable, SCIM query filters, and observe the rules surrounding SCIM Patch.
     public class ScimObjectTreeAnalysisResult
     {
         private readonly IContractResolver _ContractResolver;

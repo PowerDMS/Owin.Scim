@@ -12,6 +12,7 @@
     {
         public void OnAssemblyStart()
         {
+            //ncrunch: no coverage start
             _Server = TestServer.Create(app =>
             {
                 app.UseScimServer(
@@ -20,6 +21,7 @@
                         RequireSsl = false
                     });
             });
+            //ncrunch: no coverage end
         }
 
         public void OnAssemblyComplete()

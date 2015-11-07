@@ -28,6 +28,7 @@
     {
         public static IAppBuilder UseScimServer(this IAppBuilder app, ScimServerConfiguration serverConfig)
         {
+            //ncrunch: no coverage start
             if (app == null) throw new ArgumentNullException("app");
             if (serverConfig == null) throw new ArgumentNullException("serverConfig");
 
@@ -75,6 +76,7 @@
             Configure.Using(appConfig);
             
             app.UseWebApi(httpConfig);
+            //ncrunch: no coverage end
 
             return app;
         }

@@ -69,15 +69,6 @@ namespace DryIoc.WebApi
             return container;
         }
 
-        /// <summary>Adds rule to register unknown service when it is resolved.</summary>
-        /// <param name="container"></param> <param name="config">Required to get <see cref="IAssembliesResolver"/>.</param>
-        /// <returns>Container with added rule.</returns>
-        public static IContainer WithAutoFallbackResolution(this IContainer container, HttpConfiguration config)
-        {
-            var assembliesResolver = config.Services.GetAssembliesResolver();
-            return container.ThrowIfNull().WithAutoFallbackResolution(assembliesResolver.GetAssemblies());
-        }
-
         /// <summary>Registers controllers found in provided assemblies with per-request reuse.</summary>
         /// <param name="container">Container.</param>
         /// <param name="config">Http configuration.</param>
@@ -92,7 +83,7 @@ namespace DryIoc.WebApi
             var controllerTypeResolver = config.Services.GetHttpControllerTypeResolver();
             var controllerTypes = controllerTypeResolver.GetControllerTypes(assembliesResolver);
 
-            container.ThrowIfNull().RegisterMany(controllerTypes, reuse: Reuse.InWebRequest);
+            container.ThrowIfNull().RegisterMany(controllerTypes, Reuse.InWebRequest);
         }
 
         private sealed class GivenAssembliesResolver : IAssembliesResolver
@@ -246,7 +237,7 @@ namespace DryIoc.WebApi
         public void RegisterInDependencyScope(HttpRequestMessage request)
         {
             var dependencyScope = request.ThrowIfNull()
-                .GetDependencyScope().ThrowIfNotOf(typeof(DryIocDependencyScope), Error.REQUEST_MESSAGE_DOESNOT_REFERENCE_DRYIOC_DEPENDENCY_SCOPE);
+                .GetDependencyScope().ThrowIfNotOf(typeof(DryIocDependencyScope), Error.RequestMessageDoesnotReferenceDryiocDependencyScope);
             
             var container = ((DryIocDependencyScope)dependencyScope).ScopedContainer;
             container.RegisterInstance(request, Reuse.InWebRequest, IfAlreadyRegistered.Replace);
@@ -258,7 +249,7 @@ namespace DryIoc.WebApi
     {
 #pragma warning disable 1591 // "Missing XML-comment"
         public static readonly int
-            REQUEST_MESSAGE_DOESNOT_REFERENCE_DRYIOC_DEPENDENCY_SCOPE = DryIoc.Error.Of(
+            RequestMessageDoesnotReferenceDryiocDependencyScope = DryIoc.Error.Of(
                 "Expecting request message dependency scope to be of type {1} but found: {0}.");
 #pragma warning restore 1591
     }

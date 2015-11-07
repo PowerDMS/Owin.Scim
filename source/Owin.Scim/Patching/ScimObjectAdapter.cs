@@ -43,7 +43,13 @@
         public IContractResolver ContractResolver { get; private set; }
 
         /// <summary>
+        /// The "add" operation is used to add a new attribute value to an existing resource. 
+        /// The operation MUST contain a "value" member whose content specifies 
+        /// the value to be added.
         /// 
+        /// The value MAY be a quoted value, or it may be 
+        /// a JSON object containing the sub-attributes of the complex attribute 
+        /// specified in the operation's "path".
         /// </summary>
         /// <param name="operation">The add operation.</param>
         /// <param name="objectToApplyTo">Object to apply the operation to.</param>
@@ -357,6 +363,13 @@
             return null;
         }
 
+        /// <summary>
+        /// The "remove" operation removes the value at the target location 
+        /// specified by the required attribute "path". 
+        /// </summary>
+        /// <param name="operation"></param>
+        /// <param name="objectToApplyTo"></param>
+        /// <returns></returns>
         public IEnumerable<PatchOperationResult> Remove(Operation operation, object objectToApplyTo)
         {
             throw new NotImplementedException();
