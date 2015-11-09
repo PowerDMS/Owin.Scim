@@ -14,25 +14,25 @@ namespace Owin.Scim.Patching.Operations
         {
             get
             {
-                return (OperationType)Enum.Parse(typeof(OperationType), op, true);
+                return (OperationType)Enum.Parse(typeof(OperationType), Operation, true);
             }
         }
 
         [JsonProperty("path")]
-        public string path { get; set; }
+        public string Path { get; set; }
 
         [JsonProperty("op")]
-        public string op { get; set; }
+        public string Operation { get; set; }
 
         public OperationBase()
         {
         }
 
-        public OperationBase(string op, string path)
+        public OperationBase(string operation, string path)
         {
-            if (op == null)
+            if (operation == null)
             {
-                throw new ArgumentNullException(nameof(op));
+                throw new ArgumentNullException(nameof(operation));
             }
 
             if (path == null)
@@ -40,8 +40,8 @@ namespace Owin.Scim.Patching.Operations
                 throw new ArgumentNullException(nameof(path));
             }
 
-            this.op = op;
-            this.path = path;
+            this.Operation = operation;
+            this.Path = path;
         }
     }
 }

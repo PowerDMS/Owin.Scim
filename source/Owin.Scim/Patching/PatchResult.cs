@@ -27,7 +27,17 @@
     {
         public PatchOperationResult(JsonPatchProperty property, object oldValue, object  newValue)
         {
-            
+            OldValue = oldValue;
+            NewValue = newValue;
+        }
+
+        public object OldValue { get; private set; }
+
+        public object NewValue { get; private set; }
+
+        public bool HasChanged
+        {
+            get { return OldValue != NewValue; }
         }
     }
 }

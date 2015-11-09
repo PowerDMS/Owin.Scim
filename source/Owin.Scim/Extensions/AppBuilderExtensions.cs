@@ -68,7 +68,13 @@
                 .RegisterComponent<DryIocManager>()
                     .With<DryIocManagerBuilder>()
                         .SetContainer(() => container)
-                .RegisterComponent<IManageAutoMapper>(() => new AutoMapperManager())
+                .RegisterComponent<IManageAutoMapper>(() =>
+                {
+                    var autoMapperManager = new AutoMapperManager();
+                    autoMapperManager.Configuration.AllowNullCollections = true;
+
+                    return autoMapperManager;
+                })
                 .RegisterComponent<IManageEvents>()
                     .With<EventManagerBuilder>()
                         .SetActivationProvider(() => new DryIocActivationProvider(container));

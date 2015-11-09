@@ -3,7 +3,6 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
 
     using Exceptions;
 
@@ -104,10 +103,10 @@
 
             // Below we handle the null path by reflecting the "value" object;
             // treating each property on the object as a patch operation.
-            if (string.IsNullOrWhiteSpace(operation.path))
+            if (string.IsNullOrWhiteSpace(operation.Path))
             {
                 var operations = new List<PatchOperationResult>();
-                var resourcePatch = JObject.Parse(operation.value.ToString());
+                var resourcePatch = JObject.Parse(operation.Value.ToString());
                 foreach (var kvp in resourcePatch)
                 {
                     operations.AddRange(Add(kvp.Key, kvp.Value, objectToApplyTo, operation));
@@ -116,7 +115,7 @@
                 return operations;
             }
 
-            return Add(operation.path, operation.value, objectToApplyTo, operation);
+            return Add(operation.Path, operation.Value, objectToApplyTo, operation);
         }
         
         private IEnumerable<PatchOperationResult> Add(
@@ -218,14 +217,14 @@
             // Here we are going to be modifying an existing enumerable:
 
             /*
-                    TODO: (DG) Handle case when:
+                TODO: (DG) Handle case when:
 
-                        o  If the target location already contains the value specified, no
-                            changes SHOULD be made to the resource, and a success response
-                            SHOULD be returned.  Unless other operations change the resource,
-                            this operation SHALL NOT change the modify timestamp of the
-                            resource.
-                */
+                    o  If the target location already contains the value specified, no
+                        changes SHOULD be made to the resource, and a success response
+                        SHOULD be returned.  Unless other operations change the resource,
+                        this operation SHALL NOT change the modify timestamp of the
+                        resource.
+            */
                 
             // The first case below handles the following SCIM rule:
             // o  If the target location specifies a complex attribute, a set of
@@ -234,23 +233,16 @@
             {
                 // value should be an object composed of sub-attributes of the parent, a MultiValuedAttribute
                 var operations = new List<PatchOperationResult>();
-                var resourcePatch = JObject.Parse(operation.value.ToString());
+                var resourcePatch = JObject.Parse(operation.Value.ToString());
                 var jsonContract = (JsonObjectContract)ContractResolver.ResolveContract(patchMember.Target.GetType());
                 foreach (var kvp in resourcePatch)
                 {
-                    var attemptedProperty = jsonContract
-                        .Properties
-                        .SingleOrDefault(
-                            p =>
-                                p.PropertyName.Equals(
-                                    kvp.Key,
-                                    StringComparison.OrdinalIgnoreCase));
-
+                    var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(kvp.Key);
                     var patch = new PatchMember(kvp.Key, new JsonPatchProperty(attemptedProperty, patchMember.Target));
                     operations.AddRange(
                         AddNonDynamic(
                             kvp.Value, 
-                            new Operation(operation.op, kvp.Key, kvp.Value), 
+                            new Operation(operation.Operation, kvp.Key, kvp.Value), 
                             patch));
                 }
                     
@@ -372,7 +364,108 @@
         /// <returns></returns>
         public IEnumerable<PatchOperationResult> Remove(Operation operation, object objectToApplyTo)
         {
-            throw new NotImplementedException();
+            if (operation == null)
+                throw new ArgumentNullException(nameof(operation));
+
+            if (objectToApplyTo == null)
+                throw new ArgumentNullException(nameof(objectToApplyTo));
+
+            // o  If "path" is unspecified, the operation fails with HTTP status
+            //    code 400 and a "scimType" error code of "noTarget".
+            if (string.IsNullOrWhiteSpace(operation.Path))
+                throw new ScimPatchException(ScimErrorType.NoTarget, operation);
+
+            var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
+                objectToApplyTo,
+                operation.Path,
+                ContractResolver);
+
+            if (treeAnalysisResult.ErrorType != null)
+            {
+                throw new ScimPatchException(
+                    treeAnalysisResult.ErrorType,
+                    operation);
+            }
+
+            var operations = new List<PatchOperationResult>();
+            foreach (var patchMember in treeAnalysisResult.PatchMembers)
+            {
+                if (treeAnalysisResult.UseDynamicLogic)
+                    throw new NotSupportedException(); // TODO: (DG) If actually needed.
+                else
+                    operations.Add(RemoveNonDynamic(patchMember));
+            }
+
+            return operations;
+        }
+
+        private PatchOperationResult RemoveNonDynamic(PatchMember patchMember)
+        {
+            var patchProperty = patchMember.JsonPatchProperty;
+            if (!patchProperty.Property.Writable)
+            {
+                throw new Exception(); // TODO: (DG) This is int server error.
+            }
+
+            var defaultValue = patchProperty.Property.PropertyType.GetDefaultValue();
+            var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
+            if (instanceValue == defaultValue)
+            {
+                return new PatchOperationResult(patchProperty, instanceValue, defaultValue);
+            }
+
+            // Here we are going to be setting or replacing a current value:
+            // o  If the target location is a single-value attribute, the attribute
+            //    and its associated value is removed, and the attribute SHALL be
+            //    considered unassigned.
+            if (!patchProperty.Property.PropertyType.IsNonStringEnumerable())
+            {
+                patchProperty.Property.ValueProvider.SetValue(
+                    patchProperty.Parent,
+                    defaultValue);
+
+                return new PatchOperationResult(patchProperty, instanceValue, defaultValue);
+            }
+
+            // Here we are going to be modifying an existing enumerable:
+            // The first case below handles the following SCIM rule:
+            // o  If the target location is a multi-valued attribute and a complex
+            //    filter is specified comparing a "value", the values matched by the
+            //    filter are removed.  If no other values remain after removal of
+            //    the selected values, the multi-valued attribute SHALL be
+            //    considered unassigned.
+            // o  If the target location is a complex multi-valued attribute and a
+            //    complex filter is specified based on the attribute's
+            //    sub - attributes, the matching records are removed. Sub-attributes
+            //    whose values have been removed SHALL be considered unassigned. If
+            //    the complex multi-valued attribute has no remaining records, the
+            //    attribute SHALL be considered unassigned.
+            if (patchMember.Target is MultiValuedAttribute)
+            {
+                var listType = typeof(List<>).MakeGenericType(patchMember.Target.GetType());
+                var array = (IList)listType.CreateInstance(instanceValue);
+                array.Remove(patchMember.Target);
+
+                var newValue = array.Count == 0
+                    ? defaultValue
+                    : array;
+
+                patchProperty.Property.ValueProvider.SetValue(
+                    patchProperty.Parent,
+                    newValue);
+
+                return new PatchOperationResult(patchProperty, instanceValue, newValue);
+            }
+
+            // The second case handles the following SCIM rule:
+            // o  If the target location is a multi-valued attribute and no filter
+            //    is specified, the attribute and all values are removed, and the
+            //    attribute SHALL be considered unassigned.
+            patchProperty.Property.ValueProvider.SetValue(
+                patchProperty.Parent,
+                defaultValue);
+
+            return new PatchOperationResult(patchProperty, instanceValue, defaultValue);
         }
 
         public IEnumerable<PatchOperationResult> Replace(Operation operation, object objectToApplyTo)

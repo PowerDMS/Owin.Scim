@@ -13,12 +13,12 @@ namespace Owin.Scim.Patching.Operations
 
         }
 
-        public Operation(string op, string path, object value)
-            : base(op, path)
+        public Operation(string operation, string path, object value)
+            : base(operation, path)
         {
-            if (op == null)
+            if (operation == null)
             {
-                throw new ArgumentNullException(nameof(op));
+                throw new ArgumentNullException(nameof(operation));
             }
 
             if (path == null)
@@ -26,15 +26,15 @@ namespace Owin.Scim.Patching.Operations
                 throw new ArgumentNullException(nameof(path));
             }
 
-            this.value = value;
+            this.Value = value;
         }
 
-        public Operation(string op, string path)
-            : base(op, path)
+        public Operation(string operation, string path)
+            : base(operation, path)
         {
-            if (op == null)
+            if (operation == null)
             {
-                throw new ArgumentNullException(nameof(op));
+                throw new ArgumentNullException(nameof(operation));
             }
 
             if (path == null)

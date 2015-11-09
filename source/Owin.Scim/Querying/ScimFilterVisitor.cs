@@ -103,7 +103,7 @@
                 var childLambdaArgument = Expression.TryCatch(
                     Expression.Block(Expression.Property(argument, property)),
                     Expression.Catch(typeof (Exception),
-                        Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
+                        Expression.Constant(property.PropertyType.GetDefaultValue(), property.PropertyType))
                     );
 
                 if (isEnumerable)
@@ -172,7 +172,7 @@
                 Expression.Block(Expression.Property(argument, property)),
                 Expression.Catch(
                     typeof(NullReferenceException),
-                    Expression.Constant(GetDefaultValue(property.PropertyType), property.PropertyType))
+                    Expression.Constant(property.PropertyType.GetDefaultValue(), property.PropertyType))
                 );
 
             if (isEnumerable && 
@@ -189,7 +189,7 @@
                     Expression.Block(Expression.Property(multiValuedAttribute, valueAttribute)),
                     Expression.Catch(
                         typeof (NullReferenceException),
-                        Expression.Constant(GetDefaultValue(valueAttribute.PropertyType), valueAttribute.PropertyType))
+                        Expression.Constant(valueAttribute.PropertyType.GetDefaultValue(), valueAttribute.PropertyType))
                     );
 
                 var valueLambda = Expression.Lambda(
@@ -510,14 +510,7 @@
 
             throw new Exception("Invalid filter operator for a binary expression.");
         }
-
-        protected static object GetDefaultValue(Type type)
-        {
-            return type.IsValueType
-                ? Activator.CreateInstance(type)
-                : null;
-        }
-
+        
         protected static DateTime ParseDateTime(string valueToken)
         {
             return JToken.Parse("\"" + valueToken + "\"").ToObject<DateTime>(_JsonSerializer);

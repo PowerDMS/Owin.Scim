@@ -119,7 +119,8 @@
     <Compile Include="Integration\Users\Retrieve\when_retrieving_a_user.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_invalid_userid.cs" />
-    <Compile Include="Integration\Users\Update\add\when_updating_a_user.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_and_filter.cs" />
+    <Compile Include="Integration\Users\Update\when_updating_a_user.cs" />
     <Compile Include="Integration\Users\Update\add\with_an_invalid_path.cs" />
     <Compile Include="Integration\Users\Update\add\with_no_patch_request.cs" />
     <Compile Include="Integration\Users\Update\add\with_no_path.cs" />
@@ -130,6 +131,11 @@
     <Compile Include="Integration\Users\Update\add\with_path_and_filter_with_subattribute.cs" />
     <Compile Include="Integration\Users\Update\add\with_path_and_filter_with_no_subattribute.cs" />
     <Compile Include="Integration\Users\Update\add\with_path_and_null_multivaluedattribute.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_and_complex_attribute.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_and_existing_multivaluedattribute_values.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_and_filter_that_all_elements_satisfy.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_and_filter_with_subattribute.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_and_null_multivaluedattribute.cs" />
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
@@ -198,7 +204,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Integration\Users\Update\remove\" />
     <Folder Include="Integration\Users\Update\replace\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

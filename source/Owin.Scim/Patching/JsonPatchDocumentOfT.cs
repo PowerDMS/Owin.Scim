@@ -210,9 +210,9 @@ namespace Owin.Scim.Patching
                 {
                     var untypedOp = new Operation
                     {
-                        op = op.op,
-                        value = op.value,
-                        path = op.path
+                        Operation = op.Operation,
+                        Value = op.Value,
+                        Path = op.Path
                     };
 
                     operations.Add(untypedOp);

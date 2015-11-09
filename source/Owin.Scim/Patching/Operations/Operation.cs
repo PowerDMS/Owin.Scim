@@ -10,21 +10,21 @@ namespace Owin.Scim.Patching.Operations
     public class Operation : OperationBase
     {
         [JsonProperty("value")]
-        public object value { get; set; }
+        public object Value { get; set; }
 
         public Operation()
         {
 
         }
 
-        public Operation(string op, string path, object value)
-            : base(op, path)
+        public Operation(string operation, string path, object value)
+            : base(operation, path)
         {
-            this.value = value;
+            this.Value = value;
         }
 
-        public Operation(string op, string path)
-            : base(op, path)
+        public Operation(string operation, string path)
+            : base(operation, path)
         {
         }
 

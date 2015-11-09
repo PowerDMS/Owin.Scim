@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Tests.Integration.Users.Update.add
+﻿namespace Owin.Scim.Tests.Integration.Users.Update
 {
     using System.Net;
     using System.Net.Http;
