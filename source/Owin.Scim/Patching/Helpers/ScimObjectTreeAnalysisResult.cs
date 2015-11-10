@@ -167,29 +167,29 @@
                 lastPosition = i; 
                 
                 // TODO: (DG) Dictionary support may not be needed. Look into.
-                var dictionary = node.Target as IDictionary<string, object>;
-                if (dictionary != null)
-                {
-                    // find the value in the dictionary                   
-                    if (dictionary.ContainsCaseInsensitiveKey(pathTree[i].Path))
-                    {
-                        // TODO: (DG) This (Path) needs to support complex property paths (ie. name.familyName)
-                        var possibleNewTargetObject = dictionary.GetValueForCaseInsensitiveKey(pathTree[i].Path);
+//                var dictionary = node.Target as IDictionary<string, object>;
+//                if (dictionary != null)
+//                {
+//                     find the value in the dictionary                   
+//                    if (dictionary.ContainsCaseInsensitiveKey(pathTree[i].Path))
+//                    {
+//                         TODO: (DG) This (Path) needs to support complex property paths (ie. name.familyName)
+//                        var possibleNewTargetObject = dictionary.GetValueForCaseInsensitiveKey(pathTree[i].Path);
 
-                        // unless we're at the last item, we should set the targetobject
-                        // to the new object.  If we're at the last item, we need to stop
-                        if (i != pathTree.Count - 1)
-                        {
-                            node = new Node(possibleNewTargetObject, node.Target);
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
-                }
-                else
-                {
+//                         unless we're at the last item, we should set the targetobject
+//                         to the new object.  If we're at the last item, we need to stop
+//                        if (i != pathTree.Count - 1)
+//                        {
+//                            node = new Node(possibleNewTargetObject, node.Target);
+//                        }
+//                    }
+//                    else
+//                    {
+//                        break;
+//                    }
+//                }
+//                else
+//                {
                     var jsonContract = (JsonObjectContract)_ContractResolver.ResolveContract(node.Target.GetType());
                     var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(pathTree[i].Path);
                     if (attemptedProperty == null)
@@ -284,7 +284,7 @@
 
                         return filteredNodes;
                     }
-                }
+//                }
             }
 
             return new List<Node> { node };

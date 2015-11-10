@@ -224,9 +224,8 @@
             {
                 throw new ScimPatchException(ScimErrorType.InvalidValue, operation);
             }
-
-            var listType = typeof (List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
-            var array = (IList) listType.CreateInstance(instanceValue);
+            
+            var array = CreateGenericListFromObject(instanceValue);
             array.AddPossibleRange(conversionResult.ConvertedInstance);
 
             patchProperty.Property.ValueProvider.SetValue(
@@ -242,13 +241,14 @@
             };
         }
 
+        /*
         private IEnumerable<PatchOperationResult> AddDynamic(object value, ScimObjectTreeAnalysisResult treeAnalysisResult, PatchMember patchMember)
         {
             // TODO: (DG) NOT SURE IF THIS IS EVER NEEDED!
-            /*
+            
                     o  If the target location specifies an attribute that does not exist
                         (has no value), the attribute is added with the new value.
-            */
+            
             // possibly with resource extensions like enterpriseuser support
 
             var container = treeAnalysisResult.Container;
@@ -315,6 +315,7 @@
 
             return null;
         }
+    */
 
         /// <summary>
         /// The "remove" operation removes the value at the target location 
@@ -405,9 +406,7 @@
                 (patchMember.Target is MultiValuedAttribute ||
                  !patchMember.Target.GetType().IsTerminalObject()))
             {
-                // TODO: (DG) Make more efficient! Next two lines should check if already a IList and cast. Also fix elsewhere.
-                var listType = typeof(List<>).MakeGenericType(patchMember.Target.GetType());
-                var array = (IList)listType.CreateInstance(instanceValue);
+                var array = CreateGenericListFromObject(instanceValue);
                 array.Remove(patchMember.Target);
 
                 var newValue = array.Count == 0
@@ -470,7 +469,8 @@
             var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
                 objectToApplyTo,
                 path,
-                ContractResolver);
+                ContractResolver,
+                operation);
 
             if (treeAnalysisResult.ErrorType != null)
             {
@@ -591,9 +591,8 @@
             {
                 throw new ScimPatchException(ScimErrorType.InvalidValue, operation);
             }
-
-            var listType = typeof(List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
-            var array = (IList)listType.CreateInstance();
+            
+            var array = CreateGenericListFromObject(instanceValue, false);
             array.AddPossibleRange(conversionResult.ConvertedInstance);
 
             patchProperty.Property.ValueProvider.SetValue(
@@ -626,6 +625,25 @@
             {
                 return new ConversionResult(false, null);
             }
+        }
+
+        private IList CreateGenericListFromObject(object instanceValue, bool initializeWithInstanceValue = true)
+        {
+            if (instanceValue == null) return null;
+
+            var enumerableInterface = instanceValue.GetType().GetEnumerableType();
+            if (enumerableInterface == null) return null;
+
+            if (instanceValue is IList && initializeWithInstanceValue)
+            {
+                return (IList) instanceValue;
+            }
+
+            var listArgumentType = enumerableInterface.GetGenericArguments()[0];
+            var listType = typeof(List<>).MakeGenericType(listArgumentType);
+            return initializeWithInstanceValue
+                ? (IList)listType.CreateInstance(instanceValue)
+                : (IList)listType.CreateInstance();
         }
     }
 }

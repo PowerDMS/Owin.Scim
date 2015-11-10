@@ -135,6 +135,7 @@
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Patching\Helpers\PatchMember.cs" />
+    <Compile Include="Patching\PatchOperationResult.cs" />
     <Compile Include="Patching\PatchResult.cs" />
     <Compile Include="Querying\FilterHelpers.cs" />
     <Compile Include="Querying\ScimFilter.cs" />

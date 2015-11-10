@@ -123,6 +123,7 @@
     <Compile Include="Integration\Users\Update\replace\with_path_and_complex_attribute.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_existing_multivaluedattribute_values.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_filter.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_path_and_filter_that_returns_nothing.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_filter_with_null.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_filter_with_subattribute.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_null_multivaluedattribute.cs" />
