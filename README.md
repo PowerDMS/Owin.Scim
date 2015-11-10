@@ -8,6 +8,13 @@ RFC 7644
 Looking for solid contributers to expedite this effort!  
 email me:  daniel.gioulakis [at] powerdms [dot] com
 
+PROJECT STATUS
+==============
+In recent light of coming across Microsoft's SCIM implementation: https://github.com/Azure/AzureAD-BYOA-Provisioning-Samples,  
+this project is no longer in active development until I can vet that Microsoft.SystemForCrossDomainIdentityManagement will fit all needs.  
+
+See:  
+https://www.nuget.org/packages/Microsoft.SystemForCrossDomainIdentityManagement/  
 
 Roadmap
 -------
