@@ -19,9 +19,10 @@ Roadmap
   4. [ ] Update (Patch) (IN PROGRESS)
     1. [x] Support for path filters
     2. [x] Add
-    3. [ ] Replace
+    3. [x] Replace
     4. [x] Remove
-    5. [ ] Error Handling / Rule Processing
+    5. [ ] Add more test coverage to prove compliance
+    6. [ ] Error handling / rule processing
   5. [x] Delete  
   6. [ ] Add support for custom canonical types / validation
 2. Add groups endpoints
