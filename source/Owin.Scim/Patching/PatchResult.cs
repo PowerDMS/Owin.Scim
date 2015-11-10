@@ -1,11 +1,8 @@
 ﻿namespace Owin.Scim.Patching
 {
     using System.Collections.Generic;
-    using System.Linq.Expressions;
 
     using Helpers;
-
-    using Newtonsoft.Json.Serialization;
 
     public class PatchResult : List<PatchOperationResult>
     {

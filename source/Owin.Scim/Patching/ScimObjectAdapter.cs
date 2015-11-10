@@ -55,50 +55,17 @@
         public IEnumerable<PatchOperationResult> Add(Operation operation, object objectToApplyTo)
         {
             if (operation == null)
-            {
                 throw new ArgumentNullException(nameof(operation));
-            }
 
             if (objectToApplyTo == null)
-            {
                 throw new ArgumentNullException(nameof(objectToApplyTo));
-            }
-            
+
             /*
-            With SCIM 2.0, path is only required for the remove operation:
+                With SCIM 2.0, path is only required for the remove operation:
             
                    o  If omitted, the target location is assumed to be the resource
                       itself.  The "value" parameter contains a set of attributes to be
                       added to the resource.
-
-            PATCH /Users/2819c223-7f76-453a-919d-413861904646
-            Host: example.com
-            Accept: application/scim+json
-            Content-Type: application/scim+json
-            Authorization: Bearer h480djs93hd8
-            If-Match: W/"a330bc54f0671c9"
-
-            {
-                "schemas":
-                ["urn:ietf:params:scim:api:messages:2.0:PatchOp"],
-                "Operations":[{
-                "op":"add",
-                "value":{
-                    "emails":[
-                    {
-                        "value":"babs@jensen.org",
-                        "type":"home"
-                    }
-                    ],
-                    "nickname":"Babs"
-                }]
-            }
-
-            In the above example, an additional value is added to the
-            multi-valued attribute "emails".  The second attribute, "nickname",
-            is added to the User resource.  If the resource already had an
-            existing "nickname", the value is replaced per the processing rules
-            above for single-valued attributes.
             */
 
             // Below we handle the null path by reflecting the "value" object;
@@ -109,30 +76,26 @@
                 var resourcePatch = JObject.Parse(operation.Value.ToString());
                 foreach (var kvp in resourcePatch)
                 {
-                    operations.AddRange(Add(kvp.Key, kvp.Value, objectToApplyTo, operation));
+                    operations.AddRange(AddInternal(kvp.Key, kvp.Value, objectToApplyTo, operation));
                 }
 
                 return operations;
             }
 
-            return Add(operation.Path, operation.Value, objectToApplyTo, operation);
+            return AddInternal(operation.Path, operation.Value, objectToApplyTo, operation);
         }
         
-        private IEnumerable<PatchOperationResult> Add(
-            string path,
+        private IEnumerable<PatchOperationResult> AddInternal(
+            string path, 
             object value,
             object objectToApplyTo,
             Operation operation)
         {
             if (objectToApplyTo == null)
-            {
                 throw new ArgumentNullException(nameof(objectToApplyTo));
-            }
 
             if (operation == null)
-            {
                 throw new ArgumentNullException(nameof(operation));
-            }
 
             /* 
                 ScimObjectTreeAnalysisResult.cs will handle resolving the actual 
@@ -161,7 +124,8 @@
             foreach (var patchMember in treeAnalysisResult.PatchMembers)
             {
                 if (treeAnalysisResult.UseDynamicLogic)
-                    operations.AddRange(AddDynamic(value, treeAnalysisResult, patchMember));
+                    throw new NotSupportedException(); // TODO: (DG) Add support if needed.
+                    //operations.AddRange(AddDynamic(value, treeAnalysisResult, patchMember));
                 else
                     operations.AddRange(AddNonDynamic(value, operation, patchMember));
             }
@@ -229,7 +193,9 @@
             // The first case below handles the following SCIM rule:
             // o  If the target location specifies a complex attribute, a set of
             //    sub - attributes SHALL be specified in the "value" parameter.
-            if (patchMember.Target is MultiValuedAttribute)
+            if (patchMember.Target != null &&
+                (patchMember.Target is MultiValuedAttribute ||
+                 !patchMember.Target.GetType().IsTerminalObject()))
             {
                 // value should be an object composed of sub-attributes of the parent, a MultiValuedAttribute
                 var operations = new List<PatchOperationResult>();
@@ -257,11 +223,6 @@
             if (!conversionResult.CanBeConverted)
             {
                 throw new ScimPatchException(ScimErrorType.InvalidValue, operation);
-            }
-
-            if (!patchProperty.Property.Readable)
-            {
-                throw new Exception(); // TODO: (DG) This is int server error.
             }
 
             var listType = typeof (List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
@@ -436,12 +397,15 @@
             //    considered unassigned.
             // o  If the target location is a complex multi-valued attribute and a
             //    complex filter is specified based on the attribute's
-            //    sub - attributes, the matching records are removed. Sub-attributes
+            //    sub-attributes, the matching records are removed. Sub-attributes
             //    whose values have been removed SHALL be considered unassigned. If
             //    the complex multi-valued attribute has no remaining records, the
             //    attribute SHALL be considered unassigned.
-            if (patchMember.Target is MultiValuedAttribute)
+            if (patchMember.Target != null &&
+                (patchMember.Target is MultiValuedAttribute ||
+                 !patchMember.Target.GetType().IsTerminalObject()))
             {
+                // TODO: (DG) Make more efficient! Next two lines should check if already a IList and cast. Also fix elsewhere.
                 var listType = typeof(List<>).MakeGenericType(patchMember.Target.GetType());
                 var array = (IList)listType.CreateInstance(instanceValue);
                 array.Remove(patchMember.Target);
@@ -470,11 +434,188 @@
 
         public IEnumerable<PatchOperationResult> Replace(Operation operation, object objectToApplyTo)
         {
-            throw new NotImplementedException();
+            if (operation == null)
+                throw new ArgumentNullException(nameof(operation));
+
+            if (objectToApplyTo == null)
+                throw new ArgumentNullException(nameof(objectToApplyTo));
+
+            /*
+                With SCIM 2.0, path is only required for the remove operation:
+            
+                   o  If omitted, the target location is assumed to be the resource
+                      itself.  The "value" parameter contains a set of attributes to be
+                      added to the resource.
+            */
+
+            // Below we handle the null path by reflecting the "value" object;
+            // treating each property on the object as a patch operation.
+            if (string.IsNullOrWhiteSpace(operation.Path))
+            {
+                var operations = new List<PatchOperationResult>();
+                var resourcePatch = JObject.Parse(operation.Value.ToString());
+                foreach (var kvp in resourcePatch)
+                {
+                    operations.AddRange(ReplaceInternal(kvp.Key, kvp.Value, objectToApplyTo, operation));
+                }
+
+                return operations;
+            }
+
+            return ReplaceInternal(operation.Path, operation.Value, objectToApplyTo, operation);
         }
-        
+
+        private IEnumerable<PatchOperationResult> ReplaceInternal(string path, object value, object objectToApplyTo, Operation operation)
+        {
+            var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
+                objectToApplyTo,
+                path,
+                ContractResolver);
+
+            if (treeAnalysisResult.ErrorType != null)
+            {
+                throw new ScimPatchException(
+                    treeAnalysisResult.ErrorType,
+                    operation);
+            }
+
+            var operations = new List<PatchOperationResult>();
+            foreach (var patchMember in treeAnalysisResult.PatchMembers)
+            {
+                if (treeAnalysisResult.UseDynamicLogic)
+                    throw new NotSupportedException(); // TODO: (DG) Added support if needed.
+                else
+                    operations.AddRange(ReplaceNonDynamic(value, operation, patchMember));
+            }
+
+            return operations;
+        }
+
+        private IEnumerable<PatchOperationResult> ReplaceNonDynamic(object value, Operation operation, PatchMember patchMember)
+        {
+            var patchProperty = patchMember.JsonPatchProperty;
+            if (!patchProperty.Property.Writable)
+            {
+                throw new Exception(); // TODO: (DG) This is int server error.
+            }
+
+            var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
+            if (instanceValue == null || !patchProperty.Property.PropertyType.IsNonStringEnumerable())
+            {
+                /*
+                    Here we are going to be setting or replacing a current value:
+                        o  If the target location is a single-value attribute, the attributes
+                           value is replaced.
+                        o  If the target location path specifies an attribute that does not
+                           exist, the service provider SHALL treat the operation as an "add".
+                           (instanceValue == null)
+                        o  If the target location is a complex multi-valued attribute with a
+                           value selection filter ("valuePath") and a specific sub-attribute
+                           (e.g., "addresses[type eq "work"].streetAddress"), the matching
+                           sub-attribute of all matching records is replaced.
+                           (!patchProperty.Property.PropertyType.IsNonStringEnumerable())
+                */
+
+                var conversionResultTuple = ConvertToActualType(
+                    patchProperty.Property.PropertyType,
+                    value);
+
+                if (!conversionResultTuple.CanBeConverted)
+                {
+                    throw new ScimPatchException(
+                        ScimErrorType.InvalidValue,
+                        operation);
+                }
+
+                patchProperty.Property.ValueProvider.SetValue(
+                    patchProperty.Parent,
+                    conversionResultTuple.ConvertedInstance);
+
+                return new[]
+                {
+                    new PatchOperationResult(
+                        patchProperty,
+                        instanceValue,
+                        conversionResultTuple.ConvertedInstance)
+                };
+            }
+            
+            // Here we are going to be modifying a complex object:
+            // The first case below handles the following SCIM rules:
+            // o  If the target location is a multi-valued attribute and a value
+            //    selection("valuePath") filter is specified that matches one or
+            //    more values of the multi-valued attribute, then all matching
+            //    record values SHALL be replaced.
+            // o  If the target location specifies a complex attribute, a set of
+            //    sub-attributes SHALL be specified in the "value" parameter, which
+            //    replaces any existing values or adds where an attribute did not
+            //    previously exist.  Sub-attributes that are not specified in the
+            //    "value" parameter are left unchanged.
+            if (patchMember.Target != null &&
+                (patchMember.Target is MultiValuedAttribute || 
+                 !patchMember.Target.GetType().IsTerminalObject()))
+            {
+                // if value is null, we're setting the MultiValuedAttribute to null
+                if (value == null)
+                {
+                    return new[]
+                    {
+                        RemoveNonDynamic(patchMember)
+                    };
+                }
+
+                // value should be an object composed of sub-attributes of the parent, a MultiValuedAttribute
+                var operations = new List<PatchOperationResult>();
+                var resourcePatch = JObject.Parse(value.ToString());
+                var jsonContract = (JsonObjectContract)ContractResolver.ResolveContract(patchMember.Target.GetType());
+                foreach (var kvp in resourcePatch)
+                {
+                    var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(kvp.Key);
+                    var patch = new PatchMember(kvp.Key, new JsonPatchProperty(attemptedProperty, patchMember.Target));
+                    operations.AddRange(
+                        AddNonDynamic(
+                            kvp.Value,
+                            new Operation(operation.Operation, kvp.Key, kvp.Value),
+                            patch));
+                }
+
+                return operations;
+            }
+
+            // The second case handles the following SCIM rule:
+            // o  If the target location is a multi-valued attribute and no filter
+            //    is specified, the attribute and all values are replaced.
+            var genericTypeOfArray = patchProperty.Property.PropertyType.GetEnumerableType();
+            var conversionResult = ConvertToActualType(genericTypeOfArray, value);
+            if (!conversionResult.CanBeConverted)
+            {
+                throw new ScimPatchException(ScimErrorType.InvalidValue, operation);
+            }
+
+            var listType = typeof(List<>).MakeGenericType(genericTypeOfArray.GetGenericArguments()[0]);
+            var array = (IList)listType.CreateInstance();
+            array.AddPossibleRange(conversionResult.ConvertedInstance);
+
+            patchProperty.Property.ValueProvider.SetValue(
+                patchProperty.Parent,
+                array);
+
+            return new[]
+            {
+                new PatchOperationResult(
+                    patchProperty,
+                    instanceValue,
+                    array)
+            };
+        }
+
         private ConversionResult ConvertToActualType(Type propertyType, object value)
         {
+            if (value == null)
+            {
+                return new ConversionResult(true, propertyType.GetDefaultValue());
+            }
+
             try
             {
                 var o = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value), propertyType);

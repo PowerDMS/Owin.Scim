@@ -9,6 +9,8 @@
 
     using Antlr4.Runtime;
 
+    using Exceptions;
+
     using Extensions;
 
     using Model;
@@ -16,6 +18,8 @@
     using NContext.Common;
 
     using Newtonsoft.Json.Serialization;
+
+    using Operations;
 
     using Querying;
 
@@ -26,9 +30,16 @@
     {
         private readonly IContractResolver _ContractResolver;
 
-        public ScimObjectTreeAnalysisResult(object objectToSearch, string filter, IContractResolver contractResolver)
+        private readonly Operation _Operation;
+
+        public ScimObjectTreeAnalysisResult(
+            object objectToSearch, 
+            string filter, 
+            IContractResolver contractResolver,
+            Operation operation = null)
         {
             _ContractResolver = contractResolver;
+            _Operation = operation;
 
             /* 
                 ScimFilter.cs will handle normalizing the actual path string. 
@@ -40,7 +51,8 @@
                 "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"]"
                 "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"].displayName"
 
-                Once normalized, associate each resource member with its filter (if present). -> Tuple<memberName, memberFilter>
+                Once normalized, associate each resource member with its filter (if present).
+                This is represented as a PathMember, which is essentially a tuple of <memberName, memberFilter?>
             */
             var pathTree = new ScimFilter(filter)
                 .Paths
@@ -153,9 +165,8 @@
                 // seems absurd, but this MAY be called recursively, OR simply
                 // interated via the for loop - 
                 lastPosition = i; 
-
-                // if the current target object is an ExpandoObject (IDictionary<string, object>),
-                // we cannot use the ContractResolver.
+                
+                // TODO: (DG) Dictionary support may not be needed. Look into.
                 var dictionary = node.Target as IDictionary<string, object>;
                 if (dictionary != null)
                 {
@@ -238,11 +249,13 @@
                         // we have an enumerable and a filter predicate
                         // for each element in the enumerable that satisfies the predicate, 
                         // visit that element as part of the path tree
+                        var originalHasElements = false;
                         var filteredNodes = new List<Node>();
                         var enumerator = enumerable.GetEnumerator();
                         lastPosition = i + 1; // increase the position in the tree
                         while (enumerator.MoveNext())
                         {
+                            originalHasElements = true;
                             if ((bool) predicate.DynamicInvoke(enumerator.Current))
                             {
                                 filteredNodes.AddRange(
@@ -251,6 +264,22 @@
                                         ref lastPosition,
                                         new Node(enumerator.Current, node.Target)));
                             }
+                        }
+
+                        /* SCIM PATCH 'replace' RULE:
+                            o  If the target location is a multi-valued attribute for which a
+                               value selection filter ("valuePath") has been supplied and no
+                               record match was made, the service provider SHALL indicate failure
+                               by returning HTTP status code 400 and a "scimType" error code of
+                               "noTarget".
+                        */
+                        if (originalHasElements &&
+                            filteredNodes.Count == 0 &&
+                            _Operation != null &&
+                            _Operation.OperationType == OperationType.Replace)
+                        {
+                            throw new ScimPatchException(
+                                ScimErrorType.NoTarget, _Operation);
                         }
 
                         return filteredNodes;

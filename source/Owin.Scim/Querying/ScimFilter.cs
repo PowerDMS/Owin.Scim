@@ -33,7 +33,8 @@
         private void ProcessFilter(string filterExpression)
         {
             /*
-            Processing a SCIM filter SHOULD support query filters and PATCH path filters
+            Processing a SCIM filter SHOULD support search query filters and patch path filters.
+            See: https://tools.ietf.org/html/rfc7644#section-3.4.2
 
             Query Examples
 
@@ -50,8 +51,8 @@
             "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"].displayName"
 
             In the below code, we look to differentiate a '.' from a path after a filter expression and one
-            that's placed before a potential filter expression.  If it's before, then we replace the '.' with a 
-            temporary '/' - used as a marker.  This way we can normalize our filters with brackets.
+            that's placed before a potential filter expression.  We replace the '.' with a temporary '/' - 
+            used as a marker.  This way we can normalize our filters with brackets.
 
             This is very important because if we just did a string.Split('.') then:
 
@@ -63,6 +64,8 @@
 
             The second example there shows that we'd have TWO paths instead of ONE + filter. The approach taken here
             normalizes the second expression into: meta[lastModified gt "2011-05-13T04:42:34Z]"
+
+            The third issue handled here is treating a '.' within quotes as a string literal and not part of a path.
             */
 
             var pathList = new List<string>();
@@ -78,10 +81,10 @@
                 {
                     closing = true;
                 }
-
+                
                 if (pathChar == '.' && filterExpression[index - 1] != ']' && !openQuoteFound)
                 {
-                    // we are most likely parsing a query filter, not PATCH path filter
+                    // we are most likely parsing an attrPath, not subAttr (as per the SCIM RFC filtering ABNF)
                     separatorIndex = index;
                     pathBuilder.Append('/');
                 }
@@ -129,9 +132,11 @@
                 }
             }
 
+            // TODO: (DG) This is too fragile. We need a marker that is unique 
+            // and won't be found in a filter expression value string.
             if (pathBuilder.Length > 0)
                 pathList.AddRange(pathBuilder.ToString().Split('/'));
-
+            
             _NormalizedFilterExpression = string.Concat(pathList);
             _Paths = pathList;
         }
