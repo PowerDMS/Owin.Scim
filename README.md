@@ -26,7 +26,10 @@ Roadmap
   5. [x] Delete  
   6. [ ] Add support for custom canonical types / validation
 2. Add groups endpoints
-3. Add scim server configuration endpoints
+3. Add SCIM server configuration endpoints
+  1. [ ] /ServiceProviderConfig
+  2. [ ] /Schemas
+  3. [ ] /ResourceTypes
 4. Add support for bulk processing
 5. Add support for querying
   1. [ ] Filtering (parsing into an expression tree is already done)
