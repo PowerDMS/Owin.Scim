@@ -10,9 +10,9 @@ email me:  daniel.gioulakis [at] powerdms [dot] com
 
 PROJECT STATUS
 ==============
-In recent light of coming across Microsoft's SCIM implementation, this project is pending active development until I can vet that Microsoft.SystemForCrossDomainIdentityManagement will fit most needs.  
+This project is in active development until further information of Microsoft's  Microsoft.SystemForCrossDomainIdentityManagement has been announced.  As of now, it looks like that project is focusing specifically on outbound SCIM provisioning from Azure AD only.  As of now it's not SCIM compliant.
 
-See:  
+For more information, see:  
 https://github.com/Azure/AzureAD-BYOA-Provisioning-Samples  
 https://www.nuget.org/packages/Microsoft.SystemForCrossDomainIdentityManagement/  
 
