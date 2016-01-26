@@ -1,18 +1,11 @@
 ﻿namespace Owin.Scim.Model
 {
-    using System.Collections.Generic;
-
     using Newtonsoft.Json;
 
-    public abstract class Resource
+    public abstract class Resource : SchemaBase
     {
-        [JsonProperty(Order = -5)]
+        [JsonProperty(Order = -5, PropertyName = "id")]
         public string Id { get; set; }
-
-        public string ExternalId { get; set; }
-
-        [JsonProperty(Order = -10)]
-        public abstract IEnumerable<string> Schemas { get; set; }
 
         public ResourceMetadata Meta { get; set; }
     }

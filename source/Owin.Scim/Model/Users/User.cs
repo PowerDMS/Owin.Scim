@@ -3,23 +3,17 @@
     using System;
     using System.Collections.Generic;
 
+    using Newtonsoft.Json;
+
     public class User : Resource
     {
-        private IEnumerable<string> _Schemas;
-         
         public User()
         {
-            _Schemas = new List<string>
-                {
-                    ScimConstants.Schemas.User
-                };
+            AddSchema(ScimConstants.Schemas.User);
         }
 
-        public override IEnumerable<string> Schemas
-        {
-            get { return _Schemas; }
-            set { _Schemas = value; }
-        }
+        [JsonProperty(PropertyName = "externalId")]
+        public string ExternalId { get; set; }
 
         /// <summary>
         /// Unique identifier for the User, typically used by the user to directly 

@@ -39,7 +39,7 @@
                 new ScimServerConfiguration(), 
                 UserRepository, 
                 PasswordManager, 
-                new UserValidator(UserRepository, PasswordComplexityVerifier, PasswordManager));
+                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager));
         };
 
         Because of = async () => Result = await _UserService.UpdateUser(ClientUserDto).AwaitResponse().AsTask;

@@ -2,12 +2,15 @@
 {
     using FakeItEasy;
 
+    using FluentValidation;
+
     using Machine.Specifications;
 
     using Model.Users;
 
     using Repository;
 
+    using Scim.Extensions;
     using Scim.Validation;
     using Scim.Validation.Users;
 
@@ -21,13 +24,17 @@
             PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
             PasswordManager = A.Fake<IManagePasswords>();
 
-            _Validator = new UserValidator(UserRepository, PasswordComplexityVerifier, PasswordManager);
+            _ValidatorFactory = new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager);
 
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(true);
         };
 
-        Because of = async () => Result = await _Validator.ValidateAsync(User, RuleSetConstants.Default).AwaitResponse().AsTask;
+        Because of = async () =>
+        {
+            _Validator = await _ValidatorFactory.CreateValidator(User);
+            Result = (await _Validator.ValidateAsync(User, ruleSet: RuleSetConstants.Default).AwaitResponse().AsTask).ToScimValidationResult();
+        };
 
         protected static IUserRepository UserRepository;
 
@@ -39,6 +46,8 @@
 
         protected static ValidationResult Result;
 
-        private static UserValidator _Validator;
+        private static IValidator<User> _Validator;
+
+        private static UserValidatorFactory _ValidatorFactory;
     }
 }

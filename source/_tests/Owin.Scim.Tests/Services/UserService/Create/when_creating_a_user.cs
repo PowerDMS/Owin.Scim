@@ -48,8 +48,8 @@
             _UserService = new UserService(
                 new ScimServerConfiguration(), 
                 UserRepository, 
-                PasswordManager, 
-                new UserValidator(UserRepository, PasswordComplexityVerifier, PasswordManager));
+                PasswordManager,
+                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager));
         };
 
         Because of = async () => Result = await _UserService.CreateUser(ClientUserDto).AwaitResponse().AsTask;

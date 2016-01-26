@@ -3,25 +3,21 @@
     using System.Threading.Tasks;
     using System.Transactions;
 
-    /// <summary>
-    /// Defines an abstraction for validating entities.
-    /// </summary>
-    /// <typeparam name="TEntity"></typeparam>
-    public abstract class ValidatorBase<TEntity> : IValidator<TEntity>
+    using FluentValidation;
+    
+    public abstract class ValidatorBase<TEntity> : AbstractValidator<TEntity>
     {
-        public async Task<ValidationResult> ValidateAsync(TEntity entity, string ruleSet = RuleSetConstants.Default)
+        public override async Task<FluentValidation.Results.ValidationResult> ValidateAsync(ValidationContext<TEntity> context)
         {
             if (Transaction.Current != null)
             {
                 using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    return await ValidateAsyncInternal(entity, ruleSet);
+                    return await base.ValidateAsync(context);
                 }
             }
 
-            return await ValidateAsyncInternal(entity, ruleSet);
+            return await base.ValidateAsync(context);
         }
-
-        protected abstract Task<ValidationResult> ValidateAsyncInternal(TEntity entity, string ruleSet = RuleSetConstants.Default);
     }
 }

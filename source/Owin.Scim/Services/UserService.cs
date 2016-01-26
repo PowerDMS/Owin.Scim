@@ -4,13 +4,13 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    using AutoMapper;
-
     using Configuration;
 
     using ErrorHandling;
 
     using Extensions;
+
+    using FluentValidation;
 
     using Microsoft.FSharp.Core;
 
@@ -36,26 +36,26 @@
 
         private readonly IManagePasswords _PasswordManager;
 
-        private readonly UserValidator _UserValidator;
+        private readonly UserValidatorFactory _UserValidatorFactory;
 
         public UserService(
             ScimServerConfiguration serverConfiguration,
             IUserRepository userRepository,
             IManagePasswords passwordManager,
-            UserValidator userValidator)
+            UserValidatorFactory userValidatorFactory)
         {
             _ServerConfiguration = serverConfiguration;
             _UserRepository = userRepository;
             _PasswordManager = passwordManager;
-            _UserValidator = userValidator;
+            _UserValidatorFactory = userValidatorFactory;
         }
 
         public async Task<IScimResponse<User>> CreateUser(User user)
         {
             await CanonicalizeUser(user);
 
-            var newUser = Mapper.Map(user, new User()); // Replace all new User metadata according to SCIM rules concerning mutability.
-            var validationResult = await _UserValidator.ValidateAsync(newUser, RuleSetConstants.Create);
+            var validator = await _UserValidatorFactory.CreateValidator(user);
+            var validationResult = (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors);
@@ -88,8 +88,8 @@
 
             await CanonicalizeUser(user);
 
-            Mapper.Map(user, userRecord); // Replace all userRecord metadata according to SCIM rules concerning mutability.
-            var validationResult = await _UserValidator.ValidateAsync(userRecord, RuleSetConstants.Update);
+            var validator = await _UserValidatorFactory.CreateValidator(user);
+            var validationResult = (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Update)).ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors);
@@ -130,18 +130,18 @@
 
             // ADDRESSES
             user.Addresses.Canonicalize(
-                ((Address attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)),
-                ((Address attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                (Address attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
+                (Address attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
             // CERTIFICATES
             user.X509Certificates.Canonicalize(
-                ((X509Certificate attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)),
-                ((X509Certificate attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                (X509Certificate attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
+                (X509Certificate attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
             // EMAILS
             user.Emails.Canonicalize(
-                ((Email attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)),
-                ((Email attribute, ref object state) =>
+                (Email attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
+                (Email attribute, ref object state) =>
                 {
                     if (string.IsNullOrWhiteSpace(attribute.Value)) return;
 
@@ -150,23 +150,23 @@
 
                     var cEmail = attribute.Value.Substring(0, atIndex) + attribute.Value.Substring(atIndex).ToLower();
                     attribute.Display = cEmail;
-                }),
-                ((Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                },
+                (Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
             // ENTITLEMENTS
             user.Entitlements.Canonicalize(
-                ((Entitlement attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)),
-                ((Entitlement attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                (Entitlement attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
+                (Entitlement attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
             // INSTANT MESSAGE ADDRESSES
             user.Ims.Canonicalize(
-                ((InstantMessagingAddress attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)),
-                ((InstantMessagingAddress attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                (InstantMessagingAddress attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
+                (InstantMessagingAddress attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
             // PHONE NUMBERS
             user.PhoneNumbers.Canonicalize(
-                ((PhoneNumber attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)),
-                ((PhoneNumber attribute, ref object state) =>
+                (PhoneNumber attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
+                (PhoneNumber attribute, ref object state) =>
                 {
                     if (!string.IsNullOrWhiteSpace(attribute.Value))
                     {
@@ -175,19 +175,19 @@
                             ? null
                             : normalized;
                     }
-                }), 
-                ((PhoneNumber attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                }, 
+                (PhoneNumber attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
             // PHOTOS
             user.Photos.Canonicalize(
-                ((Photo attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)),
-                ((Photo attribute, ref object state) => Canonicalization.Lowercase(attribute, photo => photo.Value)),
-                ((Photo attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                (Photo attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
+                (Photo attribute, ref object state) => Canonicalization.Lowercase(attribute, photo => photo.Value),
+                (Photo attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
             // ROLES
             user.Roles.Canonicalize(
-                ((Role attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute)), 
-                ((Role attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state)));
+                (Role attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute), 
+                (Role attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
             
             return Task.FromResult(0);
         }
