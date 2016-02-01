@@ -16,7 +16,6 @@
 
     using NContext.Configuration;
     using NContext.EventHandling;
-    using NContext.Extensions.AutoMapper.Configuration;
     using NContext.Extensions.Ninject.Configuration;
     using NContext.Security.Cryptography;
 
@@ -63,13 +62,6 @@
                 .RegisterComponent<DryIocManager>()
                     .With<DryIocManagerBuilder>()
                         .SetContainer(() => container)
-                .RegisterComponent<IManageAutoMapper>(() =>
-                {
-                    var autoMapperManager = new AutoMapperManager();
-                    autoMapperManager.Configuration.AllowNullCollections = true;
-
-                    return autoMapperManager;
-                })
                 .RegisterComponent<IManageEvents>()
                     .With<EventManagerBuilder>()
                         .SetActivationProvider(() => new DryIocActivationProvider(container));

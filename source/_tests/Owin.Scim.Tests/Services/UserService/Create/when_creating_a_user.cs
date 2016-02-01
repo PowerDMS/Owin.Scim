@@ -3,15 +3,11 @@
     using System;
     using System.Threading.Tasks;
 
-    using AutoMapper;
-
     using Configuration;
 
     using FakeItEasy;
 
     using Machine.Specifications;
-
-    using Mappings;
 
     using Model;
     using Model.Users;
@@ -27,8 +23,6 @@
     {
         Establish context = () =>
         {
-            Mapper.Initialize(c => new UserMapping().Configure(Mapper.Configuration));
-
             UserRepository = A.Fake<IUserRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
             PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();

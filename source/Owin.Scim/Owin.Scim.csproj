@@ -36,10 +36,6 @@
       <HintPath>..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="AutoMapper, Version=4.1.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
-      <HintPath>..\packages\AutoMapper.4.1.1\lib\net45\AutoMapper.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
     <Reference Include="FluentValidation, Version=5.6.2.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\FluentValidation.5.6.2.0\lib\Net45\FluentValidation.dll</HintPath>
       <Private>True</Private>
@@ -58,10 +54,6 @@
     </Reference>
     <Reference Include="NContext.Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\NContext.Common.3.0.0\lib\portable-net45+windows8+wpa\NContext.Common.dll</HintPath>
-      <Private>True</Private>
-    </Reference>
-    <Reference Include="NContext.Extensions.AutoMapper, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NContext.Extensions.AutoMapper.3.0.0\lib\net40\NContext.Extensions.AutoMapper.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=7.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -141,7 +133,6 @@
     <Compile Include="Patching\PatchResult.cs" />
     <Compile Include="Querying\FilterHelpers.cs" />
     <Compile Include="Querying\ScimFilter.cs" />
-    <Compile Include="Mappings\UserMapping.cs" />
     <Compile Include="Middleware\RequireSslMiddleware.cs" />
     <Compile Include="Model\BulkRequest.cs" />
     <Compile Include="Patching\PatchRequest.cs" />
