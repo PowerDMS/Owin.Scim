@@ -12,7 +12,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     public class with_path_and_existing_multivaluedattribute_values : when_updating_a_user
     {
-        static with_path_and_existing_multivaluedattribute_values()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
@@ -22,10 +22,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                     new Email { Value = "user@corp.com", Type = "work" }
                 }
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = new StringContent(
                 @"
                     {

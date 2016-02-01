@@ -12,7 +12,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
     public class with_path_and_filter_with_null : when_updating_a_user
     {
-        static with_path_and_filter_with_null()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
@@ -24,10 +24,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
                     new Email { Value = "user@company.com", Type = "home", Primary = true }
                 }
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = new StringContent(
                 @"
                     {

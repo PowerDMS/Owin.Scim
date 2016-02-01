@@ -13,16 +13,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     public class with_an_invalid_path : when_updating_a_user
     {
-        static with_an_invalid_path()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = new StringContent(
                 @"{ ""schemas"":
                                [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],

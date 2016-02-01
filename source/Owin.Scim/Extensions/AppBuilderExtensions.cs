@@ -52,13 +52,8 @@
                 ? AppDomain.CurrentDomain.BaseDirectory
                 : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
-            // Defining a composition directory just to make testing easier with ncrunch
-            var compositionDirectory = executionDirectory.Contains("_tests")
-                ? executionDirectory.Substring(0, executionDirectory.IndexOf("_tests"))
-                : executionDirectory;
-
             ApplicationConfiguration appConfig = new ApplicationConfigurationBuilder()
-                .ComposeWith(new[] { compositionDirectory },
+                .ComposeWith(new[] { executionDirectory },
                     fileInfo => 
                     fileInfo.Name.StartsWith("Owin.Scim", StringComparison.OrdinalIgnoreCase) && 
                     (new[] { ".dll" }).Contains(fileInfo.Extension.ToLower()))

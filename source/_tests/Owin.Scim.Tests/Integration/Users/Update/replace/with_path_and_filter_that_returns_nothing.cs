@@ -13,7 +13,7 @@
 
     public class with_path_and_filter_that_returns_nothing : when_updating_a_user
     {
-        static with_path_and_filter_that_returns_nothing()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
@@ -23,10 +23,7 @@
                     new Email { Value = "Babs@Jensen.org", Type = "home" }
                 }
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = new StringContent(
                 @"{
                     ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],

@@ -16,7 +16,7 @@
 
     using Security;
 
-    public abstract class when_validating_a_user
+    public class when_validating_a_user
     {
         Establish context = () =>
         {

@@ -13,6 +13,8 @@
         public void OnAssemblyStart()
         {
             //ncrunch: no coverage start
+            if (_Server != null) return;
+
             _Server = TestServer.Create(app =>
             {
                 app.UseScimServer(
@@ -26,6 +28,8 @@
 
         public void OnAssemblyComplete()
         {
+            if (_Server == null) return;
+            
             _Server.Dispose();
         }
 

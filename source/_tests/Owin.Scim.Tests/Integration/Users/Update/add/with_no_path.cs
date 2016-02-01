@@ -11,16 +11,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     public class with_no_path : when_updating_a_user
     {
-        static with_no_path()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = new StringContent(
                 @"
                         {

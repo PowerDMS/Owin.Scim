@@ -7,7 +7,7 @@
 
     using Model.Users;
 
-    public abstract class when_replacing_a_user : using_a_scim_server
+    public class when_replacing_a_user : using_a_scim_server
     {
         Because of = async () =>
         {

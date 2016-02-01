@@ -12,7 +12,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
 
     public class with_path_and_filter : when_updating_a_user
     {
-        static with_path_and_filter()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
@@ -23,10 +23,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
                     new Email { Value = "user@gmail.com", Type = "home", Primary = true }
                 }
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = new StringContent(
                 @"
                     {

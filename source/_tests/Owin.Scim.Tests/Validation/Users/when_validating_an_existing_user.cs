@@ -16,7 +16,7 @@ namespace Owin.Scim.Tests.Validation.Users
 
     using Security;
 
-    public abstract class when_validating_an_existing_user
+    public class when_validating_an_existing_user
     {
         Establish context = () =>
         {

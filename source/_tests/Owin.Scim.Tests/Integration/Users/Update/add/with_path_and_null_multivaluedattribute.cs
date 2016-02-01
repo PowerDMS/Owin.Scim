@@ -11,17 +11,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     public class with_path_and_null_multivaluedattribute : when_updating_a_user
     {
-        static with_path_and_null_multivaluedattribute()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Emails = null
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = new StringContent(
                 @"
                     {

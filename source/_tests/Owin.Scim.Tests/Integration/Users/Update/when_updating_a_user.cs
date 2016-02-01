@@ -8,9 +8,9 @@
 
     using Model.Users;
 
-    public abstract class when_updating_a_user : using_a_scim_server
+    public class when_updating_a_user : using_a_scim_server
     {
-        Establish context = async () =>
+        Because of = async () =>
         {
             // Insert the first user so there's one already in-memory.
             var userRecord = await Server
@@ -20,10 +20,7 @@
                 .AsTask;
 
             _UserId = (await userRecord.Content.ReadAsAsync<User>()).Id;
-        };
 
-        Because of = async () =>
-        {
             PatchResponse = await Server
                 .HttpClient
                 .SendAsync(

@@ -7,7 +7,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
     using Model.Users;
 
-    public abstract class when_creating_a_user : using_a_scim_server
+    public class when_creating_a_user : using_a_scim_server
     {
         Because of = async () =>
         {

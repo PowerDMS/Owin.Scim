@@ -14,7 +14,7 @@
     using Scim.Extensions;
     using Scim.Querying;
 
-    public abstract class when_parsing_a_filter_expression<TResource>
+    public class when_parsing_a_filter_expression<TResource>
     {
         Because of = () =>
         {

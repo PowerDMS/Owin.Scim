@@ -23,7 +23,7 @@
 
     using Security;
 
-    public abstract class when_creating_a_user
+    public class when_creating_a_user
     {
         Establish context = () =>
         {

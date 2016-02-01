@@ -22,7 +22,7 @@
 
     using Security;
 
-    public abstract class when_updating_a_user
+    public class when_updating_a_user
     {
         Establish context = () =>
         {

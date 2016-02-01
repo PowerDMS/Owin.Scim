@@ -4,7 +4,7 @@
 
     using Machine.Specifications;
 
-    public abstract class when_retrieving_a_user : using_a_scim_server
+    public class when_retrieving_a_user : using_a_scim_server
     {
         Because of = async () =>
         {

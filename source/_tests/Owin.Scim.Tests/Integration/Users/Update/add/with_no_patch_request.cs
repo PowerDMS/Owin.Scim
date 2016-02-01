@@ -8,16 +8,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     public class with_no_patch_request : when_updating_a_user
     {
-        static with_no_patch_request()
+        Establish context = () =>
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
-        }
 
-        Establish context = () =>
-        {
             PatchContent = null;
         };
 
