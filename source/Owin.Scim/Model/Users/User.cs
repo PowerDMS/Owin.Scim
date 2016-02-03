@@ -18,7 +18,7 @@
              * the endpoint "/Users" will set "resourceType" to "User", and
              * "/Groups" will set "resourceType" to "Group".
              */
-            Meta.ResourceType = ScimConstants.ResourceTypes.User;
+            Meta = new ResourceMetadata {ResourceType = ScimConstants.ResourceTypes.User};
         }
 
         [JsonProperty(PropertyName = "externalId")]

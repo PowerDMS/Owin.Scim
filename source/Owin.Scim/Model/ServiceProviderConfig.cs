@@ -26,7 +26,7 @@
             _AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
 
             AddSchema(ScimConstants.Schemas.ServiceProviderConfig);
-            Meta.ResourceType = ScimConstants.ResourceTypes.ServiceProviderConfig;
+            Meta = new ResourceMetadata {ResourceType = ScimConstants.ResourceTypes.ServiceProviderConfig};
         }
 
         [JsonProperty("name")]
