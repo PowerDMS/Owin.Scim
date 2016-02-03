@@ -10,6 +10,15 @@
         public User()
         {
             AddSchema(ScimConstants.Schemas.User);
+
+            /* 3.3.1.Resource Types
+             * When adding a resource to a specific endpoint, the meta attribute
+             * "resourceType" SHALL be set by the HTTP service provider to the
+             * corresponding resource type for the endpoint.  For example, a POST to
+             * the endpoint "/Users" will set "resourceType" to "User", and
+             * "/Groups" will set "resourceType" to "Group".
+             */
+            Meta.ResourceType = ScimConstants.ResourceTypes.User;
         }
 
         [JsonProperty(PropertyName = "externalId")]

@@ -115,6 +115,7 @@
     <Compile Include="DryIoc\Owin\DryIocOwin.cs" />
     <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
     <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />
+    <Compile Include="Endpoints\ServiceProviderConfigController.cs" />
     <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="ErrorHandling\ErrorDetail.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
@@ -127,7 +128,15 @@
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Extensions\ValidationResultExtensions.cs" />
+    <Compile Include="Model\AuthenticationScheme.cs" />
+    <Compile Include="Model\BulkSupport.cs" />
+    <Compile Include="Model\ChangePasswordSupport.cs" />
+    <Compile Include="Model\ETagSupport.cs" />
+    <Compile Include="Model\FilterSupport.cs" />
+    <Compile Include="Model\PatchSupprt.cs" />
     <Compile Include="Model\SchemaBase.cs" />
+    <Compile Include="Model\ServiceProviderConfig.cs" />
+    <Compile Include="Model\SortSupport.cs" />
     <Compile Include="Patching\Helpers\PatchMember.cs" />
     <Compile Include="Patching\PatchOperationResult.cs" />
     <Compile Include="Patching\PatchResult.cs" />

@@ -55,7 +55,7 @@
                 .ComposeWith(new[] { executionDirectory },
                     fileInfo => 
                     fileInfo.Name.StartsWith("Owin.Scim", StringComparison.OrdinalIgnoreCase) && 
-                    (new[] { ".dll" }).Contains(fileInfo.Extension.ToLower()))
+                    new[] { ".dll" }.Contains(fileInfo.Extension.ToLower()))
                 .RegisterComponent<IManageCryptography>()
                     .With<CryptographyManagerBuilder>()
                         .SetDefaults<SHA256Cng, HMACSHA256, AesCryptoServiceProvider>()

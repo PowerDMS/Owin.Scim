@@ -1,10 +1,14 @@
 ﻿namespace Owin.Scim.Tests.Integration
 {
+    using System;
+
     using Configuration;
 
     using Machine.Specifications;
 
     using Microsoft.Owin.Testing;
+
+    using Model;
 
     using Scim.Extensions;
 
@@ -21,7 +25,14 @@
                     new ScimServerConfiguration
                     {
                         RequireSsl = false
-                    });
+                    }
+                    .AddAuthenticationScheme(
+                        new AuthenticationScheme(
+                            "oauthbearertoken",
+                            "OAuth Bearer Token",
+                            "Authentication scheme using the OAuth Bearer Token standard.", 
+                            specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
+                            isPrimary: true)));
             });
             //ncrunch: no coverage end
         }
