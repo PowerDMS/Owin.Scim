@@ -1,7 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
     using System.Net.Http;
-    using System.Net.Http.Formatting;
 
     using Machine.Specifications;
 
@@ -12,8 +11,8 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         Because of = async () =>
         {
             Response = await Server
-                .HttpClient
-                .PostAsync("users", new ObjectContent<User>(UserDto, new JsonMediaTypeFormatter()))
+            .HttpClient
+                .PostAsync("users", new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
         };

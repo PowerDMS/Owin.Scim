@@ -89,6 +89,9 @@
                 IgnoreSerializableInterface = true
             };
 
+            // refer to https://tools.ietf.org/html/rfc7644#section-3.1
+            httpConfiguration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("application/scim+json"));
+
             return httpConfiguration;
         }
     }
