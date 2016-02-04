@@ -11,6 +11,7 @@
     using Extensions;
 
     using FluentValidation;
+    using FluentValidation.Internal;
 
     using Microsoft.FSharp.Core;
 

@@ -4,26 +4,60 @@ namespace Owin.Scim.Validation.Users
     using System.Threading.Tasks;
 
     using FluentValidation;
+    using FluentValidation.Results;
 
     using Model.Users;
 
-    public class FluentEnterpriseUserValidator : ValidatorBase<EnterpriseUser>
+    using Repository;
+
+    public class FluentEnterpriseUserValidator : ValidatorBase<EnterpriseUser>, IValidator<User>
     {
+        private readonly IUserRepository _UserRepository;
+
         private readonly FluentUserValidator _UserValidator;
 
-        public FluentEnterpriseUserValidator(FluentUserValidator userValidator)
+        public FluentEnterpriseUserValidator(
+            IUserRepository userRepository,
+            FluentUserValidator userValidator)
         {
+            _UserRepository = userRepository;
             _UserValidator = userValidator;
+            ConfigureDefaultRuleSet();
+            ConfigureCreateRuleSet();
+            ConfigureUpdateRuleSet();
         }
-            
+
+        private void ConfigureDefaultRuleSet()
+        {
+        }
+
+        private void ConfigureCreateRuleSet()
+        {
+        }
+
+        private void ConfigureUpdateRuleSet()
+        {
+        }
+
         public override async Task<FluentValidation.Results.ValidationResult> ValidateAsync(ValidationContext<EnterpriseUser> context)
         {
-            var results = await _UserValidator.ValidateAsync(context.InstanceToValidate);
-
-            var eResults = await base.ValidateAsync(context);
+            var coreUserValidationResults = await _UserValidator.ValidateAsync(context.InstanceToValidate);
+            var enterpriseValidationResults = await base.ValidateAsync(context);
 
             return new FluentValidation.Results.ValidationResult(
-                results.Errors.Concat(eResults.Errors));
+                coreUserValidationResults
+                    .Errors
+                    .Concat(enterpriseValidationResults.Errors));
+        }
+
+        public ValidationResult Validate(User instance)
+        {
+            return _UserValidator.Validate(instance);
+        }
+
+        public Task<ValidationResult> ValidateAsync(User instance)
+        {
+            return _UserValidator.ValidateAsync(instance);
         }
     }
 }

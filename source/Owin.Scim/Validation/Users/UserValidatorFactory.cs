@@ -28,12 +28,14 @@
             _PasswordManager = passwordManager;
         }
 
-        public virtual Task<IValidator<TUser>> CreateValidator<TUser>(TUser entity) where TUser : User
+        public virtual Task<IValidator<TUser>> CreateValidator<TUser>(TUser entity) 
+            where TUser : User
         {
             if (entity is EnterpriseUser)
             {
                 return Task.FromResult(
                     (IValidator<TUser>)new FluentEnterpriseUserValidator(
+                        _UserRepository,
                         new FluentUserValidator(
                             _UserRepository,
                             _PasswordComplexityVerifier,

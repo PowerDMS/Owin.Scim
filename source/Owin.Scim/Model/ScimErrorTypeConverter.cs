@@ -4,7 +4,7 @@ namespace Owin.Scim.Model
 
     using Newtonsoft.Json;
 
-    public class ScimTypeConverter : JsonConverter
+    public class ScimErrorTypeConverter : JsonConverter
     {
         public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
         {

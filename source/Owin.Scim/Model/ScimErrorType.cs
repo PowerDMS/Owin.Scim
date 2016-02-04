@@ -6,7 +6,7 @@
 
     using Newtonsoft.Json;
 
-    [JsonConverter(typeof(ScimTypeConverter))]
+    [JsonConverter(typeof(ScimErrorTypeConverter))]
     public sealed class ScimErrorType : IEquatable<ScimErrorType>
     {
         private readonly string _Type;

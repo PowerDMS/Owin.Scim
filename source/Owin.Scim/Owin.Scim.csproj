@@ -104,6 +104,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AsyncLazy.cs" />
     <Compile Include="CanonicalizationRule.cs" />
     <Compile Include="Configuration\DefaultSchemaTypeFactory.cs" />
     <Compile Include="Configuration\DryIocActivationProvider.cs" />
@@ -154,7 +155,7 @@
     <Compile Include="Model\ScimError.cs" />
     <Compile Include="Model\ScimResponse.cs" />
     <Compile Include="Model\ScimErrorType.cs" />
-    <Compile Include="Model\ScimTypeConverter.cs" />
+    <Compile Include="Model\ScimErrorTypeConverter.cs" />
     <Compile Include="Model\Users\Address.cs" />
     <Compile Include="Model\Users\Email.cs" />
     <Compile Include="Model\Users\EnterpriseUser.cs" />

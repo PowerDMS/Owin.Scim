@@ -5,7 +5,6 @@ namespace Owin.Scim.Validation.Users
     using System.Globalization;
     using System.Linq;
     using System.Net;
-    using System.Threading;
     using System.Threading.Tasks;
 
     using ErrorHandling;
@@ -40,7 +39,7 @@ namespace Owin.Scim.Validation.Users
             _PasswordComplexityVerifier = passwordComplexityVerifier;
             _PasswordManager = passwordManager;
 
-            var userRecord = new Lazy<User>(() => GetUser().Result, LazyThreadSafetyMode.ExecutionAndPublication);
+            var userRecord = new AsyncLazy<User>(() => GetUser());
             ConfigureDefaultRuleSet();
             ConfigureCreateRuleSet();
             ConfigureUpdateRuleSet(userRecord);
@@ -304,12 +303,12 @@ namespace Owin.Scim.Validation.Users
             });
         }
 
-        private void ConfigureUpdateRuleSet(Lazy<User> userRecord)
+        private void ConfigureUpdateRuleSet(AsyncLazy<User> userRecord)
         {
             RuleSet("update", () =>
             {
                 RuleFor(user => user.Id)
-                    .Immutable(() => userRecord.Value.Id, StringComparer.OrdinalIgnoreCase)
+                    .ImmutableAsync(async () => (await userRecord).Id, StringComparer.OrdinalIgnoreCase)
                     .WithState(u =>
                         new ScimError(
                             HttpStatusCode.BadRequest,
@@ -318,8 +317,8 @@ namespace Owin.Scim.Validation.Users
 
                 // Updating a username validation
                 When(user =>
-                    !String.IsNullOrWhiteSpace(user.UserName) &&
-                    !user.UserName.Equals(userRecord.Value.UserName, StringComparison.OrdinalIgnoreCase),
+                    !string.IsNullOrWhiteSpace(user.UserName) &&
+                    !user.UserName.Equals(userRecord.Value.Result.UserName, StringComparison.OrdinalIgnoreCase),
                     () =>
                     {
                         RuleFor(user => user.UserName)
@@ -336,9 +335,8 @@ namespace Owin.Scim.Validation.Users
 
                 // Updating a user password
                 When(user =>
-                    !String.IsNullOrWhiteSpace(user.Password) &&
-                    (userRecord.Value.Password == null ||
-                     !_PasswordManager.VerifyHash(user.Password, userRecord.Value.Password)),
+                    !string.IsNullOrWhiteSpace(user.Password) &&
+                    (userRecord.Value.Result.Password == null || !_PasswordManager.VerifyHash(user.Password, userRecord.Value.Result.Password)),
                     () =>
                     {
                         RuleFor(user => user.Password)

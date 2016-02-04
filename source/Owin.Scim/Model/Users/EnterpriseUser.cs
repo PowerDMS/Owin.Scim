@@ -7,6 +7,7 @@ namespace Owin.Scim.Model.Users
         public EnterpriseUser()
         {
             AddSchema(ScimConstants.Schemas.UserEnterprise);
+            Enterprise = new EnterpriseUserExtension();
         }
 
         [JsonProperty(ScimConstants.Schemas.UserEnterprise)]

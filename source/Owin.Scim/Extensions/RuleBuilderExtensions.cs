@@ -19,7 +19,9 @@
                 comparer = EqualityComparer<TProperty>.Default;
             }
 
-            return ruleBuilder.MustAsync(async (val) => await Task.FromResult(comparer.Equals(val, toCompare())));
+            return ruleBuilder.MustAsync(
+                async val => 
+                await Task.FromResult(comparer.Equals(val, toCompare())));
         }
 
         public static IRuleBuilderOptions<T, TProperty> Immutable<T, TProperty>(
@@ -32,7 +34,45 @@
                 comparer = EqualityComparer<TProperty>.Default;
             }
 
-            return ruleBuilder.MustAsync(async (entity, val) => await Task.FromResult(comparer.Equals(val, toCompare(entity))));
+            return ruleBuilder.MustAsync(
+                async (entity, val) => 
+                await Task.FromResult(comparer.Equals(val, toCompare(entity))));
+        }
+
+        public static IRuleBuilderOptions<T, TProperty> ImmutableAsync<T, TProperty>(
+            this IRuleBuilder<T, TProperty> ruleBuilder,
+            Func<Task<TProperty>> toCompare,
+            IEqualityComparer comparer = null)
+        {
+            if (comparer == null)
+            {
+                comparer = EqualityComparer<TProperty>.Default;
+            }
+
+            return ruleBuilder.MustAsync(
+                async val =>
+                {
+                    var compareValue = await toCompare();
+                    return await Task.FromResult(comparer.Equals(val, compareValue));
+                });
+        }
+
+        public static IRuleBuilderOptions<T, TProperty> ImmutableAsync<T, TProperty>(
+            this IRuleBuilder<T, TProperty> ruleBuilder,
+            Func<T, Task<TProperty>> toCompare,
+            IEqualityComparer comparer = null)
+        {
+            if (comparer == null)
+            {
+                comparer = EqualityComparer<TProperty>.Default;
+            }
+
+            return ruleBuilder.MustAsync(
+                async (entity, val) =>
+                {
+                    var compareValue = await toCompare(entity);
+                    return await Task.FromResult(comparer.Equals(val, compareValue));
+                });
         }
     }
 }
