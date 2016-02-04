@@ -27,25 +27,25 @@ Roadmap
     5. [x] Add more test coverage to prove compliance
     6. [ ] Error handling / rule processing
   5. [x] Delete  
-  6. [ ] Add custom WebApi parameter binding for user resource-type extensions / deserialization. (IN PROGRESS)
-  7. [ ] Add support for custom canonical types / validation
-2. Add SCIM server configuration endpoints (IN PROGRESS)
+  6. [ ] Add support for custom canonical types / validation  
+2. Schema extensions
+  1. [x] Add custom parameter binding for schema extension deserialization
+3. Add SCIM server configuration endpoints (IN PROGRESS)
   1. [x] /ServiceProviderConfig
   2. [ ] /Schemas
   3. [ ] /ResourceTypes
-3. Add groups endpoints
+4. Add groups endpoints
   1. [ ] Create
   2. [ ] Retrieve
   3. [ ] Replace
   4. [ ] Update (Patch)
   5. [ ] Delete
-  6. [ ] Add custom WebApi parameter binding for group resource-type extensions / deserialization.
-4. Add support for bulk processing
-5. Add support for querying
+5. Add support for bulk processing
+6. Add support for querying
   1. [ ] Filtering (parsing into an expression tree is already done)
   2. [ ] Sorting
   3. [ ] Ordering
   4. [ ] Pagination
   5. [ ] Projection
-6. Add more extensiblity options
-7. Add authN / authZ
+7. Add more extensiblity options
+8. Add authN / authZ
