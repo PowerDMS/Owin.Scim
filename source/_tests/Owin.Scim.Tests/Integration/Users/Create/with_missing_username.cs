@@ -29,7 +29,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                     .ReadAsAsync<IEnumerable<ScimError>>(ScimJsonMediaTypeFormatter.AsArray())
                     .Result
                     .Single()
-                    .ScimErrorType
+                    .ScimType
                     .ShouldEqual(ScimErrorType.InvalidValue);
     }
 }

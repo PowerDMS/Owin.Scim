@@ -29,12 +29,11 @@
 
         public int Priority
         {
-            get { return 0; }
+            get { return -1; }
         }
 
         public void ConfigureContainer(IContainer container)
         {
-            // TODO: (DG) Create extensibility points for ScimServerConfiguration to register the below impl.
             container.RegisterDelegate<IProvideHashing>(r => _CryptograhyManager.HashProvider);
             container.Register<ISchemaTypeFactory, DefaultSchemaTypeFactory>(Reuse.Singleton);
             container.Register<IUserRepository, InMemoryUserRepository>(Reuse.InWebRequest);

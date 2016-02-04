@@ -43,7 +43,7 @@
 
         It should_return_no_target = async () => (await PatchResponse.Content.ReadAsAsync<IEnumerable<ScimError>>())
             .Single()
-            .ScimErrorType
+            .ScimType
             .ShouldEqual(ScimErrorType.NoTarget);
 
         protected static string UserId;

@@ -278,18 +278,22 @@ namespace Owin.Scim.Validation.Users
         {
             RuleSet("create", () =>
             {
-                RuleFor(user => user.UserName)
-                    .MustAsync(async userName =>
+                When(user => !string.IsNullOrWhiteSpace(user.UserName),
+                    () =>
                     {
-                        return await _UserRepository.IsUserNameAvailable(userName);
-                    })
-                    .WithState(u =>
-                        new ScimError(
-                            HttpStatusCode.Conflict,
-                            ScimErrorType.Uniqueness,
-                            ErrorDetail.AttributeUnique("userName")));
+                        RuleFor(user => user.UserName)
+                            .MustAsync(async userName =>
+                            {
+                                return await _UserRepository.IsUserNameAvailable(userName);
+                            })
+                            .WithState(u =>
+                                new ScimError(
+                                    HttpStatusCode.Conflict,
+                                    ScimErrorType.Uniqueness,
+                                    ErrorDetail.AttributeUnique("userName")));
+                    });
 
-                When(user => !String.IsNullOrWhiteSpace(user.Password),
+                When(user => !string.IsNullOrWhiteSpace(user.Password),
                     () =>
                     {
                         RuleFor(user => user.Password)

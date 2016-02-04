@@ -13,12 +13,12 @@
         [JsonConstructor]
         public ScimError(
             HttpStatusCode status, 
-            ScimErrorType scimErrorType = null,
+            ScimErrorType scimType = null,
             string detail = null)
         {
             _Schemas = new[] { ScimConstants.Messages.Error };
             Status = status;
-            ScimErrorType = scimErrorType;
+            ScimType = scimType;
             Detail = detail;
         }
         
@@ -31,7 +31,7 @@
         [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
         public HttpStatusCode Status { get; private set; }
 
-        public ScimErrorType ScimErrorType { get; set; }
+        public ScimErrorType ScimType { get; set; }
 
         public string Detail { get; set; }
     }
