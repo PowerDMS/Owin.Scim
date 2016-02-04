@@ -30,13 +30,8 @@
         [Route("users", Name = "CreateUser")]
         public async Task<HttpResponseMessage> Post(User user)
         {
-            return (await PostInternal(user))
+            return (await _UserService.CreateUser(user))
                 .ToHttpResponseMessage(Request, HttpStatusCode.Created);
-        }
-
-        internal async Task<IScimResponse<User>> PostInternal(User user)
-        {
-            return await _UserService.CreateUser(user);
         }
 
         [Route("users/{userId}", Name = "RetrieveUser")]
@@ -49,20 +44,22 @@
         [Route("users/{userId}", Name = "UpdateUser")]
         public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<User> patchRequest)
         {
+            if (patchRequest == null || patchRequest.Operations == null)
+            {
+                return new ScimErrorResponse<User>(
+                    new ScimError(
+                        HttpStatusCode.BadRequest,
+                        ScimErrorType.InvalidSyntax,
+                        "The patch request body is unparsable, syntactically incorrect, or violates schema."))
+                    .ToHttpResponseMessage(Request);
+            }
+
             return (await (await _UserService.RetrieveUser(userId))
                 .Bind<User, User>(user =>
                 {
-                    if (patchRequest == null || patchRequest.Operations == null)
-                    {
-                        return new ScimErrorResponse<User>(
-                            new ScimError(
-                                HttpStatusCode.BadRequest,
-                                ScimErrorType.InvalidSyntax,
-                                "The patch request body is unparsable, syntactically incorrect, or violates schema."));
-                    }
-
                     try
                     {
+                        // TODO: (DG) Finish patch support
                         var result = patchRequest.Operations.ApplyTo(
                             user,
                             new ScimObjectAdapter<User>(

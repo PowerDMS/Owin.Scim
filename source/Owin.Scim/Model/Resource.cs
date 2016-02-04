@@ -4,6 +4,11 @@
 
     public abstract class Resource : SchemaBase
     {
+        protected Resource()
+        {
+            Meta = new ResourceMetadata();
+        }
+
         [JsonProperty(Order = -5, PropertyName = "id")]
         public string Id { get; set; }
 

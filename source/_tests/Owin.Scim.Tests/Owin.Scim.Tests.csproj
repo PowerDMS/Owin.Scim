@@ -170,7 +170,6 @@
     <Compile Include="Services\UserService\Create\with_non_canonicalized_attributes.cs" />
     <Compile Include="Services\UserService\Update\when_updating_a_user.cs" />
     <Compile Include="Services\UserService\Update\with_a_new_password.cs" />
-    <Compile Include="Services\UserService\Update\with_a_password.cs" />
     <Compile Include="Services\UserService\Update\with_client_supplied_groups.cs" />
     <Compile Include="TaskExtensions.cs" />
     <Compile Include="Validation\Users\when_validating_an_existing_user.cs" />

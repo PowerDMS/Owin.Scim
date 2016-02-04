@@ -105,10 +105,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CanonicalizationRule.cs" />
+    <Compile Include="Configuration\DefaultSchemaTypeFactory.cs" />
     <Compile Include="Configuration\DryIocActivationProvider.cs" />
     <Compile Include="Configuration\DryIocManager.cs" />
     <Compile Include="Configuration\DryIocManagerBuilder.cs" />
     <Compile Include="Configuration\IConfigureDryIoc.cs" />
+    <Compile Include="Configuration\ISchemaTypeFactory.cs" />
+    <Compile Include="Configuration\SchemaBaseParameterBinding.cs" />
+    <Compile Include="Configuration\SchemaBaseParameterBindingAttribute.cs" />
+    <Compile Include="Configuration\SchemaBindingRule.cs" />
     <Compile Include="Configuration\ScimServerConfiguration.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />
@@ -137,6 +142,7 @@
     <Compile Include="Model\SchemaBase.cs" />
     <Compile Include="Model\ServiceProviderConfig.cs" />
     <Compile Include="Model\SortSupport.cs" />
+    <Compile Include="Model\Users\EnterpriseUserExtension.cs" />
     <Compile Include="Patching\Helpers\PatchMember.cs" />
     <Compile Include="Patching\PatchOperationResult.cs" />
     <Compile Include="Patching\PatchResult.cs" />

@@ -4,7 +4,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using System.Linq;
     using System.Net;
     using System.Net.Http;
-    using System.Net.Http.Formatting;
 
     using Machine.Specifications;
 
@@ -21,12 +20,16 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             };
         };
 
-        It should_return_bad_request = () => Response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+        It should_return_bad_request = 
+            () => Response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_contain_two_errors = () =>
-        {
-            var content = Response.Content.ReadAsAsync<IEnumerable<ScimError>>(ScimJsonMediaTypeFormatter.AsArray()).Result;
-            content.Count().ShouldEqual(2);
-        };
+        It should_return_invalid_value =
+            () =>
+                Response.Content
+                    .ReadAsAsync<IEnumerable<ScimError>>(ScimJsonMediaTypeFormatter.AsArray())
+                    .Result
+                    .Single()
+                    .ScimErrorType
+                    .ShouldEqual(ScimErrorType.InvalidValue);
     }
 }

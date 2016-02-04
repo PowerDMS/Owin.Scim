@@ -26,7 +26,15 @@
             _AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
 
             AddSchema(ScimConstants.Schemas.ServiceProviderConfig);
-            Meta = new ResourceMetadata {ResourceType = ScimConstants.ResourceTypes.ServiceProviderConfig};
+
+            /* 3.3.1.Resource Types
+             * When adding a resource to a specific endpoint, the meta attribute
+             * "resourceType" SHALL be set by the HTTP service provider to the
+             * corresponding resource type for the endpoint.  For example, a POST to
+             * the endpoint "/Users" will set "resourceType" to "User", and
+             * "/Groups" will set "resourceType" to "Group".
+             */
+            Meta.ResourceType = ScimConstants.ResourceTypes.ServiceProviderConfig;
         }
 
         [JsonProperty("name")]

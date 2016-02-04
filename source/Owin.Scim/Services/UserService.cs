@@ -62,8 +62,6 @@
             
             var userRecord = await _UserRepository.CreateUser(user);
 
-            userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
-
             return new ScimDataResponse<User>(userRecord);
         }
 
@@ -75,8 +73,6 @@
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ErrorDetail.NotFound(userId)));
-
-            userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
 
             return new ScimDataResponse<User>(userRecord);
         }
@@ -101,8 +97,6 @@
             }
 
             await _UserRepository.UpdateUser(userRecord);
-
-            userRecord.Password = null; // The password is writeOnly and MUST NOT be returned.
 
             return new ScimDataResponse<User>(userRecord);
         }

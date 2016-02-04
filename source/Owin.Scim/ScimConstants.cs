@@ -4,6 +4,8 @@
     {
         public static class Schemas
         {
+            public const string Key = @"schemas";
+
             public const string User = @"urn:ietf:params:scim:schemas:core:2.0:User";
 
             public const string UserEnterprise = @"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
@@ -17,6 +19,8 @@
 
         public static class Messages
         {
+            public const string UriPrefix = @"urn:ietf:params:scim:api:";
+
             public const string BulkRequest = @"urn:ietf:params:scim:api:messages:2.0:BulkRequest";
 
             public const string BulkResponse = @"urn:ietf:params:scim:api:messages:2.0:BulkResponse";

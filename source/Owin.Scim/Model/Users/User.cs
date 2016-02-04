@@ -18,7 +18,7 @@
              * the endpoint "/Users" will set "resourceType" to "User", and
              * "/Groups" will set "resourceType" to "Group".
              */
-            Meta = new ResourceMetadata {ResourceType = ScimConstants.ResourceTypes.User};
+            Meta.ResourceType = ScimConstants.ResourceTypes.User;
         }
 
         [JsonProperty(PropertyName = "externalId")]
@@ -100,6 +100,7 @@
         /// to specify an initial password when creating a new User or to reset an existing 
         /// User's password.
         /// </summary>
+        [JsonIgnore]
         public string Password { get; set; }
 
         /// <summary>

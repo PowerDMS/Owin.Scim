@@ -1,6 +1,8 @@
 ﻿namespace Owin.Scim.Model
 {
     using System;
+    using System.Globalization;
+    using System.Reflection;
 
     using Newtonsoft.Json;
 
@@ -23,6 +25,14 @@
         public static implicit operator string (ScimErrorType errorType)
         {
             return errorType == null ? null : errorType.ToString();
+        }
+
+        public static explicit operator ScimErrorType(string errorType)
+        {
+            return (ScimErrorType)typeof (ScimErrorType)
+                .GetTypeInfo()
+                .GetDeclaredProperty(char.ToUpper(errorType[0]) + errorType.Substring(1))
+                .GetValue(null, BindingFlags.Static | BindingFlags.Public, null, null, CultureInfo.CurrentUICulture);
         }
 
         public string Type

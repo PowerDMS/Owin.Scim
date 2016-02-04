@@ -1,5 +1,7 @@
 namespace Owin.Scim.Model.Users
 {
+    using Newtonsoft.Json;
+
     public class EnterpriseUser : User
     {
         public EnterpriseUser()
@@ -7,16 +9,7 @@ namespace Owin.Scim.Model.Users
             AddSchema(ScimConstants.Schemas.UserEnterprise);
         }
 
-        public string EmployeeNumber { get; set; }
-
-        public string CostCenter { get; set; }
-
-        public string Organization { get; set; }
-
-        public string Division { get; set; }
-
-        public string Department { get; set; }
-
-        public Manager Manager { get; set; }
+        [JsonProperty(ScimConstants.Schemas.UserEnterprise)]
+        public EnterpriseUserExtension Enterprise { get; set; }
     }
 }

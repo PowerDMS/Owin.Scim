@@ -14,6 +14,8 @@
 
     using Middleware;
 
+    using Model;
+
     using NContext.Configuration;
     using NContext.EventHandling;
     using NContext.Extensions.Ninject.Configuration;
@@ -88,6 +90,18 @@
                 IgnoreSerializableAttribute = true,
                 IgnoreSerializableInterface = true
             };
+
+            httpConfiguration.ParameterBindingRules.Insert(
+                0,
+                descriptor =>
+                {
+                    if (typeof(SchemaBase).IsAssignableFrom(descriptor.ParameterType))
+                        return new SchemaBaseParameterBinding(
+                            descriptor, 
+                            descriptor.Configuration.DependencyResolver.GetService(typeof(ISchemaTypeFactory)) as ISchemaTypeFactory);
+
+                    return null;
+                });
 
             // refer to https://tools.ietf.org/html/rfc7644#section-3.1
             httpConfiguration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("application/scim+json"));
