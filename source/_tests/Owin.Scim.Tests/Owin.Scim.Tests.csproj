@@ -108,6 +108,7 @@
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
     <Compile Include="Integration\Users\Create\with_an_enterprise_user.cs" />
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
+    <Compile Include="Integration\Users\Create\with_missing_schema.cs" />
     <Compile Include="Integration\Users\Create\with_missing_username.cs" />
     <Compile Include="Integration\Users\Create\with_multiple_validation_errors.cs" />
     <Compile Include="Integration\Users\Delete\when_deleting_a_user.cs" />
