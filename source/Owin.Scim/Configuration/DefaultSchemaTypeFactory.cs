@@ -3,6 +3,9 @@
     using System;
     using System.Collections.Generic;
 
+    using Model;
+    using ErrorHandling;
+
     public class DefaultSchemaTypeFactory : ISchemaTypeFactory
     {
         private readonly ScimServerConfiguration _ServerConfiguration;
@@ -20,7 +23,10 @@
                     return schemaBindingRule.Target;
             }
 
-            throw new Exception("Unsupported schema!"); // TODO: (DG) unsupported schema or no binding rules to handle it
+            throw new ScimError(System.Net.HttpStatusCode.BadRequest,
+                ScimErrorType.InvalidValue,
+                "Unsupported schema!")
+                .ToResponseException();
         }
     }
 }

@@ -124,6 +124,7 @@
     <Compile Include="Endpoints\ServiceProviderConfigController.cs" />
     <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="ErrorHandling\ErrorDetail.cs" />
+    <Compile Include="ErrorHandling\ScimErrorExtensions.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
     <Compile Include="Extensions\DelegateExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />

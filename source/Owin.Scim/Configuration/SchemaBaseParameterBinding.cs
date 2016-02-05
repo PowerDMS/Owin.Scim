@@ -11,6 +11,8 @@
     
     using Newtonsoft.Json.Linq;
 
+    using ErrorHandling;
+    using Model;
     using Patching.Helpers;
 
     public class SchemaBaseParameterBinding : HttpParameterBinding
@@ -47,7 +49,12 @@
                 .Deserialize<IDictionary<string, object>>(jsonReader);
 
             if (!dictionary.ContainsCaseInsensitiveKey(ScimConstants.Schemas.Key))
-                throw new Exception(""); // TODO: (DG) invalid scim message
+            {
+                throw new ScimError(System.Net.HttpStatusCode.BadRequest,
+                    ScimErrorType.InvalidValue,
+                    ErrorDetail.AttributeRequired(ScimConstants.Schemas.Key))
+                    .ToResponseException();
+            }
 
             var schemasValue = dictionary.GetValueForCaseInsensitiveKey(ScimConstants.Schemas.Key);
             if (schemasValue == null)
