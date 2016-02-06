@@ -9,13 +9,15 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
     using Model.Users;
 
-    public class with_a_valid_user : when_creating_a_user
+    public class with_a_fully_populated_user : when_creating_a_user
     {
         Establish context = () =>
         {
+            var userName = UserNameUtility.GenerateUserName();
             UserDto = new User
             {
-                UserName = UserNameUtility.GenerateUserName()
+                UserName = userName,
+                ExternalId = "Id-" + userName
             };
         };
 

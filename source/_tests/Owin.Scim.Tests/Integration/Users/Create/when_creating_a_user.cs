@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
+    using System.Net;
     using System.Net.Http;
 
     using Machine.Specifications;
@@ -15,9 +16,15 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 .PostAsync("users", new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
+
+            CreatedUser = Response.StatusCode == HttpStatusCode.Created
+                ? Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                : null;
         };
         
         protected static User UserDto;
+
+        protected static User CreatedUser;
 
         protected static HttpResponseMessage Response;
     }
