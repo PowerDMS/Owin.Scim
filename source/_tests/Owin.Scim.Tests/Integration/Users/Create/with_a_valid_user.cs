@@ -2,6 +2,7 @@ using System.Linq;
 
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
+    using System;
     using System.Net;
     using System.Net.Http;
 
@@ -13,6 +14,8 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     {
         Establish context = () =>
         {
+            CurrentUtcDateTime = DateTime.UtcNow;
+
             UserDto = new User
             {
                 UserName = UserNameUtility.GenerateUserName()
@@ -25,11 +28,12 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_the_user = () => CreatedUser.Id.ShouldNotBeEmpty();
 
-        private It should_return_meta = () =>
+        It should_return_meta = () =>
         {
             CreatedUser.Meta.ShouldNotBeNull();
             CreatedUser.Meta.ResourceType.ShouldEqual("User");
             CreatedUser.Meta.Created.ShouldNotBeNull();
+            CreatedUser.Meta.Created.ShouldBeGreaterThanOrEqualTo(CurrentUtcDateTime);
             CreatedUser.Meta.LastModified.ShouldEqual(CreatedUser.Meta.Created);
             CreatedUser.Meta.Location.ShouldNotBeNull();
         };
@@ -39,5 +43,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             CreatedUser.Schemas.ShouldEqual(UserDto.Schemas);
             CreatedUser.UserName.ShouldEqual(UserDto.UserName);
         };
+
+        private static DateTime CurrentUtcDateTime;
     }
 }

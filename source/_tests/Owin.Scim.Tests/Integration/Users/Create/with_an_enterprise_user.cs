@@ -23,6 +23,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);
 
-        It should_return_the_user = () => Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result.Id.ShouldNotBeEmpty();
+        It should_return_the_user = () => CreatedUser.Id.ShouldNotBeEmpty();
     }
 }

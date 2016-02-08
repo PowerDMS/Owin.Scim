@@ -37,12 +37,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_bad_request = () => Response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_contain_two_errors = 
-            () => 
-            Response.Content
-                .ReadAsAsync<IEnumerable<ScimError>>(ScimJsonMediaTypeFormatter.AsArray())
-                .Result
-                .Count()
-                .ShouldEqual(2);
+        It should_contain_two_errors = () => Error.Count().ShouldEqual(2);
     }
 }

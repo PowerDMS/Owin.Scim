@@ -24,11 +24,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             () => Response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
         It should_return_invalid_value =
-            () =>
-                Response.Content
-                    .ReadAsAsync<IEnumerable<ScimError>>(ScimJsonMediaTypeFormatter.AsArray())
-                    .Result
-                    .Single()
+            () => Error.Single()
                     .ScimType
                     .ShouldEqual(ScimErrorType.InvalidValue);
     }
