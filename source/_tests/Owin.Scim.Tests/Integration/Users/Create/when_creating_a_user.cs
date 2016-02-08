@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
 
@@ -20,6 +21,10 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
                 ? Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result
                 : null;
+
+            Error = Response.StatusCode == HttpStatusCode.BadRequest
+                ? Response.Content.ReadAsAsync<IEnumerable<Model.ScimError>>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                : null;
         };
         
         protected static User UserDto;
@@ -27,5 +32,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         protected static User CreatedUser;
 
         protected static HttpResponseMessage Response;
+
+        protected static IEnumerable<Model.ScimError> Error;
     }
 }

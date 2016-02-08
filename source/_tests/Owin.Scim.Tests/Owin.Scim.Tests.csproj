@@ -81,6 +81,10 @@
     <Reference Include="Owin.Scim.Antlr">
       <HintPath>..\..\lib\Owin.Scim.Antlr.dll</HintPath>
     </Reference>
+    <Reference Include="Ploeh.AutoFixture, Version=3.40.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoFixture.3.40.0\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
@@ -108,7 +112,7 @@
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
     <Compile Include="Integration\Users\Create\with_an_enterprise_user.cs" />
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
-    <Compile Include="Integration\Users\Create\with_a_fully_populated_user.cs" />
+    <Compile Include="Integration\Users\Create\with_a_fully_populated_simple_attributes_user.cs" />
     <Compile Include="Integration\Users\Create\with_invalid_schema.cs" />
     <Compile Include="Integration\Users\Create\with_content_type_json.cs" />
     <Compile Include="Integration\Users\Create\with_missing_schema.cs" />
