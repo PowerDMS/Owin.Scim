@@ -14,7 +14,8 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     {
         Establish context = () =>
         {
-            CurrentUtcDateTime = DateTime.UtcNow;
+            // TODO: CY - still worry that server is emitting dates in the server's timezone
+            CurrentUtcDateTime = DateTime.Now;
 
             UserDto = new User
             {

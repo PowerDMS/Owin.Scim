@@ -50,7 +50,8 @@
         }
 
         public bool RequireSsl { get; set; }
-
+        
+        // TODO: should we make this Uri instead of string?
         public string PublicOrigin { get; set; }
 
         public IEnumerable<AuthenticationScheme> AuthenticationSchemes

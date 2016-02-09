@@ -30,6 +30,9 @@
         [Route("users", Name = "CreateUser")]
         public async Task<HttpResponseMessage> Post(User user)
         {
+            // TODO: better way to clear (or not de-serialize) read only attributes
+            user.Meta = null;
+
             return (await _UserService.CreateUser(user))
                 .ToHttpResponseMessage(Request, HttpStatusCode.Created);
         }

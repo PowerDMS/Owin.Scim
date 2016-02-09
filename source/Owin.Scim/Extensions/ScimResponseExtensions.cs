@@ -117,9 +117,17 @@
                 responseStatusCode = GetStatusCode(scimResponse.GetLeft());
             }
 
-            return ShouldSetResponseContent(httpRequestMessage, responseStatusCode)
+            var response = ShouldSetResponseContent(httpRequestMessage, responseStatusCode)
                 ? httpRequestMessage.CreateResponse(responseStatusCode, scimResponse.GetContent())
                 : httpRequestMessage.CreateResponse(responseStatusCode);
+
+            var resource = scimResponse.IsRight ? scimResponse.GetRight() as Resource : default(Resource);
+            if (resource?.Meta?.Location != null)
+            {
+                response.Headers.Location = resource.Meta.Location;
+            } 
+
+            return response;
         }
 
         /// <summary>
