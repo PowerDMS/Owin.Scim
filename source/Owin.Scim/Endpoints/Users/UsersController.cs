@@ -34,7 +34,15 @@
             user.Meta = null;
 
             return (await _UserService.CreateUser(user))
-                .ToHttpResponseMessage(Request, HttpStatusCode.Created);
+                .ToHttpResponseMessage(Request, (userDto, response) =>
+                {
+                    response.StatusCode = HttpStatusCode.Created;
+
+                    if (userDto.Meta?.Location != null)
+                    {
+                        response.Headers.Location = userDto.Meta.Location;
+                    }
+                });
         }
 
         [Route("users/{userId}", Name = "RetrieveUser")]

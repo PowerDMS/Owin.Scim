@@ -121,12 +121,6 @@
                 ? httpRequestMessage.CreateResponse(responseStatusCode, scimResponse.GetContent())
                 : httpRequestMessage.CreateResponse(responseStatusCode);
 
-            var resource = scimResponse.IsRight ? scimResponse.GetRight() as Resource : default(Resource);
-            if (resource?.Meta?.Location != null)
-            {
-                response.Headers.Location = resource.Meta.Location;
-            } 
-
             return response;
         }
 
