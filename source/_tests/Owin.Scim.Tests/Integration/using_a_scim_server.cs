@@ -24,7 +24,8 @@
                 app.UseScimServer(
                     new ScimServerConfiguration
                     {
-                        RequireSsl = false
+                        RequireSsl = false,
+                        PublicOrigin = "https://helloworld.org/scim/v2"
                     }
                     .AddAuthenticationScheme(
                         new AuthenticationScheme(

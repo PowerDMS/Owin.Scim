@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Extensions
 {
     using System;
+    using System.Collections.Generic;
     using System.Security.Cryptography;
     using System.IO;
     using System.Linq;
@@ -46,6 +47,25 @@
                 },
                 new AsyncExecutionFlowScopeContext())
                 .WithWebApi(httpConfig);
+
+            // TODO: CY is there a better way to obtain host address from Owin?
+            if (String.IsNullOrEmpty(serverConfig.PublicOrigin) && app.Properties.ContainsKey("host.Addresses"))
+            {
+                dynamic test = app.Properties["host.Addresses"];
+                var items = (Dictionary<string, object>) test[0];
+
+                var port = items.ContainsKey("port")
+                    ? Int32.Parse(items["port"].ToString())
+                    : -1;
+
+                var uriBuilder = new UriBuilder(
+                    items.ContainsKey("scheme") ? items["scheme"].ToString() : null,
+                    items.ContainsKey("host") ? items["host"].ToString() : null,
+                    (port != 80 && port != 443) ? port : -1,
+                    items.ContainsKey("path") ? items["path"].ToString() : null);
+
+                serverConfig.PublicOrigin = uriBuilder.ToString();
+            }
 
             container.RegisterInstance<ScimServerConfiguration>(serverConfig, Reuse.Singleton);
             

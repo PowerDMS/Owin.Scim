@@ -7,6 +7,7 @@
     using System.Threading.Tasks;
 
     using Model.Users;
+    using Configuration;
 
     using NContext.Security.Cryptography;
 
@@ -14,14 +15,26 @@
     {
         private readonly IList<User> _Users;
 
-        public InMemoryUserRepository()
+        private readonly ScimServerConfiguration _scimServerConfiguration;
+
+        public InMemoryUserRepository(ScimServerConfiguration serverConfiguration)
         {
             _Users = new List<User>();
+            _scimServerConfiguration = serverConfiguration;
         }
 
         public async Task<User> CreateUser(User user)
         {
             user.Id = Guid.NewGuid().ToString();
+
+            var createdDate = DateTime.UtcNow;
+            user.Meta = new Model.ResourceMetadata()
+            {
+                ResourceType = ScimConstants.ResourceTypes.User,
+                Created = createdDate,
+                LastModified = createdDate,
+                Location = new Uri(new Uri(_scimServerConfiguration.PublicOrigin), ScimConstants.ResourceTypes.User + @"/" + user.Id)
+            };
 
             _Users.Add(user);
 

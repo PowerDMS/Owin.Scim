@@ -117,9 +117,11 @@
                 responseStatusCode = GetStatusCode(scimResponse.GetLeft());
             }
 
-            return ShouldSetResponseContent(httpRequestMessage, responseStatusCode)
+            var response = ShouldSetResponseContent(httpRequestMessage, responseStatusCode)
                 ? httpRequestMessage.CreateResponse(responseStatusCode, scimResponse.GetContent())
                 : httpRequestMessage.CreateResponse(responseStatusCode);
+
+            return response;
         }
 
         /// <summary>
