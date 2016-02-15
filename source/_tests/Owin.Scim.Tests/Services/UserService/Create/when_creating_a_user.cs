@@ -40,11 +40,15 @@
                     return Task.FromResult(user);
                 });
 
+            var etagProvider = A.Fake<IResourceETagProvider>();
             _UserService = new UserService(
                 ServerConfiguration,
                 UserRepository, 
                 PasswordManager,
-                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager));
+                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
+            {
+                ETagProvider = etagProvider
+            };
         };
 
         Because of = async () => Result = await _UserService.CreateUser(ClientUserDto).AwaitResponse().AsTask;

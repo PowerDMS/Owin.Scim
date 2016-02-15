@@ -30,11 +30,15 @@
             A.CallTo(() => UserRepository.UpdateUser(A<User>._))
                 .ReturnsLazily(c => Task.FromResult((User)c.Arguments[0]));
 
+            var etagProvider = A.Fake<IResourceETagProvider>();
             _UserService = new UserService(
                 ServerConfiguration,
-                UserRepository, 
-                PasswordManager, 
-                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager));
+                UserRepository,
+                PasswordManager,
+                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
+            {
+                ETagProvider = etagProvider
+            };
         };
 
         Because of = async () => Result = await _UserService.UpdateUser(ClientUserDto).AwaitResponse().AsTask;
