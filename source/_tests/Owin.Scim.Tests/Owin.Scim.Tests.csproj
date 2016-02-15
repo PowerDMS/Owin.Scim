@@ -206,6 +206,11 @@
     <Compile Include="Validation\Users\with_invalid_emails.cs" />
     <Compile Include="Validation\Users\with_no_username.cs" />
     <Compile Include="Validation\Users\with_valid_emails.cs" />
+    <Compile Include="Versioning\when_generating_etag_version.cs" />
+    <Compile Include="Versioning\with_alternate_property_values.cs" />
+    <Compile Include="Versioning\with_different_default_multi_valued_attributes.cs" />
+    <Compile Include="Versioning\with_different_derived_multi_valued_attributes.cs" />
+    <Compile Include="Versioning\with_enterprise_users.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Owin.Scim\Owin.Scim.csproj">

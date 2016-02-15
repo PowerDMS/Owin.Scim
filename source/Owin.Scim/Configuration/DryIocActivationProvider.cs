@@ -5,6 +5,7 @@
     using DryIoc;
 
     using NContext.EventHandling;
+
     public class DryIocActivationProvider : IActivationProvider
     {
         private readonly IContainer _Container;

@@ -23,6 +23,7 @@
     {
         Establish context = () =>
         {
+            ServerConfiguration = A.Fake<ScimServerConfiguration>();
             UserRepository = A.Fake<IUserRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
             PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
@@ -40,7 +41,7 @@
                 });
 
             _UserService = new UserService(
-                new ScimServerConfiguration(), 
+                ServerConfiguration,
                 UserRepository, 
                 PasswordManager,
                 new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager));
@@ -49,6 +50,8 @@
         Because of = async () => Result = await _UserService.CreateUser(ClientUserDto).AwaitResponse().AsTask;
 
         protected static User ClientUserDto;
+
+        protected static ScimServerConfiguration ServerConfiguration;
 
         protected static IUserRepository UserRepository;
 

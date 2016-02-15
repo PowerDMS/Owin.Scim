@@ -2,6 +2,9 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq.Expressions;
+
+    using Extensions;
 
     using Newtonsoft.Json;
 
@@ -152,5 +155,40 @@
         /// A list of certificates issued to the User.
         /// </summary>
         public IEnumerable<X509Certificate> X509Certificates { get; set; }
+
+        public override string GenerateETagHash()
+        {
+            return GenerateETagHashInternal().ToString();
+        }
+
+        protected int GenerateETagHashInternal()
+        {
+            return new
+            {
+                Active,
+                ExternalId,
+                Locale,
+                Id,
+                Name,
+                NickName,
+                DisplayName,
+                Password,
+                PreferredLanguage,
+                ProfileUrl,
+                Timezone,
+                Title,
+                UserName,
+                UserType,
+                Addresses = Addresses.GetMultiValuedAttributeCollectionETagHashCode(),
+                Emails = Emails.GetMultiValuedAttributeCollectionETagHashCode(),
+                Entitlements = Entitlements.GetMultiValuedAttributeCollectionETagHashCode(),
+                Groups = Groups.GetMultiValuedAttributeCollectionETagHashCode(),
+                Ims = Ims.GetMultiValuedAttributeCollectionETagHashCode(),
+                PhoneNumbers = PhoneNumbers.GetMultiValuedAttributeCollectionETagHashCode(),
+                Photos = Photos.GetMultiValuedAttributeCollectionETagHashCode(),
+                Roles = Roles.GetMultiValuedAttributeCollectionETagHashCode(),
+                X509Certificates = X509Certificates.GetMultiValuedAttributeCollectionETagHashCode()
+            }.GetHashCode();
+        }
     }
 }

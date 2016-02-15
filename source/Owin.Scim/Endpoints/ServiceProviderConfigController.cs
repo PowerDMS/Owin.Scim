@@ -9,22 +9,17 @@
 
     using Model;
 
-    public class ServiceProviderConfigController : ApiController
+    public class ServiceProviderConfigController : ControllerBase
     {
-        private readonly ScimServerConfiguration _Configuration;
-
-        public ServiceProviderConfigController(ScimServerConfiguration configuration)
+        public ServiceProviderConfigController(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
-            _Configuration = configuration;
         }
 
         [Route("serviceproviderconfig", Name = "ServiceProviderConfig")]
         public async Task<HttpResponseMessage> Get()
         {
-            return Request.CreateResponse(
-                HttpStatusCode.OK,
-                new ServiceProviderConfig(
-                    _Configuration.AuthenticationSchemes));
+            return Request.CreateResponse(HttpStatusCode.OK, (ServiceProviderConfig)ServerConfiguration);
         }
     }
 }

@@ -6,6 +6,8 @@
     using System.Threading.Tasks;
     using System.Web.Http;
 
+    using Configuration;
+
     using Extensions;
 
     using Model;
@@ -18,11 +20,14 @@
 
     using Services;
 
-    public class UsersController : ApiController
+    public class UsersController : ControllerBase
     {
         private readonly IUserService _UserService;
 
-        public UsersController(IUserService userService)
+        public UsersController(
+            ScimServerConfiguration serverConfiguration,
+            IUserService userService)
+            : base(serverConfiguration)
         {
             _UserService = userService;
         }
@@ -30,18 +35,13 @@
         [Route("users", Name = "CreateUser")]
         public async Task<HttpResponseMessage> Post(User user)
         {
-            // TODO: better way to clear (or not de-serialize) read only attributes
-            user.Meta = null;
-
             return (await _UserService.CreateUser(user))
                 .ToHttpResponseMessage(Request, (userDto, response) =>
                 {
                     response.StatusCode = HttpStatusCode.Created;
 
-                    if (userDto.Meta?.Location != null)
-                    {
-                        response.Headers.Location = userDto.Meta.Location;
-                    }
+                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
+                    SetETagHeader(response, userDto);
                 });
         }
 
@@ -49,7 +49,11 @@
         public async Task<HttpResponseMessage> Get(string userId)
         {
             return (await _UserService.RetrieveUser(userId))
-                .ToHttpResponseMessage(Request);
+                .ToHttpResponseMessage(Request, (userDto, response) =>
+                {
+                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
+                    SetETagHeader(response, userDto);
+                });
         }
         
         [Route("users/{userId}", Name = "UpdateUser")]
@@ -84,7 +88,11 @@
                     }
                 })
                 .BindAsync(user => _UserService.UpdateUser(user)))
-                .ToHttpResponseMessage(Request);
+                .ToHttpResponseMessage(Request, (userDto, response) =>
+                {
+                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
+                    SetETagHeader(response, userDto);
+                });
         }
 
         [AcceptVerbs("PUT", "OPTIONS")]
@@ -104,7 +112,11 @@
             }
 
             return (await _UserService.UpdateUser(user))
-                .ToHttpResponseMessage(Request);
+                .ToHttpResponseMessage(Request, (userDto, response) =>
+                {
+                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
+                    SetETagHeader(response, userDto);
+                });
         }
 
         [Route("users/{userId}", Name = "DeleteUser")]

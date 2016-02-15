@@ -19,7 +19,6 @@
 
     using NContext.Configuration;
     using NContext.EventHandling;
-    using NContext.Extensions.Ninject.Configuration;
     using NContext.Security.Cryptography;
 
     using Newtonsoft.Json;
@@ -74,10 +73,13 @@
                 : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             ApplicationConfiguration appConfig = new ApplicationConfigurationBuilder()
-                .ComposeWith(new[] { executionDirectory },
-                    fileInfo => 
-                    fileInfo.Name.StartsWith("Owin.Scim", StringComparison.OrdinalIgnoreCase) && 
-                    new[] { ".dll" }.Contains(fileInfo.Extension.ToLower()))
+                .ComposeWith(
+                    new[] { executionDirectory },
+                    new Predicate<FileInfo>[] {
+                        fileInfo => 
+                        fileInfo.Name.StartsWith("Owin.Scim", StringComparison.OrdinalIgnoreCase) && 
+                        new[] { ".dll" }.Contains(fileInfo.Extension.ToLower()) }
+                    .Append(serverConfig.CompositionFileInfoConstraints.ToArray()))
                 .RegisterComponent<IManageCryptography>()
                     .With<CryptographyManagerBuilder>()
                         .SetDefaults<SHA256Cng, HMACSHA256, AesCryptoServiceProvider>()

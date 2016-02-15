@@ -11,7 +11,6 @@
     using Extensions;
 
     using FluentValidation;
-    using FluentValidation.Internal;
 
     using Microsoft.FSharp.Core;
 
@@ -29,10 +28,8 @@
 
     using PhoneNumber = Model.Users.PhoneNumber;
 
-    public class UserService : IUserService
+    public class UserService : ServiceBase, IUserService
     {
-        private readonly ScimServerConfiguration _ServerConfiguration;
-
         private readonly IUserRepository _UserRepository;
 
         private readonly IManagePasswords _PasswordManager;
@@ -44,8 +41,8 @@
             IUserRepository userRepository,
             IManagePasswords passwordManager,
             UserValidatorFactory userValidatorFactory)
+            : base(serverConfiguration)
         {
-            _ServerConfiguration = serverConfiguration;
             _UserRepository = userRepository;
             _PasswordManager = passwordManager;
             _UserValidatorFactory = userValidatorFactory;
@@ -61,14 +58,14 @@
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors);
             
-            var userRecord = await _UserRepository.CreateUser(user);
+            var userRecord = CalculateVersion(await _UserRepository.CreateUser(user));
 
             return new ScimDataResponse<User>(userRecord);
         }
 
         public async Task<IScimResponse<User>> RetrieveUser(string userId)
         {
-            var userRecord = await _UserRepository.GetUser(userId);
+            var userRecord = CalculateVersion(await _UserRepository.GetUser(userId));
             if (userRecord == null)
                 return new ScimErrorResponse<User>(
                     new ScimError(
@@ -98,6 +95,8 @@
             }
 
             await _UserRepository.UpdateUser(userRecord);
+
+            CalculateVersion(userRecord);
 
             return new ScimDataResponse<User>(userRecord);
         }

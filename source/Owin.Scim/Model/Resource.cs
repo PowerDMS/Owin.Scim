@@ -11,7 +11,9 @@
 
         [JsonProperty(Order = -5, PropertyName = "id")]
         public string Id { get; set; }
-
+        
         public ResourceMetadata Meta { get; set; }
+
+        public abstract string GenerateETagHash();
     }
 }

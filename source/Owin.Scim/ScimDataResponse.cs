@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Model
+﻿namespace Owin.Scim
 {
     using System;
     using System.Collections;
@@ -6,6 +6,8 @@
     using System.Collections.ObjectModel;
     using System.Linq;
     using System.Reflection;
+
+    using Model;
 
     using NContext.Common;
 

@@ -13,5 +13,25 @@
         public string PostalCode { get; set; }
 
         public string Country { get; set; }
+
+        protected internal override int GetETagHashCode()
+        {
+            unchecked
+            {
+                var hash = 19;
+                hash = hash * 31 + base.GetETagHashCode();
+                hash = hash * 31 + new
+                {
+                    Formatted,
+                    StreetAddress,
+                    Locality,
+                    Region,
+                    PostalCode,
+                    Country
+                }.GetHashCode();
+
+                return hash;
+            }
+        }
     }
 }

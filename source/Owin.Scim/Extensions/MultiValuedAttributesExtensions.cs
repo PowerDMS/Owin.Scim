@@ -3,6 +3,8 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Configuration;
+
     using Model;
 
     using NContext.Extensions;
@@ -31,6 +33,25 @@
                     stateCache[rule] = state;
                 });
             });
+        }
+
+        public static int GetMultiValuedAttributeCollectionETagHashCode<T>(
+            this IEnumerable<T> multiValuedAttributes)
+            where T : MultiValuedAttribute
+        {
+            if (multiValuedAttributes == null)
+                return 0;
+
+            unchecked
+            {
+                int hash = 19;
+                foreach (var mva in multiValuedAttributes)
+                {
+                    hash = hash * 31 + (mva?.GetETagHashCode() ?? 0);
+                }
+
+                return hash;
+            }
         }
     }
 }

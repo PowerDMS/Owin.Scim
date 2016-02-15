@@ -27,13 +27,16 @@
                         RequireSsl = false,
                         PublicOrigin = "https://helloworld.org/scim/v2"
                     }
+                    .AddCompositionConditions(
+                        fileInfo => fileInfo.Name.StartsWith("Sample.Host.Console", StringComparison.OrdinalIgnoreCase))
                     .AddAuthenticationScheme(
                         new AuthenticationScheme(
                             "oauthbearertoken",
                             "OAuth Bearer Token",
                             "Authentication scheme using the OAuth Bearer Token standard.", 
                             specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
-                            isPrimary: true)));
+                            isPrimary: true))
+                    .ConfigureETag(true, true));
             });
             //ncrunch: no coverage end
         }

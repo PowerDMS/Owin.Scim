@@ -14,7 +14,7 @@
     using Security;
 
     using Services;
-
+    
     using Validation.Users;
 
     public class Registry : IConfigureDryIoc
@@ -39,7 +39,10 @@
             container.Register<IUserRepository, InMemoryUserRepository>(Reuse.InWebRequest);
             container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
             container.Register<IVerifyPasswordComplexity, DefaultPasswordComplexityVerifier>(Reuse.Singleton);
-            container.Register<IUserService, UserService>(Reuse.Singleton);
+            container.Register<IResourceETagProvider, DefaultETagProvider>(Reuse.Singleton);
+            container.Register<IUserService, UserService>(
+                reuse: Reuse.Singleton,
+                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
             container.Register<UserValidatorFactory>(Reuse.Singleton);
         }
     }

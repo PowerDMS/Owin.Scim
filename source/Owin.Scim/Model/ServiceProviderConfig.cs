@@ -3,28 +3,35 @@
     using System.Collections.Generic;
     using System.Linq;
 
+    using Extensions;
+
     using Newtonsoft.Json;
 
     public class ServiceProviderConfig : Resource
     {
-        private readonly PatchSupprt _Patch = new PatchSupprt();
+        private readonly ScimFeature _Patch;
 
-        private readonly BulkSupport _Bulk = new BulkSupport();
+        private readonly ScimFeature _Bulk;
 
-        private readonly FilterSupport _Filter = new FilterSupport();
+        private readonly ScimFeature _Filter;
 
-        private readonly ChangePasswordSupport _ChangePassword = new ChangePasswordSupport();
+        private readonly ScimFeature _ChangePassword;
 
-        private readonly SortSupport _Sort = new SortSupport();
+        private readonly ScimFeature _Sort;
 
-        private readonly ETagSupport _ETag = new ETagSupport();
+        private readonly ScimFeature _ETag;
 
-        private readonly IEnumerable<AuthenticationScheme> _AuthenticationSchemes; 
+        private readonly IEnumerable<AuthenticationScheme> _AuthenticationSchemes;
 
-        public ServiceProviderConfig(IEnumerable<AuthenticationScheme> authenticationSchemes = null)
+        public ServiceProviderConfig(
+            ScimFeature featurePatch,
+            ScimFeatureBulk featureBulk,
+            ScimFeatureFilter featureFilter,
+            ScimFeature featureChangePassword,
+            ScimFeature featureSort,
+            ScimFeature featureETag,
+            IEnumerable<AuthenticationScheme> authenticationSchemes = null)
         {
-            _AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
-
             AddSchema(ScimConstants.Schemas.ServiceProviderConfig);
 
             /* 3.3.1.Resource Types
@@ -35,6 +42,14 @@
              * "/Groups" will set "resourceType" to "Group".
              */
             Meta.ResourceType = ScimConstants.ResourceTypes.ServiceProviderConfig;
+
+            _Bulk = featureBulk ?? ScimFeatureBulk.CreateUnsupported();
+            _Filter = featureFilter ?? ScimFeatureFilter.CreateUnsupported();
+            _Patch = featurePatch;
+            _ChangePassword = featureChangePassword;
+            _Sort = featureSort;
+            _ETag = featureETag;
+            _AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
         }
 
         [JsonProperty("name")]
@@ -62,27 +77,44 @@
         }
 
         [JsonProperty("patch")]
-        public PatchSupprt Patch { get { return _Patch; } }
+        public ScimFeature Patch { get { return _Patch; } }
 
         [JsonProperty("bulk")]
-        public BulkSupport Bulk { get { return _Bulk; } }
+        public ScimFeature Bulk { get { return _Bulk; } }
 
         [JsonProperty("filter")]
-        public FilterSupport Filter { get { return _Filter; } }
+        public ScimFeature Filter { get { return _Filter; } }
 
         [JsonProperty("changePassword")]
-        public ChangePasswordSupport ChangePassword { get { return _ChangePassword; } }
+        public ScimFeature ChangePassword { get { return _ChangePassword; } }
 
         [JsonProperty("sort")]
-        public SortSupport Sort { get { return _Sort; } }
+        public ScimFeature Sort { get { return _Sort; } }
 
         [JsonProperty("etag")]
-        public ETagSupport ETag { get { return _ETag; } }
+        public ScimFeature ETag { get { return _ETag; } }
 
         [JsonProperty("authenticationSchemes")]
         public IEnumerable<AuthenticationScheme> AuthenticationSchemes
         {
             get { return _AuthenticationSchemes; }
+        }
+
+        public override string GenerateETagHash()
+        {
+            return new
+            {
+                Name,
+                Description,
+                DocumentationUri,
+                Patch = Patch.GetETagHashCode(),
+                Bulk = Bulk.GetETagHashCode(),
+                Filter = Filter.GetETagHashCode(),
+                ChangePassword = ChangePassword.GetETagHashCode(),
+                Sort = Sort.GetETagHashCode(),
+                ETag = ETag.GetETagHashCode(),
+                AuthenticationSchemes = AuthenticationSchemes.GetMultiValuedAttributeCollectionETagHashCode()
+            }.GetHashCode().ToString();
         }
     }
 }

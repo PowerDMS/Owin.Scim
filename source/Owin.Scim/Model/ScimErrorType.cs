@@ -6,6 +6,8 @@
 
     using Newtonsoft.Json;
 
+    using Serialization;
+
     [JsonConverter(typeof(ScimErrorTypeConverter))]
     public sealed class ScimErrorType : IEquatable<ScimErrorType>
     {

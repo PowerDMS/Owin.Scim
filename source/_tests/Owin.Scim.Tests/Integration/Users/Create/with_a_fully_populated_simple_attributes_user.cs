@@ -1,5 +1,3 @@
-using System.Linq;
-
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
     using System.Net;
@@ -9,10 +7,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Model.Users;
 
     using Ploeh.AutoFixture;
-
-    /// <summary>
-    /// What gets popu
-    /// </summary>
+    
     public class with_a_fully_populated_simple_attributes_user : when_creating_a_user
     {
         Establish context = () =>
@@ -40,13 +35,14 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_the_user = () => CreatedUser.Id.ShouldNotBeEmpty();
 
-        private It should_return_meta = () =>
+        It should_return_meta = () =>
         {
             CreatedUser.Meta.ShouldNotBeNull();
             CreatedUser.Meta.ResourceType.ShouldEqual("User");
             CreatedUser.Meta.Created.ShouldNotBeNull();
             CreatedUser.Meta.LastModified.ShouldEqual(CreatedUser.Meta.Created);
             CreatedUser.Meta.Location.ShouldNotBeNull();
+            CreatedUser.Meta.Version.ShouldNotBeNull();
         };
 
         It should_echo_create_values = () =>

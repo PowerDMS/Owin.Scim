@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim
+﻿namespace Owin.Scim.Configuration
 {
     using Model;
 

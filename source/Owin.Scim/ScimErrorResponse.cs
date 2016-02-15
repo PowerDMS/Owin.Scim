@@ -1,7 +1,9 @@
-﻿namespace Owin.Scim.Model
+﻿namespace Owin.Scim
 {
     using System.Collections.Generic;
     using System.Linq;
+
+    using Model;
 
     public class ScimErrorResponse<T> : ScimResponse<T>
     {

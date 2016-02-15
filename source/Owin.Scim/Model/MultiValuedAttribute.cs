@@ -17,13 +17,25 @@
         [JsonProperty("$ref")]
         public string Ref { get; set; }
 
+        protected internal virtual int GetETagHashCode()
+        {
+            return new
+            {
+                Type,
+                Value,
+                Primary
+            }.GetHashCode();
+        }
+
 #region IEquatable Implementation
 
         public bool Equals(MultiValuedAttribute other)
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Type, other.Type) && string.Equals(Value, other.Value);
+
+            return string.Equals(Type, other.Type) && 
+                   string.Equals(Value, other.Value);
         }
 
         public override bool Equals(object obj)
@@ -31,6 +43,7 @@
             if (ReferenceEquals(null, obj)) return false;
             if (ReferenceEquals(this, obj)) return true;
             var other = obj as MultiValuedAttribute;
+
             return other != null && Equals(other);
         }
 

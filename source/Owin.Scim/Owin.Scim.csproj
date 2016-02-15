@@ -105,7 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLazy.cs" />
-    <Compile Include="CanonicalizationRule.cs" />
+    <Compile Include="Configuration\CanonicalizationRule.cs" />
     <Compile Include="Configuration\DefaultSchemaTypeFactory.cs" />
     <Compile Include="Configuration\DryIocActivationProvider.cs" />
     <Compile Include="Configuration\DryIocManager.cs" />
@@ -115,6 +115,7 @@
     <Compile Include="Configuration\SchemaBaseParameterBinding.cs" />
     <Compile Include="Configuration\SchemaBaseParameterBindingAttribute.cs" />
     <Compile Include="Configuration\SchemaBindingRule.cs" />
+    <Compile Include="Configuration\ScimFeatureType.cs" />
     <Compile Include="Configuration\ScimServerConfiguration.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />
@@ -122,6 +123,7 @@
     <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
     <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />
     <Compile Include="Endpoints\ServiceProviderConfigController.cs" />
+    <Compile Include="Endpoints\ControllerBase.cs" />
     <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="ErrorHandling\ErrorDetail.cs" />
     <Compile Include="ErrorHandling\ScimErrorExtensions.cs" />
@@ -136,14 +138,12 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Extensions\ValidationResultExtensions.cs" />
     <Compile Include="Model\AuthenticationScheme.cs" />
-    <Compile Include="Model\BulkSupport.cs" />
-    <Compile Include="Model\ChangePasswordSupport.cs" />
-    <Compile Include="Model\ETagSupport.cs" />
-    <Compile Include="Model\FilterSupport.cs" />
-    <Compile Include="Model\PatchSupprt.cs" />
+    <Compile Include="Model\ScimFeatureBulk.cs" />
+    <Compile Include="Model\ScimFeatureETag.cs" />
+    <Compile Include="Model\ScimFeatureFilter.cs" />
+    <Compile Include="Model\ScimFeature.cs" />
     <Compile Include="Model\SchemaBase.cs" />
     <Compile Include="Model\ServiceProviderConfig.cs" />
-    <Compile Include="Model\SortSupport.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtension.cs" />
     <Compile Include="Patching\Helpers\PatchMember.cs" />
     <Compile Include="Patching\PatchOperationResult.cs" />
@@ -154,9 +154,9 @@
     <Compile Include="Model\BulkRequest.cs" />
     <Compile Include="Patching\PatchRequest.cs" />
     <Compile Include="Model\ScimError.cs" />
-    <Compile Include="Model\ScimResponse.cs" />
+    <Compile Include="ScimResponse.cs" />
     <Compile Include="Model\ScimErrorType.cs" />
-    <Compile Include="Model\ScimErrorTypeConverter.cs" />
+    <Compile Include="Serialization\ScimErrorTypeConverter.cs" />
     <Compile Include="Model\Users\Address.cs" />
     <Compile Include="Model\Users\Email.cs" />
     <Compile Include="Model\Users\EnterpriseUser.cs" />
@@ -201,11 +201,14 @@
     <Compile Include="Repository\InMemory\InMemoryUserRepository.cs" />
     <Compile Include="Security\DefaultPasswordManager.cs" />
     <Compile Include="Security\IManagePasswords.cs" />
-    <Compile Include="Model\IScimResponse.cs" />
+    <Compile Include="IScimResponse.cs" />
+    <Compile Include="Configuration\DefaultETagProvider.cs" />
+    <Compile Include="Configuration\IResourceETagProvider.cs" />
     <Compile Include="Services\IUserService.cs" />
-    <Compile Include="Model\ScimDataResponse.cs" />
-    <Compile Include="Model\ScimErrorResponse.cs" />
+    <Compile Include="ScimDataResponse.cs" />
+    <Compile Include="ScimErrorResponse.cs" />
     <Compile Include="Services\Canonicalization.cs" />
+    <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Validation\Users\FluentEnterpriseUserValidator.cs" />
     <Compile Include="Validation\Users\FluentUserValidator.cs" />

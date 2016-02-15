@@ -1,7 +1,6 @@
-﻿namespace NContext.Extensions.Ninject.Configuration
+﻿namespace Owin.Scim.Configuration
 {
     using System;
-    using System.Collections.Generic;
 
     using DryIoc;
 

@@ -1,7 +1,9 @@
-﻿namespace Owin.Scim.Model
+﻿namespace Owin.Scim
 {
     using System.Collections.Generic;
     using System.Runtime.Serialization;
+
+    using Model;
 
     using NContext.Common;
 

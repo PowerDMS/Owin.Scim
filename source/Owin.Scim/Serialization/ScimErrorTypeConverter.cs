@@ -1,6 +1,8 @@
-namespace Owin.Scim.Model
+namespace Owin.Scim.Serialization
 {
     using System;
+
+    using Model;
 
     using Newtonsoft.Json;
 
