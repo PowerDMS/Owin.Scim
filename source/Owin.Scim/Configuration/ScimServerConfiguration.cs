@@ -89,7 +89,7 @@
             return this;
         }
 
-        public ScimServerConfiguration ConfigureBulk(bool supported = true, int maxOperations = 1000, int maxPayloadSizeInBytes = 1048576)
+        public ScimServerConfiguration ConfigureBulk(bool supported = true, int maxOperations = ScimConstants.Defaults.BulkMaxOperations, int maxPayloadSizeInBytes = ScimConstants.Defaults.BulkMaxPayload)
         {
             _Features[ScimFeatureType.Bulk] = supported
                 ? ScimFeatureBulk.Create(maxOperations, maxPayloadSizeInBytes)
@@ -98,7 +98,7 @@
             return this;
         }
 
-        public ScimServerConfiguration ConfigureFilter(bool supported = true, int maxResults = 200)
+        public ScimServerConfiguration ConfigureFilter(bool supported = true, int maxResults = ScimConstants.Defaults.FilterMaxResults)
         {
             _Features[ScimFeatureType.Filter] = supported
                 ? ScimFeatureFilter.Create(maxResults)
@@ -188,8 +188,8 @@
         {
             var features = new Dictionary<ScimFeatureType, ScimFeature>();
             features.Add(ScimFeatureType.Patch, new ScimFeature(true));
-            features.Add(ScimFeatureType.Bulk, ScimFeatureBulk.Create(1000, 1048576));
-            features.Add(ScimFeatureType.Filter, ScimFeatureFilter.Create(1000));
+            features.Add(ScimFeatureType.Bulk, ScimFeatureBulk.Create(ScimConstants.Defaults.BulkMaxOperations, ScimConstants.Defaults.BulkMaxPayload));
+            features.Add(ScimFeatureType.Filter, ScimFeatureFilter.Create(ScimConstants.Defaults.FilterMaxResults));
             features.Add(ScimFeatureType.ChangePassword, new ScimFeature(true));
             features.Add(ScimFeatureType.Sort, new ScimFeature(true));
             features.Add(ScimFeatureType.ETag, new ScimFeatureETag(true, true));

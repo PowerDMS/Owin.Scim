@@ -30,13 +30,22 @@
             public const string PatchOp = @"urn:ietf:params:scim:api:messages:2.0:PatchOp";
         }
 
-        public class ResourceTypes
+        public static class ResourceTypes
         {
             public const string ServiceProviderConfig = @"ServiceProviderConfig";
 
             public const string User = @"User";
 
             public const string Group = @"Group";
+        }
+
+        public static class Defaults
+        {
+            public const int BulkMaxOperations = 1000;
+
+            public const int BulkMaxPayload = 1048576;
+
+            public const int FilterMaxResults = 200;
         }
     }
 }
