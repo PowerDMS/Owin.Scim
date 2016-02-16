@@ -138,6 +138,7 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Extensions\ValidationResultExtensions.cs" />
     <Compile Include="Model\AuthenticationScheme.cs" />
+    <Compile Include="Model\ResourceType.cs" />
     <Compile Include="Model\ScimFeatureBulk.cs" />
     <Compile Include="Model\ScimFeatureETag.cs" />
     <Compile Include="Model\ScimFeatureFilter.cs" />

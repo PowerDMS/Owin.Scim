@@ -1,6 +1,14 @@
 ﻿namespace Owin.Scim.Tests.Integration
 {
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
+    using System.Linq.Expressions;
+    using System.Net.Http;
+    using System.Reflection;
+    using System.Text;
+    using System.Threading.Tasks;
 
     using Configuration;
 
@@ -14,6 +22,11 @@
 
     public class using_a_scim_server : IAssemblyContext
     {
+        protected static TestServer Server
+        {
+            get { return _Server; }
+        }
+
         public void OnAssemblyStart()
         {
             //ncrunch: no coverage start
@@ -48,11 +61,6 @@
             _Server.Dispose();
         }
 
-        protected static TestServer Server
-        {
-            get { return _Server; }
-        }
-        
         private static TestServer _Server;
     }
 }

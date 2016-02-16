@@ -24,8 +24,7 @@
 
             // Only calculate the etag hash if it's empty.
             // If it's not null, then the etag is coming from the repository impl.
-            // This allows implementors to provide strong etag hashes or their own hash
-            // calculation method.
+            // This allows implementors to provide strong etag hashes.
             if (resource.Meta != null && string.IsNullOrWhiteSpace(resource.Meta.Version))
             {
                 resource.Meta.Version = ETagProvider.GenerateETag(resource);

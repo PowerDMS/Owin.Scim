@@ -15,5 +15,10 @@
         public ResourceMetadata Meta { get; set; }
 
         public abstract string GenerateETagHash();
+
+        public virtual bool ShouldSerializeId()
+        {
+            return true;
+        }
     }
 }

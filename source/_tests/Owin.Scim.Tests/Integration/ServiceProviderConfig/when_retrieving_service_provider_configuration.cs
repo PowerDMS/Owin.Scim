@@ -1,7 +1,10 @@
 ﻿namespace Owin.Scim.Tests.Integration.ServiceProviderConfig
 {
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
+
+    using Extensions;
 
     using Machine.Specifications;
 
@@ -18,13 +21,21 @@
                 .AsTask;
 
             if (Response.StatusCode == HttpStatusCode.OK)
-                Config = await Response.Content.ReadAsAsync<ServiceProviderConfig>();
+            {
+                await Response.DeserializeTo(
+                    () => Config,
+                    () => JsonData);
+            }
         };
+
+        It should_not_serialize_id = () => JsonData.ContainsKey("id").ShouldBeFalse();
 
         It should_list_authentication_schemes = () => Config.AuthenticationSchemes.ShouldNotBeEmpty();
         
         protected static HttpResponseMessage Response;
 
         protected static ServiceProviderConfig Config;
+
+        protected static IDictionary<string, object> JsonData;
     }
 }

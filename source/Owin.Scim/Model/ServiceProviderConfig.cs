@@ -116,5 +116,10 @@
                 AuthenticationSchemes = AuthenticationSchemes.GetMultiValuedAttributeCollectionETagHashCode()
             }.GetHashCode().ToString();
         }
+
+        public override bool ShouldSerializeId()
+        {
+            return false;
+        }
     }
 }
