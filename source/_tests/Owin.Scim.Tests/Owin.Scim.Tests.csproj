@@ -112,10 +112,13 @@
     <Compile Include="Integration\ServiceProviderConfig\when_retrieving_service_provider_configuration.cs" />
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
     <Compile Include="Integration\Users\Create\with_an_enterprise_user.cs" />
+    <Compile Include="Integration\Users\Create\with_a_fully_populated_multi_attributes_user.cs" />
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
     <Compile Include="Integration\Users\Create\with_a_fully_populated_simple_attributes_user.cs" />
+    <Compile Include="Integration\Users\Create\with_fully_populated_enterprise_user.cs" />
     <Compile Include="Integration\Users\Create\with_invalid_schema.cs" />
     <Compile Include="Integration\Users\Create\with_content_type_json.cs" />
+    <Compile Include="Integration\Users\Create\with_missing_enterprise_schema.cs" />
     <Compile Include="Integration\Users\Create\with_missing_schema.cs" />
     <Compile Include="Integration\Users\Create\with_missing_username.cs" />
     <Compile Include="Integration\Users\Create\with_multiple_validation_errors.cs" />

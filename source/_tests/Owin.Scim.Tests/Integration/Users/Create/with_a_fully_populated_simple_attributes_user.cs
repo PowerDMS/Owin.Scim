@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
     using System.Net;
@@ -7,7 +9,10 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Model.Users;
 
     using Ploeh.AutoFixture;
-    
+
+    /// <summary>
+    /// What gets popu
+    /// </summary>
     public class with_a_fully_populated_simple_attributes_user : when_creating_a_user
     {
         Establish context = () =>
@@ -20,7 +25,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 .With(x => x.PreferredLanguage, "en-US,en,es")
                 .With(x => x.Locale, "en-US")
                 .With(x => x.Timezone, @"US/Eastern")
-                .With(x => x.ProfileUrl, null)
                 .With(x => x.Emails, null)
                 .With(x => x.PhoneNumbers, null)
                 .With(x => x.Ims, null)
@@ -35,20 +39,22 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_the_user = () => CreatedUser.Id.ShouldNotBeEmpty();
 
-        It should_return_meta = () =>
+        It should_return_null_password = () => CreatedUser.Password.ShouldBeNull();
+
+        private It should_return_meta = () =>
         {
             CreatedUser.Meta.ShouldNotBeNull();
             CreatedUser.Meta.ResourceType.ShouldEqual("User");
             CreatedUser.Meta.Created.ShouldNotBeNull();
             CreatedUser.Meta.LastModified.ShouldEqual(CreatedUser.Meta.Created);
             CreatedUser.Meta.Location.ShouldNotBeNull();
-            CreatedUser.Meta.Version.ShouldNotBeNull();
         };
 
         It should_echo_create_values = () =>
         {
             CreatedUser.Schemas.ShouldEqual(UserDto.Schemas);
             CreatedUser.UserName.ShouldEqual(UserDto.UserName);
+            CreatedUser.ExternalId.ShouldEqual(UserDto.ExternalId);
             CreatedUser.DisplayName.ShouldEqual(UserDto.DisplayName);
             CreatedUser.NickName.ShouldEqual(UserDto.NickName);
             CreatedUser.ProfileUrl.ShouldEqual(UserDto.ProfileUrl);
@@ -58,7 +64,13 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             CreatedUser.Locale.ShouldEqual(UserDto.Locale);
             CreatedUser.Timezone.ShouldEqual(UserDto.Timezone);
             CreatedUser.Active.ShouldEqual(UserDto.Active);
-            CreatedUser.Password.ShouldBeNull();
+
+            CreatedUser.Name.GivenName.ShouldEqual(UserDto.Name.GivenName);
+            CreatedUser.Name.MiddleName.ShouldEqual(UserDto.Name.MiddleName);
+            CreatedUser.Name.FamilyName.ShouldEqual(UserDto.Name.FamilyName);
+            CreatedUser.Name.Formatted.ShouldEqual(UserDto.Name.Formatted);
+            CreatedUser.Name.HonorificPrefix.ShouldEqual(UserDto.Name.HonorificPrefix);
+            CreatedUser.Name.HonorificSuffix.ShouldEqual(UserDto.Name.HonorificSuffix);
         };
     }
 }
