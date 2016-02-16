@@ -126,8 +126,10 @@
     <Compile Include="Integration\Users\Delete\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Delete\with_an_invalid_userid.cs" />
     <Compile Include="Integration\Users\Replace\when_replacing_a_user.cs" />
+    <Compile Include="Integration\Users\Replace\with_several_attribute_changes.cs" />
     <Compile Include="Integration\Users\Replace\with_an_existing_user.cs" />
     <Compile Include="Integration\Users\Retrieve\when_retrieving_a_user.cs" />
+    <Compile Include="Integration\Users\Retrieve\when_retrieving_fully_populated_user.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_invalid_userid.cs" />
     <Compile Include="Integration\Users\Update\remove\with_path_and_filter.cs" />
