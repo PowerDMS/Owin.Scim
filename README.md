@@ -27,13 +27,12 @@ Roadmap
     5. [x] Add more test coverage to prove compliance
     6. [ ] Error handling / rule processing
   5. [x] Delete  
-  6. [ ] Add support for custom canonical types / validation  
 2. Schema extensions
   1. [x] Add custom parameter binding for schema extension deserialization
-3. Add SCIM server configuration endpoints (IN PROGRESS)
+3. Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
-  2. [ ] /Schemas
-  3. [ ] /ResourceTypes
+  2. [ ] /Schemas (IN PROGRESS)
+  3. [ ] /ResourceTypes (IN PROGRESS)
 4. Add groups endpoints
   1. [ ] Create
   2. [ ] Retrieve
@@ -48,4 +47,7 @@ Roadmap
   4. [ ] Pagination
   5. [ ] Projection
 7. Add more extensiblity options
+  1. [ ] Canonicalization (IN PROGRESS)
+  2. [ ] Validation
+  3. [ ] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc) (IN PROGRESS)
 8. Add authN / authZ
