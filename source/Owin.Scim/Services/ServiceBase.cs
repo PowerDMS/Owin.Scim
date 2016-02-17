@@ -20,14 +20,17 @@
         {
             if (resource == null) return null;
 
-            if (!_Configuration.IsFeatureSupported(ScimFeatureType.ETag)) return resource;
+            var etagConfig = _Configuration.GetFeature<ScimFeatureETag>(ScimFeatureType.ETag);
+
+            if (!etagConfig.Supported) return resource;
 
             // Only calculate the etag hash if it's empty.
             // If it's not null, then the etag is coming from the repository impl.
             // This allows implementors to provide strong etag hashes.
             if (resource.Meta != null && string.IsNullOrWhiteSpace(resource.Meta.Version))
             {
-                resource.Meta.Version = ETagProvider.GenerateETag(resource);
+                var etagPrefix = etagConfig.IsWeak ? @"W/" : string.Empty;
+                resource.Meta.Version = $"{etagPrefix}\"{ETagProvider.GenerateETag(resource)}\""; 
             }
 
             return resource;

@@ -34,10 +34,9 @@ namespace Owin.Scim.Endpoints
 
         protected void SetETagHeader(HttpResponseMessage response, Resource resource)
         {
-            var etagConfig = ServerConfiguration.GetFeature<ScimFeatureETag>(ScimFeatureType.ETag);
-            if (etagConfig.Supported)
+            if (ServerConfiguration.IsFeatureSupported(ScimFeatureType.ETag))
             {
-                response.Headers.ETag = new EntityTagHeaderValue("\"" + resource.Meta.Version + "\"", etagConfig.IsWeak);
+                response.Headers.ETag = EntityTagHeaderValue.Parse(resource.Meta.Version);
             }
         }
     }

@@ -37,7 +37,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             CreatedUser.Meta.Created.ShouldBeGreaterThanOrEqualTo(CurrentUtcDateTime);
             CreatedUser.Meta.LastModified.ShouldEqual(CreatedUser.Meta.Created);
             CreatedUser.Meta.Location.ShouldNotBeNull();
-            CreatedUser.Meta.Version.ShouldNotBeNull();
+            CreatedUser.Meta.Version.ShouldEqual(Response.Headers.ETag.ToString());
         };
 
         It should_echo_create_values = () =>
