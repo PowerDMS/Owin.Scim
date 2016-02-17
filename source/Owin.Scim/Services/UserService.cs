@@ -94,11 +94,11 @@
                     Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
             }
 
-            await _UserRepository.UpdateUser(userRecord);
+            await _UserRepository.UpdateUser(user);
 
-            CalculateVersion(userRecord);
+            CalculateVersion(user);
 
-            return new ScimDataResponse<User>(userRecord);
+            return new ScimDataResponse<User>(user);
         }
 
         public async Task<IScimResponse<Unit>> DeleteUser(string userId)

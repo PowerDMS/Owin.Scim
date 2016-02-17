@@ -69,6 +69,18 @@
 
         It should_not_return_password = () => UpdatedUser.Password.ShouldBeNull();
 
+        It should_change_etag_with_new_version = () =>
+        {
+            UpdatedUser.Meta.Version.ShouldNotBeNull();
+            UpdatedUser.Meta.Version.ShouldNotEqual(UserDto.Meta.Version);
+        };
+
+        It should_change_last_modified = () =>
+        {
+            UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UpdatedUser.Meta.Created);
+            UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UserDto.Meta.LastModified);
+        };
+
         protected static EnterpriseUser UserDto;
 
         protected static EnterpriseUser UpdatedUser;

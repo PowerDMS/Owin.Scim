@@ -46,7 +46,12 @@
             var userRecord = _Users.SingleOrDefault(u => u.Id.Equals(user.Id));
             if (userRecord == null) return;
 
-            userRecord = user;
+            user.Meta = userRecord.Meta;
+            user.Meta.LastModified = DateTime.UtcNow;
+
+            // TODO: this operation is not be thread safe...
+            _Users.Remove(userRecord);
+            _Users.Add(user);
         }
 
         public async Task<User> DeleteUser(string userId)
