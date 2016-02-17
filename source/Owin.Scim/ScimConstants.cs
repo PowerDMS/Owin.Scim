@@ -49,5 +49,10 @@
 
             public const int FilterMaxResults = 200;
         }
+
+        public static class Endpoints
+        {
+            public const string Users = @"users";
+        }
     }
 }

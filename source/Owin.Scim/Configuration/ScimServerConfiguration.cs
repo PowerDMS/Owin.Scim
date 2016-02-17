@@ -19,12 +19,15 @@
 
         private readonly ISet<Predicate<FileInfo>> _CompositionFileInfoConstraints;
 
+        private readonly ISet<IScimTypeDefinitionBuilder> _ResourceTypeDefinitions;
+
         public ScimServerConfiguration()
         {
             _Features = CreateDefaultFeatures();
             _SchemaBindingRules = CreateDefaultBindingRules();
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
             _CompositionFileInfoConstraints = new HashSet<Predicate<FileInfo>>();
+            _ResourceTypeDefinitions = new HashSet<IScimTypeDefinitionBuilder>();
 
             RequireSsl = true;
         }
@@ -154,6 +157,22 @@
             return _Features[feature].Supported;
         }
 
+        public ScimTypeDefinitionBuilder<T> AddOrModifyResourceType<T>(string name, string schema, string endpoint)
+            where T : Resource
+        {
+            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("name");
+            if (string.IsNullOrWhiteSpace(schema)) throw new ArgumentNullException("schema");
+            if (string.IsNullOrWhiteSpace(endpoint)) throw new ArgumentNullException("endpoint");
+
+            // TODO: (DG) Check if already registered and just pull existing one. Instead of ISet, make _ResourceTypes IDictionary<type, IScimTypeDefBuilder>
+            // Used to modify default SCIM / Owin.Scim settings for the service provider.
+            
+            var builder = new ScimResourceTypeDefinitionBuilder<T>(this, name, schema, endpoint);
+            AddResourceTypeDefinition(builder);
+
+            return builder;
+        }
+
         private IList<SchemaBindingRule> CreateDefaultBindingRules()
         {
             var rules = new List<SchemaBindingRule>
@@ -195,6 +214,11 @@
             features.Add(ScimFeatureType.ETag, new ScimFeatureETag(true, true));
 
             return features;
+        }
+
+        protected internal void AddResourceTypeDefinition(IScimTypeDefinitionBuilder builder)
+        {
+            _ResourceTypeDefinitions.Add(builder);
         }
     }
 }

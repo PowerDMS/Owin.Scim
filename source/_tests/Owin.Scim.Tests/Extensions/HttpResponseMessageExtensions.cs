@@ -2,13 +2,12 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using System.Linq.Expressions;
+    using System.Net;
     using System.Net.Http;
     using System.Reflection;
-    using System.Runtime.CompilerServices;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -21,7 +20,9 @@
         {
             var instMemberExp = instanceToSet.Body as MemberExpression;
             if (instMemberExp == null) throw new ArgumentException("Must be a MemberExpression!", "instanceToSet");
-            
+
+            if (response.StatusCode != HttpStatusCode.OK) return;
+
             var result = await DeserializeResponse<T>(response, jsonDataToSet != null);
             
             instMemberExp.Member

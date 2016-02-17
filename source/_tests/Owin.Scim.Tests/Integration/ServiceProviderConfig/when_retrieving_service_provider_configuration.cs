@@ -1,7 +1,6 @@
 ﻿namespace Owin.Scim.Tests.Integration.ServiceProviderConfig
 {
     using System.Collections.Generic;
-    using System.Net;
     using System.Net.Http;
 
     using Extensions;
@@ -20,12 +19,9 @@
                 .AwaitResponse()
                 .AsTask;
 
-            if (Response.StatusCode == HttpStatusCode.OK)
-            {
-                await Response.DeserializeTo(
-                    () => Config,
-                    () => JsonData);
-            }
+            await Response.DeserializeTo(
+                () => Config,
+                () => JsonData);
         };
 
         It should_not_serialize_id = () => JsonData.ContainsKey("id").ShouldBeFalse();

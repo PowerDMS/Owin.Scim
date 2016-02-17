@@ -1,8 +1,10 @@
 ﻿namespace Owin.Scim.Model
 {
+    using System.Collections.Generic;
+
     using Newtonsoft.Json;
 
-    public class ResourceType : Resource
+    public sealed class ResourceType : Resource
     {
         public ResourceType()
         {
@@ -12,6 +14,18 @@
 
         [JsonProperty("name")]
         public string Name { get; set; }
+
+        [JsonProperty("description")]
+        public string Description { get; set; }
+
+        [JsonProperty("endpoint")]
+        public string Endpoint { get; set; }
+
+        [JsonProperty("schema")]
+        public string Schema { get; set; }
+
+        [JsonProperty("schemaExtensions")]
+        public IEnumerable<SchemaExtension> SchemaExtensions { get; set; }
 
         public override string GenerateETagHash()
         {

@@ -22,7 +22,7 @@ namespace Owin.Scim.Endpoints
             HttpResponseMessage response, 
             Resource resource,
             string routeName,
-            object routeValues)
+            object routeValues = null)
         {
             var resourceLocation = new Uri(Request
                 .GetUrlHelper()
