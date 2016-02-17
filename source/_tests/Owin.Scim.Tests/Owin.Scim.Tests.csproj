@@ -112,10 +112,13 @@
     <Compile Include="Integration\ServiceProviderConfig\when_retrieving_service_provider_configuration.cs" />
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
     <Compile Include="Integration\Users\Create\with_an_enterprise_user.cs" />
+    <Compile Include="Integration\Users\Create\with_a_fully_populated_multi_attributes_user.cs" />
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
     <Compile Include="Integration\Users\Create\with_a_fully_populated_simple_attributes_user.cs" />
+    <Compile Include="Integration\Users\Create\with_fully_populated_enterprise_user.cs" />
     <Compile Include="Integration\Users\Create\with_invalid_schema.cs" />
     <Compile Include="Integration\Users\Create\with_content_type_json.cs" />
+    <Compile Include="Integration\Users\Create\with_missing_enterprise_schema.cs" />
     <Compile Include="Integration\Users\Create\with_missing_schema.cs" />
     <Compile Include="Integration\Users\Create\with_missing_username.cs" />
     <Compile Include="Integration\Users\Create\with_multiple_validation_errors.cs" />
@@ -123,8 +126,10 @@
     <Compile Include="Integration\Users\Delete\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Delete\with_an_invalid_userid.cs" />
     <Compile Include="Integration\Users\Replace\when_replacing_a_user.cs" />
+    <Compile Include="Integration\Users\Replace\with_several_attribute_changes.cs" />
     <Compile Include="Integration\Users\Replace\with_an_existing_user.cs" />
     <Compile Include="Integration\Users\Retrieve\when_retrieving_a_user.cs" />
+    <Compile Include="Integration\Users\Retrieve\when_retrieving_fully_populated_user.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_invalid_userid.cs" />
     <Compile Include="Integration\Users\Update\remove\with_path_and_filter.cs" />
