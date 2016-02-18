@@ -4,6 +4,6 @@
 
     public interface IScimTypeAttributeDefinitionBuilder
     {
-        PropertyDescriptor Member { get; }
+        PropertyDescriptor AttributeDescriptor { get; }
     }
 }
