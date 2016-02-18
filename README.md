@@ -99,7 +99,7 @@ private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> buil
         .SetRequired(true)
         .SetUniqueness(Unique.Server)
     .For(u => u.Name)
-        .ForSubAttributes(nameCofig => nameCofig
+        .DefineSubAttributes(nameCofig => nameCofig
             .For(name => name.FamilyName)
                 .SetRequired(true))
     .For(u => u.Id)
