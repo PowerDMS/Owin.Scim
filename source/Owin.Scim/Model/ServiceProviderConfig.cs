@@ -121,5 +121,10 @@
         {
             return false;
         }
+
+        public override bool ShouldSerializeExternalId()
+        {
+            return false;
+        }
     }
 }

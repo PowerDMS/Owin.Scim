@@ -256,27 +256,25 @@
         private void DefineUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
             builder
-                .SetDescription("User accounts")
-                    .For(u => u.Id)
-                        .SetDescription("Unique identifier for the user.")
-                        .SetMutability(Mutable.ReadOnly)
-                        .SetReturned(Return.Always)
-                        .SetUniqueness(Unique.Server)
-                        .SetCaseExact(true)
-                    .For(u => u.Password)
-                        .SetDescription(@"The user's cleartext password. This attribute is intended to be used as a means to specify an initial password when creating a new User or to reset an existing user's password.")
-                        .SetMutability(Mutable.WriteOnly)
-                        .SetCaseExact(true)
-                        .SetReturned(Return.Never)
-                    .For(u => u.Name)
-                        .ForSubAttributes(nameCofig => nameCofig
-                            .For(name => name.FamilyName)
-                                .SetDescription("The user's family / surname.")
-                            .For(name => name.GivenName)
-                                .SetDescription(""))
-                    .For(u => u.Groups)
-                        .SetMutability(Mutable.ReadOnly)
-
+                .For(u => u.UserName)
+                .For(u => u.Id)
+                    .SetMutability(Mutable.ReadOnly)
+                    .SetReturned(Return.Always)
+                    .SetUniqueness(Unique.Server)
+                    .SetCaseExact(true)
+                .For(u => u.Password)
+                    .SetMutability(Mutable.WriteOnly)
+                    .SetCaseExact(true)
+                    .SetReturned(Return.Never)
+                .For(u => u.Name)
+                    .ForSubAttributes(nameCofig => nameCofig
+                        .For(name => name.FamilyName)
+                            .SetDescription("The user's family / surname.")
+                        .For(name => name.GivenName)
+                            .SetDescription(""))
+                .For(u => u.Groups)
+                    .SetMutability(Mutable.ReadOnly)
+                
 // Canonicalization Support?
 //                        .For(u => u.Locale)
 //                            .AddCanonicalizationRules(
@@ -288,12 +286,11 @@
 //                                    }
 //                                })
 
-                    .For(u => u.Addresses)
-                    .For(u => u.Emails)
-                        .SetDescription("")
-                        .ForSubAttributes(emailConfig => emailConfig
-                            .For(e => e.Display)
-                                .SetMutability(Mutable.ReadOnly))
+                .For(u => u.Addresses)
+                .For(u => u.Emails)
+                    .ForSubAttributes(emailConfig => emailConfig
+                        .For(e => e.Display)
+                            .SetMutability(Mutable.ReadOnly))
 //                            .AddCanonicalizationRules(
 //                                (Email attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
 //                                (Email attribute, ref object state) =>

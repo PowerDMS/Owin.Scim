@@ -146,6 +146,7 @@
     <Compile Include="Extensions\MultiValuedAttributesExtensions.cs" />
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
+    <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Extensions\ValidationResultExtensions.cs" />
     <Compile Include="Model\AuthenticationScheme.cs" />

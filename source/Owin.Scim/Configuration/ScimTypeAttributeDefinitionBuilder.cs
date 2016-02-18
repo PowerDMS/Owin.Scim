@@ -3,7 +3,10 @@ namespace Owin.Scim.Configuration
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using System.Linq.Expressions;
+
+    using Extensions;
 
     public class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinitionBuilder
     {
@@ -23,6 +26,16 @@ namespace Owin.Scim.Configuration
             Returned = Return.Default;
             Uniqueness = Unique.None;
             CaseExact = false;
+
+            var descriptionAttr = descriptor
+                .Attributes
+                .Cast<Attribute>()
+                .SingleOrDefault(attr => attr is DescriptionAttribute) as DescriptionAttribute;
+
+            if (descriptionAttr != null)
+            {
+                Description = descriptionAttr.Description.RemoveMultipleSpaces();
+            }
         }
 
         public static implicit operator ScimServerConfiguration(ScimTypeAttributeDefinitionBuilder<T, TAttribute> builder)
@@ -47,7 +60,7 @@ namespace Owin.Scim.Configuration
             get { return _ScimTypeDefinitionBuilder; }
         }
 
-        public PropertyDescriptor Member
+        public PropertyDescriptor AttributeDescriptor
         {
             get { return _Descriptor; }
         }
