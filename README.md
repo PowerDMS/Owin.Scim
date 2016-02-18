@@ -82,7 +82,7 @@ SCIM's resource type attributes default to:
 * returned: default (always, never)  
 * uniqueness: none (server, global)  
 
-Owin.Scim configures all core attributes according to the SCIM standard schema, configuring those attributes that differ from the default above.  Depending on your requirements as a SCIM service provider, you may need to modify these types as you see fit.  It is up to you to ensure you do not violate SCIM's explicit rules about core resource schema types.
+Owin.Scim auto-assigns all core attribute qualities as per https://tools.ietf.org/html/rfc7643#section-7.  Depending on your requirements as a SCIM service provider, you may need to modify these qualities as you see fit.  It is up to you to ensure any modificaitons remain in compliance of the SCIM standard.
 
 To modify core resource types:
 ```csharp
@@ -109,7 +109,6 @@ private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> buil
         .SetCaseExact(true)
     .For(u => u.Password)
         .SetMutability(Mutable.WriteOnly)
-        .SetCaseExact(true)
         .SetReturned(Return.Never)
     .For(u => u.Groups)
         .SetMutability(Mutable.ReadOnly)
