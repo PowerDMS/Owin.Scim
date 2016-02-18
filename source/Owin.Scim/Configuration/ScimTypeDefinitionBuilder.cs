@@ -8,13 +8,11 @@ namespace Owin.Scim.Configuration
 
     using Extensions;
 
-    using Model;
-
     public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinitionBuilder
     {
         private readonly ScimServerConfiguration _ScimServerConfiguration;
 
-        private readonly IDictionary<PropertyDescriptor, IScimTypeMemberDefinitionBuilder> _MemberDefinitions;
+        private readonly IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> _MemberDefinitions;
 
         public ScimTypeDefinitionBuilder(ScimServerConfiguration configuration)
         {
@@ -34,7 +32,7 @@ namespace Owin.Scim.Configuration
             get { return _ScimServerConfiguration; }
         }
 
-        protected internal IDictionary<PropertyDescriptor, IScimTypeMemberDefinitionBuilder> MemberDefinitions
+        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> MemberDefinitions
         {
             get { return _MemberDefinitions; }
         }
@@ -45,50 +43,37 @@ namespace Owin.Scim.Configuration
             return this;
         }
         
-        public ScimTypeScalarMemberDefinitionBuilder<T, TMember> For<TMember>(Expression<Func<T, TMember>> memberExp)
-            where TMember : IConvertible
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
+            Expression<Func<T, TAttribute>> attrExp)
         {
-            if (memberExp == null) throw new ArgumentNullException("memberExp");
+            if (attrExp == null) throw new ArgumentNullException("attrExp");
 
-            var memberExpression = memberExp.Body as MemberExpression;
+            var memberExpression = attrExp.Body as MemberExpression;
             if (memberExpression == null)
             {
-                throw new InvalidOperationException("memberExp must be of type MemberExpression.");
+                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-
-            return (ScimTypeScalarMemberDefinitionBuilder<T, TMember>)_MemberDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_MemberDefinitions[propertyDescriptor];
         }
 
-        public ScimTypeMultiValuedAttributeDefinitionBuilder<T, TMultiValuedAttribute> For<TMultiValuedAttribute>(
-            Expression<Func<T, IEnumerable<TMultiValuedAttribute>>> memberExp)
-            where TMultiValuedAttribute : MultiValuedAttribute
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
+            Expression<Func<T, IEnumerable<TAttribute>>> attrExp)
         {
-            if (memberExp == null) throw new ArgumentNullException("memberExp");
+            if (attrExp == null) throw new ArgumentNullException("attrExp");
 
-            var memberExpression = memberExp.Body as MemberExpression;
+            var memberExpression = attrExp.Body as MemberExpression;
             if (memberExpression == null)
             {
-                throw new InvalidOperationException("memberExp must be of type MemberExpression.");
+                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-
-            return (ScimTypeMultiValuedAttributeDefinitionBuilder<T, TMultiValuedAttribute>)_MemberDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_MemberDefinitions[propertyDescriptor];
         }
 
-        protected internal void AddMemberDefinition(IScimTypeMemberDefinitionBuilder builder)
-        {
-            _MemberDefinitions.Add(builder.Member, builder);
-        }
-
-        protected internal bool Contains(PropertyDescriptor propertyDescriptor)
-        {
-            return _MemberDefinitions.Any(kvp => kvp.Value != null && kvp.Value.Member.Equals(propertyDescriptor));
-        }
-
-        private IDictionary<PropertyDescriptor, IScimTypeMemberDefinitionBuilder> BuildDefaultTypeDefinitions()
+        private IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> BuildDefaultTypeDefinitions()
         {
             return TypeDescriptor.GetProperties(typeof(T))
                 .OfType<PropertyDescriptor>()
@@ -97,28 +82,35 @@ namespace Owin.Scim.Configuration
                     d => CreateTypeMemberDefinitionBuilder(d));
         }
 
-        private IScimTypeMemberDefinitionBuilder CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)
+        private IScimTypeAttributeDefinitionBuilder CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)
         {
-            if (typeof(IConvertible).IsAssignableFrom(descriptor.PropertyType))
-            {
-                var builder = typeof(ScimTypeScalarMemberDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
-                var instance = Activator.CreateInstance(builder, this, descriptor);
+            Type builder;
+            IScimTypeAttributeDefinitionBuilder instance;
 
-                return (IScimTypeMemberDefinitionBuilder)instance;
+            // scalar attribute
+            if (descriptor.PropertyType.IsTerminalObject())
+            {
+                builder = typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
+                instance = (IScimTypeAttributeDefinitionBuilder)Activator.CreateInstance(builder, this, descriptor);
+
+                return instance;
             }
 
-            if (descriptor.PropertyType.IsGenericType &&
-                descriptor.PropertyType.IsNonStringEnumerable() &&
-                typeof(MultiValuedAttribute).IsAssignableFrom(descriptor.PropertyType.GetGenericArguments()[0]))
+            // multiValued complex attribute
+            if (descriptor.PropertyType.IsNonStringEnumerable())
             {
-                var builder = typeof(ScimTypeMultiValuedAttributeDefinitionBuilder<,>)
+                builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>)
                     .MakeGenericType(typeof(T), descriptor.PropertyType.GetGenericArguments()[0]);
-                var instance = Activator.CreateInstance(builder, this, descriptor);
+                instance = (IScimTypeAttributeDefinitionBuilder)Activator.CreateInstance(builder, this, descriptor, true);
 
-                return (IScimTypeMemberDefinitionBuilder)instance;
+                return instance;
             }
 
-            return null; // TODO: (DG) Support ComplexProperties
+            // complex attribute
+            builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
+            instance = (IScimTypeAttributeDefinitionBuilder)Activator.CreateInstance(builder, this, descriptor, false);
+
+            return instance;
         }
     }
 }

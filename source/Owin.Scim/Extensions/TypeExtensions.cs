@@ -47,18 +47,19 @@
                 : null;
         }
 
-        public static Boolean IsTerminalObject(this Type type)
+        public static bool IsTerminalObject(this Type type)
         {
             if (type == null) return true;
 
-            return type.IsPrimitive ||
-                   type.IsEnum ||
-                   type.IsPointer ||
-                   type == typeof (string) ||
-                   type == typeof (DateTime) ||
-                   type == typeof (decimal) ||
-                   type == typeof (Guid) ||
-                   type == typeof (DateTimeOffset) ||
+            return type.IsPrimitive || 
+                   type.IsEnum || 
+                   type.IsPointer || 
+                   type == typeof (string) || 
+                   type == typeof (DateTime) || 
+                   type == typeof (decimal) || 
+                   type == typeof(Uri) || 
+                   type == typeof (Guid) || 
+                   type == typeof (DateTimeOffset) || 
                    type == typeof (TimeSpan);
         }
     }

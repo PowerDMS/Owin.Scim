@@ -2,7 +2,7 @@
 {
     using System.ComponentModel;
 
-    public interface IScimTypeMemberDefinitionBuilder
+    public interface IScimTypeAttributeDefinitionBuilder
     {
         PropertyDescriptor Member { get; }
     }

@@ -113,7 +113,7 @@
     <Compile Include="Configuration\IConfigureDryIoc.cs" />
     <Compile Include="Configuration\ISchemaTypeFactory.cs" />
     <Compile Include="Configuration\IScimTypeDefinitionBuilder.cs" />
-    <Compile Include="Configuration\IScimTypeMemberDefinitionBuilder.cs" />
+    <Compile Include="Configuration\IScimTypeAttributeDefinitionBuilder.cs" />
     <Compile Include="Configuration\Mutable.cs" />
     <Compile Include="Configuration\Return.cs" />
     <Compile Include="Configuration\SchemaBaseParameterBinding.cs" />
@@ -122,10 +122,11 @@
     <Compile Include="Configuration\ScimFeatureType.cs" />
     <Compile Include="Configuration\ScimResourceTypeDefinitionBuilder.cs" />
     <Compile Include="Configuration\ScimServerConfiguration.cs" />
+    <Compile Include="Configuration\ScimTypeAttributeDefinitionBuilderExtensions.cs" />
     <Compile Include="Configuration\ScimTypeDefinitionBuilder.cs" />
-    <Compile Include="Configuration\ScimTypeMemberDefinitionBuilder.cs" />
-    <Compile Include="Configuration\ScimTypeMultiValuedAttributeDefinitionBuilder.cs" />
-    <Compile Include="Configuration\ScimTypeScalarMemberDefinitionBuilder.cs" />
+    <Compile Include="Configuration\ScimTypeAttributeDefinitionBuilder.cs" />
+    <Compile Include="Configuration\ScimTypeComplexAttributeDefinitionBuilder.cs" />
+    <Compile Include="Configuration\ScimTypeScalarAttributeDefinitionBuilder.cs" />
     <Compile Include="Configuration\Unique.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />
