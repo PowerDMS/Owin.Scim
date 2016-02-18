@@ -51,3 +51,68 @@ Roadmap
   2. [ ] Validation
   3. [ ] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc) (IN PROGRESS)
 8. Add authN / authZ
+
+Getting Started
+===============
+Like most OWIN extensions, just configure your appBuilder.  
+```csharp
+app.UseScimServer(
+  new ScimServerConfiguration
+  {
+      RequireSsl = false
+  }
+  .AddAuthenticationScheme(
+      new AuthenticationScheme(
+          "oauthbearertoken",
+          "OAuth Bearer Token",
+          "Authentication scheme using the OAuth Bearer Token standard.", 
+          specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
+          isPrimary: true))
+  .ConfigureETag(supported: true, isWeak: true));
+```
+
+##SCIM Extensibility  
+###Defining & Modifying Resource Types  
+All core SCIM resource types and rules are added by default.
+
+SCIM's resource type attributes default to:  
+* caseExact: false  
+* mutability: readWrite (readOnly, writeOnly, immutable)  
+* required: false  
+* returned: default (always, never)  
+* uniqueness: none (server, global)  
+
+Owin.Scim configures all core attributes according to the SCIM standard schema, configuring those attributes that differ from the default above.  Depending on your requirements as a SCIM service provider, you may need to modify these types as you see fit.  It is up to you to ensure you do not violate SCIM's explicit rules about core resource schema types.
+
+To modify core resource types:
+```csharp
+app.UseScimServer(
+  new ScimServerConfiguration { RequireSsl = false }
+    .ModifyResourceType<User>(ModifyUserResourceType));
+
+// ...
+
+private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
+{
+  builder
+    .For(u => u.UserName)
+        .SetRequired(true)
+        .SetUniqueness(Unique.Server)
+    .For(u => u.Name)
+        .ForSubAttributes(nameCofig => nameCofig
+            .For(name => name.FamilyName)
+                .SetRequired(true))
+    .For(u => u.Id)
+        .SetMutability(Mutable.ReadOnly)
+        .SetReturned(Return.Always)
+        .SetUniqueness(Unique.Server)
+        .SetCaseExact(true)
+    .For(u => u.Password)
+        .SetMutability(Mutable.WriteOnly)
+        .SetCaseExact(true)
+        .SetReturned(Return.Never)
+    .For(u => u.Groups)
+        .SetMutability(Mutable.ReadOnly)
+}
+```
+In the example provided, I have made a User.Name.FamilyName required.  This is against the default SCIM rule and will enforce clients to submit a FamilyName when creating/modifying users.
