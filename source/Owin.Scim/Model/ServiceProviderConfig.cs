@@ -41,7 +41,7 @@
              * the endpoint "/Users" will set "resourceType" to "User", and
              * "/Groups" will set "resourceType" to "Group".
              */
-            Meta.ResourceType = ScimConstants.ResourceTypes.ServiceProviderConfig;
+            Meta = new ResourceMetadata(ScimConstants.ResourceTypes.ServiceProviderConfig);
 
             _Bulk = featureBulk ?? ScimFeatureBulk.CreateUnsupported();
             _Filter = featureFilter ?? ScimFeatureFilter.CreateUnsupported();
@@ -100,7 +100,7 @@
             get { return _AuthenticationSchemes; }
         }
 
-        public override string GenerateETagHash()
+        public override string CalculateVersion()
         {
             return new
             {

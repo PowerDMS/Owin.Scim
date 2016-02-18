@@ -19,7 +19,7 @@
 
         private readonly ISet<Predicate<FileInfo>> _CompositionFileInfoConstraints;
 
-        private readonly ISet<IScimTypeDefinitionBuilder> _ResourceTypeDefinitions;
+        private readonly IDictionary<Type, IScimTypeDefinitionBuilder> _ResourceTypeDefinitions;
 
         public ScimServerConfiguration()
         {
@@ -27,7 +27,7 @@
             _SchemaBindingRules = CreateDefaultBindingRules();
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
             _CompositionFileInfoConstraints = new HashSet<Predicate<FileInfo>>();
-            _ResourceTypeDefinitions = new HashSet<IScimTypeDefinitionBuilder>();
+            _ResourceTypeDefinitions = new Dictionary<Type, IScimTypeDefinitionBuilder>();
 
             RequireSsl = true;
         }
@@ -157,20 +157,44 @@
             return _Features[feature].Supported;
         }
 
-        public ScimTypeDefinitionBuilder<T> AddOrModifyResourceType<T>(string name, string schema, string endpoint)
+        public ScimServerConfiguration AddResourceType<T>(
+            string name, 
+            string schema, 
+            string endpoint,
+            Action<ScimResourceTypeDefinitionBuilder<T>> builder)
             where T : Resource
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("name");
             if (string.IsNullOrWhiteSpace(schema)) throw new ArgumentNullException("schema");
             if (string.IsNullOrWhiteSpace(endpoint)) throw new ArgumentNullException("endpoint");
 
-            // TODO: (DG) Check if already registered and just pull existing one. Instead of ISet, make _ResourceTypes IDictionary<type, IScimTypeDefBuilder>
-            // Used to modify default SCIM / Owin.Scim settings for the service provider.
-            
-            var builder = new ScimResourceTypeDefinitionBuilder<T>(this, name, schema, endpoint);
-            AddResourceTypeDefinition(builder);
 
-            return builder;
+            var rtb = new ScimResourceTypeDefinitionBuilder<T>(this, name, schema, endpoint);
+            AddResourceTypeDefinition(rtb);
+
+            builder(rtb);
+
+            return this;
+        }
+
+        public ScimServerConfiguration ModifyResourceType<T>(Action<ScimResourceTypeDefinitionBuilder<T>> builder) where T : Resource
+        {
+            if (!_ResourceTypeDefinitions.ContainsKey(typeof(T)))
+                throw new Exception(string.Format("There is no resource type defined for type '{0}'.", typeof(T).FullName));
+
+            builder((ScimResourceTypeDefinitionBuilder<T>) _ResourceTypeDefinitions[typeof (T)]);
+
+            return this;
+        }
+
+        public ScimServerConfiguration RemoveResourceType<T>()
+        {
+            if (_ResourceTypeDefinitions.ContainsKey(typeof (T)))
+            {
+                _ResourceTypeDefinitions.Remove(typeof (T));
+            }
+
+            return this;
         }
 
         private IList<SchemaBindingRule> CreateDefaultBindingRules()
@@ -218,7 +242,7 @@
 
         protected internal void AddResourceTypeDefinition(IScimTypeDefinitionBuilder builder)
         {
-            _ResourceTypeDefinitions.Add(builder);
+            _ResourceTypeDefinitions.Add(builder.ResourceType, builder);
         }
     }
 }

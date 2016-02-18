@@ -4,6 +4,8 @@
     using System.Net.Http;
     using System.Net.Http.Formatting;
 
+    using Extensions;
+
     using Machine.Specifications;
 
     using Model.Users;
@@ -12,11 +14,11 @@
 
     public class with_several_attribute_changes : using_a_scim_server
     {
-        Establish context = () =>
+        Establish context = async () =>
         {
             var autoFixture = new Fixture();
 
-            var existingUser = autoFixture.Build<EnterpriseUser>()
+            MutableUserPayload = autoFixture.Build<EnterpriseUser>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -33,59 +35,56 @@
             // Insert the first user so there's one already in-memory.
             var userRecord = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<EnterpriseUser>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<EnterpriseUser>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
                 .Result;
 
-            UserDto = userRecord.Content.ReadAsAsync<EnterpriseUser>(ScimJsonMediaTypeFormatter.AsArray()).Result;
-
-            UserId = UserDto.Id;
+            await userRecord.DeserializeTo(() => OriginalUserRecord); // capture original user record
 
             // Common use case for replace is for client to send the full object back
-            UserDto.UserName = UserNameUtility.GenerateUserName();
-            UserDto.Password = "someOtherPass";
-            UserDto.Enterprise.EmployeeNumber = "007";
+            MutableUserPayload.Id = OriginalUserRecord.Id; // set server-assigned ID
+            MutableUserPayload.UserName = UserNameUtility.GenerateUserName(); // new userName
+            MutableUserPayload.Password = "someOtherPass"; // newPassword
+            MutableUserPayload.Enterprise.EmployeeNumber = "007";
         };
 
         Because of = async () =>
         {
             Response = await Server
                 .HttpClient
-                .PutAsync("users/" + UserId, new ObjectContent<EnterpriseUser>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("users/" + MutableUserPayload.Id, new ObjectContent<EnterpriseUser>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
-            if (Response.StatusCode == HttpStatusCode.OK)
-            {
-                UpdatedUser = Response.Content.ReadAsAsync<EnterpriseUser>(ScimJsonMediaTypeFormatter.AsArray()).Result;
-            }
+            await Response.DeserializeTo(() => UpdatedUserRecord); // capture updated user record
         };
+
+        It should_return_success = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
         It should_contain_the_new_values = () =>
         {
-            Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
-            UpdatedUser.UserName.ShouldEqual(UserDto.UserName);
-            UpdatedUser.Enterprise.EmployeeNumber.ShouldEqual(UserDto.Enterprise.EmployeeNumber);
+            UpdatedUserRecord.UserName.ShouldNotEqual(OriginalUserRecord.UserName);
+            UpdatedUserRecord.Enterprise.EmployeeNumber.ShouldNotEqual(OriginalUserRecord.Enterprise.EmployeeNumber);
         };
 
-        It should_not_return_password = () => UpdatedUser.Password.ShouldBeNull();
+        It should_not_return_password = () => UpdatedUserRecord.Password.ShouldBeNull();
 
         It should_change_etag_with_new_version = () =>
         {
-            UpdatedUser.Meta.Version.ShouldNotBeNull();
-            UpdatedUser.Meta.Version.ShouldNotEqual(UserDto.Meta.Version);
+            UpdatedUserRecord.Meta.Version.ShouldNotBeNull();
+            UpdatedUserRecord.Meta.Version.ShouldNotEqual(OriginalUserRecord.Meta.Version);
         };
 
         It should_change_last_modified = () =>
         {
-            UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UpdatedUser.Meta.Created);
-            UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UserDto.Meta.LastModified);
+            UpdatedUserRecord.Meta.LastModified.ShouldBeGreaterThan(UpdatedUserRecord.Meta.Created);
+            UpdatedUserRecord.Meta.LastModified.ShouldBeGreaterThan(OriginalUserRecord.Meta.LastModified);
         };
 
-        protected static EnterpriseUser UserDto;
+        protected static EnterpriseUser OriginalUserRecord;
 
-        protected static EnterpriseUser UpdatedUser;
+        protected static EnterpriseUser UpdatedUserRecord;
 
-        protected static string UserId;
+        protected static EnterpriseUser MutableUserPayload;
 
         protected static HttpResponseMessage Response;
     }

@@ -53,7 +53,7 @@
 
             mva(typeBuilder);
 
-            _SubAttributeDefinitions.AddRange(typeBuilder.MemberDefinitions.Values);
+            _SubAttributeDefinitions.AddRange(typeBuilder.MemberDefinitions.Values); // TODO: (DG) Change to dictionary?
 
             return this;
         }

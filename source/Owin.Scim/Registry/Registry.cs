@@ -39,7 +39,7 @@
             container.Register<IUserRepository, InMemoryUserRepository>(Reuse.InWebRequest);
             container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
             container.Register<IVerifyPasswordComplexity, DefaultPasswordComplexityVerifier>(Reuse.Singleton);
-            container.Register<IResourceETagProvider, DefaultETagProvider>(Reuse.Singleton);
+            container.Register<IResourceVersionProvider, DefaultResourceVersionProvider>(Reuse.Singleton);
             container.Register<IUserService, UserService>(
                 reuse: Reuse.Singleton,
                 made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));

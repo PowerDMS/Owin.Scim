@@ -21,7 +21,7 @@
             var instMemberExp = instanceToSet.Body as MemberExpression;
             if (instMemberExp == null) throw new ArgumentException("Must be a MemberExpression!", "instanceToSet");
 
-            if (response.StatusCode != HttpStatusCode.OK) return;
+            if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created) return;
 
             var result = await DeserializeResponse<T>(response, jsonDataToSet != null);
             

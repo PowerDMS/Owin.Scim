@@ -13,7 +13,7 @@ namespace Owin.Scim.Model.Users
         [JsonProperty(ScimConstants.Schemas.UserEnterprise)]
         public EnterpriseUserExtension Enterprise { get; set; }
 
-        public override string GenerateETagHash()
+        public override string CalculateVersion()
         {
             unchecked
             {

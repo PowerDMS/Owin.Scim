@@ -17,8 +17,8 @@
         {
             Users = new List<User>
             {
-                new User { UserName = "BJensen", Meta = new ResourceMetadata { LastModified = new DateTime(2015, 01, 01, 0, 0, 0, DateTimeKind.Utc) } },
-                new User { UserName = "ROMalley", Meta = new ResourceMetadata { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
+                new User { UserName = "BJensen", Meta = { LastModified = new DateTime(2015, 01, 01, 0, 0, 0, DateTimeKind.Utc) } },
+                new User { UserName = "ROMalley", Meta = { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
             };
 
             FilterExpression = new ScimFilter("meta.lastModified lt \"2014-05-13T04:42:34Z\"");

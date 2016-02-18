@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq.Expressions;
 
     using Extensions;
 
@@ -21,7 +20,7 @@
              * the endpoint "/Users" will set "resourceType" to "User", and
              * "/Groups" will set "resourceType" to "Group".
              */
-            Meta.ResourceType = ScimConstants.ResourceTypes.User;
+            Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User);
         }
 
         [JsonProperty(PropertyName = "externalId")]
@@ -156,7 +155,7 @@
         /// </summary>
         public IEnumerable<X509Certificate> X509Certificates { get; set; }
 
-        public override string GenerateETagHash()
+        public override string CalculateVersion()
         {
             return GenerateETagHashInternal().ToString();
         }

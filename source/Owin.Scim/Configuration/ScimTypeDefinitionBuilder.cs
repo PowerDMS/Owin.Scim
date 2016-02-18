@@ -21,44 +21,10 @@ namespace Owin.Scim.Configuration
             _ScimServerConfiguration = configuration;
             _MemberDefinitions = BuildDefaultTypeDefinitions();
         }
-
-        private IDictionary<PropertyDescriptor, IScimTypeMemberDefinitionBuilder> BuildDefaultTypeDefinitions()
+        
+        public Type ResourceType
         {
-            return TypeDescriptor.GetProperties(typeof (T))
-                .OfType<PropertyDescriptor>()
-                .ToDictionary(
-                    d => d,
-                    d => CreateTypeMemberDefinitionBuilder(d));
-        }
-
-        private IScimTypeMemberDefinitionBuilder CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)
-        {
-            if (typeof (IConvertible).IsAssignableFrom(descriptor.PropertyType))
-            {
-                var builder = typeof (ScimTypeScalarMemberDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
-                var instance = Activator.CreateInstance(builder, this, descriptor);
-
-                return (IScimTypeMemberDefinitionBuilder)instance;
-            }
-
-            if (descriptor.PropertyType.IsGenericType &&
-                descriptor.PropertyType.IsNonStringEnumerable() &&
-                typeof (MultiValuedAttribute).IsAssignableFrom(descriptor.PropertyType.GetGenericArguments()[0]))
-            {
-                var builder = typeof (ScimTypeMultiValuedAttributeDefinitionBuilder<,>)
-                    .MakeGenericType(typeof (T), descriptor.PropertyType.GetGenericArguments()[0]);
-                var instance = Activator.CreateInstance(builder, this, descriptor);
-
-                return (IScimTypeMemberDefinitionBuilder) instance;
-            }
-
-            return null; // TODO: (DG) Support ComplexProperties
-        }
-
-        public static implicit operator ScimServerConfiguration(ScimTypeDefinitionBuilder<T> typeDefinitionBuilder)
-        {
-            typeDefinitionBuilder.ScimServerConfiguration.AddResourceTypeDefinition(typeDefinitionBuilder);
-            return typeDefinitionBuilder.ScimServerConfiguration;
+            get { return typeof(T); }
         }
 
         public string Description { get; private set; }
@@ -78,19 +44,7 @@ namespace Owin.Scim.Configuration
             Description = description;
             return this;
         }
-
-        public ScimTypeDefinitionBuilder<TOtherResource> AddOrModifyResourceType<TOtherResource>(string name, string schema, string endpoint)
-            where TOtherResource : Resource
-        {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("name");
-            if (string.IsNullOrWhiteSpace(schema)) throw new ArgumentNullException("schema");
-            if (string.IsNullOrWhiteSpace(endpoint)) throw new ArgumentNullException("endpoint");
-            
-            ScimServerConfiguration.AddResourceTypeDefinition(this);
-
-            return new ScimResourceTypeDefinitionBuilder<TOtherResource>(this, name, schema, endpoint);
-        }
-
+        
         public ScimTypeScalarMemberDefinitionBuilder<T, TMember> For<TMember>(Expression<Func<T, TMember>> memberExp)
             where TMember : IConvertible
         {
@@ -132,6 +86,39 @@ namespace Owin.Scim.Configuration
         protected internal bool Contains(PropertyDescriptor propertyDescriptor)
         {
             return _MemberDefinitions.Any(kvp => kvp.Value != null && kvp.Value.Member.Equals(propertyDescriptor));
+        }
+
+        private IDictionary<PropertyDescriptor, IScimTypeMemberDefinitionBuilder> BuildDefaultTypeDefinitions()
+        {
+            return TypeDescriptor.GetProperties(typeof(T))
+                .OfType<PropertyDescriptor>()
+                .ToDictionary(
+                    d => d,
+                    d => CreateTypeMemberDefinitionBuilder(d));
+        }
+
+        private IScimTypeMemberDefinitionBuilder CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)
+        {
+            if (typeof(IConvertible).IsAssignableFrom(descriptor.PropertyType))
+            {
+                var builder = typeof(ScimTypeScalarMemberDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
+                var instance = Activator.CreateInstance(builder, this, descriptor);
+
+                return (IScimTypeMemberDefinitionBuilder)instance;
+            }
+
+            if (descriptor.PropertyType.IsGenericType &&
+                descriptor.PropertyType.IsNonStringEnumerable() &&
+                typeof(MultiValuedAttribute).IsAssignableFrom(descriptor.PropertyType.GetGenericArguments()[0]))
+            {
+                var builder = typeof(ScimTypeMultiValuedAttributeDefinitionBuilder<,>)
+                    .MakeGenericType(typeof(T), descriptor.PropertyType.GetGenericArguments()[0]);
+                var instance = Activator.CreateInstance(builder, this, descriptor);
+
+                return (IScimTypeMemberDefinitionBuilder)instance;
+            }
+
+            return null; // TODO: (DG) Support ComplexProperties
         }
     }
 }

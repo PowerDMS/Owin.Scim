@@ -25,7 +25,7 @@
                 StreetAddress = "213 E 26th St."
             });
 
-            User1ETag = User.GenerateETagHash();
+            User1ETag = User.CalculateVersion();
 
             _Addresses.Add(new Address
             {
@@ -37,7 +37,7 @@
                 StreetAddress = "150 E Robinson St."
             });
 
-            User2ETag = User.GenerateETagHash();
+            User2ETag = User.CalculateVersion();
         };
 
         It should_be_different_values = () => User1ETag.ShouldNotEqual(User2ETag);

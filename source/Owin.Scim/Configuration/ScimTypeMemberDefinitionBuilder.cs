@@ -51,20 +51,7 @@ namespace Owin.Scim.Configuration
         {
             get { return _Descriptor; }
         }
-
-        public ScimTypeDefinitionBuilder<TOtherResource> AddOrModifyResourceType<TOtherResource>(string name, string schema, string endpoint)
-            where TOtherResource : Resource
-        {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("name");
-            if (string.IsNullOrWhiteSpace(schema)) throw new ArgumentNullException("schema");
-            if (string.IsNullOrWhiteSpace(endpoint)) throw new ArgumentNullException("endpoint");
-            
-            var builder = new ScimResourceTypeDefinitionBuilder<TOtherResource>(this, name, schema, endpoint);
-            ScimTypeDefinitionBuilder.ScimServerConfiguration.AddResourceTypeDefinition(builder);
-
-            return builder;
-        }
-
+        
         public ScimTypeScalarMemberDefinitionBuilder<T, TOtherMember> For<TOtherMember>(
             Expression<Func<T, TOtherMember>> memberExp)
             where TOtherMember : IConvertible

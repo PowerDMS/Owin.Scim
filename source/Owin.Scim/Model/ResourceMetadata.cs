@@ -2,8 +2,20 @@
 {
     using System;
 
+    using Newtonsoft.Json;
+
     public sealed class ResourceMetadata
     {
+        public ResourceMetadata(string resourceType)
+        {
+            ResourceType = resourceType;
+        }
+
+        [JsonConstructor]
+        private ResourceMetadata()
+        {
+        }
+
         public string ResourceType { get; set; }
 
         public DateTime Created { get; set; }

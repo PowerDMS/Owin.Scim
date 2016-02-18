@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.Services
 {
+    using System;
     using System.Net;
     using System.Text;
     using System.Threading.Tasks;
@@ -58,14 +59,23 @@
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors);
             
-            var userRecord = CalculateVersion(await _UserRepository.CreateUser(user));
+            var createdDate = DateTime.UtcNow;
+            user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
+            {
+                Created = createdDate,
+                LastModified = createdDate
+            };
+
+            SetResourceVersion(user);
+
+            var userRecord = await _UserRepository.CreateUser(user);
 
             return new ScimDataResponse<User>(userRecord);
         }
 
         public async Task<IScimResponse<User>> RetrieveUser(string userId)
         {
-            var userRecord = CalculateVersion(await _UserRepository.GetUser(userId));
+            var userRecord = SetResourceVersion(await _UserRepository.GetUser(userId));
             if (userRecord == null)
                 return new ScimErrorResponse<User>(
                     new ScimError(
@@ -78,8 +88,8 @@
         public async Task<IScimResponse<User>> UpdateUser(User user)
         {
             var userRecord = await _UserRepository.GetUser(user.Id);
-            if (userRecord == null) return null;
-
+            if (userRecord == null) return null; // TODO: (DG) properly handle this.
+            
             await CanonicalizeUser(user);
 
             var validator = await _UserValidatorFactory.CreateValidator(user);
@@ -87,16 +97,23 @@
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors);
-
+            
+            // TODO: (DG) support password change properly, according to service prov config.
             if (!string.IsNullOrWhiteSpace(userRecord.Password))
             {
                 userRecord.Password = _PasswordManager.CreateHash(
                     Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
             }
 
-            await _UserRepository.UpdateUser(user);
+            user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
+            {
+                Created = userRecord.Meta.Created,
+                LastModified = DateTime.UtcNow
+            };
 
-            CalculateVersion(user);
+            SetResourceVersion(user);
+
+            await _UserRepository.UpdateUser(user);
 
             return new ScimDataResponse<User>(user);
         }

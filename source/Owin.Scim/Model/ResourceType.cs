@@ -9,7 +9,7 @@
         public ResourceType()
         {
             AddSchema(ScimConstants.Schemas.ResourceType);
-            Meta.ResourceType = ScimConstants.ResourceTypes.ResourceType;
+            Meta = new ResourceMetadata(ScimConstants.ResourceTypes.ResourceType);
         }
 
         [JsonProperty("name")]
@@ -27,7 +27,7 @@
         [JsonProperty("schemaExtensions")]
         public IEnumerable<SchemaExtension> SchemaExtensions { get; set; }
 
-        public override string GenerateETagHash()
+        public override string CalculateVersion()
         {
             return null;
         }

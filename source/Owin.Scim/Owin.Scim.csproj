@@ -214,8 +214,8 @@
     <Compile Include="Security\DefaultPasswordManager.cs" />
     <Compile Include="Security\IManagePasswords.cs" />
     <Compile Include="IScimResponse.cs" />
-    <Compile Include="Configuration\DefaultETagProvider.cs" />
-    <Compile Include="Configuration\IResourceETagProvider.cs" />
+    <Compile Include="Configuration\DefaultResourceVersionProvider.cs" />
+    <Compile Include="Configuration\IResourceVersionProvider.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="ScimDataResponse.cs" />
     <Compile Include="ScimErrorResponse.cs" />

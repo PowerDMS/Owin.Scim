@@ -17,11 +17,11 @@
         {
             _Emails.Add(new Email { Type = "work", Value = "babs.jensen@work.com" });
 
-            User1ETag = User.GenerateETagHash();
+            User1ETag = User.CalculateVersion();
 
             _Emails.Add(new Email { Type = "home", Value = "babs.jensen@home.com" });
 
-            User2ETag = User.GenerateETagHash();
+            User2ETag = User.CalculateVersion();
         };
 
         It should_be_different_values = () => User1ETag.ShouldNotEqual(User2ETag);

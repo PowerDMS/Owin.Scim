@@ -15,12 +15,12 @@
         {
             User.UserName = "daniel";
 
-            User1ETag = User.GenerateETagHash();
+            User1ETag = User.CalculateVersion();
 
             User.UserName = "daniel";
             User.Enterprise.Manager = new Manager { Value = "Chi Ho" };
 
-            User2ETag = User.GenerateETagHash();
+            User2ETag = User.CalculateVersion();
         };
 
         It should_be_different_values = () => User1ETag.ShouldNotEqual(User2ETag);

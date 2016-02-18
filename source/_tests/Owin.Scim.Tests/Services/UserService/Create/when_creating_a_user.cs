@@ -40,14 +40,14 @@
                     return Task.FromResult(user);
                 });
 
-            var etagProvider = A.Fake<IResourceETagProvider>();
+            var etagProvider = A.Fake<IResourceVersionProvider>();
             _UserService = new UserService(
                 ServerConfiguration,
                 UserRepository, 
                 PasswordManager,
                 new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
             {
-                ETagProvider = etagProvider
+                VersionProvider = etagProvider
             };
         };
 

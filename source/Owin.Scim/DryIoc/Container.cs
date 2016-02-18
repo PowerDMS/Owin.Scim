@@ -7758,7 +7758,7 @@ namespace DryIoc
         }
     }
 
-    /// <summary>Contains helper methods to work with Type: for instance to find Type implemented base types and interfaces, etc.</summary>
+    /// <summary>Contains helper methods to work with Type: for instance to find ResourceType implemented base types and interfaces, etc.</summary>
     public static class ReflectionTools
     {
         /// <summary>Flags for <see cref="GetImplementedTypes"/> method.</summary>
@@ -8443,7 +8443,7 @@ namespace DryIoc
             return s;
         }
 
-        /// <summary>Default delegate to print Type details: by default prints Type FullName and
+        /// <summary>Default delegate to print Type details: by default prints ResourceType FullName and
         /// skips namespace if it start with "System."</summary>
         public static readonly Func<Type, string> GetTypeNameDefault = t =>
             t.FullName != null && t.Namespace != null && !t.Namespace.StartsWith("System") ? t.FullName : t.Name;
@@ -8548,7 +8548,7 @@ namespace DryIoc
     /// <summary>Immutable Key-Value pair. It is reference type (could be check for null), 
     /// which is different from System value type <see cref="KeyValuePair{TKey,TValue}"/>.
     /// In addition provides <see cref="Equals"/> and <see cref="GetHashCode"/> implementations.</summary>
-    /// <typeparam name="K">Type of Key.</typeparam><typeparam name="V">Type of Value.</typeparam>
+    /// <typeparam name="K">Type of Key.</typeparam><typeparam name="V">ResourceType of Value.</typeparam>
     public sealed class KV<K, V>
     {
         /// <summary>Key.</summary>
