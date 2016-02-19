@@ -105,7 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLazy.cs" />
-    <Compile Include="Configuration\CanonicalizationRule.cs" />
+    <Compile Include="Configuration\ComplexCanonicalizationRule.cs" />
     <Compile Include="Configuration\DefaultSchemaTypeFactory.cs" />
     <Compile Include="Configuration\DryIocActivationProvider.cs" />
     <Compile Include="Configuration\DryIocManager.cs" />
@@ -127,6 +127,7 @@
     <Compile Include="Configuration\ScimTypeAttributeDefinitionBuilder.cs" />
     <Compile Include="Configuration\ScimTypeComplexAttributeDefinitionBuilder.cs" />
     <Compile Include="Configuration\ScimTypeScalarAttributeDefinitionBuilder.cs" />
+    <Compile Include="Configuration\ScimTypeUriAttributeDefinitionBuilder.cs" />
     <Compile Include="Configuration\Unique.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />

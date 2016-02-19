@@ -42,10 +42,16 @@
                             "Authentication scheme using the OAuth Bearer Token standard.", 
                             specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
                             isPrimary: true))
-                    .ConfigureETag(true, true)
+                    .ConfigureETag(supported: true, isWeak: true)
+                    .ModifyResourceType<User>(ModifyUserResourceType)
                 );
             });
             // ncrunch: no coverage end
+        }
+
+        private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
+        {
+            
         }
 
         public void OnAssemblyComplete()

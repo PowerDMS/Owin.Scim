@@ -60,7 +60,7 @@
         [JsonProperty(PropertyName = "profileUrl")]
         public Uri ProfileUrl { get; set; }
 
-        [Description(@"The user's title, such as ""Vice President"".")]
+        [Description(@"The user's title, such as 'Vice President'.")]
         [JsonProperty(PropertyName = "title")]
         public string Title { get; set; }
 

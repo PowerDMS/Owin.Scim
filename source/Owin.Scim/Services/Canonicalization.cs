@@ -1,17 +1,31 @@
-﻿namespace Owin.Scim.Services
+﻿using System;
+using System.ComponentModel;
+using System.Linq.Expressions;
+
+using Owin.Scim.Model.Users;
+
+namespace Owin.Scim.Services
 {
     using System;
-    using System.Collections;
+    using System.ComponentModel;
     using System.Linq.Expressions;
     using System.Reflection;
 
+    using Configuration;
+
+    using Extensions;
+
     using Model;
 
-    public class Canonicalization
+    using PhoneNumbers;
+
+    using PhoneNumber = Model.Users.PhoneNumber;
+
+
+    public static class Canonicalization
     {
-        public static void Lowercase<T, TProperty>(T attribute, Expression<Func<T, TProperty>> expression)
+        public static void Lowercase<T>(T attribute, Expression<Func<T, string>> expression)
             where T : MultiValuedAttribute
-            where TProperty : class, IComparable, ICloneable, IConvertible, IEnumerable
         {
             var mE = expression.Body as MemberExpression;
             if (mE == null) throw new InvalidOperationException("Expression body must be a MemberExpression to an attribute's string property.");
@@ -46,6 +60,66 @@
         public static void EnforceMutabilityRules(MultiValuedAttribute attribute)
         {
             attribute.Display = null; // Immutable, readOnly, returns the canonical value
+        }
+
+        public static TProperty Canonicalize<TProperty>(
+            this TProperty property,
+            CanonicalizationFunc<TProperty> canonicalizationFunc)
+        {
+            return default(TProperty);
+        }
+
+        public static void Canonicalize<T, TProperty>(
+            this T source,
+            Expression<Func<T, TProperty>> property,
+            Func<TProperty, TProperty> canonicalizationFunc)
+        {
+            source.Canonicalize(property, property, canonicalizationFunc);
+        }
+
+        public static void Canonicalize<T, TProperty, TOtherProperty>(
+            this T source,
+            Expression<Func<T, TProperty>> sourceProperty,
+            Expression<Func<T, TOtherProperty>> targetProperty,
+            Func<TProperty, TOtherProperty> canonicalizationFunc)
+            where TProperty : TOtherProperty
+        {
+            if (source == null) return;
+            if (sourceProperty == null) throw new ArgumentNullException("sourceProperty");
+            if (targetProperty == null) throw new ArgumentNullException("targetProperty");
+            if (canonicalizationFunc == null) throw new ArgumentNullException("canonicalizationFunc");
+
+            var descriptors = GetDescriptors(sourceProperty, targetProperty);
+            var sourceValue = descriptors.Item1.GetValue(source);
+
+            // If sourceValue is null or default for type, just set target to default
+            if (sourceValue == descriptors.Item1.PropertyType.GetDefaultValue())
+            {
+                descriptors.Item2.SetValue(source, sourceValue);
+                return;
+            }
+
+            var canonicalizedValue = canonicalizationFunc((TProperty)sourceValue);
+            descriptors.Item2.SetValue(source, canonicalizedValue);
+        }
+
+        private static Tuple<PropertyDescriptor, PropertyDescriptor> GetDescriptors<T, TProperty, TOtherProperty>(
+            Expression<Func<T, TProperty>> sourceProperty,
+            Expression<Func<T, TOtherProperty>> targetProperty)
+        {
+            var memberExpression = sourceProperty.Body as MemberExpression;
+            if (memberExpression == null)
+                throw new InvalidOperationException("sourceProperty must be of type MemberExpression.");
+
+            var sourceDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
+
+            memberExpression = targetProperty.Body as MemberExpression;
+            if (memberExpression == null)
+                throw new InvalidOperationException("targetProperty must be of type MemberExpression.");
+
+            var targetDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
+
+            return Tuple.Create(sourceDescriptor, targetDescriptor);
         }
     }
 }

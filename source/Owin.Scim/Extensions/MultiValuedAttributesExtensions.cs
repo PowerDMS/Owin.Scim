@@ -13,12 +13,12 @@
     {
         public static void Canonicalize<T>(
             this IEnumerable<T> multiValuedAttributes,
-            params CanonicalizationRule<T>[] canonicalizationRules)
+            params ComplexCanonicalizationRule<T>[] canonicalizationRules)
             where T : MultiValuedAttribute
         {
             if (multiValuedAttributes == null || !multiValuedAttributes.Any()) return;
 
-            var stateCache = new Dictionary<CanonicalizationRule<T>, object>();
+            var stateCache = new Dictionary<ComplexCanonicalizationRule<T>, object>();
             multiValuedAttributes.ForEach(attribute =>
             {
                 if (attribute == null) return;

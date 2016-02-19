@@ -12,12 +12,22 @@ namespace Owin.Scim.Configuration
     {
         private readonly ScimServerConfiguration _ScimServerConfiguration;
 
-        private readonly IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> _MemberDefinitions;
+        private readonly IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> _AttributeDefinitions;
 
         public ScimTypeDefinitionBuilder(ScimServerConfiguration configuration)
         {
             _ScimServerConfiguration = configuration;
-            _MemberDefinitions = BuildDefaultTypeDefinitions();
+            _AttributeDefinitions = BuildDefaultTypeDefinitions();
+            
+            var descriptionAttr = TypeDescriptor
+                .GetAttributes(typeof(T))
+                .Cast<Attribute>()
+                .SingleOrDefault(attr => attr is DescriptionAttribute) as DescriptionAttribute;
+
+            if (descriptionAttr != null)
+            {
+                Description = descriptionAttr.Description.RemoveMultipleSpaces();
+            }
         }
         
         public Type ResourceType
@@ -32,9 +42,9 @@ namespace Owin.Scim.Configuration
             get { return _ScimServerConfiguration; }
         }
 
-        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> MemberDefinitions
+        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> AttributeDefinitions
         {
-            get { return _MemberDefinitions; }
+            get { return _AttributeDefinitions; }
         }
 
         public ScimTypeDefinitionBuilder<T> SetDescription(string description)
@@ -55,7 +65,7 @@ namespace Owin.Scim.Configuration
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_MemberDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[propertyDescriptor];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
@@ -70,8 +80,9 @@ namespace Owin.Scim.Configuration
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_MemberDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[propertyDescriptor];
         }
+
 
         private IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> BuildDefaultTypeDefinitions()
         {
@@ -90,7 +101,9 @@ namespace Owin.Scim.Configuration
             // scalar attribute
             if (descriptor.PropertyType.IsTerminalObject())
             {
-                builder = typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
+                builder = typeof(Uri).IsAssignableFrom(descriptor.PropertyType)
+                    ? typeof(ScimTypeUriAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType)
+                    : typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
                 instance = (IScimTypeAttributeDefinitionBuilder)Activator.CreateInstance(builder, this, descriptor);
 
                 return instance;

@@ -7,6 +7,8 @@ namespace Owin.Scim.Configuration
     using System.Linq.Expressions;
 
     using Extensions;
+    
+    using Services;
 
     public class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinitionBuilder
     {
@@ -22,10 +24,11 @@ namespace Owin.Scim.Configuration
             _Descriptor = descriptor;
 
             // Initialize defaults
+            CaseExact = false;
             Mutability = Mutable.ReadWrite;
+            Required = false;
             Returned = Return.Default;
             Uniqueness = Unique.None;
-            CaseExact = false;
 
             var descriptionAttr = descriptor
                 .Attributes
@@ -46,6 +49,8 @@ namespace Owin.Scim.Configuration
         internal string Description { get; set; }
 
         internal Mutable Mutability { get; set; }
+
+        internal bool Required { get; set; }
 
         internal Return Returned { get; set; }
 
@@ -78,6 +83,12 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetRequired(bool required)
+        {
+            Required = required;
+            return this;
+        }
+
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetReturned(Return returned)
         {
             Returned = returned;
@@ -87,12 +98,6 @@ namespace Owin.Scim.Configuration
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetUniqueness(Unique uniqueness)
         {
             Uniqueness = uniqueness;
-            return this;
-        }
-
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetCaseExact(bool caseExact)
-        {
-            CaseExact = caseExact;
             return this;
         }
 
@@ -108,7 +113,7 @@ namespace Owin.Scim.Configuration
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof (T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)ScimTypeDefinitionBuilder.MemberDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute> For<TOtherAttribute>(
@@ -123,7 +128,40 @@ namespace Owin.Scim.Configuration
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)ScimTypeDefinitionBuilder.MemberDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationFunc<TAttribute> rule)
+        {
+            //var c = new Func<T, PropertyDescriptor, CanonicalizationFunc<>>
+            var canonicalizationRule = new Func<TAttribute, TAttribute>(attr => attr.Canonicalize(rule));
+
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationAction<TAttribute> rule)
+        {
+            // TODO: (DG) impl
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule<TState>(
+            StatefulCanonicalizationAction<TAttribute, TState> rule)
+        {
+            // TODO: (DG) impl
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> ClearCanonicalizationRules()
+        {
+            // TODO: (DG) impl
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddAcceptableValues(params TAttribute[] acceptableValues)
+        {
+            // TODO: (DG) impl
+            return this;
         }
     }
 }

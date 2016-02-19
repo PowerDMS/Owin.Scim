@@ -9,8 +9,7 @@
         : ScimTypeAttributeDefinitionBuilder<T, TComplexAttribute>
         where TComplexAttribute : class
     {
-        private readonly ISet<IScimTypeAttributeDefinitionBuilder> _SubAttributeDefinitions = 
-            new HashSet<IScimTypeAttributeDefinitionBuilder>();
+        private readonly ScimTypeDefinitionBuilder<TComplexAttribute> _TypeDefinitionBuilder;
         
         public ScimTypeComplexAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
@@ -19,11 +18,17 @@
             : base (scimTypeDefinitionBuilder, descriptor)
         {
             MultiValued = multiValued;
+            _TypeDefinitionBuilder = new ScimTypeDefinitionBuilder<TComplexAttribute>(ScimTypeDefinitionBuilder.ScimServerConfiguration);
         }
-        
-        internal void AddSubAttributeDefinitions(IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> memberDefinitions)
+
+        protected internal ScimTypeDefinitionBuilder<TComplexAttribute> TypeDefinitionBuilder
         {
-            _SubAttributeDefinitions.AddRange(memberDefinitions.Values); // TODO: (DG) Change to dictionary?
+            get { return _TypeDefinitionBuilder; }
+        }
+
+        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> SubAttributeDefinitions
+        {
+            get { return _TypeDefinitionBuilder.AttributeDefinitions; }
         }
     }
 }

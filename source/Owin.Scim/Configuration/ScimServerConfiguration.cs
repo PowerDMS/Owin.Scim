@@ -4,10 +4,18 @@
     using System.Collections.Generic;
     using System.IO;
 
+    using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
+
     using Model;
     using Model.Users;
 
     using NContext.Extensions;
+
+    using PhoneNumbers;
+
+    using Services;
+
+    using PhoneNumber = Model.Users.PhoneNumber;
 
     public class ScimServerConfiguration
     {
@@ -256,42 +264,39 @@
         private void DefineUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
             builder
-                .For(u => u.UserName)
                 .For(u => u.Id)
                     .SetMutability(Mutable.ReadOnly)
                     .SetReturned(Return.Always)
                     .SetUniqueness(Unique.Server)
                     .SetCaseExact(true)
+                .For(u => u.UserName)
+                    .SetRequired(true)
+                    .SetUniqueness(Unique.Server)
+                .For(u => u.Locale)
+                    .AddCanonicalizationRule(locale => !string.IsNullOrWhiteSpace(locale) ? locale.Replace('_', '-') : locale)
+                .For(u => u.ProfileUrl)
+                    .SetReferenceTypes("external")
                 .For(u => u.Password)
                     .SetMutability(Mutable.WriteOnly)
-                    .SetCaseExact(true)
                     .SetReturned(Return.Never)
-                .For(u => u.Name)
-                    .ForSubAttributes(nameCofig => nameCofig
-                        .For(name => name.FamilyName)
-                            .SetDescription("The user's family / surname.")
-                        .For(name => name.GivenName)
-                            .SetDescription(""))
-                .For(u => u.Groups)
-                    .SetMutability(Mutable.ReadOnly)
-                
-// Canonicalization Support?
-//                        .For(u => u.Locale)
-//                            .AddCanonicalizationRules(
-//                                (User user) =>
-//                                {
-//                                    if (!string.IsNullOrWhiteSpace(user.Locale))
-//                                    {
-//                                        user.Locale = user.Locale.Replace('_', '-'); // Supports backwards compatability
-//                                    }
-//                                })
-
-                .For(u => u.Addresses)
                 .For(u => u.Emails)
-                    .ForSubAttributes(emailConfig => emailConfig
+                    .DefineSubAttributes(configEmail => configEmail
                         .For(e => e.Display)
                             .SetMutability(Mutable.ReadOnly))
-//                            .AddCanonicalizationRules(
+                .For(u => u.PhoneNumbers)
+                    .AddCanonicalizationRule(phone => phone.Canonicalize(p => p.Value, p => p.Display, PhoneNumberUtil.Normalize))
+                    .AddCanonicalizationRule((PhoneNumber phone, ref object state) => { Canonicalization.EnforceSinglePrimaryAttribute(phone, ref state); })
+                    .DefineSubAttributes(config => config
+                        .For(phone => phone.Value)
+                            .AddCanonicalizationRule(value => value))
+                .For(u => u.Groups)
+                    .SetMutability(Mutable.ReadOnly)
+
+                .For(u => u.Addresses)
+                    .DefineSubAttributes(addressConfig => addressConfig
+                        .For(a => a.Display)
+                            .SetMutability(Mutable.ReadOnly))
+//                            .SetCanonicalizationRules(
 //                                (Email attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
 //                                (Email attribute, ref object state) =>
 //                                {
@@ -311,5 +316,6 @@
 //                                .SetDescription("A string identifier, typically numeric or alphanumeric, assigned to a person, typically based on order of hire or association with an organization.")
 ;
         }
+
     }
 }
