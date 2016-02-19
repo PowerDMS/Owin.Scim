@@ -88,16 +88,23 @@
         public async Task<IScimResponse<User>> UpdateUser(User user)
         {
             var userRecord = await _UserRepository.GetUser(user.Id);
-            if (userRecord == null) return null; // TODO: (DG) properly handle this.
-            
+            if (userRecord == null)
+            {
+                return new ScimErrorResponse<User>(
+                                    new ScimError(
+                                        HttpStatusCode.NotFound,
+                                        detail: ErrorDetail.NotFound(user.Id)));
+            }
+
             await CanonicalizeUser(user);
 
             var validator = await _UserValidatorFactory.CreateValidator(user);
-            var validationResult = (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Update)).ToScimValidationResult();
+            var validationResult =
+                (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Update)).ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors);
-            
+
             // TODO: (DG) support password change properly, according to service prov config.
             if (!string.IsNullOrWhiteSpace(userRecord.Password))
             {
