@@ -73,9 +73,13 @@ app.UseScimServer(
 
 ##SCIM Extensibility  
 ###Defining & Modifying Resource Types  
-All core SCIM resource types and rules are added by default.
+All core SCIM resource types and rules are added by default.  There are many valid use cases to modify the default Owin.Scim resource type settings:
+1. service provider may require certain fields
+2. service provider has specific canonicalization rules
+3. service provider has specific validation rules
+4. etc ...
 
-SCIM's resource type attributes default to:  
+The majority of SCIM's resource type attributes have qualities which default to:  
 * caseExact: false  
 * mutability: readWrite (readOnly, writeOnly, immutable)  
 * required: false  
@@ -114,4 +118,47 @@ private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> buil
         .SetMutability(Mutable.ReadOnly)
 }
 ```
-In the example provided, I have made a User.Name.FamilyName required.  This is against the default SCIM rule and will enforce clients to submit a FamilyName when creating/modifying users.
+In the example provided, I have made a User.Name.FamilyName required.  This is against the default SCIM rule and will enforce clients to submit a FamilyName when creating/modifying users.  These qualities define metadata which is then used to create validation and canonicalization rules.
+
+####Adding Canonicalization Rules (c-rule)
+Owin.Scim allows the developer to specify canonicalization rules (delegates) as rules for resource type attributes. Some rules are built-in by default.
+
+```csharp
+private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
+{
+  .For(u => u.Emails)
+      .AddCanonicalizationRule(email => 
+          email.Canonicalize(
+              e => e.Value, 
+              e => e.Display, 
+              value =>
+          {
+              // canonicalize email.Value (user@MyDomain.cOm) into email.Display (user@mydomain.com)
+              var atIndex = value.IndexOf('@') + 1;
+              if (atIndex == 0) return null; // IndexOf returned -1, invalid email
+                              
+              return value.Substring(0, atIndex) + value.Substring(atIndex).ToLower();
+          }))
+      .AddCanonicalizationRule((Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state))
+```
+This example illustrates setting c-rules on multi-valued attributes for email.  Here, we are taking the email.Value attribute and canonicalizing it to the email.Display attribute.  Since this rule requires access to multiple email attributes, we add this rule to the Emails attribute of User.  Next, we will look at canonicalization rules for scalar attributes.
+
+*By default, all core resource types with multi-valued attributes have a canonicalization rule to `EnforceSinglePrimaryAttribute`.  This complies with the specification's rules.*
+
+#####Scalar Attributes
+It may be you're only canonicalizing a single scalar valued attribute or do not need to reference it's parent object's other attributes. (e.g. value and display).  In that case, just apply the "c-rule" 
+```csharp
+.For(u => u.Photos)
+  .AddCanonicalizationRule((Photo photo, ref object state) => Canonical  orceSinglePrimaryAttribute(photo, ref state))
+    .DefineSubAttributes(config => config
+      .For(p => p.Display)
+        .SetMutability(Mutability.ReadOnly)
+      .For(p => p.Value)
+        .AddCanonicalizationRule(value => value.ToLower()))
+```
+
+**You do not need to check for null (reference-type) or default (value-type) values being passed in.**  Owin.Scim saves time by doing this for you.
+
+*Owin.Scim does not include any default acceptable attribute values; canonical values.*
+
+The SCIM specification frequently references canonical values for multi-valued attribute's type.  Items like: `work`, `home`, `other`, etc.  Owin.Scim does not view this as canonicalization, but validation.  Canonicalization should be viewed strictly in terms of normalization of data.
