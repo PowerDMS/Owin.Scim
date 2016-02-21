@@ -4,6 +4,8 @@
     using System.Collections.Generic;
     using System.IO;
 
+    using Canonicalization;
+
     using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
 
     using Model;
@@ -27,13 +29,13 @@
 
         private readonly ISet<Predicate<FileInfo>> _CompositionFileInfoConstraints;
 
-        private readonly IDictionary<Type, IScimTypeDefinitionBuilder> _ResourceTypeDefinitions;
+        private readonly IDictionary<Type, IScimTypeDefinition> _ResourceTypeDefinitions;
 
         public ScimServerConfiguration()
         {
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
             _CompositionFileInfoConstraints = new HashSet<Predicate<FileInfo>>();
-            _ResourceTypeDefinitions = new Dictionary<Type, IScimTypeDefinitionBuilder>();
+            _ResourceTypeDefinitions = new Dictionary<Type, IScimTypeDefinition>();
 
             _Features = CreateDefaultFeatures();
             _SchemaBindingRules = CreateDefaultBindingRules();
@@ -209,6 +211,13 @@
             return this;
         }
 
+        public IScimTypeDefinition GetScimTypeDefinition(Type type)
+        {
+            return _ResourceTypeDefinitions.ContainsKey(type)
+                ? _ResourceTypeDefinitions[type]
+                : null;
+        }
+
         private IList<SchemaBindingRule> CreateDefaultBindingRules()
         {
             var rules = new List<SchemaBindingRule>
@@ -265,50 +274,96 @@
         {
             builder
                 .For(u => u.Id)
-                    .SetMutability(Mutable.ReadOnly)
-                    .SetReturned(Return.Always)
-                    .SetUniqueness(Unique.Server)
+                    .SetMutability(Mutability.ReadOnly)
+                    .SetReturned(Returned.Always)
+                    .SetUniqueness(Uniqueness.Server)
                     .SetCaseExact(true)
+
                 .For(u => u.UserName)
                     .SetRequired(true)
-                    .SetUniqueness(Unique.Server)
+                    .SetUniqueness(Uniqueness.Server)
+
                 .For(u => u.Locale)
                     .AddCanonicalizationRule(locale => !string.IsNullOrWhiteSpace(locale) ? locale.Replace('_', '-') : locale)
+
                 .For(u => u.ProfileUrl)
                     .SetReferenceTypes("external")
+
                 .For(u => u.Password)
-                    .SetMutability(Mutable.WriteOnly)
-                    .SetReturned(Return.Never)
+                    .SetMutability(Mutability.WriteOnly)
+                    .SetReturned(Returned.Never)
+
                 .For(u => u.Emails)
-                    .DefineSubAttributes(configEmail => configEmail
+                    .AddCanonicalizationRule(email => 
+                        email.Canonicalize(
+                            e => e.Value, 
+                            e => e.Display, 
+                            value =>
+                        {
+                            if (string.IsNullOrWhiteSpace(value)) return null;
+
+                            var atIndex = value.IndexOf('@') + 1;
+                            if (atIndex == 0) return null; // IndexOf returned -1, invalid email
+                            
+                            return value.Substring(0, atIndex) + value.Substring(atIndex).ToLower();
+                        }))
+                    .AddCanonicalizationRule((Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state))
+                    .DefineSubAttributes(config => config
                         .For(e => e.Display)
-                            .SetMutability(Mutable.ReadOnly))
+                            .SetMutability(Mutability.ReadOnly))
+
                 .For(u => u.PhoneNumbers)
                     .AddCanonicalizationRule(phone => phone.Canonicalize(p => p.Value, p => p.Display, PhoneNumberUtil.Normalize))
-                    .AddCanonicalizationRule((PhoneNumber phone, ref object state) => { Canonicalization.EnforceSinglePrimaryAttribute(phone, ref state); })
+                    .AddCanonicalizationRule((PhoneNumber phone, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(phone, ref state))
                     .DefineSubAttributes(config => config
-                        .For(phone => phone.Value)
-                            .AddCanonicalizationRule(value => value))
+                        .For(p => p.Display)
+                            .SetMutability(Mutability.ReadOnly))
+
                 .For(u => u.Groups)
-                    .SetMutability(Mutable.ReadOnly)
+                    .AddCanonicalizationRule((UserGroup group, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(group, ref state))
+                    .SetMutability(Mutability.ReadOnly)
+                    .DefineSubAttributes(config => config
+                        .For(g => g.Display)
+                            .SetMutability(Mutability.ReadOnly))
 
                 .For(u => u.Addresses)
-                    .DefineSubAttributes(addressConfig => addressConfig
+                    .AddCanonicalizationRule((Address address, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(address, ref state))
+                    .DefineSubAttributes(config => config
                         .For(a => a.Display)
-                            .SetMutability(Mutable.ReadOnly))
-//                            .SetCanonicalizationRules(
-//                                (Email attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-//                                (Email attribute, ref object state) =>
-//                                {
-//                                    if (string.IsNullOrWhiteSpace(attribute.Value)) return;
+                            .SetMutability(Mutability.ReadOnly))
 
-//                                    var atIndex = attribute.Value.IndexOf('@') + 1;
-//                                    if (atIndex == 0) return; // IndexOf returned -1
+                .For(u => u.Roles)
+                    .AddCanonicalizationRule((Role role, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(role, ref state))
+                    .DefineSubAttributes(config => config
+                        .For(r => r.Display)
+                            .SetMutability(Mutability.ReadOnly))
 
-//                                    var cEmail = attribute.Value.Substring(0, atIndex) + attribute.Value.Substring(atIndex).ToLower();
-//                                    attribute.Display = cEmail;
-//                                },
-//                                (Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state))
+                .For(u => u.Entitlements)
+                    .AddCanonicalizationRule((Entitlement entitlement, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(entitlement, ref state))
+                    .DefineSubAttributes(config => config
+                        .For(e => e.Display)
+                            .SetMutability(Mutability.ReadOnly))
+
+                .For(u => u.Ims)
+                    .AddCanonicalizationRule((InstantMessagingAddress im, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(im, ref state))
+                    .DefineSubAttributes(config => config
+                        .For(im => im.Display)
+                            .SetMutability(Mutability.ReadOnly))
+
+                .For(u => u.Photos)
+                    .AddCanonicalizationRule((Photo photo, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(photo, ref state))
+                    .DefineSubAttributes(config => config
+                        .For(p => p.Display)
+                            .SetMutability(Mutability.ReadOnly)
+                        .For(p => p.Value)
+                            .AddCanonicalizationRule(value => value.ToLower()))
+
+                .For(u => u.X509Certificates)
+                    .AddCanonicalizationRule((X509Certificate certificate, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(certificate, ref state))
+                    .DefineSubAttributes(config => config
+                        .For(c => c.Display)
+                            .SetMutability(Mutability.ReadOnly))
+
 
 // SUPPORT SCHEMA EXTENSIONS!
 //                        .AddOrModifySchemaExtension<EnterpriseUser, EnterpriseUserExtension>(ScimConstants.Schemas.UserEnterprise, true)

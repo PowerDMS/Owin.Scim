@@ -4,16 +4,21 @@
 
     using Model;
 
-    public class ServiceBase
+    public abstract class ServiceBase
     {
         private readonly ScimServerConfiguration _Configuration;
 
-        public ServiceBase(ScimServerConfiguration configuration)
+        protected ServiceBase(ScimServerConfiguration configuration)
         {
             _Configuration = configuration;
         }
 
         public IResourceVersionProvider VersionProvider { get; set; }
+
+        public ScimServerConfiguration ScimServerConfiguration
+        {
+            get { return _Configuration; }
+        }
 
         protected virtual TResource SetResourceVersion<TResource>(TResource resource)
             where TResource : Resource

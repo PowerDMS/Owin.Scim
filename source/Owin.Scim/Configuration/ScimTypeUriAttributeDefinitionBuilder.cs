@@ -10,8 +10,8 @@ namespace Owin.Scim.Configuration
     {
         public ScimTypeUriAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
-            PropertyDescriptor descriptor)
-            : base(scimTypeDefinitionBuilder, descriptor)
+            PropertyDescriptor propertyDescriptor)
+            : base(scimTypeDefinitionBuilder, propertyDescriptor)
         {
         }
 

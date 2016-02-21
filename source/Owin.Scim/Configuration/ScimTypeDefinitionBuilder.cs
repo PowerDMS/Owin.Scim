@@ -8,11 +8,11 @@ namespace Owin.Scim.Configuration
 
     using Extensions;
 
-    public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinitionBuilder
+    public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinition
     {
         private readonly ScimServerConfiguration _ScimServerConfiguration;
 
-        private readonly IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> _AttributeDefinitions;
+        private readonly IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> _AttributeDefinitions;
 
         public ScimTypeDefinitionBuilder(ScimServerConfiguration configuration)
         {
@@ -42,7 +42,7 @@ namespace Owin.Scim.Configuration
             get { return _ScimServerConfiguration; }
         }
 
-        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> AttributeDefinitions
+        public IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> AttributeDefinitions
         {
             get { return _AttributeDefinitions; }
         }
@@ -84,7 +84,7 @@ namespace Owin.Scim.Configuration
         }
 
 
-        private IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> BuildDefaultTypeDefinitions()
+        private IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> BuildDefaultTypeDefinitions()
         {
             return TypeDescriptor.GetProperties(typeof(T))
                 .OfType<PropertyDescriptor>()
@@ -93,10 +93,10 @@ namespace Owin.Scim.Configuration
                     d => CreateTypeMemberDefinitionBuilder(d));
         }
 
-        private IScimTypeAttributeDefinitionBuilder CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)
+        private IScimTypeAttributeDefinition CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)
         {
             Type builder;
-            IScimTypeAttributeDefinitionBuilder instance;
+            IScimTypeAttributeDefinition instance;
 
             // scalar attribute
             if (descriptor.PropertyType.IsTerminalObject())
@@ -104,7 +104,7 @@ namespace Owin.Scim.Configuration
                 builder = typeof(Uri).IsAssignableFrom(descriptor.PropertyType)
                     ? typeof(ScimTypeUriAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType)
                     : typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
-                instance = (IScimTypeAttributeDefinitionBuilder)Activator.CreateInstance(builder, this, descriptor);
+                instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor);
 
                 return instance;
             }
@@ -114,14 +114,14 @@ namespace Owin.Scim.Configuration
             {
                 builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>)
                     .MakeGenericType(typeof(T), descriptor.PropertyType.GetGenericArguments()[0]);
-                instance = (IScimTypeAttributeDefinitionBuilder)Activator.CreateInstance(builder, this, descriptor, true);
+                instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, true);
 
                 return instance;
             }
 
             // complex attribute
             builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
-            instance = (IScimTypeAttributeDefinitionBuilder)Activator.CreateInstance(builder, this, descriptor, false);
+            instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, false);
 
             return instance;
         }

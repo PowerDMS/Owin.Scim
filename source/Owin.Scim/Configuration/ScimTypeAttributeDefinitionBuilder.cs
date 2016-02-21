@@ -6,31 +6,34 @@ namespace Owin.Scim.Configuration
     using System.Linq;
     using System.Linq.Expressions;
 
-    using Extensions;
-    
-    using Services;
+    using Canonicalization;
 
-    public class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinitionBuilder
+    using Extensions;
+
+    public abstract class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinition
     {
         private readonly ScimTypeDefinitionBuilder<T> _ScimTypeDefinitionBuilder;
 
-        private readonly PropertyDescriptor _Descriptor;
+        private readonly PropertyDescriptor _PropertyDescriptor;
+
+        private readonly IList<ICanonicalizationRule> _CanonicalizationRules; 
 
         protected ScimTypeAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
-            PropertyDescriptor descriptor)
+            PropertyDescriptor propertyDescriptor)
         {
             _ScimTypeDefinitionBuilder = scimTypeDefinitionBuilder;
-            _Descriptor = descriptor;
+            _PropertyDescriptor = propertyDescriptor;
+            _CanonicalizationRules = new List<ICanonicalizationRule>();
 
             // Initialize defaults
             CaseExact = false;
-            Mutability = Mutable.ReadWrite;
+            Mutability = Configuration.Mutability.ReadWrite;
             Required = false;
-            Returned = Return.Default;
-            Uniqueness = Unique.None;
+            Returned = Configuration.Returned.Default;
+            Uniqueness = Configuration.Uniqueness.None;
 
-            var descriptionAttr = descriptor
+            var descriptionAttr = propertyDescriptor
                 .Attributes
                 .Cast<Attribute>()
                 .SingleOrDefault(attr => attr is DescriptionAttribute) as DescriptionAttribute;
@@ -46,19 +49,24 @@ namespace Owin.Scim.Configuration
             return builder._ScimTypeDefinitionBuilder.ScimServerConfiguration;
         }
 
-        internal string Description { get; set; }
+        public string Description { get; protected set; }
 
-        internal Mutable Mutability { get; set; }
+        public Mutability Mutability { get; protected set; }
 
-        internal bool Required { get; set; }
+        public bool Required { get; protected set; }
 
-        internal Return Returned { get; set; }
+        public Returned Returned { get; protected set; }
 
-        internal Unique Uniqueness { get; set; }
+        public Uniqueness Uniqueness { get; protected set; }
 
-        internal bool CaseExact { get; set; }
+        public bool CaseExact { get; protected set; }
 
-        internal bool MultiValued { get; set; }
+        public IEnumerable<ICanonicalizationRule> GetCanonicalizationRules()
+        {
+            return _CanonicalizationRules;
+        }
+
+        public bool MultiValued { get; protected set; }
 
         protected internal ScimTypeDefinitionBuilder<T> ScimTypeDefinitionBuilder
         {
@@ -67,9 +75,10 @@ namespace Owin.Scim.Configuration
 
         public PropertyDescriptor AttributeDescriptor
         {
-            get { return _Descriptor; }
+            get { return _PropertyDescriptor; }
         }
 
+        public virtual IScimTypeDefinition TypeDefinitionBuilder { get { return null; } }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetDescription(string description)
         {
@@ -77,7 +86,7 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetMutability(Mutable mutability)
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetMutability(Mutability mutability)
         {
             Mutability = mutability;
             return this;
@@ -89,13 +98,13 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetReturned(Return returned)
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetReturned(Returned returned)
         {
             Returned = returned;
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetUniqueness(Unique uniqueness)
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetUniqueness(Uniqueness uniqueness)
         {
             Uniqueness = uniqueness;
             return this;
@@ -131,30 +140,46 @@ namespace Owin.Scim.Configuration
             return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationFunc<TAttribute> rule)
-        {
-            //var c = new Func<T, PropertyDescriptor, CanonicalizationFunc<>>
-            var canonicalizationRule = new Func<TAttribute, TAttribute>(attr => attr.Canonicalize(rule));
-
-            return this;
-        }
-
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationAction<TAttribute> rule)
         {
-            // TODO: (DG) impl
-            return this;
+            var func = new StatefulCanonicalizationFunc<TAttribute>(
+                (TAttribute value, ref object state) =>
+                {
+                    rule.Invoke(value);
+                    return value;
+                });
+
+            return AddCanonicalizationRule(func);
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule<TState>(
-            StatefulCanonicalizationAction<TAttribute, TState> rule)
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationFunc<TAttribute> rule)
         {
-            // TODO: (DG) impl
+            var func = new StatefulCanonicalizationFunc<TAttribute>((TAttribute value, ref object state) => rule.Invoke(value));
+
+            return AddCanonicalizationRule(func);
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(StatefulCanonicalizationAction<TAttribute> rule)
+        {
+            var func = new StatefulCanonicalizationFunc<TAttribute>(
+                (TAttribute value, ref object state) =>
+                {
+                    rule.Invoke(value, ref state);
+                    return value;
+                });
+
+            return AddCanonicalizationRule(func);
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(StatefulCanonicalizationFunc<TAttribute> rule)
+        {
+            _CanonicalizationRules.Add(new CanonicalizationRule<TAttribute>(_PropertyDescriptor, rule));
             return this;
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> ClearCanonicalizationRules()
         {
-            // TODO: (DG) impl
+            _CanonicalizationRules.Clear();
             return this;
         }
 

@@ -37,7 +37,7 @@ namespace Owin.Scim.Configuration
             var complexBuilder = attributeBuilder as ScimTypeComplexAttributeDefinitionBuilder<T, TComplexAttribute>;
             if (complexBuilder == null) throw new InvalidOperationException("You cannot define sub-attributes on a non-complex attribute type.");
             
-            builder(complexBuilder.TypeDefinitionBuilder);
+            builder((ScimTypeDefinitionBuilder<TComplexAttribute>)complexBuilder.TypeDefinitionBuilder);
             
             return complexBuilder;
         }

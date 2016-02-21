@@ -1,6 +1,6 @@
 ﻿namespace Owin.Scim.Configuration
 {
-    public enum Return
+    public enum Returned
     {
         Default,
         Always,

@@ -1,31 +1,17 @@
-﻿using System;
-using System.ComponentModel;
-using System.Linq.Expressions;
-
-using Owin.Scim.Model.Users;
-
-namespace Owin.Scim.Services
+﻿namespace Owin.Scim.Canonicalization
 {
     using System;
     using System.ComponentModel;
     using System.Linq.Expressions;
     using System.Reflection;
 
-    using Configuration;
-
     using Extensions;
 
     using Model;
-
-    using PhoneNumbers;
-
-    using PhoneNumber = Model.Users.PhoneNumber;
-
-
+    
     public static class Canonicalization
     {
         public static void Lowercase<T>(T attribute, Expression<Func<T, string>> expression)
-            where T : MultiValuedAttribute
         {
             var mE = expression.Body as MemberExpression;
             if (mE == null) throw new InvalidOperationException("Expression body must be a MemberExpression to an attribute's string property.");
@@ -57,16 +43,11 @@ namespace Owin.Scim.Services
             }
         }
 
-        public static void EnforceMutabilityRules(MultiValuedAttribute attribute)
-        {
-            attribute.Display = null; // Immutable, readOnly, returns the canonical value
-        }
-
         public static TProperty Canonicalize<TProperty>(
             this TProperty property,
-            CanonicalizationFunc<TProperty> canonicalizationFunc)
+            StatefulCanonicalizationFunc<TProperty> canonicalizationFunc)
         {
-            return default(TProperty);
+            return default(TProperty);// TODO : (DG) remove or impl this
         }
 
         public static void Canonicalize<T, TProperty>(

@@ -2,8 +2,6 @@
 {
     using System.Collections.Generic;
     using System.ComponentModel;
-    
-    using NContext.Extensions;
 
     public class ScimTypeComplexAttributeDefinitionBuilder<T, TComplexAttribute>
         : ScimTypeAttributeDefinitionBuilder<T, TComplexAttribute>
@@ -13,20 +11,20 @@
         
         public ScimTypeComplexAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
-            PropertyDescriptor descriptor,
+            PropertyDescriptor propertyDescriptor,
             bool multiValued = false)
-            : base (scimTypeDefinitionBuilder, descriptor)
+            : base (scimTypeDefinitionBuilder, propertyDescriptor)
         {
             MultiValued = multiValued;
             _TypeDefinitionBuilder = new ScimTypeDefinitionBuilder<TComplexAttribute>(ScimTypeDefinitionBuilder.ScimServerConfiguration);
         }
 
-        protected internal ScimTypeDefinitionBuilder<TComplexAttribute> TypeDefinitionBuilder
+        public override IScimTypeDefinition TypeDefinitionBuilder
         {
             get { return _TypeDefinitionBuilder; }
         }
 
-        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinitionBuilder> SubAttributeDefinitions
+        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> SubAttributeDefinitions
         {
             get { return _TypeDefinitionBuilder.AttributeDefinitions; }
         }

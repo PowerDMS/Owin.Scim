@@ -5,6 +5,8 @@
     using System.Text;
     using System.Threading.Tasks;
 
+    using Canonicalization;
+
     using Configuration;
 
     using ErrorHandling;
@@ -18,8 +20,6 @@
     using Model;
     using Model.Users;
 
-    using PhoneNumbers;
-
     using Repository;
 
     using Security;
@@ -27,10 +27,10 @@
     using Validation;
     using Validation.Users;
 
-    using PhoneNumber = Model.Users.PhoneNumber;
-
     public class UserService : ServiceBase, IUserService
     {
+        private readonly DefaultCanonicalizationService _CanonicalizationService;
+
         private readonly IUserRepository _UserRepository;
 
         private readonly IManagePasswords _PasswordManager;
@@ -38,12 +38,14 @@
         private readonly UserValidatorFactory _UserValidatorFactory;
 
         public UserService(
-            ScimServerConfiguration serverConfiguration,
+            ScimServerConfiguration scimServerConfiguration,
+            DefaultCanonicalizationService canonicalizationService,
             IUserRepository userRepository,
             IManagePasswords passwordManager,
             UserValidatorFactory userValidatorFactory)
-            : base(serverConfiguration)
+            : base(scimServerConfiguration)
         {
+            _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
             _PasswordManager = passwordManager;
             _UserValidatorFactory = userValidatorFactory;
@@ -139,74 +141,8 @@
 
         protected virtual Task CanonicalizeUser(User user)
         {
-            if (!string.IsNullOrWhiteSpace(user.Locale))
-            {
-                user.Locale = user.Locale.Replace('_', '-'); // Supports backwards compatability
-            }
+            _CanonicalizationService.Canonicalize(user, ScimServerConfiguration.GetScimTypeDefinition(typeof(User)));
 
-            // TODO: (DG) Create generic canonicalization rule for ScimServerConfig + multiValuedAttribute.Type.
-
-            // ADDRESSES
-            user.Addresses.Canonicalize(
-                (Address attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-                (Address attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-
-            // CERTIFICATES
-            user.X509Certificates.Canonicalize(
-                (X509Certificate attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-                (X509Certificate attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-
-            // EMAILS
-            user.Emails.Canonicalize(
-                (Email attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-                (Email attribute, ref object state) =>
-                {
-                    if (string.IsNullOrWhiteSpace(attribute.Value)) return;
-
-                    var atIndex = attribute.Value.IndexOf('@') + 1;
-                    if (atIndex == 0) return; // IndexOf returned -1
-
-                    var cEmail = attribute.Value.Substring(0, atIndex) + attribute.Value.Substring(atIndex).ToLower();
-                    attribute.Display = cEmail;
-                },
-                (Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-
-            // ENTITLEMENTS
-            user.Entitlements.Canonicalize(
-                (Entitlement attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-                (Entitlement attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-
-            // INSTANT MESSAGE ADDRESSES
-            user.Ims.Canonicalize(
-                (InstantMessagingAddress attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-                (InstantMessagingAddress attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-
-            // PHONE NUMBERS
-            user.PhoneNumbers.Canonicalize(
-                (PhoneNumber attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-                (PhoneNumber attribute, ref object state) =>
-                {
-                    if (!string.IsNullOrWhiteSpace(attribute.Value))
-                    {
-                        var normalized = PhoneNumberUtil.Normalize(attribute.Value);
-                        attribute.Display = string.IsNullOrWhiteSpace(normalized)
-                            ? null
-                            : normalized;
-                    }
-                }, 
-                (PhoneNumber attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-
-            // PHOTOS
-            user.Photos.Canonicalize(
-                (Photo attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute),
-                (Photo attribute, ref object state) => Canonicalization.Lowercase(attribute, photo => photo.Value),
-                (Photo attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-
-            // ROLES
-            user.Roles.Canonicalize(
-                (Role attribute, ref object state) => Canonicalization.EnforceMutabilityRules(attribute), 
-                (Role attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
-            
             return Task.FromResult(0);
         }
     }

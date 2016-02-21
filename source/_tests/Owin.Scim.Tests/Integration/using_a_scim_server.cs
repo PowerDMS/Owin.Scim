@@ -51,7 +51,7 @@
 
         private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
-            
+
         }
 
         public void OnAssemblyComplete()

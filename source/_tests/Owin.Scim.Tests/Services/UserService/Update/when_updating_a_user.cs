@@ -2,6 +2,8 @@
 {
     using System.Threading.Tasks;
 
+    using Canonicalization;
+
     using Configuration;
 
     using FakeItEasy;
@@ -31,8 +33,10 @@
                 .ReturnsLazily(c => Task.FromResult((User)c.Arguments[0]));
 
             var etagProvider = A.Fake<IResourceVersionProvider>();
+            var canonicalizationService = A.Fake<DefaultCanonicalizationService>();
             _UserService = new UserService(
                 ServerConfiguration,
+                canonicalizationService,
                 UserRepository,
                 PasswordManager,
                 new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))

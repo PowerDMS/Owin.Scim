@@ -1,6 +1,6 @@
 ﻿namespace Owin.Scim.Configuration
 {
-    public enum Unique
+    public enum Uniqueness
     {
         None,
         Server,

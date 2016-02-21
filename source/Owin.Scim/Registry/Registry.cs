@@ -2,6 +2,8 @@
 {
     using System.ComponentModel.Composition;
 
+    using Canonicalization;
+
     using Configuration;
 
     using DryIoc;
@@ -44,6 +46,7 @@
                 reuse: Reuse.Singleton,
                 made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
             container.Register<UserValidatorFactory>(Reuse.Singleton);
+            container.Register<DefaultCanonicalizationService>(Reuse.Singleton);
         }
     }
 }

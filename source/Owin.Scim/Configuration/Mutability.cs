@@ -1,6 +1,6 @@
 namespace Owin.Scim.Configuration
 {
-    public enum Mutable
+    public enum Mutability
     {
         ReadWrite,
         ReadOnly,
