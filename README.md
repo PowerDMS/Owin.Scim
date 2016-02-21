@@ -86,7 +86,7 @@ The majority of SCIM's resource type attributes have qualities which default to:
 * returned: default (always, never)  
 * uniqueness: none (server, global)  
 
-Owin.Scim auto-assigns all core attribute qualities as per https://tools.ietf.org/html/rfc7643#section-7.  Depending on your requirements as a SCIM service provider, you may need to modify these qualities as you see fit.  It is up to you to ensure any modificaitons remain in compliance of the SCIM standard.
+Owin.Scim auto-assigns all core attribute qualities as per https://tools.ietf.org/html/rfc7643#section-7.  Depending on your requirements as a SCIM service provider, you may need to modify these qualities as you see fit.  It is up to you to ensure any modifications remain in compliance of the SCIM standard.
 
 To modify core resource types:
 ```csharp
@@ -124,8 +124,7 @@ In the example provided, I have made a User.Name.FamilyName required.  This is a
 Owin.Scim allows the developer to specify canonicalization rules (delegates) as rules for resource type attributes. Some rules are built-in by default.
 
 ```csharp
-private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
-{
+builder
   .For(u => u.Emails)
       .AddCanonicalizationRule(email => 
           email.Canonicalize(
@@ -148,13 +147,14 @@ This example illustrates setting c-rules on multi-valued attributes for email.  
 #####Scalar Attributes
 It may be you're only canonicalizing a single scalar valued attribute or do not need to reference it's parent object's other attributes. (e.g. value and display).  In that case, just apply the "c-rule" 
 ```csharp
-.For(u => u.Photos)
-  .AddCanonicalizationRule((Photo photo, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(photo, ref state))
-    .DefineSubAttributes(config => config
-      .For(p => p.Display)
-        .SetMutability(Mutability.ReadOnly)
-      .For(p => p.Value)
-        .AddCanonicalizationRule(value => value.ToLower()))
+builder
+  .For(u => u.Photos)
+    .AddCanonicalizationRule((Photo photo, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(photo, ref   state))
+      .DefineSubAttributes(config => config
+        .For(p => p.Display)
+          .SetMutability(Mutability.ReadOnly)
+        .For(p => p.Value)
+          .AddCanonicalizationRule(value => value.ToLower()))
 ```
 
 *You do not need to check for null (reference-type) or default (value-type) values being passed in.*  Owin.Scim saves time by doing this for you.
@@ -162,3 +162,21 @@ It may be you're only canonicalizing a single scalar valued attribute or do not 
 ######Canonical Values
 Owin.Scim does not include any default acceptable attribute values; canonical values.  
 The SCIM specification frequently references canonical values for multi-valued attribute's type.  Items like: `work`, `home`, `other`, etc.  Owin.Scim does not view this as canonicalization, but validation.  Canonicalization should be viewed strictly in terms of normalization of data.
+
+###Schema Binding Rules
+At some point you may wish to overwrite Owin.Scim's default schema binding rules or insert new ones for custom schema extensions.  You can do this via `InsertSchemaBindingRule`.  Owin.Scim uses these rules, processing them sequentially during parameter binding / deserialization.  Based on the request's schemas[] attribute, Owin.Scim must determine which resource type to instantiate.
+```csharp
+app.UseScimServer(
+  new ScimServerConfiguration { RequireSsl = false }
+    .InsertSchemaBindingRule<EnterpriseUser>(
+      schemaIdentifiers =>
+      {
+          if (schemaIdentifiers.Count == 2 &&
+              schemaIdentifiers.Contains(ScimConstants.Schemas.User) &&
+              schemaIdentifiers.Contains(ScimConstants.Schemas.UserEnterprise))
+              return true;
+    
+          return false;
+      })
+```
+In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate the associated type argument of `EnterpriseUser`.
