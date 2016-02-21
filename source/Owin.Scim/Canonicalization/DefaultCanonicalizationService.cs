@@ -44,7 +44,7 @@
 
                     // canonicalize the complex object instance as it may have sub-attributes 
                     // with defined canonicalization rules
-                    Canonicalize(attributeDescriptor.GetValue(instance), attributeDefinition.TypeDefinitionBuilder);
+                    Canonicalize(attributeDescriptor.GetValue(instance), attributeDefinition.TypeDefinition);
 
                     continue;
                 }
@@ -69,7 +69,7 @@
                     }
 
                     // recursively canonicalize each enumeration value as they may have sub-attributes with canonicalization rules
-                    Canonicalize(enumerator.Current, attributeDefinition.TypeDefinitionBuilder);
+                    Canonicalize(enumerator.Current, attributeDefinition.TypeDefinition);
                 }
             }
         }

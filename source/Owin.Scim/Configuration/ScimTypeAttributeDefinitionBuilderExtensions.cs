@@ -22,7 +22,7 @@ namespace Owin.Scim.Configuration
             where TUri : Uri
         {
             var uriBuilder = attributeBuilder as ScimTypeUriAttributeDefinitionBuilder<T, TUri>;
-            if (uriBuilder == null) throw new InvalidOperationException("You cannot define sub-attributes on a non-complex attribute type.");
+            if (uriBuilder == null) throw new InvalidOperationException("You cannot define reference types on a non-Uri attribute type.");
             
             uriBuilder.AddReferenceTypes(referenceTypes.ToList());
 
@@ -34,12 +34,12 @@ namespace Owin.Scim.Configuration
             Action<ScimTypeDefinitionBuilder<TComplexAttribute>> builder)
             where TComplexAttribute : class
         {
-            var complexBuilder = attributeBuilder as ScimTypeComplexAttributeDefinitionBuilder<T, TComplexAttribute>;
-            if (complexBuilder == null) throw new InvalidOperationException("You cannot define sub-attributes on a non-complex attribute type.");
+            if (!(attributeBuilder is ScimTypeComplexAttributeDefinitionBuilder<T, TComplexAttribute>))
+                throw new InvalidOperationException("You cannot define sub-attributes on a non-complex attribute type.");
             
-            builder((ScimTypeDefinitionBuilder<TComplexAttribute>)complexBuilder.TypeDefinitionBuilder);
+            builder((ScimTypeDefinitionBuilder<TComplexAttribute>)attributeBuilder.TypeDefinition);
             
-            return complexBuilder;
+            return attributeBuilder;
         }
     }
 }

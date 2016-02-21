@@ -28,10 +28,10 @@ namespace Owin.Scim.Configuration
 
             // Initialize defaults
             CaseExact = false;
-            Mutability = Configuration.Mutability.ReadWrite;
+            Mutability = Mutability.ReadWrite;
             Required = false;
-            Returned = Configuration.Returned.Default;
-            Uniqueness = Configuration.Uniqueness.None;
+            Returned = Returned.Default;
+            Uniqueness = Uniqueness.None;
 
             var descriptionAttr = propertyDescriptor
                 .Attributes
@@ -67,18 +67,13 @@ namespace Owin.Scim.Configuration
         }
 
         public bool MultiValued { get; protected set; }
-
-        protected internal ScimTypeDefinitionBuilder<T> ScimTypeDefinitionBuilder
-        {
-            get { return _ScimTypeDefinitionBuilder; }
-        }
-
+        
         public PropertyDescriptor AttributeDescriptor
         {
             get { return _PropertyDescriptor; }
         }
 
-        public virtual IScimTypeDefinition TypeDefinitionBuilder { get { return null; } }
+        public virtual IScimTypeDefinition TypeDefinition { get { return _ScimTypeDefinitionBuilder; } }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetDescription(string description)
         {
@@ -122,7 +117,7 @@ namespace Owin.Scim.Configuration
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof (T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute> For<TOtherAttribute>(
@@ -137,7 +132,7 @@ namespace Owin.Scim.Configuration
             }
 
             var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
+            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationAction<TAttribute> rule)

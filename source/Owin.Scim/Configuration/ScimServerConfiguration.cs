@@ -21,6 +21,8 @@
         private static readonly IDictionary<Type, IScimTypeDefinition> _ResourceTypeDefinitions = 
             new Dictionary<Type, IScimTypeDefinition>();
 
+        private readonly object _SyncLock = new object();
+
         private readonly IDictionary<ScimFeatureType, ScimFeature> _Features;
 
         private readonly ISet<AuthenticationScheme> _AuthenticationSchemes;
@@ -281,11 +283,21 @@
 
         private void CreateCoreResourceTypes()
         {
-            AddResourceType<User>(
-                ScimConstants.ResourceTypes.User, 
-                ScimConstants.Schemas.User,
-                ScimConstants.Endpoints.Users, 
-                DefineUserResourceType);
+            // this is mainly for unit tests to not try and keep creating resource types as they are static
+            if (!_ResourceTypeDefinitions.Any())
+            {
+                lock (_SyncLock)
+                {
+                    if (!_ResourceTypeDefinitions.Any())
+                    {
+                        AddResourceType<User>(
+                            ScimConstants.ResourceTypes.User,
+                            ScimConstants.Schemas.User,
+                            ScimConstants.Endpoints.Users,
+                            DefineUserResourceType);
+                    }
+                }
+            }
         }
 
         private void DefineUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)

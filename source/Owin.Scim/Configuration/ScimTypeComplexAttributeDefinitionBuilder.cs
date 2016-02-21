@@ -7,7 +7,7 @@
         : ScimTypeAttributeDefinitionBuilder<T, TComplexAttribute>
         where TComplexAttribute : class
     {
-        private readonly ScimTypeDefinitionBuilder<TComplexAttribute> _TypeDefinitionBuilder;
+        private readonly ScimTypeDefinitionBuilder<TComplexAttribute> _TypeDefinition;
         
         public ScimTypeComplexAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
@@ -16,17 +16,17 @@
             : base (scimTypeDefinitionBuilder, propertyDescriptor)
         {
             MultiValued = multiValued;
-            _TypeDefinitionBuilder = new ScimTypeDefinitionBuilder<TComplexAttribute>(ScimTypeDefinitionBuilder.ScimServerConfiguration);
+            _TypeDefinition = new ScimTypeDefinitionBuilder<TComplexAttribute>(scimTypeDefinitionBuilder.ScimServerConfiguration);
         }
 
-        public override IScimTypeDefinition TypeDefinitionBuilder
+        public override IScimTypeDefinition TypeDefinition
         {
-            get { return _TypeDefinitionBuilder; }
+            get { return _TypeDefinition; }
         }
 
         protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> SubAttributeDefinitions
         {
-            get { return _TypeDefinitionBuilder.AttributeDefinitions; }
+            get { return _TypeDefinition.AttributeDefinitions; }
         }
     }
 }
