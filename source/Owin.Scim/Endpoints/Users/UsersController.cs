@@ -25,9 +25,9 @@
         private readonly IUserService _UserService;
 
         public UsersController(
-            ScimServerConfiguration serverConfiguration,
+            ScimServerConfiguration scimServerConfiguration,
             IUserService userService)
-            : base(serverConfiguration)
+            : base(scimServerConfiguration)
         {
             _UserService = userService;
         }

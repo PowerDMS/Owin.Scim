@@ -3,10 +3,9 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
 
     using Canonicalization;
-
-    using Microsoft.FSharp.Data.UnitSystems.SI.UnitNames;
 
     using Model;
     using Model.Users;
@@ -15,27 +14,43 @@
 
     using PhoneNumbers;
 
-    using Services;
-
     using PhoneNumber = Model.Users.PhoneNumber;
 
     public class ScimServerConfiguration
     {
+        private static readonly IDictionary<Type, IScimTypeDefinition> _ResourceTypeDefinitions = 
+            new Dictionary<Type, IScimTypeDefinition>();
+
         private readonly IDictionary<ScimFeatureType, ScimFeature> _Features;
-         
+
         private readonly ISet<AuthenticationScheme> _AuthenticationSchemes;
 
         private readonly IList<SchemaBindingRule> _SchemaBindingRules;
 
         private readonly ISet<Predicate<FileInfo>> _CompositionFileInfoConstraints;
 
-        private readonly IDictionary<Type, IScimTypeDefinition> _ResourceTypeDefinitions;
+        private readonly Lazy<IEnumerable<ResourceType>> _ResourceTypes = 
+            new Lazy<IEnumerable<ResourceType>>(() =>
+            {
+                return _ResourceTypeDefinitions
+                    .Values
+                    .Select(typeDef =>
+                    {
+                        var resDef = (IScimResourceTypeDefinition)typeDef;
+                        return new ResourceType
+                        {
+                            Description = resDef.Description,
+                            Schema = resDef.Schema,
+                            Name = resDef.Name,
+                            Endpoint = resDef.Endpoint
+                        };
+                    });
+            }); 
 
         public ScimServerConfiguration()
         {
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
             _CompositionFileInfoConstraints = new HashSet<Predicate<FileInfo>>();
-            _ResourceTypeDefinitions = new Dictionary<Type, IScimTypeDefinition>();
 
             _Features = CreateDefaultFeatures();
             _SchemaBindingRules = CreateDefaultBindingRules();
@@ -59,9 +74,7 @@
 
         public bool RequireSsl { get; set; }
 
-        public string PublicOrigin { get; set; }
-
-        // TODO: should we make this Uri instead of string?
+        public string PublicOrigin { get; set; } // TODO: (CY) should we make this Uri instead of string?
 
         public IEnumerable<AuthenticationScheme> AuthenticationSchemes
         {
@@ -78,6 +91,11 @@
         public IEnumerable<Predicate<FileInfo>> CompositionFileInfoConstraints
         {
             get { return _CompositionFileInfoConstraints; }
+        }
+
+        public IEnumerable<ResourceType> ResourceTypes
+        {
+            get { return _ResourceTypes.Value; }
         }
 
         public ScimServerConfiguration AddAuthenticationScheme(AuthenticationScheme authenticationScheme)
@@ -171,7 +189,7 @@
 
             return _Features[feature].Supported;
         }
-
+        
         public ScimServerConfiguration AddResourceType<T>(
             string name, 
             string schema, 
@@ -371,6 +389,5 @@
 //                                .SetDescription("A string identifier, typically numeric or alphanumeric, assigned to a person, typically based on order of hire or association with an organization.")
 ;
         }
-
     }
 }

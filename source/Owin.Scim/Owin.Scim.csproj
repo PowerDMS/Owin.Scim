@@ -114,6 +114,7 @@
     <Compile Include="Canonicalization\ICanonicalizationRule.cs" />
     <Compile Include="Configuration\IConfigureDryIoc.cs" />
     <Compile Include="Configuration\ISchemaTypeFactory.cs" />
+    <Compile Include="Configuration\IScimResourceTypeDefinition.cs" />
     <Compile Include="Configuration\IScimTypeDefinition.cs" />
     <Compile Include="Configuration\IScimTypeAttributeDefinition.cs" />
     <Compile Include="Configuration\Mutability.cs" />
@@ -137,6 +138,7 @@
     <Compile Include="DryIoc\Owin\DryIocOwin.cs" />
     <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
     <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />
+    <Compile Include="Endpoints\ResourceTypesController.cs" />
     <Compile Include="Endpoints\ServiceProviderConfigurationController.cs" />
     <Compile Include="Endpoints\ControllerBase.cs" />
     <Compile Include="Endpoints\Users\UsersController.cs" />

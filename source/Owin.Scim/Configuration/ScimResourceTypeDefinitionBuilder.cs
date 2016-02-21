@@ -2,7 +2,9 @@ namespace Owin.Scim.Configuration
 {
     using Model;
 
-    public class ScimResourceTypeDefinitionBuilder<T> : ScimTypeDefinitionBuilder<T>
+    using Newtonsoft.Json;
+
+    public class ScimResourceTypeDefinitionBuilder<T> : ScimTypeDefinitionBuilder<T>, IScimResourceTypeDefinition
         where T : Resource
     {
         private readonly string _Endpoint;
@@ -27,6 +29,24 @@ namespace Owin.Scim.Configuration
             }
 
             _Endpoint = endpoint;
+        }
+
+        [JsonProperty("endpoint")]
+        public string Endpoint
+        {
+            get { return _Endpoint; }
+        }
+
+        [JsonProperty("name")]
+        public string Name
+        {
+            get { return _Name; }
+        }
+
+        [JsonProperty("schema")]
+        public string Schema
+        {
+            get { return _Schema; }
         }
     }
 }

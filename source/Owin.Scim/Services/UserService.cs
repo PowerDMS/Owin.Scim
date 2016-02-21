@@ -93,9 +93,9 @@
             if (userRecord == null)
             {
                 return new ScimErrorResponse<User>(
-                                    new ScimError(
-                                        HttpStatusCode.NotFound,
-                                        detail: ErrorDetail.NotFound(user.Id)));
+                    new ScimError(
+                        HttpStatusCode.NotFound,
+                        detail: ErrorDetail.NotFound(user.Id)));
             }
 
             await CanonicalizeUser(user);

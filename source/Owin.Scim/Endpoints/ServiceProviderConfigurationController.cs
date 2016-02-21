@@ -11,15 +11,15 @@
 
     public class ServiceProviderConfigurationController : ControllerBase
     {
-        public ServiceProviderConfigurationController(ScimServerConfiguration serverConfiguration)
-            : base(serverConfiguration)
+        public ServiceProviderConfigurationController(ScimServerConfiguration scimServerConfiguration)
+            : base(scimServerConfiguration)
         {
         }
 
         [Route("serviceproviderconfig", Name = "ServiceProviderConfig")]
         public async Task<HttpResponseMessage> Get()
         {
-            var serviceProviderConfig = (ServiceProviderConfig) ServerConfiguration;
+            var serviceProviderConfig = (ServiceProviderConfig) ScimServerConfiguration;
             var response = Request.CreateResponse(
                 HttpStatusCode.OK, 
                 serviceProviderConfig);

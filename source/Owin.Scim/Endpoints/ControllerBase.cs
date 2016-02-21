@@ -11,12 +11,12 @@ namespace Owin.Scim.Endpoints
 
     public class ControllerBase : ApiController
     {
-        public ControllerBase(ScimServerConfiguration serverConfiguration)
+        public ControllerBase(ScimServerConfiguration scimServerConfiguration)
         {
-            ServerConfiguration = serverConfiguration;
+            ScimServerConfiguration = scimServerConfiguration;
         }
 
-        protected ScimServerConfiguration ServerConfiguration { get; private set; }
+        protected ScimServerConfiguration ScimServerConfiguration { get; private set; }
 
         protected void SetLocationHeader(
             HttpResponseMessage response, 
@@ -34,7 +34,7 @@ namespace Owin.Scim.Endpoints
 
         protected void SetETagHeader(HttpResponseMessage response, Resource resource)
         {
-            if (ServerConfiguration.IsFeatureSupported(ScimFeatureType.ETag))
+            if (ScimServerConfiguration.IsFeatureSupported(ScimFeatureType.ETag))
             {
                 response.Headers.ETag = EntityTagHeaderValue.Parse(resource.Meta.Version);
             }
