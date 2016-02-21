@@ -19,27 +19,25 @@ Roadmap
   1. [x] Create  
   2. [x] Retrieve  
   3. [x] Replace  
-  4. [ ] Update (Patch)
-    1. [x] Support for path filters
-    2. [x] Add
-    3. [x] Replace
-    4. [x] Remove
-    5. [x] Add more test coverage to prove compliance
-    6. [ ] Error handling / rule processing
+  4. [ ] Update (Patch) (IN PROGRESS)  
+    1. [x] Support for path filters  
+    2. [x] Add  
+    3. [x] Replace  
+    4. [x] Remove  
   5. [x] Delete  
 2. Schema extensions
   1. [x] Add custom parameter binding for schema extension deserialization
 3. Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
   2. [ ] /Schemas (IN PROGRESS)
-  3. [ ] /ResourceTypes (IN PROGRESS)
-4. Add groups endpoints
+  3. [x] /ResourceTypes
+4. Add support for bulk processing
+5. Add groups endpoints
   1. [ ] Create
   2. [ ] Retrieve
   3. [ ] Replace
   4. [ ] Update (Patch)
   5. [ ] Delete
-5. Add support for bulk processing
 6. Add support for querying
   1. [ ] Filtering (parsing into an expression tree is already done)
   2. [ ] Sorting
@@ -47,9 +45,9 @@ Roadmap
   4. [ ] Pagination
   5. [ ] Projection
 7. Add more extensiblity options
-  1. [ ] Canonicalization (IN PROGRESS)
-  2. [ ] Validation
-  3. [ ] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc) (IN PROGRESS)
+  1. [x] Canonicalization  
+  2. [ ] Validation (IN PROGRESS)  
+  3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
 8. Add authN / authZ
 
 Getting Started
