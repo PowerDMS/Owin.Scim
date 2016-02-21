@@ -393,12 +393,12 @@
                     .DefineSubAttributes(config => config
                         .For(c => c.Display)
                             .SetMutability(Mutability.ReadOnly))
-
-
-// SUPPORT SCHEMA EXTENSIONS!
-//                        .AddOrModifySchemaExtension<EnterpriseUser, EnterpriseUserExtension>(ScimConstants.Schemas.UserEnterprise, true)
-//                            .ForMember(eu => eu.EmployeeNumber)
-//                                .SetDescription("A string identifier, typically numeric or alphanumeric, assigned to a person, typically based on order of hire or association with an organization.")
+                
+                .AddSchemaExtension<EnterpriseUser, EnterpriseUserExtension>(
+                    ScimConstants.Schemas.UserEnterprise, 
+                    true,
+                    config => config
+                        .For(ext => ext.Manager))
 ;
         }
     }

@@ -10,6 +10,8 @@ namespace Owin.Scim.Configuration
 
     using Extensions;
 
+    using Model;
+
     public abstract class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinition
     {
         private readonly ScimTypeDefinitionBuilder<T> _ScimTypeDefinitionBuilder;
@@ -181,6 +183,34 @@ namespace Owin.Scim.Configuration
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddAcceptableValues(params TAttribute[] acceptableValues)
         {
             // TODO: (DG) impl
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddSchemaExtension<TDerivative, TExtension>(
+            string schemaIdentifier, 
+            bool required = false,
+            Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
+            where TDerivative : Resource, T
+            where TExtension : class
+        {
+            if (!typeof (Resource).IsAssignableFrom(typeof (T)))
+                throw new InvalidOperationException("You cannot add schema extensions to non-resource types.");
+
+            if (!typeof (TDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
+                throw new InvalidOperationException(
+                    string.Format(
+                        @"To use type '{0}' as a schema extension, it must have a single property 
+                        of type '{1}' with a JsonPropertyAttribute whose PropertyName is equal to '{2}'."
+                            .RemoveMultipleSpaces(),
+                        typeof (TDerivative).Name,
+                        typeof (TExtension).Name,
+                        schemaIdentifier));
+
+            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(_ScimTypeDefinitionBuilder.ScimServerConfiguration);
+            _ScimTypeDefinitionBuilder.AddExtension(extensionDefinition);
+
+            extensionBuilder?.Invoke(extensionDefinition);
+
             return this;
         }
     }

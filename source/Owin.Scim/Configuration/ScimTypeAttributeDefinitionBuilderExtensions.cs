@@ -3,6 +3,10 @@ namespace Owin.Scim.Configuration
     using System;
     using System.Linq;
 
+    using Extensions;
+
+    using Model;
+
     public static class ScimTypeAttributeDefinitionBuilderExtensions
     {
         public static ScimTypeAttributeDefinitionBuilder<T, string> SetCaseExact<T>(

@@ -3,7 +3,12 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
+
+    using NContext.Common;
+
+    using Newtonsoft.Json;
 
     public static class TypeExtensions
     {
@@ -61,6 +66,19 @@
                    type == typeof (Guid) || 
                    type == typeof (DateTimeOffset) || 
                    type == typeof (TimeSpan);
+        }
+
+        public static bool ContainsSchemaExtension<TExtension>(this Type type, string schemaIdentifier)
+        {
+            if (type == null) return false;
+            if (string.IsNullOrWhiteSpace(schemaIdentifier)) return false;
+
+            return (from property in TypeDescriptor.GetProperties(type).Cast<PropertyDescriptor>()
+                    let jsonAttribute = property.Attributes.OfType<JsonPropertyAttribute>().SingleOrDefault()
+                    where property.PropertyType == typeof (TExtension) &&
+                          jsonAttribute != null &&
+                          jsonAttribute.PropertyName.Equals(schemaIdentifier, StringComparison.Ordinal)
+                    select property).SingleOrDefault() != null;
         }
     }
 }

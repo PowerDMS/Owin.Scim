@@ -51,10 +51,7 @@
 
         private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
-//            builder
-//                .For(u => u.NickName)
-//                .For(u => u.Name)
-//                    .TypeDefinition
+
         }
 
         public void OnAssemblyComplete()

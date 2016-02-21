@@ -23,10 +23,5 @@
         {
             get { return _TypeDefinition; }
         }
-
-        protected internal IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> SubAttributeDefinitions
-        {
-            get { return _TypeDefinition.AttributeDefinitions; }
-        }
     }
 }

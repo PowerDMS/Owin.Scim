@@ -8,15 +8,20 @@ namespace Owin.Scim.Configuration
 
     using Extensions;
 
+    using Model;
+
     public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinition
     {
         private readonly ScimServerConfiguration _ScimServerConfiguration;
 
         private readonly IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> _AttributeDefinitions;
 
+        private readonly IList<IScimTypeDefinition> _Extensions;
+
         public ScimTypeDefinitionBuilder(ScimServerConfiguration configuration)
         {
             _ScimServerConfiguration = configuration;
+            _Extensions = new List<IScimTypeDefinition>();
             _AttributeDefinitions = BuildDefaultTypeDefinitions();
             
             var descriptionAttr = TypeDescriptor
@@ -83,11 +88,15 @@ namespace Owin.Scim.Configuration
             return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[propertyDescriptor];
         }
 
+        protected internal void AddExtension(IScimTypeDefinition extensionDefinition)
+        {
+            _Extensions.Add(extensionDefinition);
+        }
 
         private IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> BuildDefaultTypeDefinitions()
         {
             return TypeDescriptor.GetProperties(typeof(T))
-                .OfType<PropertyDescriptor>()
+                .Cast<PropertyDescriptor>()
                 .ToDictionary(
                     d => d,
                     d => CreateTypeMemberDefinitionBuilder(d));

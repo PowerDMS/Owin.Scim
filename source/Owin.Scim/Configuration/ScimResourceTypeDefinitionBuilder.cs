@@ -1,5 +1,9 @@
 namespace Owin.Scim.Configuration
 {
+    using System;
+
+    using Extensions;
+
     using Model;
 
     using Newtonsoft.Json;
@@ -47,6 +51,33 @@ namespace Owin.Scim.Configuration
         public string Schema
         {
             get { return _Schema; }
+        }
+
+        public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TDerivative, TExtension>(
+            string schemaIdentifier,
+            bool required = false,
+            Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
+            where TDerivative : Resource, T
+            where TExtension : class
+        {
+            if (!typeof(TDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
+            {
+                throw new InvalidOperationException(
+                    string.Format(
+                        @"To use type '{0}' as a schema extension, it must have a single property 
+                        of type '{1}' with a JsonPropertyAttribute whose PropertyName is equal to '{2}'.".RemoveMultipleSpaces(),
+                        typeof(TDerivative).Name,
+                        typeof(TExtension).Name,
+                        schemaIdentifier));
+            }
+
+            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(ScimServerConfiguration);
+
+            AddExtension(extensionDefinition);
+
+            extensionBuilder?.Invoke(extensionDefinition);
+
+            return this;
         }
     }
 }
