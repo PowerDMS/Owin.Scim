@@ -1,4 +1,6 @@
-﻿namespace Owin.Scim.Endpoints.Users
+﻿using System.Linq;
+
+namespace Owin.Scim.Endpoints.Users
 {
     using System;
     using System.Net;
@@ -59,7 +61,8 @@
         [Route("users/{userId}", Name = "UpdateUser")]
         public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<User> patchRequest)
         {
-            if (patchRequest == null || patchRequest.Operations == null)
+            if (patchRequest?.Operations == null
+                || patchRequest.Operations.Operations.Any(a => a.OperationType == Patching.Operations.OperationType.Invalid))
             {
                 return new ScimErrorResponse<User>(
                     new ScimError(

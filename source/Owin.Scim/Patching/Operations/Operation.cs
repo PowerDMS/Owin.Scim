@@ -17,14 +17,14 @@ namespace Owin.Scim.Patching.Operations
 
         }
 
-        public Operation(string operation, string path, object value)
-            : base(operation, path)
+        public Operation(OperationType operationType, string path, object value)
+            : base(operationType, path)
         {
             this.Value = value;
         }
 
-        public Operation(string operation, string path)
-            : base(operation, path)
+        public Operation(OperationType operationType, string path)
+            : base(operationType, path)
         {
         }
 

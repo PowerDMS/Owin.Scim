@@ -66,7 +66,7 @@ namespace Owin.Scim.Patching
             }
 
             Operations.Add(new Operation<TModel>(
-                "add",
+                OperationType.Add, 
                 ExpressionHelpers.GetPath(path).ToLowerInvariant(),
                 value: value));
 
@@ -88,7 +88,7 @@ namespace Owin.Scim.Patching
             }
 
             Operations.Add(new Operation<TModel>(
-                "add",
+                OperationType.Add,
                 ExpressionHelpers.GetPath(path).ToLowerInvariant(),
                 value: value));
 
@@ -107,7 +107,7 @@ namespace Owin.Scim.Patching
                 throw new ArgumentNullException(nameof(path));
             }
 
-            Operations.Add(new Operation<TModel>("remove", ExpressionHelpers.GetPath(path).ToLowerInvariant()));
+            Operations.Add(new Operation<TModel>(OperationType.Remove, ExpressionHelpers.GetPath(path).ToLowerInvariant()));
 
             return this;
         }
@@ -126,7 +126,7 @@ namespace Owin.Scim.Patching
             }
 
             Operations.Add(new Operation<TModel>(
-                "remove",
+                OperationType.Remove,
                 ExpressionHelpers.GetPath(path).ToLowerInvariant()));
 
             return this;
@@ -146,7 +146,7 @@ namespace Owin.Scim.Patching
             }
 
             Operations.Add(new Operation<TModel>(
-                "replace",
+                OperationType.Replace,
                 ExpressionHelpers.GetPath(path).ToLowerInvariant(),
                 value: value));
 
@@ -168,7 +168,7 @@ namespace Owin.Scim.Patching
             }
 
             Operations.Add(new Operation<TModel>(
-                "replace",
+                OperationType.Replace,
                 ExpressionHelpers.GetPath(path).ToLowerInvariant(),
                 value: value));
 
@@ -210,7 +210,7 @@ namespace Owin.Scim.Patching
                 {
                     var untypedOp = new Operation
                     {
-                        Operation = op.Operation,
+                        OperationType = op.OperationType,
                         Value = op.Value,
                         Path = op.Path
                     };

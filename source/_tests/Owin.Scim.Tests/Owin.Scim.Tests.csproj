@@ -158,6 +158,7 @@
     <Compile Include="Integration\Users\Update\remove\with_path_and_filter_that_all_elements_satisfy.cs" />
     <Compile Include="Integration\Users\Update\remove\with_path_and_filter_with_subattribute.cs" />
     <Compile Include="Integration\Users\Update\remove\with_path_and_null_multivaluedattribute.cs" />
+    <Compile Include="Integration\Users\Update\with_an_invalid_operation.cs" />
     <Compile Include="Integration\Users\UserNameUtility.cs" />
     <Compile Include="Integration\using_a_scim_server.cs" />
     <Compile Include="Integration\Users\Create\with_a_valid_user.cs" />
