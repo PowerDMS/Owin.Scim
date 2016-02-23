@@ -6,41 +6,28 @@ namespace Owin.Scim.Patching.Operations
     using System;
 
     using Newtonsoft.Json;
+    using Newtonsoft.Json.Converters;
 
     public class OperationBase
     {
-        [JsonIgnore]
-        public OperationType OperationType
-        {
-            get
-            {
-                return (OperationType)Enum.Parse(typeof(OperationType), Operation, true);
-            }
-        }
-
         [JsonProperty("path")]
         public string Path { get; set; }
 
-        [JsonProperty("op")]
-        public string Operation { get; set; }
+        [JsonProperty("op", ItemConverterType = typeof(StringEnumConverter))]
+        public OperationType OperationType { get; set; }
 
         public OperationBase()
         {
         }
 
-        public OperationBase(string operation, string path)
+        public OperationBase(OperationType operationType, string path)
         {
-            if (operation == null)
-            {
-                throw new ArgumentNullException(nameof(operation));
-            }
-
             if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
             }
 
-            this.Operation = operation;
+            this.OperationType = operationType;
             this.Path = path;
         }
     }

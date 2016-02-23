@@ -13,14 +13,9 @@ namespace Owin.Scim.Patching.Operations
 
         }
 
-        public Operation(string operation, string path, object value)
-            : base(operation, path)
+        public Operation(OperationType operationType, string path, object value)
+            : base(operationType, path)
         {
-            if (operation == null)
-            {
-                throw new ArgumentNullException(nameof(operation));
-            }
-
             if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
@@ -29,14 +24,9 @@ namespace Owin.Scim.Patching.Operations
             this.Value = value;
         }
 
-        public Operation(string operation, string path)
-            : base(operation, path)
+        public Operation(OperationType operationType, string path)
+            : base(operationType, path)
         {
-            if (operation == null)
-            {
-                throw new ArgumentNullException(nameof(operation));
-            }
-
             if (path == null)
             {
                 throw new ArgumentNullException(nameof(path));
@@ -65,7 +55,7 @@ namespace Owin.Scim.Patching.Operations
                 case OperationType.Replace:
                     return adapter.Replace(this, objectToApplyTo);
                 default:
-                    throw new InvalidOperationException(string.Format("Patch operation type '{0}' is invalid.", OperationType));
+                    throw new InvalidOperationException(string.Format("Patch OperationType type '{0}' is invalid.", OperationType));
             }
         }
     }

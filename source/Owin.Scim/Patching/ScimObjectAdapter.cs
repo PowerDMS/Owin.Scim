@@ -208,7 +208,7 @@
                     operations.AddRange(
                         AddNonDynamic(
                             kvp.Value, 
-                            new Operation(operation.Operation, kvp.Key, kvp.Value), 
+                            new Operation(operation.OperationType, kvp.Key, kvp.Value), 
                             patch));
                 }
                     
@@ -575,7 +575,7 @@
                     operations.AddRange(
                         AddNonDynamic(
                             kvp.Value,
-                            new Operation(operation.Operation, kvp.Key, kvp.Value),
+                            new Operation(operation.OperationType, kvp.Key, kvp.Value),
                             patch));
                 }
 

@@ -34,6 +34,11 @@
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
                 UpdatedUser = await PatchResponse.Content.ReadAsAsync<User>();
+
+            if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
+            {
+                var errorText = PatchResponse.Content.ReadAsStringAsync();
+            }
         };
 
         protected static User UserToUpdate;
