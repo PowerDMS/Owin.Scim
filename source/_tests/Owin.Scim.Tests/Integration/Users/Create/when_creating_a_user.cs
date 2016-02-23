@@ -23,7 +23,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
-                ? Response.Content.ReadAsAsync<IEnumerable<Model.ScimError>>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                ? Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray()).Result
                 : null;
         };
         
@@ -33,6 +33,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         protected static HttpResponseMessage Response;
 
-        protected static IEnumerable<Model.ScimError> Error;
+        protected static Model.ScimError Error;
     }
 }

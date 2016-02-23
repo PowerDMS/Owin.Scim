@@ -1,22 +1,14 @@
 ﻿namespace Owin.Scim
 {
-    using System.Collections.Generic;
-    using System.Linq;
-
     using Model;
 
     public class ScimErrorResponse<T> : ScimResponse<T>
     {
-        private readonly IEnumerable<ScimError> _Errors;
+        private readonly ScimError _Error;
 
         public ScimErrorResponse(ScimError error)
-            : this(new[] { error })
         {
-        }
-
-        public ScimErrorResponse(IEnumerable<ScimError> errors)
-        {
-            _Errors = errors.ToList();
+            _Error = error;
         }
 
         /// <summary>
@@ -25,13 +17,7 @@
         /// <value>
         /// The is left.
         /// </value>
-        public override bool IsLeft
-        {
-            get
-            {
-                return true;
-            }
-        }
+        public override bool IsLeft => true;
 
         /// <summary>
         /// Gets the error. 
@@ -39,13 +25,7 @@
         /// <value>
         /// The error.
         /// </value>
-        public IEnumerable<ScimError> Errors
-        {
-            get
-            {
-                return _Errors;
-            }
-        }
+        public ScimError Error => _Error;
 
         /// <summary>
         /// Gets the left value. 
@@ -53,9 +33,9 @@
         /// <returns>
         /// ScimError.
         /// </returns>
-        public override IEnumerable<ScimError> GetLeft()
+        public override ScimError GetLeft()
         {
-            return _Errors;
+            return _Error;
         }
 
         /// <summary>

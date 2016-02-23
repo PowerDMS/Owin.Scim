@@ -2,6 +2,7 @@
 {
     using System;
     using System.Net;
+    using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -59,7 +60,7 @@
             var validationResult = (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
 
             if (!validationResult)
-                return new ScimErrorResponse<User>(validationResult.Errors);
+                return new ScimErrorResponse<User>(validationResult.Errors.First());
             
             var createdDate = DateTime.UtcNow;
             user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
@@ -105,7 +106,7 @@
                 (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Update)).ToScimValidationResult();
 
             if (!validationResult)
-                return new ScimErrorResponse<User>(validationResult.Errors);
+                return new ScimErrorResponse<User>(validationResult.Errors.First());
 
             // TODO: (DG) support password change properly, according to service prov config.
             if (!string.IsNullOrWhiteSpace(userRecord.Password))

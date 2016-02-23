@@ -50,11 +50,11 @@
             return scimResponse;
         }
 
-        internal static IScimResponse<T2> CreateGenericErrorResponse<T, T2>(IScimResponse<T> originalResponse, IEnumerable<ScimError> errors)
+        internal static IScimResponse<T2> CreateGenericErrorResponse<T, T2>(IScimResponse<T> originalResponse, ScimError error)
         {
             if (IsBuiltInErrorResponse(originalResponse))
             {
-                return new ScimErrorResponse<T2>(errors);
+                return new ScimErrorResponse<T2>(error);
             }
 
             try
@@ -63,12 +63,12 @@
                     originalResponse.GetType()
                                     .GetGenericTypeDefinition()
                                     .MakeGenericType(typeof(T2)),
-                    errors) as IScimResponse<T2>;
+                    error) as IScimResponse<T2>;
             }
             catch (TargetInvocationException)
             {
                 // No supportable constructor found! Return default.
-                return new ScimErrorResponse<T2>(errors);
+                return new ScimErrorResponse<T2>(error);
             }
         }
 
@@ -174,9 +174,9 @@
             return response.IsLeft ? (Object)response.GetLeft() : (Object)response.GetRight();
         }
 
-        private static HttpStatusCode GetStatusCode(IEnumerable<ScimError> errors)
+        private static HttpStatusCode GetStatusCode(ScimError error)
         {
-            if (errors.Count() == 1) return errors.First().Status;
+            if (error != null) return error.Status;
 
             return HttpStatusCode.BadRequest;
         }
