@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -12,7 +13,13 @@
     using Newtonsoft.Json.Linq;
 
     using ErrorHandling;
+
+    using Extensions;
+
     using Model;
+
+    using Newtonsoft.Json;
+
     using Patching.Helpers;
 
     public class SchemaBaseParameterBinding : HttpParameterBinding
@@ -31,24 +38,11 @@
             HttpActionContext actionContext,
             CancellationToken cancellationToken)
         {
-            var jsonBytes = await actionContext.Request.Content.ReadAsByteArrayAsync();
+            var jsonString = await actionContext.Request.Content.ReadAsStringAsync();
 
-            var jsonReader = Descriptor
-                .Configuration
-                .Formatters
-                .JsonFormatter
-                .CreateJsonReader(typeof(IDictionary<string, object>), new MemoryStream(jsonBytes), Encoding.UTF8);
-
-            var serializer = Descriptor
-                .Configuration
-                .Formatters
-                .JsonFormatter
-                .CreateJsonSerializer();
-
-            var dictionary = serializer
-                .Deserialize<IDictionary<string, object>>(jsonReader);
-
-            if (!dictionary.ContainsCaseInsensitiveKey(ScimConstants.Schemas.Key))
+            var jsonData = JObject.Parse(jsonString);
+            var schemasKey = jsonData.FindKeyCaseInsensitive(ScimConstants.Schemas.Key);
+            if (schemasKey == null)
             {
                 throw new ScimError(System.Net.HttpStatusCode.BadRequest,
                     ScimErrorType.InvalidValue,
@@ -56,18 +50,23 @@
                     .ToResponseException();
             }
 
-            var schemasValue = dictionary.GetValueForCaseInsensitiveKey(ScimConstants.Schemas.Key);
+            var schemasValue = jsonData[schemasKey];
             if (schemasValue == null)
                 throw new Exception(""); // TODO: (DG) no schemas specified
             
             var schemaType = _SchemaTypeFactory.GetSchemaType(((JArray)schemasValue).ToObject<ISet<string>>());
-            var schemaReader = Descriptor
-                .Configuration
-                .Formatters
-                .JsonFormatter
-                .CreateJsonReader(schemaType, new MemoryStream(jsonBytes), Encoding.UTF8);
+            if (!Descriptor.ParameterType.IsAssignableFrom(schemaType))
+                throw new Exception(""); // TODO: (DG) binding rules resolved to a type which is not assignable to the action parameter's type
             
-            actionContext.ActionArguments[Descriptor.ParameterName] = serializer.Deserialize(schemaReader, schemaType);
+            actionContext.ActionArguments[Descriptor.ParameterName] =
+                JsonConvert.DeserializeObject(
+                    jsonString,
+                    schemaType,
+                    Descriptor
+                        .Configuration
+                        .Formatters
+                        .JsonFormatter
+                        .SerializerSettings);
         }
     }
 }

@@ -121,7 +121,6 @@
     <Compile Include="Configuration\Returned.cs" />
     <Compile Include="Canonicalization\CanonicalizationRule.cs" />
     <Compile Include="Configuration\SchemaBaseParameterBinding.cs" />
-    <Compile Include="Configuration\SchemaBaseParameterBindingAttribute.cs" />
     <Compile Include="Configuration\SchemaBindingRule.cs" />
     <Compile Include="Configuration\ScimFeatureType.cs" />
     <Compile Include="Configuration\ScimResourceTypeDefinitionBuilder.cs" />
@@ -148,6 +147,7 @@
     <Compile Include="Extensions\DelegateExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
+    <Compile Include="Extensions\JObjectExtensions.cs" />
     <Compile Include="Extensions\JsonPatchExceptionExtensions.cs" />
     <Compile Include="Extensions\MultiValuedAttributesExtensions.cs" />
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
