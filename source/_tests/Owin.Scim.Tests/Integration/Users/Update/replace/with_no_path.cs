@@ -1,4 +1,4 @@
-namespace Owin.Scim.Tests.Integration.Users.Update.add
+namespace Owin.Scim.Tests.Integration.Users.Update.replace
 {
     using System.Linq;
     using System.Net;
@@ -31,7 +31,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                         {
                             ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                             ""Operations"": [{
-                                ""op"":""add"",
+                                ""op"":""replace"",
                                 ""value"": {
                                     ""emails"":[{
                                         ""value"": ""babs@jensen.org"",
@@ -55,24 +55,23 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_add_the_email = () => UpdatedUser
+        It should_replace_email_list = () => UpdatedUser
             .Emails
             .SingleOrDefault(e => e.Value.Equals("babs@jensen.org"))
             .ShouldNotBeNull();
 
-        It should_add_phone = () =>
+        It should_replace_phone_list = () =>
         {
-            UpdatedUser.PhoneNumbers.Count().ShouldBeGreaterThan(1);
-            UpdatedUser.PhoneNumbers.First().Type.ShouldEqual("old");
-            UpdatedUser.PhoneNumbers.Last().Type.ShouldEqual("new");
+            UpdatedUser.PhoneNumbers.Count().ShouldEqual(1);
+            UpdatedUser.PhoneNumbers.First().Type.ShouldEqual("new");
         };
 
         It should_replace_the_display_name = () => UpdatedUser.DisplayName.ShouldEqual("Babs");
 
-        It should_replace_complex_attribute = () =>
+        It should_update_complex_attribute = () =>
         {
             UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
-            UpdatedUser.Name.FamilyName.ShouldBeNull();
+            UpdatedUser.Name.FamilyName.ShouldEqual("Regular Joe");
         };
     }
 }

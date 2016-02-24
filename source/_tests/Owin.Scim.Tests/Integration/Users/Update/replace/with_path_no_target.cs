@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Update.replace
 {
+    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -8,38 +9,35 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
     using Model.Users;
 
-    public class with_path_and_complex_attribute : when_updating_a_user
+    public class with_path_no_target : when_updating_a_user
     {
         Establish context = () =>
         {
             UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName(),
-                Name = new Name
+                Emails = new List<Email>
                 {
-                    FamilyName = "Smith",
-                    GivenName = "John"
+                    new Email { Value = "user@corp.com", Type = "work" },
+                    new Email { Value = "user@gmail.com", Type = "home", Primary = true }
                 }
             };
 
             PatchContent = new StringContent(
-                @"
-                    {
+                @"{
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
                             ""op"": ""replace"",
-                            ""path"": ""name.givenName"",
-                            ""value"": ""Daniel""
+                            ""path"": ""emails[type eq \""cell\""]"",
+                            ""value"": { ""value"": ""romalley@email.com"" }
                         }]
                     }",
                 Encoding.UTF8,
                 "application/json");
         };
 
-        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
+        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_replace_the_attribute_value = () => UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
-
-        It should_not_touch_other_attributes = () => UpdatedUser.Name.FamilyName.ShouldEqual(UserToUpdate.Name.FamilyName);
+        It should_return_no_target = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.NoTarget);
     }
 }
