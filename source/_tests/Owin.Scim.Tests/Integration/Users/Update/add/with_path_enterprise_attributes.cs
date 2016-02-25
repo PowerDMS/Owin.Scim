@@ -29,7 +29,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
             PatchContent = new StringContent(
                 @"
                     {
-                        ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
+                        ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp"",
+                                      ""urn:ietf:params:scim:schemas:extension:enterprise:2.0:User""],
                         ""Operations"": [{
                             ""op"": ""add"",
                             ""path"": ""urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department"",
