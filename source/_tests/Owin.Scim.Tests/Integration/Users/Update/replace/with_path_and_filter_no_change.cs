@@ -1,7 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Update.replace
 {
     using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -10,7 +9,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
     using Model.Users;
 
-    public class with_path_and_filter : when_updating_a_user
+    public class with_path_and_filter_no_change : when_updating_a_user
     {
         Establish context = () =>
         {
@@ -37,14 +36,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
                             ""op"": ""replace"",
                             ""path"": ""emails[type eq \""work\""]"",
                             ""value"": {
-                                ""value"": ""user@employer.org""
+                                ""value"": ""user@corp.com""
                             }
                         },
                         {
                             ""op"": ""replace"",
                             ""path"": ""phoneNumbers[type eq \""old\""]"",
                             ""value"": {
-                                ""type"": ""new""
+                                ""primary"": ""false""
                             }
                         }]
                     }",
@@ -54,19 +53,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_update_version = () => UpdatedUser.Meta.Version.ShouldNotEqual(UserToUpdate.Meta.Version);
+        It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
 
-        It should_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UserToUpdate.Meta.LastModified);
+        It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
 
-        It should_update_complex_attribute = () => UpdatedUser
-            .Emails
-            .Single(e => e.Value.Equals("user@employer.org"))
-            .Type
-            .ShouldEqual("work");
-
-        It should_update_multiple_complex_attributes = () => UpdatedUser
-            .PhoneNumbers
-            .Count(a => a.Type == "new" && a.Value != null)
-            .ShouldEqual(2);
+        It should_not_update_complex_attributes = () =>
+        {
+            UpdatedUser.Emails.ShouldBeLike(UserToUpdate.Emails);
+            UpdatedUser.PhoneNumbers.ShouldBeLike(UserToUpdate.PhoneNumbers);
+        };
     }
 }

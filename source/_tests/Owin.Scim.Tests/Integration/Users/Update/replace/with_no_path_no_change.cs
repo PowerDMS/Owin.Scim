@@ -33,27 +33,17 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
                             ""Operations"": [{
                                 ""op"":""replace"",
                                 ""value"": {
-                                    ""displayName"": ""Babs""
+                                    ""phonenumbers"":[{
+                                        ""value"": ""8009991234"",
+                                        ""type"": ""old""
+                                    }],
+                                    ""displayName"": ""Babs"",
+                                    ""name"":{
+                                        ""familyName"":""Regular Joe""
+                                    }
                                 }
                             }]
                         }",
-                //@"
-                //        {
-                //            ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
-                //            ""Operations"": [{
-                //                ""op"":""add"",
-                //                ""value"": {
-                //                    ""phonenumbers"":[{
-                //                        ""value"": ""8009991234"",
-                //                        ""type"": ""old""
-                //                    }],
-                //                    ""displayName"": ""Babs"",
-                //                    ""name"":{
-                //                        ""familyName"":""Regular Joe""
-                //                    }
-                //                }
-                //            }]
-                //        }",
                 Encoding.UTF8,
                 "application/json");
         };
@@ -65,5 +55,9 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
         It should_not_change_last_modified = () =>
             UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
+
+        It should_not_change_complex_attribute = () => UpdatedUser.Name.ShouldBeLike(UserToUpdate.Name);
+
+        It should_not_change_multi_attribute = () => UpdatedUser.PhoneNumbers.ShouldBeLike(UserToUpdate.PhoneNumbers);
     }
 }

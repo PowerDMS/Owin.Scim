@@ -27,7 +27,6 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                 }
             };
 
-            // TODO: test modifying complex attribute as well
             PatchContent = new StringContent(
                 @"
                         {
@@ -36,6 +35,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                                 ""op"":""add"",
                                 ""path"": ""displayName"",
                                 ""value"": ""Danny""
+                            },
+                            {
+                                ""op"":""add"",
+                                ""path"": ""name"",
+                                ""value"": {
+                                    ""familyName"": ""Regular Joe""
+                                }
                             }]
                         }",
                 Encoding.UTF8,
@@ -47,5 +53,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
         It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
 
         It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
+
+        It should_not_change_complex_attribute = () => UpdatedUser.Name.ShouldBeLike(UserToUpdate.Name);
     }
 }

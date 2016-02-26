@@ -1,4 +1,4 @@
-namespace Owin.Scim.Tests.Integration.Users.Update.add
+namespace Owin.Scim.Tests.Integration.Users.Update.remove
 {
     using System.Collections.Generic;
     using System.Linq;
@@ -10,7 +10,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_and_filter_with_subattribute : when_updating_a_user
+    public class with_path_and_filter_with_subattribute_no_change : when_updating_a_user
     {
         Establish context = () =>
         {
@@ -29,9 +29,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                     {
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
-                            ""op"": ""add"",
-                            ""path"": ""emails[type eq \""work\""].type"",
-                            ""value"": ""home""
+                            ""op"": ""remove"",
+                            ""path"": ""emails[type eq \""work\""].$ref""
                         }]
                     }",
                 Encoding.UTF8,
@@ -40,14 +39,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_update_version = () => UpdatedUser.Meta.Version.ShouldNotEqual(UserToUpdate.Meta.Version);
+        It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
 
-        It should_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UserToUpdate.Meta.LastModified);
+        It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
 
-        It should_replace_the_existing_value = () => UpdatedUser
+        It should_remove_the_multivaluedattribute_subattribute = () => UpdatedUser
             .Emails
             .Single(e => e.Value.Equals("user@corp.com"))
-            .Type
-            .ShouldEqual("home");
+            .Ref
+            .ShouldBeNull();
     }
 }
