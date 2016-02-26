@@ -42,6 +42,7 @@ namespace Owin.Scim.Configuration
             get { return _ScimServerConfiguration; }
         }
 
+        // TODO: (DG) Don't need to expose this as a dictionary.
         public IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> AttributeDefinitions
         {
             get { return _AttributeDefinitions; }

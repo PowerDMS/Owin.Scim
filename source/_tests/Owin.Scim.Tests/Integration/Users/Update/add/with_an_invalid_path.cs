@@ -36,8 +36,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_an_error = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_return_invalid_path = async () => (await PatchResponse.Content.ReadAsAsync<IEnumerable<ScimError>>())
-            .Single()
+        It should_return_invalid_path = () => PatchResponse.Content.ReadAsAsync<ScimError>()
+            .Result
             .ScimType
             .ShouldEqual(ScimErrorType.InvalidPath);
 

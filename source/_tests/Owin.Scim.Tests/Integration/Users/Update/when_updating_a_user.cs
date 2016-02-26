@@ -19,13 +19,13 @@
                 .AwaitResponse()
                 .AsTask;
 
-            _UserId = (await userRecord.Content.ReadAsAsync<User>()).Id;
+            UserToUpdate = userRecord.Content.ReadAsAsync<User>().Result;
 
             PatchResponse = await Server
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
-                        new HttpMethod("PATCH"), "users/" + _UserId)
+                        new HttpMethod("PATCH"), "users/" + UserToUpdate.Id)
                     {
                         Content = PatchContent
                     })
@@ -37,7 +37,8 @@
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {
-                var errorText = PatchResponse.Content.ReadAsStringAsync();
+                var errorText = PatchResponse.Content.ReadAsStringAsync().Result;
+                Error = Newtonsoft.Json.JsonConvert.DeserializeObject<Model.ScimError>(errorText);
             }
         };
 
@@ -49,6 +50,6 @@
 
         protected static User UpdatedUser;
 
-        private static string _UserId;
+        protected static Model.ScimError Error;
     }
 }

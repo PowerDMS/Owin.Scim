@@ -81,6 +81,9 @@
                         fileInfo.Name.StartsWith("Owin.Scim", StringComparison.OrdinalIgnoreCase) && 
                         new[] { ".dll" }.Contains(fileInfo.Extension.ToLower()) }
                     .Append(serverConfig.CompositionFileInfoConstraints.ToArray()))
+                .RegisterComponent<CompositionContainerRegistry>()
+                    .With<CompositionContainerRegistryBuilder>()
+                        .AddComposableInstance(serverConfig)
                 .RegisterComponent<IManageCryptography>()
                     .With<CryptographyManagerBuilder>()
                         .SetDefaults<SHA256Cng, HMACSHA256, AesCryptoServiceProvider>()

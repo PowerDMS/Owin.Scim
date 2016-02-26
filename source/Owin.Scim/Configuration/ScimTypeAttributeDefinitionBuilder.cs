@@ -192,7 +192,8 @@ namespace Owin.Scim.Configuration
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddSchemaExtension<TResourceDerivative, TValidator, TExtension>(
             string schemaIdentifier, 
-            bool required = false,
+            bool required,
+            Predicate<ISet<string>> schemaBindingRule,
             Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
             where TResourceDerivative : Resource, T
             where TExtension : class
@@ -221,6 +222,11 @@ namespace Owin.Scim.Configuration
                     extensionDefinition,
                     typeof(TResourceDerivative),
                     typeof(TValidator)));
+
+            _ScimTypeDefinitionBuilder
+                .ScimServerConfiguration
+                .SchemaBindingRules
+                .Insert(0, new SchemaBindingRule(schemaBindingRule, typeof(TResourceDerivative)));
 
             extensionBuilder?.Invoke(extensionDefinition);
 

@@ -19,11 +19,11 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 .AsTask;
 
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
-                ? Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                ? await Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).AwaitResponse().AsTask
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
-                ? Response.Content.ReadAsAsync<IEnumerable<Model.ScimError>>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                ? await Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray()).AwaitResponse().AsTask
                 : null;
         };
         
@@ -33,6 +33,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         protected static HttpResponseMessage Response;
 
-        protected static IEnumerable<Model.ScimError> Error;
+        protected static Model.ScimError Error;
     }
 }

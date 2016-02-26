@@ -107,6 +107,8 @@
     <Compile Include="AsyncLazy.cs" />
     <Compile Include="Canonicalization\DefaultCanonicalizationService.cs" />
     <Compile Include="Canonicalization\CanonicalizationDelegates.cs" />
+    <Compile Include="Configuration\CompositionContainerRegistry.cs" />
+    <Compile Include="Configuration\CompositionContainerRegistryBuilder.cs" />
     <Compile Include="Configuration\DefaultSchemaTypeFactory.cs" />
     <Compile Include="Configuration\DryIocActivationProvider.cs" />
     <Compile Include="Configuration\DryIocManager.cs" />
@@ -232,10 +234,13 @@
     <Compile Include="Canonicalization\Canonicalization.cs" />
     <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Validation\IScimValidationContext.cs" />
     <Compile Include="Validation\Users\EnterpriseUserValidator.cs" />
-    <Compile Include="Validation\Users\ResourceValidatorBase.cs" />
+    <Compile Include="Validation\IResourceValidatorFactory.cs" />
+    <Compile Include="Validation\ResourceValidatorBase.cs" />
+    <Compile Include="Validation\ScimValidationContext.cs" />
+    <Compile Include="Validation\ServiceLocatorResourceValidatorFactory.cs" />
     <Compile Include="Validation\Users\UserValidator.cs" />
-    <Compile Include="Validation\Users\ResourceValidatorFactory.cs" />
     <Compile Include="Validation\ValidationResult.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\IUserRepository.cs" />

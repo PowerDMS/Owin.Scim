@@ -2,8 +2,6 @@
 {
     using System.Net;
     using System.Net.Http;
-    using System.Net.Http.Formatting;
-
     using Machine.Specifications;
 
     using Model.Users;
@@ -25,15 +23,15 @@
         It should_return_error = () =>
         {
             Response.StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-            var errors = Response.Content.ReadAsAsync<Model.ScimError[]>().Result;
+            var error = Response.Content.ReadAsAsync<Model.ScimError>().Result;
 
             // only 400 returns scimType
-            errors[0].ScimType.ShouldBeNull();
+            error.ScimType.ShouldBeNull();
 
-            errors[0].Detail.ShouldContain(UserId);
-            errors[0].Detail.ShouldContain("not found");
+            error.Detail.ShouldContain(UserId);
+            error.Detail.ShouldContain("not found");
 
-            errors[0].Status.ShouldEqual(HttpStatusCode.NotFound);
+            error.Status.ShouldEqual(HttpStatusCode.NotFound);
         };
     }
 }

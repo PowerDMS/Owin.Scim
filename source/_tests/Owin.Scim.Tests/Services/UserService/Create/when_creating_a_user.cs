@@ -21,6 +21,8 @@
 
     using Security;
 
+    using Validation.Users;
+
     public class when_creating_a_user
     {
         Establish context = () =>
@@ -49,7 +51,7 @@
                 canonicalizationService,
                 UserRepository, 
                 PasswordManager,
-                new ResourceValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
+                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
             {
                 VersionProvider = etagProvider
             };

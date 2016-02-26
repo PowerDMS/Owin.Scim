@@ -24,7 +24,7 @@
             PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
             PasswordManager = A.Fake<IManagePasswords>();
 
-            _ValidatorFactory = new ResourceValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager);
+            _ValidatorFactory = new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager);
 
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(true);
@@ -48,6 +48,6 @@
 
         private static IValidator _Validator;
 
-        private static ResourceValidatorFactory _ValidatorFactory;
+        private static UserValidatorFactory _ValidatorFactory;
     }
 }

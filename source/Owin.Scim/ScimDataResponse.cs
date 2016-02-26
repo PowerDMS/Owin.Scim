@@ -38,7 +38,7 @@
         /// Gets the left value. (Returns null)
         /// </summary>
         /// <returns>Error.</returns>
-        public override IEnumerable<ScimError> GetLeft()
+        public override ScimError GetLeft()
         {
             return null;
         }

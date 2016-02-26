@@ -24,8 +24,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             () => Response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
         It should_return_invalid_value =
-            () => Error.Single()
-                    .ScimType
-                    .ShouldEqual(ScimErrorType.InvalidValue);
+            () => Error.ScimType.ShouldEqual(ScimErrorType.InvalidValue);
     }
 }

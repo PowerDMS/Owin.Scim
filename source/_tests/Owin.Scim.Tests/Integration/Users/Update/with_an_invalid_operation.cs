@@ -38,9 +38,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update
 
         It should_return_invalid_syntax = () =>
         {
-            var error = PatchResponse.Content.ReadAsAsync<IEnumerable<ScimError>>()
-                .Result
-                .Single();
+            var error = PatchResponse.Content.ReadAsAsync<ScimError>().Result;
 
             error.ScimType.ShouldEqual(ScimErrorType.InvalidSyntax);
         };

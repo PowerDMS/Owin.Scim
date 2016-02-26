@@ -39,5 +39,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
         It should_replace_the_attribute_value = () => UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
+
+        It should_not_touch_other_attributes = () => UpdatedUser.Name.FamilyName.ShouldEqual(UserToUpdate.Name.FamilyName);
     }
 }

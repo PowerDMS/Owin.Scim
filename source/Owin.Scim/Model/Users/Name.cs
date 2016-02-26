@@ -38,5 +38,21 @@
         suffix in most Western languages(e.g., 'III' given the full name
         'Ms. Barbara J Jensen, III').")]
         public string HonorificSuffix { get; set; }
+
+        internal int CalculateVersion()
+        {
+            unchecked
+            {
+                int hash = 19;
+                hash = hash * 31 + (Formatted?.GetHashCode() ?? 0);
+                hash = hash * 31 + (FamilyName?.GetHashCode() ?? 0);
+                hash = hash * 31 + (GivenName?.GetHashCode() ?? 0);
+                hash = hash * 31 + (MiddleName?.GetHashCode() ?? 0);
+                hash = hash * 31 + (HonorificPrefix?.GetHashCode() ?? 0);
+                hash = hash * 31 + (HonorificSuffix?.GetHashCode() ?? 0);
+
+                return hash;
+            }
+        }
     }
 }

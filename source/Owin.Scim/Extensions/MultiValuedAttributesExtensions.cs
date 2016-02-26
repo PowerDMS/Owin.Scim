@@ -6,7 +6,7 @@
 
     public static class MultiValuedAttributesExtensions
     {
-        public static int GetMultiValuedAttributeCollectionETagHashCode<T>(
+        public static int GetMultiValuedAttributeCollectionVersion<T>(
             this IEnumerable<T> multiValuedAttributes)
             where T : MultiValuedAttribute
         {

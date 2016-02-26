@@ -15,7 +15,15 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
         {
             UserToUpdate = new User
             {
-                UserName = UserNameUtility.GenerateUserName()
+                UserName = UserNameUtility.GenerateUserName(),
+                Name = new Name
+                {
+                    FamilyName = "Regular Joe"
+                },
+                PhoneNumbers = new []
+                {
+                    new PhoneNumber {Value = "8009991234", Type = "old"}
+                }
             };
 
             PatchContent = new StringContent(
@@ -29,7 +37,15 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                                         ""value"": ""babs@jensen.org"",
                                         ""type"": ""home""
                                     }],
-                                    ""displayName"": ""Babs""
+                                    ""phonenumbers"":[{
+                                        ""value"": ""8885551234"",
+                                        ""type"": ""new""
+                                    }],
+                                    ""displayName"": ""Babs"",
+                                    ""name"":{
+                                        ""honorificPrefix"":""Dr"",
+                                        ""givenName"":""Daniel""
+                                    }
                                 }
                             }]
                         }",
@@ -44,6 +60,19 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
             .SingleOrDefault(e => e.Value.Equals("babs@jensen.org"))
             .ShouldNotBeNull();
 
+        It should_add_phone = () =>
+        {
+            UpdatedUser.PhoneNumbers.Count().ShouldBeGreaterThan(1);
+            UpdatedUser.PhoneNumbers.First().Type.ShouldEqual("old");
+            UpdatedUser.PhoneNumbers.Last().Type.ShouldEqual("new");
+        };
+
         It should_replace_the_display_name = () => UpdatedUser.DisplayName.ShouldEqual("Babs");
+
+        It should_replace_complex_attribute = () =>
+        {
+            UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
+            UpdatedUser.Name.FamilyName.ShouldBeNull();
+        };
     }
 }

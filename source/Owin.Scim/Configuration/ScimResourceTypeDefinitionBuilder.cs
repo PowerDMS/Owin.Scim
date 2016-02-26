@@ -5,6 +5,8 @@ namespace Owin.Scim.Configuration
 
     using Extensions;
 
+    using FluentValidation;
+
     using Model;
 
     using Newtonsoft.Json;
@@ -76,20 +78,22 @@ namespace Owin.Scim.Configuration
         }
 
 
-        public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TDerivative, TDerivativeValidator, TExtension>(
+        public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TResourceDerivative, TValidator, TExtension>(
             string schemaIdentifier,
-            bool required = false,
+            bool required,
+            Predicate<ISet<string>> schemaBindingRule,
             Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
-            where TDerivative : Resource, T
+            where TResourceDerivative : Resource, T
             where TExtension : class
+            where TValidator : IValidator<TResourceDerivative>
         {
-            if (!typeof(TDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
+            if (!typeof(TResourceDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
             {
                 throw new InvalidOperationException(
                     string.Format(
                         @"To use type '{0}' as a schema extension, it must have a single property 
                         of type '{1}' with a JsonPropertyAttribute whose PropertyName is equal to '{2}'.".RemoveMultipleSpaces(),
-                        typeof(TDerivative).Name,
+                        typeof(TResourceDerivative).Name,
                         typeof(TExtension).Name,
                         schemaIdentifier));
             }
@@ -102,8 +106,12 @@ namespace Owin.Scim.Configuration
                         schemaIdentifier,
                         required,
                         extensionDefinition,
-                        typeof(TDerivative),
-                        typeof(TDerivativeValidator)));
+                        typeof(TResourceDerivative),
+                        typeof(TValidator)));
+
+            ScimServerConfiguration
+                .SchemaBindingRules
+                .Insert(0, new SchemaBindingRule(schemaBindingRule, typeof(TResourceDerivative)));
 
             extensionBuilder?.Invoke(extensionDefinition);
 

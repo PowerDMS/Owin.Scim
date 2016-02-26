@@ -10,14 +10,13 @@ namespace Owin.Scim.Tests.Validation.Users
     {
         Establish ctx = () =>
         {
-            A.CallTo(() => UserRepository.GetUser(A<string>._))
-                .ReturnsLazily(() => new User
-                {
-                    Id = "id",
-                    UserName = "daniel",
-                    Password = "oldPass"
-                });
-            
+            ExistingUserRecord = new User
+            {
+                Id = "id",
+                UserName = "daniel",
+                Password = "oldPass"
+            };
+
             A.CallTo(() => PasswordComplexityVerifier.MeetsRequirements(A<string>._))
                 .Returns(true);
 

@@ -12,7 +12,6 @@ namespace Owin.Scim.Tests.Validation.Users
 
     using Scim.Extensions;
     using Scim.Validation;
-    using Scim.Validation.Users;
 
     using Security;
 
@@ -24,7 +23,7 @@ namespace Owin.Scim.Tests.Validation.Users
             PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
             PasswordManager = A.Fake<IManagePasswords>();
 
-            _ValidatorFactory = new ResourceValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager);
+            _ValidatorFactory = new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager);
 
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(true);
@@ -33,8 +32,11 @@ namespace Owin.Scim.Tests.Validation.Users
         Because of = async () =>
         {
             _Validator = await _ValidatorFactory.CreateValidator(User);
-            Result = (await _Validator.ValidateAsync(User, ruleSet: RuleSetConstants.Update).AwaitResponse().AsTask).ToScimValidationResult();
+            Result = (await _Validator.ValidateAsync(User, ExistingUserRecord, ruleSet: RuleSetConstants.Update).AwaitResponse().AsTask)
+                .ToScimValidationResult();
         };
+
+        protected static User ExistingUserRecord;
 
         protected static IUserRepository UserRepository;
 
@@ -48,6 +50,6 @@ namespace Owin.Scim.Tests.Validation.Users
 
         private static IValidator _Validator;
 
-        private static ResourceValidatorFactory _ValidatorFactory;
+        private static UserValidatorFactory _ValidatorFactory;
     }
 }

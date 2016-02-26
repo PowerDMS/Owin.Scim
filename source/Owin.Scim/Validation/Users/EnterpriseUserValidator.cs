@@ -32,7 +32,7 @@ namespace Owin.Scim.Validation.Users
         {
         }
 
-        protected override void ConfigureUpdateRuleSet(AsyncLazy<EnterpriseUser> resourceRecord)
+        protected override void ConfigureUpdateRuleSet()
         {
         }
 
@@ -43,12 +43,6 @@ namespace Owin.Scim.Validation.Users
             return _UserValidator.ValidateAsync(
                 new ValidationContext<User>(context.InstanceToValidate, null, context.Selector),
                 token);
-        }
-
-        protected override Task<EnterpriseUser> GetExistingResourceRecord()
-        {
-            return _UserRepository.GetUser(ResourceId)
-                .ContinueWith(u => (EnterpriseUser) u.Result);
         }
     }
 }
