@@ -140,6 +140,8 @@
     <Compile Include="Integration\Users\Update\add\with_path_direct_attribute.cs" />
     <Compile Include="Integration\Users\Update\add\with_no_path_no_change.cs" />
     <Compile Include="Integration\Users\Update\multiOperation\when_updating_a_user_with_server_state.cs" />
+    <Compile Include="Integration\Users\Update\multiOperation\with_undoing_changes.cs" />
+    <Compile Include="Integration\Users\Update\multiOperation\with_only_one_valid_change.cs" />
     <Compile Include="Integration\Users\Update\multiOperation\with_update_after_adding_attribute.cs" />
     <Compile Include="Integration\Users\Update\multiOperation\with_failed_last_operation.cs" />
     <Compile Include="Integration\Users\Update\multiOperation\with_failed_second_operation.cs" />
