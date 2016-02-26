@@ -1,16 +1,20 @@
-﻿namespace Owin.Scim.Validation.Users
+﻿namespace Owin.Scim.Tests.Validation.Users
 {
     using System.Threading.Tasks;
 
     using FluentValidation;
 
+    using Model;
     using Model.Users;
 
     using Repository;
 
+    using Scim.Validation;
+    using Scim.Validation.Users;
+
     using Security;
 
-    public class UserValidatorFactory
+    public class UserValidatorFactory : IResourceValidatorFactory
     {
         private readonly IUserRepository _UserRepository;
 
@@ -28,25 +32,23 @@
             _PasswordManager = passwordManager;
         }
 
-        public virtual Task<IValidator<TUser>> CreateValidator<TUser>(TUser entity) 
-            where TUser : User
+        public virtual Task<IValidator> CreateValidator<TResource>(TResource resource) 
+            where TResource : Resource
         {
-            if (entity is EnterpriseUser)
+            var userValidator = new UserValidator(
+                _UserRepository,
+                _PasswordComplexityVerifier,
+                _PasswordManager);
+
+            if (resource is EnterpriseUser)
             {
                 return Task.FromResult(
-                    (IValidator<TUser>)new FluentEnterpriseUserValidator(
+                    (IValidator)new EnterpriseUserValidator(
                         _UserRepository,
-                        new FluentUserValidator(
-                            _UserRepository,
-                            _PasswordComplexityVerifier,
-                            _PasswordManager)));
+                        userValidator));
             }
 
-            return Task.FromResult(
-                (IValidator<TUser>)new FluentUserValidator(
-                    _UserRepository,
-                    _PasswordComplexityVerifier,
-                    _PasswordManager));
+            return Task.FromResult((IValidator)userValidator);
         }
     }
 }

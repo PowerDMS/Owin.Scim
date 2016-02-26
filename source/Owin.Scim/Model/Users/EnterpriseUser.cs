@@ -18,7 +18,7 @@ namespace Owin.Scim.Model.Users
             unchecked
             {
                 var hash = 19;
-                hash = hash * 31 + GenerateETagHashInternal();
+                hash = hash * 31 + CalculateVersionInternal();
                 hash = hash * 31 + (Enterprise == null
                     ? 0
                     : new

@@ -44,23 +44,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
+        It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
 
-        It should_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
-
-        //It should_replace_simple_attribute = () => UpdatedUser.DisplayName.ShouldEqual("Daniel");
-
-        //It should_replace_complex_attribute = () =>
-        //{
-        //    UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
-        //    UpdatedUser.Name.FamilyName.ShouldBeNull();
-        //};
-
-        //It should_append_multi_attribute = () =>
-        //{
-        //    UpdatedUser.PhoneNumbers.Count().ShouldBeGreaterThan(1);
-        //    UpdatedUser.PhoneNumbers.First().Type.ShouldEqual("old");
-        //    UpdatedUser.PhoneNumbers.Last().Type.ShouldEqual("new");
-        //};
+        It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
     }
 }

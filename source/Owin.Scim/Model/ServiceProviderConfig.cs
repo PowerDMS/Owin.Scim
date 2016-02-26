@@ -113,7 +113,7 @@
                 ChangePassword = ChangePassword.GetETagHashCode(),
                 Sort = Sort.GetETagHashCode(),
                 ETag = ETag.GetETagHashCode(),
-                AuthenticationSchemes = AuthenticationSchemes.GetMultiValuedAttributeCollectionETagHashCode()
+                AuthenticationSchemes = AuthenticationSchemes.GetMultiValuedAttributeCollectionVersion()
             }.GetHashCode().ToString();
         }
 

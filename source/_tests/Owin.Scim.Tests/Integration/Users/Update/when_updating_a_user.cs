@@ -20,13 +20,12 @@
                 .AsTask;
 
             UserToUpdate = userRecord.Content.ReadAsAsync<User>().Result;
-            _UserId = UserToUpdate.Id;
 
             PatchResponse = await Server
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
-                        new HttpMethod("PATCH"), "users/" + _UserId)
+                        new HttpMethod("PATCH"), "users/" + UserToUpdate.Id)
                     {
                         Content = PatchContent
                     })
@@ -52,7 +51,5 @@
         protected static User UpdatedUser;
 
         protected static Model.ScimError Error;
-
-        private static string _UserId;
     }
 }

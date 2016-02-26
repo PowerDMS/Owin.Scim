@@ -7,6 +7,8 @@
 
     using Canonicalization;
 
+    using FluentValidation;
+
     using Model;
     using Model.Users;
 
@@ -14,12 +16,14 @@
 
     using PhoneNumbers;
 
+    using Validation.Users;
+
     using PhoneNumber = Model.Users.PhoneNumber;
 
     public class ScimServerConfiguration
     {
-        private static readonly IDictionary<Type, IScimTypeDefinition> _ResourceTypeDefinitions = 
-            new Dictionary<Type, IScimTypeDefinition>();
+        private static readonly IDictionary<Type, IScimResourceTypeDefinition> _ResourceTypeDefinitions = 
+            new Dictionary<Type, IScimResourceTypeDefinition>();
 
         private readonly object _SyncLock = new object();
 
@@ -36,28 +40,24 @@
             {
                 return _ResourceTypeDefinitions
                     .Values
-                    .Select(typeDef =>
+                    .Select(typeDef => new ResourceType
                     {
-                        var resDef = (IScimResourceTypeDefinition)typeDef;
-                        return new ResourceType
-                        {
-                            Description = resDef.Description,
-                            Schema = resDef.Schema,
-                            Name = resDef.Name,
-                            Endpoint = resDef.Endpoint
-                        };
+                        Description = typeDef.Description,
+                        Schema = typeDef.Schema,
+                        Name = typeDef.Name,
+                        Endpoint = typeDef.Endpoint
                     });
-            }); 
+            });
 
         public ScimServerConfiguration()
         {
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
             _CompositionFileInfoConstraints = new HashSet<Predicate<FileInfo>>();
+            _SchemaBindingRules = new List<SchemaBindingRule>();
 
             _Features = CreateDefaultFeatures();
-            _SchemaBindingRules = CreateDefaultBindingRules();
 
-            CreateCoreResourceTypes();
+            DefineCoreResourceTypes();
 
             RequireSsl = true;
         }
@@ -83,13 +83,6 @@
             get { return _AuthenticationSchemes; }
         }
 
-        public IEnumerable<SchemaBindingRule> SchemaBindingRules
-        {
-            get { return _SchemaBindingRules; }
-        }
-
-        internal IEnumerable<KeyValuePair<ScimFeatureType, ScimFeature>> Features { get { return _Features; } }
-
         public IEnumerable<Predicate<FileInfo>> CompositionFileInfoConstraints
         {
             get { return _CompositionFileInfoConstraints; }
@@ -98,6 +91,21 @@
         public IEnumerable<ResourceType> ResourceTypes
         {
             get { return _ResourceTypes.Value; }
+        }
+
+        internal IEnumerable<KeyValuePair<ScimFeatureType, ScimFeature>> Features
+        {
+            get { return _Features; }
+        }
+
+        internal IList<SchemaBindingRule> SchemaBindingRules
+        {
+            get { return _SchemaBindingRules; }
+        }
+
+        internal IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
+        {
+            get { return _ResourceTypeDefinitions.Values; }
         }
 
         public ScimServerConfiguration AddAuthenticationScheme(AuthenticationScheme authenticationScheme)
@@ -177,34 +185,30 @@
 
             return (TScimFeature) _Features[feature];
         }
-
-        public ScimServerConfiguration InsertSchemaBindingRule<TBindingTarget>(Predicate<ISet<string>> predicate) 
-            where TBindingTarget : SchemaBase, new()
-        {
-            _SchemaBindingRules.Insert(0, new SchemaBindingRule(predicate, typeof (TBindingTarget)));
-            return this;
-        }
-
+        
         public bool IsFeatureSupported(ScimFeatureType feature)
         {
             if (!_Features.ContainsKey(feature)) throw new ArgumentOutOfRangeException();
 
             return _Features[feature].Supported;
         }
-        
-        public ScimServerConfiguration AddResourceType<T>(
+
+        public ScimServerConfiguration AddResourceType<T, TValidator>(
             string name, 
             string schema, 
             string endpoint,
+            Predicate<ISet<string>> schemaBindingRule,
             Action<ScimResourceTypeDefinitionBuilder<T>> builder)
             where T : Resource
+            where TValidator : IValidator<T>
         {
             if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("name");
             if (string.IsNullOrWhiteSpace(schema)) throw new ArgumentNullException("schema");
             if (string.IsNullOrWhiteSpace(endpoint)) throw new ArgumentNullException("endpoint");
-            
-            var rtb = new ScimResourceTypeDefinitionBuilder<T>(this, name, schema, endpoint);
+
+            var rtb = new ScimResourceTypeDefinitionBuilder<T>(this, name, schema, endpoint, typeof(TValidator));
             _ResourceTypeDefinitions.Add(rtb.ResourceType, rtb);
+            _SchemaBindingRules.Insert(0, new SchemaBindingRule(schemaBindingRule, typeof(T)));
 
             builder(rtb);
 
@@ -238,36 +242,17 @@
                 : null;
         }
 
-        private IList<SchemaBindingRule> CreateDefaultBindingRules()
+        public Type GetScimResourceValidatorType(Type type)
         {
-            var rules = new List<SchemaBindingRule>
-            {
-                new SchemaBindingRule(
-                    schemaIdentifiers =>
-                    {
-                        if (schemaIdentifiers.Count == 1 &&
-                            schemaIdentifiers.Contains(ScimConstants.Schemas.User))
-                            return true;
-
-                        return false;
-                    },
-                    typeof (User)),
-                new SchemaBindingRule(
-                    schemaIdentifiers =>
-                    {
-                        if (schemaIdentifiers.Count == 2 &&
-                            schemaIdentifiers.Contains(ScimConstants.Schemas.User) &&
-                            schemaIdentifiers.Contains(ScimConstants.Schemas.UserEnterprise))
-                            return true;
-
-                        return false;
-                    },
-                    typeof (EnterpriseUser))
-            };
-
-            return rules;
+            // TODO: (DG) Cache this!
+            return _ResourceTypeDefinitions.ContainsKey(type)
+                ? _ResourceTypeDefinitions[type].ValidatorType
+                : (from rtd in _ResourceTypeDefinitions.Values
+                   let ext = rtd.SchemaExtensions.SingleOrDefault(ext => ext.ResourceType == type)
+                   where ext != null
+                   select ext.ResourceValidatorType).SingleOrDefault();
         }
-
+        
         private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()
         {
             var features = new Dictionary<ScimFeatureType, ScimFeature>();
@@ -281,7 +266,7 @@
             return features;
         }
 
-        private void CreateCoreResourceTypes()
+        private void DefineCoreResourceTypes()
         {
             // this is mainly for unit tests to not try and keep creating resource types as they are static
             if (!_ResourceTypeDefinitions.Any())
@@ -290,10 +275,18 @@
                 {
                     if (!_ResourceTypeDefinitions.Any())
                     {
-                        AddResourceType<User>(
+                        AddResourceType<User, UserValidator>(
                             ScimConstants.ResourceTypes.User,
                             ScimConstants.Schemas.User,
                             ScimConstants.Endpoints.Users,
+                            schemaIdentifiers =>
+                            {
+                                if (schemaIdentifiers.Count == 1 &&
+                                    schemaIdentifiers.Contains(ScimConstants.Schemas.User))
+                                    return true;
+
+                                return false;
+                            },
                             DefineUserResourceType);
                     }
                 }
@@ -394,9 +387,18 @@
                         .For(c => c.Display)
                             .SetMutability(Mutability.ReadOnly))
                 
-                .AddSchemaExtension<EnterpriseUser, EnterpriseUserExtension>(
+                .AddSchemaExtension<EnterpriseUser, EnterpriseUserValidator, EnterpriseUserExtension>(
                     ScimConstants.Schemas.UserEnterprise, 
-                    true,
+                    false,
+                    schemaIdentifiers =>
+                    {
+                        if (schemaIdentifiers.Count == 2 &&
+                            schemaIdentifiers.Contains(ScimConstants.Schemas.User) &&
+                            schemaIdentifiers.Contains(ScimConstants.Schemas.UserEnterprise))
+                            return true;
+
+                        return false;
+                    },
                     config => config
                         .For(ext => ext.Manager))
 ;

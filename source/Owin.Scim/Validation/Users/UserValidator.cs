@@ -5,7 +5,6 @@ namespace Owin.Scim.Validation.Users
     using System.Globalization;
     using System.Linq;
     using System.Net;
-    using System.Threading.Tasks;
 
     using ErrorHandling;
 
@@ -20,17 +19,15 @@ namespace Owin.Scim.Validation.Users
 
     using Security;
 
-    public class FluentUserValidator : ValidatorBase<User>
+    public sealed class UserValidator : ResourceValidatorBase<User>
     {
         private readonly IUserRepository _UserRepository;
 
         private readonly IVerifyPasswordComplexity _PasswordComplexityVerifier;
 
         private readonly IManagePasswords _PasswordManager;
-
-        private string _UserId;
-
-        public FluentUserValidator(
+        
+        public UserValidator(
             IUserRepository userRepository,
             IVerifyPasswordComplexity passwordComplexityVerifier,
             IManagePasswords passwordManager)
@@ -38,14 +35,9 @@ namespace Owin.Scim.Validation.Users
             _UserRepository = userRepository;
             _PasswordComplexityVerifier = passwordComplexityVerifier;
             _PasswordManager = passwordManager;
-
-            var userRecord = new AsyncLazy<User>(() => GetUser());
-            ConfigureDefaultRuleSet();
-            ConfigureCreateRuleSet();
-            ConfigureUpdateRuleSet(userRecord);
         }
 
-        private void ConfigureDefaultRuleSet()
+        protected override void ConfigureDefaultRuleSet()
         {
             RuleSet("default", () =>
             {
@@ -57,7 +49,7 @@ namespace Owin.Scim.Validation.Users
                             ScimErrorType.InvalidValue, 
                             ErrorDetail.AttributeRequired("userName")));
 
-                When(user => !String.IsNullOrWhiteSpace(user.PreferredLanguage),
+                When(user => !string.IsNullOrWhiteSpace(user.PreferredLanguage),
                     () =>
                     {
                         RuleFor(user => user.PreferredLanguage)
@@ -80,7 +72,7 @@ namespace Owin.Scim.Validation.Users
                                     ScimErrorType.InvalidValue,
                                     "The attribute 'profileUrl' must be a valid absolute URI."));
                     });
-                When(user => !String.IsNullOrWhiteSpace(user.Locale),
+                When(user => !string.IsNullOrWhiteSpace(user.Locale),
                     () =>
                     {
                         RuleFor(user => user.Locale)
@@ -150,10 +142,8 @@ namespace Owin.Scim.Validation.Users
                 When(user => user.PhoneNumbers != null && user.PhoneNumbers.Any(),
                     () =>
                     {
-                        // TODO: (DG) Add validation / configuration for PhoneNumberTypes for validation.
-                        /* The value SHOULD be specified according to the format defined 
-                               in [RFC3966], e.g., 'tel:+1-201-555-0123'. */
-
+                        // The value SHOULD be specified according to the format defined 
+                        // in [RFC3966], e.g., 'tel:+1-201-555-0123'.
                         RuleFor(user => user.PhoneNumbers)
                             .SetCollectionValidator(
                                 new GenericExpressionValidator<PhoneNumber>
@@ -208,7 +198,7 @@ namespace Owin.Scim.Validation.Users
                             .SetCollectionValidator(
                                 new GenericExpressionValidator<Address>
                                 {
-                                    v => v.When(a => !String.IsNullOrWhiteSpace(a.Country),
+                                    v => v.When(a => !string.IsNullOrWhiteSpace(a.Country),
                                         () =>
                                         {
                                             v.RuleFor(a => a.Country)
@@ -274,7 +264,7 @@ namespace Owin.Scim.Validation.Users
             });
         }
 
-        private void ConfigureCreateRuleSet()
+        protected override void ConfigureCreateRuleSet()
         {
             RuleSet("create", () =>
             {
@@ -282,10 +272,7 @@ namespace Owin.Scim.Validation.Users
                     () =>
                     {
                         RuleFor(user => user.UserName)
-                            .MustAsync(async userName =>
-                            {
-                                return await _UserRepository.IsUserNameAvailable(userName);
-                            })
+                            .MustAsync(async (userName, token) => await _UserRepository.IsUserNameAvailable(userName))
                             .WithState(u =>
                                 new ScimError(
                                     HttpStatusCode.Conflict,
@@ -297,7 +284,7 @@ namespace Owin.Scim.Validation.Users
                     () =>
                     {
                         RuleFor(user => user.Password)
-                            .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password))
+                            .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
                             .WithState(u =>
                                 new ScimError(
                                     HttpStatusCode.BadRequest,
@@ -307,12 +294,12 @@ namespace Owin.Scim.Validation.Users
             });
         }
 
-        private void ConfigureUpdateRuleSet(AsyncLazy<User> userRecord)
+        protected override void ConfigureUpdateRuleSet()
         {
             RuleSet("update", () =>
             {
                 RuleFor(user => user.Id)
-                    .ImmutableAsync(async () => (await userRecord).Id, StringComparer.OrdinalIgnoreCase)
+                    .Immutable(() => ExistingRecord.Id, StringComparer.OrdinalIgnoreCase)
                     .WithState(u =>
                         new ScimError(
                             HttpStatusCode.BadRequest,
@@ -322,15 +309,12 @@ namespace Owin.Scim.Validation.Users
                 // Updating a username validation
                 When(user =>
                     !string.IsNullOrWhiteSpace(user.UserName) &&
-                    !user.UserName.Equals(userRecord.Value.Result.UserName, StringComparison.OrdinalIgnoreCase),
+                    !user.UserName.Equals(ExistingRecord.UserName, StringComparison.OrdinalIgnoreCase),
                     () =>
                     {
                         RuleFor(user => user.UserName)
-                            .MustAsync(async (user, userName) =>
-                            {
-                                return await _UserRepository.IsUserNameAvailable(userName);
-                            })
-                            .WithState(u =>
+                            .MustAsync(async (user, userName, token) => await _UserRepository.IsUserNameAvailable(userName))
+                            .WithState(user =>
                                 new ScimError(
                                     HttpStatusCode.Conflict,
                                     ScimErrorType.Uniqueness,
@@ -340,11 +324,11 @@ namespace Owin.Scim.Validation.Users
                 // Updating a user password
                 When(user =>
                     !string.IsNullOrWhiteSpace(user.Password) &&
-                    (userRecord.Value.Result.Password == null || !_PasswordManager.VerifyHash(user.Password, userRecord.Value.Result.Password)),
+                    (ExistingRecord.Password == null || !_PasswordManager.VerifyHash(user.Password, ExistingRecord.Password)),
                     () =>
                     {
                         RuleFor(user => user.Password)
-                            .MustAsync(password => _PasswordComplexityVerifier.MeetsRequirements(password))
+                            .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
                             .WithState(u =>
                                 new ScimError(
                                     HttpStatusCode.BadRequest,
@@ -352,18 +336,6 @@ namespace Owin.Scim.Validation.Users
                                     "The attribute 'password' does not meet the security requirements set by the provider."));
                     });
             });
-        }
-
-        public override Task<FluentValidation.Results.ValidationResult> ValidateAsync(ValidationContext<User> context)
-        {
-            _UserId = context.InstanceToValidate.Id;
-
-            return base.ValidateAsync(context);
-        }
-
-        private async Task<User> GetUser()
-        {
-            return await _UserRepository.GetUser(_UserId);
         }
 
         /// <summary>

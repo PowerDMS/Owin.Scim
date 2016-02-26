@@ -21,6 +21,8 @@
 
     using Security;
 
+    using Validation.Users;
+
     public class when_creating_a_user
     {
         Establish context = () =>

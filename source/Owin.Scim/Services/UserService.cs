@@ -14,8 +14,6 @@
 
     using Extensions;
 
-    using FluentValidation;
-
     using Microsoft.FSharp.Core;
 
     using Model;
@@ -26,7 +24,6 @@
     using Security;
 
     using Validation;
-    using Validation.Users;
 
     public class UserService : ServiceBase, IUserService
     {
@@ -36,27 +33,27 @@
 
         private readonly IManagePasswords _PasswordManager;
 
-        private readonly UserValidatorFactory _UserValidatorFactory;
+        private readonly IResourceValidatorFactory _ResourceValidatorFactory;
 
         public UserService(
             ScimServerConfiguration scimServerConfiguration,
             DefaultCanonicalizationService canonicalizationService,
             IUserRepository userRepository,
             IManagePasswords passwordManager,
-            UserValidatorFactory userValidatorFactory)
+            IResourceValidatorFactory resourceValidatorFactory)
             : base(scimServerConfiguration)
         {
             _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
             _PasswordManager = passwordManager;
-            _UserValidatorFactory = userValidatorFactory;
+            _ResourceValidatorFactory = resourceValidatorFactory;
         }
 
         public async Task<IScimResponse<User>> CreateUser(User user)
         {
             await CanonicalizeUser(user);
 
-            var validator = await _UserValidatorFactory.CreateValidator(user);
+            var validator = await _ResourceValidatorFactory.CreateValidator(user);
             var validationResult = (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
 
             if (!validationResult)
@@ -69,9 +66,9 @@
                 LastModified = createdDate
             };
 
-            SetResourceVersion(user);
-
             var userRecord = await _UserRepository.CreateUser(user);
+
+            SetResourceVersion(user);
 
             return new ScimDataResponse<User>(userRecord);
         }
@@ -99,11 +96,17 @@
                         detail: ErrorDetail.NotFound(user.Id)));
             }
 
+            user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
+            {
+                Created = userRecord.Meta.Created,
+                LastModified = userRecord.Meta.LastModified
+            };
+
             await CanonicalizeUser(user);
 
-            var validator = await _UserValidatorFactory.CreateValidator(user);
-            var validationResult =
-                (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Update)).ToScimValidationResult();
+            var validator = await _ResourceValidatorFactory.CreateValidator(user);
+            var validationResult = (await validator.ValidateAsync(user, userRecord, ruleSet: RuleSetConstants.Update))
+                .ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors.First());
@@ -115,13 +118,13 @@
                     Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
             }
 
-            user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
-            {
-                Created = userRecord.Meta.Created,
-                LastModified = DateTime.UtcNow
-            };
-
             SetResourceVersion(user);
+
+            // if both versions are equal, bypass persistence
+            if (user.Meta.Version.Equals(userRecord.Meta.Version))
+                return new ScimDataResponse<User>(user); // TODO: (DG) is this proper behavior?
+
+            user.Meta.LastModified = DateTime.UtcNow;
 
             await _UserRepository.UpdateUser(user);
 

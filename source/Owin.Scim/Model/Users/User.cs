@@ -145,10 +145,10 @@
 
         public override string CalculateVersion()
         {
-            return GenerateETagHashInternal().ToString();
+            return CalculateVersionInternal().ToString();
         }
 
-        protected int GenerateETagHashInternal()
+        protected int CalculateVersionInternal()
         {
             return new
             {
@@ -156,7 +156,7 @@
                 ExternalId,
                 Locale,
                 Id,
-                Name,
+                Name = Name?.CalculateVersion(),
                 NickName,
                 DisplayName,
                 Password,
@@ -166,15 +166,15 @@
                 Title,
                 UserName,
                 UserType,
-                Addresses = Addresses.GetMultiValuedAttributeCollectionETagHashCode(),
-                Emails = Emails.GetMultiValuedAttributeCollectionETagHashCode(),
-                Entitlements = Entitlements.GetMultiValuedAttributeCollectionETagHashCode(),
-                Groups = Groups.GetMultiValuedAttributeCollectionETagHashCode(),
-                Ims = Ims.GetMultiValuedAttributeCollectionETagHashCode(),
-                PhoneNumbers = PhoneNumbers.GetMultiValuedAttributeCollectionETagHashCode(),
-                Photos = Photos.GetMultiValuedAttributeCollectionETagHashCode(),
-                Roles = Roles.GetMultiValuedAttributeCollectionETagHashCode(),
-                X509Certificates = X509Certificates.GetMultiValuedAttributeCollectionETagHashCode()
+                Addresses = Addresses.GetMultiValuedAttributeCollectionVersion(),
+                Emails = Emails.GetMultiValuedAttributeCollectionVersion(),
+                Entitlements = Entitlements.GetMultiValuedAttributeCollectionVersion(),
+                Groups = Groups.GetMultiValuedAttributeCollectionVersion(),
+                Ims = Ims.GetMultiValuedAttributeCollectionVersion(),
+                PhoneNumbers = PhoneNumbers.GetMultiValuedAttributeCollectionVersion(),
+                Photos = Photos.GetMultiValuedAttributeCollectionVersion(),
+                Roles = Roles.GetMultiValuedAttributeCollectionVersion(),
+                X509Certificates = X509Certificates.GetMultiValuedAttributeCollectionVersion()
             }.GetHashCode();
         }
     }

@@ -4,6 +4,7 @@
     using System.ComponentModel.Composition;
     using System.ComponentModel.Composition.Hosting;
     using System.Linq;
+    using System.Linq.Expressions;
 
     using DryIoc;
 
@@ -77,6 +78,7 @@
             applicationConfiguration.CompositionContainer.ComposeExportedValue<IContainer>(_Container);
             applicationConfiguration.CompositionContainer.ComposeExportedValue<DryIocManager>(this);
             Container.RegisterInstance<CompositionContainer>(applicationConfiguration.CompositionContainer, Reuse.Singleton);
+            Container.RegisterDelegate(resolver => (IContainer)resolver, setup: Setup.With(allowDisposableTransient: true));
 
             applicationConfiguration.CompositionContainer
                 .GetExportedValues<IConfigureDryIoc>()

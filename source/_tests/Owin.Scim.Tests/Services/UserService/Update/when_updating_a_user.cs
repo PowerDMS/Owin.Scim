@@ -20,6 +20,8 @@
 
     using Security;
 
+    using Validation.Users;
+
     public class when_updating_a_user
     {
         Establish context = () =>

@@ -46,7 +46,7 @@
 
         protected static ValidationResult Result;
 
-        private static IValidator<User> _Validator;
+        private static IValidator _Validator;
 
         private static UserValidatorFactory _ValidatorFactory;
     }

@@ -38,23 +38,6 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                                 }
                             }]
                         }",
-                //@"
-                //        {
-                //            ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
-                //            ""Operations"": [{
-                //                ""op"":""add"",
-                //                ""value"": {
-                //                    ""phonenumbers"":[{
-                //                        ""value"": ""8009991234"",
-                //                        ""type"": ""old""
-                //                    }],
-                //                    ""displayName"": ""Babs"",
-                //                    ""name"":{
-                //                        ""familyName"":""Regular Joe""
-                //                    }
-                //                }
-                //            }]
-                //        }",
                 Encoding.UTF8,
                 "application/json");
         };
@@ -64,10 +47,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
         /// <summary>
         /// Refer to https://tools.ietf.org/html/rfc7644#section-3.5.2.1
         /// </summary>
-        It should_not_change_version = () => 
-            UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
+        It should_not_change_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
 
-        It should_not_change_last_modified = () =>
-            UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
+        It should_not_change_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
     }
 }
