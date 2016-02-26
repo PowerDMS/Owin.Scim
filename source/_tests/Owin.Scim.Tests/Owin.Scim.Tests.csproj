@@ -134,6 +134,25 @@
     <Compile Include="Integration\Users\Retrieve\when_retrieving_fully_populated_user.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Retrieve\with_an_invalid_userid.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_direct_subattribute_no_change.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_direct_attribute_no_change.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_direct_subattribute_null_parent.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_direct_attribute.cs" />
+    <Compile Include="Integration\Users\Update\add\with_no_path_no_change.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_no_path.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_direct_attribute.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_direct_attribute_no_change.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_direct_subattribute_no_change.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_direct_subattribute_null_parent.cs" />
+    <Compile Include="Integration\Users\Update\remove\with_path_no_target.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_no_path.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_no_path_no_change.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_path_direct_attribute.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_path_direct_attribute_no_change.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_path_direct_subattribute_no_change.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_path_direct_subattribute_null_parent.cs" />
+    <Compile Include="Integration\Users\Update\replace\with_path_no_target.cs" />
+    <Compile Include="Integration\Users\Update\add\with_path_enterprise_attributes.cs" />
     <Compile Include="Integration\Users\Update\add\with_path_and_full_complex_attribute.cs" />
     <Compile Include="Integration\Users\Update\remove\with_path_and_filter.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_complex_attribute.cs" />
@@ -143,6 +162,7 @@
     <Compile Include="Integration\Users\Update\replace\with_path_and_filter_with_null.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_filter_with_subattribute.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_null_multivaluedattribute.cs" />
+    <Compile Include="Integration\Users\Update\when_updating_enterprise_user.cs" />
     <Compile Include="Integration\Users\Update\when_updating_a_user.cs" />
     <Compile Include="Integration\Users\Update\add\with_an_invalid_path.cs" />
     <Compile Include="Integration\Users\Update\add\with_no_patch_request.cs" />
@@ -232,7 +252,6 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

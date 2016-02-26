@@ -1,4 +1,4 @@
-namespace Owin.Scim.Tests.Integration.Users.Update.replace
+namespace Owin.Scim.Tests.Integration.Users.Update.add
 {
     using System.Net;
     using System.Net.Http;
@@ -8,7 +8,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
     using Model.Users;
 
-    public class with_path_and_complex_attribute : when_updating_a_user
+    public class with_path_direct_subattribute_no_change : when_updating_a_user
     {
         Establish context = () =>
         {
@@ -27,9 +27,9 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
                     {
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
-                            ""op"": ""replace"",
+                            ""op"": ""add"",
                             ""path"": ""name.givenName"",
-                            ""value"": ""Daniel""
+                            ""value"": ""John""
                         }]
                     }",
                 Encoding.UTF8,
@@ -38,8 +38,10 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_replace_the_attribute_value = () => UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
+        It should_not_change_complex_attribute = () => UpdatedUser.Name.ShouldBeLike(UserToUpdate.Name);
 
-        It should_not_touch_other_attributes = () => UpdatedUser.Name.FamilyName.ShouldEqual(UserToUpdate.Name.FamilyName);
+        It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
+
+        It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
     }
 }

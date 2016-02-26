@@ -1,6 +1,5 @@
 ﻿namespace Owin.Scim
 {
-    using System.Collections.Generic;
     using System.Runtime.Serialization;
 
     using Model;
@@ -14,7 +13,7 @@
     [DataContract(Name = "ServiceResponseOf{0}")]
     [KnownType(typeof(ScimErrorResponse<>))]
     [KnownType(typeof(ScimDataResponse<>))]
-    public abstract class ScimResponse<T> : Either<IEnumerable<ScimError>, T>, IScimResponse<T>
+    public abstract class ScimResponse<T> : Either<ScimError, T>, IScimResponse<T>
     {
     }
 }

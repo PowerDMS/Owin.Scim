@@ -8,21 +8,19 @@
 
     using Model.Users;
 
-    public class when_updating_a_user : using_a_scim_server
+    public class when_updating_enterprise_user : using_a_scim_server
     {
-        Because of = async () =>
+        Because of = () =>
         {
             // Insert the first user so there's one already in-memory.
-            var userRecord = await Server
+            var userRecord = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(UserToUpdate, new JsonMediaTypeFormatter()))
-                .AwaitResponse()
-                .AsTask;
+                .PostAsync("users", new ObjectContent<EnterpriseUser>(UserToUpdate, new JsonMediaTypeFormatter()))
+                .Result;
 
-            UserToUpdate = userRecord.Content.ReadAsAsync<User>().Result;
-            _UserId = UserToUpdate.Id;
+            _UserId = userRecord.Content.ReadAsAsync<EnterpriseUser>().Result.Id;
 
-            PatchResponse = await Server
+            PatchResponse = Server
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
@@ -30,28 +28,24 @@
                     {
                         Content = PatchContent
                     })
-                .AwaitResponse()
-                .AsTask;
+                .Result;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = await PatchResponse.Content.ReadAsAsync<User>();
+                UpdatedUser = PatchResponse.Content.ReadAsAsync<EnterpriseUser>().Result;
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {
-                var errorText = PatchResponse.Content.ReadAsStringAsync().Result;
-                Error = Newtonsoft.Json.JsonConvert.DeserializeObject<Model.ScimError>(errorText);
+                var errorText = PatchResponse.Content.ReadAsStringAsync();
             }
         };
 
-        protected static User UserToUpdate;
+        protected static EnterpriseUser UserToUpdate;
 
         protected static HttpContent PatchContent;
 
         protected static HttpResponseMessage PatchResponse;
 
-        protected static User UpdatedUser;
-
-        protected static Model.ScimError Error;
+        protected static EnterpriseUser UpdatedUser;
 
         private static string _UserId;
     }

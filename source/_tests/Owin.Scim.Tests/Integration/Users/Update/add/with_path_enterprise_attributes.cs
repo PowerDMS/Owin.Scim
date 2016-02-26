@@ -8,28 +8,33 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_and_complex_attribute : when_updating_a_user
+    public class with_path_enterprise_attributes : when_updating_enterprise_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new User
+            UserToUpdate = new EnterpriseUser
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Name = new Name
                 {
                     FamilyName = "Smith",
                     GivenName = "John"
+                },
+                Enterprise = new EnterpriseUserExtension
+                {
+                    Department = "Hello"
                 }
             };
 
             PatchContent = new StringContent(
                 @"
                     {
-                        ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
+                        ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp"",
+                                      ""urn:ietf:params:scim:schemas:extension:enterprise:2.0:User""],
                         ""Operations"": [{
                             ""op"": ""add"",
-                            ""path"": ""name.givenName"",
-                            ""value"": ""Daniel""
+                            ""path"": ""urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:department"",
+                            ""value"": ""1234""
                         }]
                     }",
                 Encoding.UTF8,
@@ -38,8 +43,6 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_replace_the_attribute_value = () => UpdatedUser.Name.GivenName.ShouldEqual("Daniel");
-
-        It should_not_touch_other_attributes = () => UpdatedUser.Name.FamilyName.ShouldEqual(UserToUpdate.Name.FamilyName);
+        It should_replace_employee_number = () => UpdatedUser.Enterprise.Department.ShouldEqual("1234");
     }
 }
