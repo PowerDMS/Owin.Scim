@@ -10,6 +10,8 @@ namespace Owin.Scim.Configuration
 
     using Extensions;
 
+    using FluentValidation;
+
     using Model;
 
     public abstract class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinition
@@ -180,34 +182,45 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddAcceptableValues(params TAttribute[] acceptableValues)
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalValues(
+            IEnumerable<TAttribute> acceptableValues,
+            IEqualityComparer<TAttribute> comparer = null)
         {
             // TODO: (DG) impl
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddSchemaExtension<TDerivative, TExtension>(
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddSchemaExtension<TResourceDerivative, TValidator, TExtension>(
             string schemaIdentifier, 
             bool required = false,
             Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
-            where TDerivative : Resource, T
+            where TResourceDerivative : Resource, T
             where TExtension : class
+            where TValidator : IValidator<TResourceDerivative>
         {
             if (!typeof (Resource).IsAssignableFrom(typeof (T)))
                 throw new InvalidOperationException("You cannot add schema extensions to non-resource types.");
 
-            if (!typeof (TDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
+            if (!typeof (TResourceDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
                 throw new InvalidOperationException(
                     string.Format(
                         @"To use type '{0}' as a schema extension, it must have a single property 
                         of type '{1}' with a JsonPropertyAttribute whose PropertyName is equal to '{2}'."
                             .RemoveMultipleSpaces(),
-                        typeof (TDerivative).Name,
+                        typeof (TResourceDerivative).Name,
                         typeof (TExtension).Name,
                         schemaIdentifier));
 
             var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(_ScimTypeDefinitionBuilder.ScimServerConfiguration);
-            _ScimTypeDefinitionBuilder.AddExtension(extensionDefinition);
+
+            ((IScimResourceTypeDefinition)_ScimTypeDefinitionBuilder)
+                .AddExtension(
+                    new ScimResourceTypeExtension(
+                    schemaIdentifier,
+                    required,
+                    extensionDefinition,
+                    typeof(TResourceDerivative),
+                    typeof(TValidator)));
 
             extensionBuilder?.Invoke(extensionDefinition);
 

@@ -20,7 +20,7 @@
             }
 
             return ruleBuilder.MustAsync(
-                async val => 
+                async (val, token) => 
                 await Task.FromResult(comparer.Equals(val, toCompare())));
         }
 
@@ -35,7 +35,7 @@
             }
 
             return ruleBuilder.MustAsync(
-                async (entity, val) => 
+                async (entity, val, token) => 
                 await Task.FromResult(comparer.Equals(val, toCompare(entity))));
         }
 
@@ -50,7 +50,7 @@
             }
 
             return ruleBuilder.MustAsync(
-                async val =>
+                async (val, token) =>
                 {
                     var compareValue = await toCompare();
                     return await Task.FromResult(comparer.Equals(val, compareValue));
@@ -68,7 +68,7 @@
             }
 
             return ruleBuilder.MustAsync(
-                async (entity, val) =>
+                async (entity, val, token) =>
                 {
                     var compareValue = await toCompare(entity);
                     return await Task.FromResult(comparer.Equals(val, compareValue));

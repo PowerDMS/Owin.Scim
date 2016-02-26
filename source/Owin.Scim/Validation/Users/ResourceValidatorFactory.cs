@@ -4,13 +4,14 @@
 
     using FluentValidation;
 
+    using Model;
     using Model.Users;
 
     using Repository;
 
     using Security;
 
-    public class UserValidatorFactory
+    public class ResourceValidatorFactory
     {
         private readonly IUserRepository _UserRepository;
 
@@ -18,7 +19,7 @@
 
         private readonly IManagePasswords _PasswordManager;
 
-        public UserValidatorFactory(
+        public ResourceValidatorFactory(
             IUserRepository userRepository,
             IVerifyPasswordComplexity passwordComplexityVerifier,
             IManagePasswords passwordManager)
@@ -28,22 +29,22 @@
             _PasswordManager = passwordManager;
         }
 
-        public virtual Task<IValidator<TUser>> CreateValidator<TUser>(TUser entity) 
-            where TUser : User
+        public virtual Task<IValidator> CreateValidator<TResource>(TResource resource) 
+            where TResource : Resource
         {
-            if (entity is EnterpriseUser)
+            if (resource is EnterpriseUser)
             {
                 return Task.FromResult(
-                    (IValidator<TUser>)new FluentEnterpriseUserValidator(
+                    (IValidator)new EnterpriseUserValidator(
                         _UserRepository,
-                        new FluentUserValidator(
+                        new UserValidator(
                             _UserRepository,
                             _PasswordComplexityVerifier,
                             _PasswordManager)));
             }
 
             return Task.FromResult(
-                (IValidator<TUser>)new FluentUserValidator(
+                (IValidator)new UserValidator(
                     _UserRepository,
                     _PasswordComplexityVerifier,
                     _PasswordManager));

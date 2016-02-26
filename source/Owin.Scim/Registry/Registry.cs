@@ -1,12 +1,19 @@
 ﻿namespace Owin.Scim.Registry
 {
+    using System;
     using System.ComponentModel.Composition;
+    using System.Threading.Tasks;
 
     using Canonicalization;
 
     using Configuration;
 
     using DryIoc;
+
+    using FluentValidation;
+
+    using Model;
+    using Model.Users;
 
     using NContext.Security.Cryptography;
 
@@ -42,11 +49,13 @@
             container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
             container.Register<IVerifyPasswordComplexity, DefaultPasswordComplexityVerifier>(Reuse.Singleton);
             container.Register<IResourceVersionProvider, DefaultResourceVersionProvider>(Reuse.Singleton);
-            container.Register<IUserService, UserService>(
-                reuse: Reuse.Singleton,
-                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
-            container.Register<UserValidatorFactory>(Reuse.Singleton);
+            container.Register<ResourceValidatorFactory>(Reuse.Singleton);
             container.Register<DefaultCanonicalizationService>(Reuse.Singleton);
+            container.Register<IUserService, UserService>(
+                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
+
+//            container.Register<UserValidator>();
+//            container.Register<EnterpriseUserValidator>();
         }
     }
 }

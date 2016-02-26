@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.Validation
 {
+    using System.Threading;
     using System.Threading.Tasks;
     using System.Transactions;
 
@@ -7,17 +8,19 @@
     
     public abstract class ValidatorBase<TEntity> : AbstractValidator<TEntity>
     {
-        public override async Task<FluentValidation.Results.ValidationResult> ValidateAsync(ValidationContext<TEntity> context)
+        public override Task<FluentValidation.Results.ValidationResult> ValidateAsync(
+            ValidationContext<TEntity> context, 
+            CancellationToken token = new CancellationToken())
         {
             if (Transaction.Current != null)
             {
                 using (new TransactionScope(TransactionScopeOption.Suppress, TransactionScopeAsyncFlowOption.Enabled))
                 {
-                    return await base.ValidateAsync(context);
+                    return base.ValidateAsync(context, token);
                 }
             }
 
-            return await base.ValidateAsync(context);
+            return base.ValidateAsync(context, token);
         }
     }
 }

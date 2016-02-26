@@ -30,7 +30,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                             ""op"": ""add"",
                             ""path"": ""name"",
                             ""value"":{
-                                ""honorificPrefix"":""Dr""
+                                ""honorificPrefix"":""Dr"",
                                 ""givenName"":""Daniel""
                             }
                         }]

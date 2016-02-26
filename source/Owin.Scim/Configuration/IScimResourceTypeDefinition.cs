@@ -1,6 +1,9 @@
 namespace Owin.Scim.Configuration
 {
-    public interface IScimResourceTypeDefinition
+    using System;
+    using System.Collections.Generic;
+
+    public interface IScimResourceTypeDefinition : IScimTypeDefinition
     {
         string Description { get; }
 
@@ -9,5 +12,11 @@ namespace Owin.Scim.Configuration
         string Name { get; }
 
         string Schema { get; }
+
+        Type ValidatorType { get; }
+
+        IEnumerable<ScimResourceTypeExtension> SchemaExtensions { get; }
+
+        void AddExtension(ScimResourceTypeExtension extension);
     }
 }

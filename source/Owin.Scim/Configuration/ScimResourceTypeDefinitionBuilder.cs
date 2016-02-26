@@ -1,6 +1,7 @@
 namespace Owin.Scim.Configuration
 {
     using System;
+    using System.Collections.Generic;
 
     using Extensions;
 
@@ -17,13 +18,20 @@ namespace Owin.Scim.Configuration
 
         private readonly string _Schema;
 
+        private readonly Type _ValidatorType;
+
+        private readonly IList<ScimResourceTypeExtension> _SchemaExtensions;
+
+
         public ScimResourceTypeDefinitionBuilder(
             ScimServerConfiguration configuration, 
             string name, 
             string schema, 
-            string endpoint) 
+            string endpoint,
+            Type validatorType)
             : base(configuration)
         {
+            _SchemaExtensions = new List<ScimResourceTypeExtension>();
             _Name = name;
             _Schema = schema;
 
@@ -33,6 +41,8 @@ namespace Owin.Scim.Configuration
             }
 
             _Endpoint = endpoint;
+            _ValidatorType = validatorType;
+
         }
 
         [JsonProperty("endpoint")]
@@ -53,7 +63,20 @@ namespace Owin.Scim.Configuration
             get { return _Schema; }
         }
 
-        public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TDerivative, TExtension>(
+        [JsonIgnore]
+        public Type ValidatorType
+        {
+            get { return _ValidatorType; }
+        }
+        
+        [JsonProperty("schemaExtensions")]
+        public IEnumerable<ScimResourceTypeExtension> SchemaExtensions
+        {
+            get { return _SchemaExtensions; }
+        }
+
+
+        public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TDerivative, TDerivativeValidator, TExtension>(
             string schemaIdentifier,
             bool required = false,
             Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
@@ -73,11 +96,23 @@ namespace Owin.Scim.Configuration
 
             var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(ScimServerConfiguration);
 
-            AddExtension(extensionDefinition);
+            ((IScimResourceTypeDefinition)this)
+                .AddExtension(
+                    new ScimResourceTypeExtension(
+                        schemaIdentifier,
+                        required,
+                        extensionDefinition,
+                        typeof(TDerivative),
+                        typeof(TDerivativeValidator)));
 
             extensionBuilder?.Invoke(extensionDefinition);
 
             return this;
+        }
+
+        void IScimResourceTypeDefinition.AddExtension(ScimResourceTypeExtension extension)
+        {
+            _SchemaExtensions.Add(extension);
         }
     }
 }

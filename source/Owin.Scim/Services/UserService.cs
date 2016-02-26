@@ -35,27 +35,27 @@
 
         private readonly IManagePasswords _PasswordManager;
 
-        private readonly UserValidatorFactory _UserValidatorFactory;
+        private readonly ResourceValidatorFactory _ResourceValidatorFactory;
 
         public UserService(
             ScimServerConfiguration scimServerConfiguration,
             DefaultCanonicalizationService canonicalizationService,
             IUserRepository userRepository,
             IManagePasswords passwordManager,
-            UserValidatorFactory userValidatorFactory)
+            ResourceValidatorFactory resourceValidatorFactory)
             : base(scimServerConfiguration)
         {
             _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
             _PasswordManager = passwordManager;
-            _UserValidatorFactory = userValidatorFactory;
+            _ResourceValidatorFactory = resourceValidatorFactory;
         }
 
         public async Task<IScimResponse<User>> CreateUser(User user)
         {
             await CanonicalizeUser(user);
 
-            var validator = await _UserValidatorFactory.CreateValidator(user);
+            var validator = await _ResourceValidatorFactory.CreateValidator(user);
             var validationResult = (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
 
             if (!validationResult)
@@ -100,7 +100,7 @@
 
             await CanonicalizeUser(user);
 
-            var validator = await _UserValidatorFactory.CreateValidator(user);
+            var validator = await _ResourceValidatorFactory.CreateValidator(user);
             var validationResult =
                 (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Update)).ToScimValidationResult();
 

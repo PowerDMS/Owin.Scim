@@ -36,7 +36,5 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         };
 
         It should_return_bad_request = () => Response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
-
-        It should_contain_two_errors = () => Error.Count().ShouldEqual(2);
     }
 }

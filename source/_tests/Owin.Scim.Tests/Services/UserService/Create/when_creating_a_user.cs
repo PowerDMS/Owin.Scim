@@ -49,7 +49,7 @@
                 canonicalizationService,
                 UserRepository, 
                 PasswordManager,
-                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
+                new ResourceValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
             {
                 VersionProvider = etagProvider
             };
