@@ -34,7 +34,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
                 "application/json");
         };
 
-        It should_return_badrequest = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+        It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
         /// <summary>
         /// Reference: https://tools.ietf.org/html/rfc7644#section-3.5.2.2

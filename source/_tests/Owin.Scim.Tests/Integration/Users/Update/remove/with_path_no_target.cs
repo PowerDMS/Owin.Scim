@@ -28,15 +28,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                         ""Operations"": [{
                             ""op"": ""remove"",
-                            ""path"": ""emails[type eq \""home\""]""
+                            ""path"": ""emails[type eq \""office\""]""
                         }]
                     }",
                 Encoding.UTF8,
                 "application/json");
         };
 
-        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
-
-        It should_return_no_target = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.NoTarget);
+        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
     }
 }

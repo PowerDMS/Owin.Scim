@@ -41,18 +41,15 @@
 
         internal int CalculateVersion()
         {
-            unchecked
+            return new
             {
-                int hash = 19;
-                hash = hash * 31 + (Formatted?.GetHashCode() ?? 0);
-                hash = hash * 31 + (FamilyName?.GetHashCode() ?? 0);
-                hash = hash * 31 + (GivenName?.GetHashCode() ?? 0);
-                hash = hash * 31 + (MiddleName?.GetHashCode() ?? 0);
-                hash = hash * 31 + (HonorificPrefix?.GetHashCode() ?? 0);
-                hash = hash * 31 + (HonorificSuffix?.GetHashCode() ?? 0);
-
-                return hash;
-            }
+                Formatted,
+                FamilyName,
+                GivenName,
+                MiddleName,
+                HonorificPrefix,
+                HonorificSuffix
+            }.GetHashCode();
         }
     }
 }

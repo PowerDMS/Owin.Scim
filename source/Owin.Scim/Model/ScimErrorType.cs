@@ -144,7 +144,7 @@
                 return new ScimErrorType(
                     "noTarget",
                     "The specified \"path\" did not yield an attribute or attribute value that could be " +
-                    "operated on.This occurs when the specified \"path\" value contains a filter that yields no match.");
+                    "operated on. This occurs when the specified \"path\" value contains a filter that yields no match.");
             }
         }
 

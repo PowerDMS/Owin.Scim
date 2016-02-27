@@ -17,7 +17,7 @@
         [JsonProperty("$ref")]
         public string Ref { get; set; }
 
-        protected internal virtual int GetETagHashCode()
+        protected internal virtual int CalculateVersion()
         {
             return new
             {

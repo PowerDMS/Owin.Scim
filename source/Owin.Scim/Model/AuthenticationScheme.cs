@@ -28,22 +28,16 @@
 
         public Uri DocumentationUri { get; private set; }
 
-        protected internal override int GetETagHashCode()
+        protected internal override int CalculateVersion()
         {
-            unchecked
+            return new
             {
-                var hash = 19;
-                hash = hash * 31 + base.GetETagHashCode();
-                hash = hash * 31 + new
-                {
-                    Name,
-                    Description,
-                    SpecUri,
-                    DocumentationUri
-                }.GetHashCode();
-
-                return hash;
-            }
+                Base = base.CalculateVersion(),
+                Name,
+                Description,
+                SpecUri,
+                DocumentationUri
+            }.GetHashCode();
         }
     }
 }

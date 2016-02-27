@@ -14,24 +14,18 @@
 
         public string Country { get; set; }
 
-        protected internal override int GetETagHashCode()
+        protected internal override int CalculateVersion()
         {
-            unchecked
+            return new
             {
-                var hash = 19;
-                hash = hash * 31 + base.GetETagHashCode();
-                hash = hash * 31 + new
-                {
-                    Formatted,
-                    StreetAddress,
-                    Locality,
-                    Region,
-                    PostalCode,
-                    Country
-                }.GetHashCode();
-
-                return hash;
-            }
+                Base = base.CalculateVersion(),
+                Formatted,
+                StreetAddress,
+                Locality,
+                Region,
+                PostalCode,
+                Country
+            }.GetHashCode();
         }
     }
 }

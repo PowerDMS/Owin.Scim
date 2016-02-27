@@ -36,10 +36,11 @@
             object objectToSearch, 
             string filter, 
             IContractResolver contractResolver,
-            Operation operation = null)
+            Operation operation)
         {
             _ContractResolver = contractResolver;
             _Operation = operation;
+            PatchMembers = new List<PatchMember>();
 
             /* 
                 ScimFilter.cs will handle normalizing the actual path string. 
@@ -75,7 +76,6 @@
                 return;
             }
 
-            PatchMembers = new List<PatchMember>();
             foreach (var node in nodes)
             {
                 if (node.Target is IDictionary<string, object>)
@@ -155,7 +155,7 @@
             return false;
         }
 
-        private IEnumerable<Node> GetAffectedMembers( 
+        private IEnumerable<Node> GetAffectedMembers(
             List<PathMember> pathTree, 
             ref int lastPosition,
             Node node)
@@ -195,16 +195,49 @@
                     if (attemptedProperty == null)
                     {
                         // property cannot be found, and we're not working with dynamics.
-                        ErrorType = ScimErrorType.NoTarget;
+                        ErrorType = ScimErrorType.InvalidPath;
                         break;
                     }
 
                     // if there's nothing to filter and we're not yet at the last path entry, continue
                     if (pathTree[i].Filter == null && i != pathTree.Count - 1)
                     {
+                        // if they enter an invalid target 
+                        if (attemptedProperty.PropertyType.IsTerminalObject())
+                        {
+                            ErrorType = ScimErrorType.InvalidPath;
+                            break;
+                        }
+
+                        // TODO: (DG) if node.Target we need to initialize it UNLESS we're in a remove operation
+                        // e.g. user.name.givenName, when name == null
+                        var targetValue = attemptedProperty.ValueProvider.GetValue(node.Target);
+                        if (targetValue == null)
+                        {
+                            if (_Operation.OperationType == OperationType.Remove)
+                            {
+                                break;
+                            }
+
+                            var propertyType = attemptedProperty.PropertyType;
+
+                            // if just a normal complex type, just create a new instance
+                            if (!propertyType.IsNonStringEnumerable())
+                                targetValue = propertyType.CreateInstance();
+                            else
+                            {
+                                var enumerableInterface = propertyType.GetEnumerableType();
+                                var listArgumentType = enumerableInterface.GetGenericArguments()[0];
+                                var listType = typeof (List<>).MakeGenericType(listArgumentType);
+                                targetValue = listType.CreateInstance();
+                            }
+
+                            attemptedProperty.ValueProvider.SetValue(node.Target, targetValue);
+                        }
+
                         // the Target becomes the Target's child property value
                         // the Parent becomes the current Target
-                        node = new Node(attemptedProperty.ValueProvider.GetValue(node.Target), node.Target);
+                        node = new Node(targetValue, node.Target);
                         continue; // keep traversing the path tree
                     }
                     

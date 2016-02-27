@@ -42,7 +42,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
         It should_remove_the_attributes = () => UpdatedUser
             .Emails
             .Single()
-            .Value
-            .ShouldEqual("user@gmail.com");
+            .Type
+            .ShouldEqual("home");
     }
 }

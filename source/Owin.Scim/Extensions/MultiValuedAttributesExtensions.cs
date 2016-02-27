@@ -18,7 +18,7 @@
                 int hash = 19;
                 foreach (var mva in multiValuedAttributes)
                 {
-                    hash = hash * 31 + (mva?.GetETagHashCode() ?? 0);
+                    hash = hash * 31 + (mva?.CalculateVersion() ?? 0);
                 }
 
                 return hash;

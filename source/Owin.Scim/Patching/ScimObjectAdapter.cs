@@ -111,7 +111,8 @@
             var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
                 objectToApplyTo,
                 path, 
-                ContractResolver);
+                ContractResolver,
+                operation);
 
             if (treeAnalysisResult.ErrorType != null)
             {
@@ -340,7 +341,8 @@
             var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
                 objectToApplyTo,
                 operation.Path,
-                ContractResolver);
+                ContractResolver,
+                operation);
 
             if (treeAnalysisResult.ErrorType != null)
             {
@@ -500,6 +502,7 @@
             }
 
             var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
+            // if the instance's property value is null or it is not an enumerable type
             if (instanceValue == null || !patchProperty.Property.PropertyType.IsNonStringEnumerable())
             {
                 /*
@@ -518,7 +521,8 @@
 
                 var conversionResultTuple = ConvertToActualType(
                     patchProperty.Property.PropertyType,
-                    value);
+                    value,
+                    instanceValue);
 
                 if (!conversionResultTuple.CanBeConverted)
                 {
@@ -608,7 +612,7 @@
             };
         }
 
-        private ConversionResult ConvertToActualType(Type propertyType, object value)
+        private ConversionResult ConvertToActualType(Type propertyType, object value, object instanceValue = null)
         {
             if (value == null)
             {
@@ -617,8 +621,13 @@
 
             try
             {
-                var o = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value), propertyType);
+                if (!propertyType.IsTerminalObject() && instanceValue != null)
+                {
+                    JsonConvert.PopulateObject(value.ToString(), instanceValue);
+                    return new ConversionResult(true, instanceValue);
+                }
 
+                var o = JsonConvert.DeserializeObject(JsonConvert.SerializeObject(value), propertyType);
                 return new ConversionResult(true, o);
             }
             catch (Exception)

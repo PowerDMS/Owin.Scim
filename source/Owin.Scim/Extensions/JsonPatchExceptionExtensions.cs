@@ -25,24 +25,12 @@
 
         private static ScimErrorType GetScimType(ScimPatchException exception)
         {
-            return ScimErrorType.InvalidPath;
-
-            switch (exception.FailedOperation.OperationType)
-            {
-                case OperationType.Add:
-                    break;
-                case OperationType.Remove:
-                    break;
-                case OperationType.Replace:
-                    break;
-                default:
-                    throw new ArgumentOutOfRangeException();
-            }
+            return exception.ErrorType;
         }
 
         private static string GetDetail(ScimPatchException exception)
         {
-            return null;
+            return exception.ErrorType.Message;
         }
     }
 }

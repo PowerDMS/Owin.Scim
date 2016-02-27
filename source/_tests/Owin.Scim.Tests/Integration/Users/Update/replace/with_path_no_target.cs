@@ -36,7 +36,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
                 "application/json");
         };
 
-        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+        /*
+        o  If the target location is a multi-valued attribute for which a
+           value selection filter ("valuePath") has been supplied and no
+           record match was made, the service provider SHALL indicate failure
+           by returning HTTP status code 400 and a "scimType" error code of
+           "noTarget".
+        */
+        It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
         It should_return_no_target = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.NoTarget);
     }
