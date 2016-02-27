@@ -34,7 +34,10 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                             ""Operations"": [{
                                 ""op"":""add"",
                                 ""value"": {
-                                    ""displayName"": ""Babs""
+                                    ""displayName"": ""Babs"",
+                                    ""name"":{
+                                        ""familyName"": ""Regular Joe""
+                                    }
                                 }
                             }]
                         }",
@@ -50,5 +53,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
         It should_not_change_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
 
         It should_not_change_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
+
+        It should_not_change_complex_attribute = () => UpdatedUser.Name.ShouldBeLike(UserToUpdate.Name);
     }
 }

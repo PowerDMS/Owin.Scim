@@ -1,6 +1,7 @@
-namespace Owin.Scim.Tests.Integration.Users.Update.add
+using System.Linq;
+
+namespace Owin.Scim.Tests.Integration.Users.Update.multiOperation
 {
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -9,7 +10,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_direct_attribute_no_change : when_updating_a_user
+    public class with_undoing_changes : when_updating_a_user
     {
         Establish context = () =>
         {
@@ -32,16 +33,31 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                         {
                             ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
                             ""Operations"": [{
+                                ""op"":""remove"",
+                                ""path"": ""displayName""
+                            },
+                            {
+                                ""op"":""add"",
+                                ""path"": ""name.givenName"",
+                                ""value"": ""Dude""
+                            },
+                            {
                                 ""op"":""add"",
                                 ""path"": ""displayName"",
                                 ""value"": ""Danny""
                             },
                             {
                                 ""op"":""add"",
-                                ""path"": ""name"",
-                                ""value"": {
-                                    ""familyName"": ""Regular Joe""
-                                }
+                                ""path"": ""emails"",
+                                ""value"": [{""value"":""bad@one.cc"", ""type"":""new""}]
+                            },
+                            {
+                                ""op"":""remove"",
+                                ""path"": ""emails[type eq \""new\""]"",
+                            },
+                            {
+                                ""op"":""remove"",
+                                ""path"": ""name.givenName"",
                             }]
                         }",
                 Encoding.UTF8,
@@ -50,10 +66,6 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
-
-        It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
-
-        It should_not_change_complex_attribute = () => UpdatedUser.Name.ShouldBeLike(UserToUpdate.Name);
+        It should_not_change_resource = () => UpdatedUser.ShouldBeLike(UserToUpdate);
     }
 }

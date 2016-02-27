@@ -46,7 +46,7 @@ Roadmap
   5. [ ] Projection
 7. Add more extensiblity options
   1. [x] Canonicalization  
-  2. [ ] Validation (IN PROGRESS)  
+  2. [x] Validation  
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
 8. Add authN / authZ
 
@@ -86,10 +86,33 @@ The majority of SCIM's resource type attributes have qualities which default to:
 
 Owin.Scim auto-assigns all core attribute qualities as per https://tools.ietf.org/html/rfc7643#section-7.  Depending on your requirements as a SCIM service provider, you may need to modify these qualities as you see fit.  It is up to you to ensure any modifications remain in compliance of the SCIM standard.
 
-To modify core resource types:
+####Adding resource types:
+```csharp
+app.UserScimServer(
+  new ScimServerConfiguration()
+    .RemoveResourceType<User>
+    .AddResourceType<User, UserValidator>(
+      "User",
+      "urn:ietf:params:scim:schemas:core:2.0:User",
+      "/users",
+      schemaIdentifiers =>
+      {
+          if (schemaIdentifiers.Count == 1 &&
+              schemaIdentifiers.Contains(ScimConstants.Schemas.User))
+              return true;
+
+          return false;
+      },
+      userResourceBuilder => {...});
+```
+
+######Schema Binding Rules
+In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate the associated type argument of type `User`.
+
+####Modifying core resource types
 ```csharp
 app.UseScimServer(
-  new ScimServerConfiguration { RequireSsl = false }
+  new ScimServerConfiguration()
     .ModifyResourceType<User>(ModifyUserResourceType));
 
 // ...
@@ -118,7 +141,7 @@ private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> buil
 ```
 In the example provided, I have made a User.Name.FamilyName required.  This is against the default SCIM rule and will enforce clients to submit a FamilyName when creating/modifying users.  These qualities define metadata which is then used to create validation and canonicalization rules.
 
-####Adding Canonicalization Rules (c-rule)
+#####Adding Canonicalization Rules (c-rule)
 Owin.Scim allows the developer to specify canonicalization rules (delegates) as rules for resource type attributes. Some rules are built-in by default.
 
 ```csharp
@@ -160,21 +183,3 @@ builder
 ######Canonical Values
 Owin.Scim does not include any default acceptable attribute values; canonical values.  
 The SCIM specification frequently references canonical values for multi-valued attribute's type.  Items like: `work`, `home`, `other`, etc.  Owin.Scim does not view this as canonicalization, but validation.  Canonicalization should be viewed strictly in terms of normalization of data.
-
-###Schema Binding Rules
-At some point you may wish to overwrite Owin.Scim's default schema binding rules or insert new ones for custom schema extensions.  You can do this via `InsertSchemaBindingRule`.  Owin.Scim uses these rules, processing them sequentially during parameter binding / deserialization.  Based on the request's schemas[] attribute, Owin.Scim must determine which resource type to instantiate.
-```csharp
-app.UseScimServer(
-  new ScimServerConfiguration { RequireSsl = false }
-    .InsertSchemaBindingRule<EnterpriseUser>(
-      schemaIdentifiers =>
-      {
-          if (schemaIdentifiers.Count == 2 &&
-              schemaIdentifiers.Contains(ScimConstants.Schemas.User) &&
-              schemaIdentifiers.Contains(ScimConstants.Schemas.UserEnterprise))
-              return true;
-    
-          return false;
-      })
-```
-In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate the associated type argument of `EnterpriseUser`.

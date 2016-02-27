@@ -43,6 +43,10 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
+        It should_update_version = () => UpdatedUser.Meta.Version.ShouldNotEqual(UserToUpdate.Meta.Version);
+
+        It should_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UserToUpdate.Meta.LastModified);
+
         It should_add_the_email = () => UpdatedUser
             .Emails
             .Where(e => e.Value.Equals("babs@jensen.org"))
