@@ -68,11 +68,13 @@
             // users
 #if DEBUG
             container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton);
+            container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton);
 #endif
             container.Register<IUserService, UserService>(
                 made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
 
-            
+            container.Register<IGroupService, GroupService>(
+                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
         }
     }
 }

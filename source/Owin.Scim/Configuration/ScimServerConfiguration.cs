@@ -11,12 +11,14 @@
 
     using Model;
     using Model.Users;
+    using Model.Groups;
 
     using NContext.Extensions;
 
     using PhoneNumbers;
 
     using Validation.Users;
+    using Validation.Groups;
 
     using PhoneNumber = Model.Users.PhoneNumber;
 
@@ -288,6 +290,20 @@
                                 return false;
                             },
                             DefineUserResourceType);
+
+                        AddResourceType<Group, GroupValidator>(
+                            ScimConstants.ResourceTypes.Group,
+                            ScimConstants.Schemas.Group,
+                            ScimConstants.Endpoints.Groups,
+                            schemaIdentifiers =>
+                            {
+                                if (schemaIdentifiers.Count == 1 &&
+                                    schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
+                                    return true;
+
+                                return false;
+                            },
+                            DefineGroupResourceType);
                     }
                 }
             }
@@ -402,6 +418,16 @@
                     config => config
                         .For(ext => ext.Manager))
 ;
+        }
+
+        private void DefineGroupResourceType(ScimResourceTypeDefinitionBuilder<Group> builder)
+        {
+            builder
+                .For(u => u.Id)
+                .SetMutability(Mutability.ReadOnly)
+                .SetReturned(Returned.Always)
+                .SetUniqueness(Uniqueness.Server)
+                .SetCaseExact(true);
         }
     }
 }
