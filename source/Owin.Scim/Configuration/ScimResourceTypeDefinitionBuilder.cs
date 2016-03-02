@@ -3,8 +3,6 @@ namespace Owin.Scim.Configuration
     using System;
     using System.Collections.Generic;
 
-    using Extensions;
-
     using FluentValidation;
 
     using Model;
@@ -22,7 +20,7 @@ namespace Owin.Scim.Configuration
 
         private readonly Type _ValidatorType;
 
-        private readonly IList<ScimResourceTypeExtension> _SchemaExtensions;
+        private readonly IDictionary<string, ScimResourceTypeExtension> _SchemaExtensions;
 
 
         public ScimResourceTypeDefinitionBuilder(
@@ -33,7 +31,7 @@ namespace Owin.Scim.Configuration
             Type validatorType)
             : base(configuration)
         {
-            _SchemaExtensions = new List<ScimResourceTypeExtension>();
+            _SchemaExtensions = new Dictionary<string, ScimResourceTypeExtension>();
             _Name = name;
             _Schema = schema;
 
@@ -74,30 +72,16 @@ namespace Owin.Scim.Configuration
         [JsonProperty("schemaExtensions")]
         public IEnumerable<ScimResourceTypeExtension> SchemaExtensions
         {
-            get { return _SchemaExtensions; }
+            get { return _SchemaExtensions.Values; }
         }
 
-
-        public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TResourceDerivative, TValidator, TExtension>(
+        public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TExtension, TValidator>(
             string schemaIdentifier,
-            bool required,
-            Predicate<ISet<string>> schemaBindingRule,
+            bool required = false,
             Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
-            where TResourceDerivative : Resource, T
-            where TExtension : class
-            where TValidator : IValidator<TResourceDerivative>
+            where TExtension : ResourceExtension, new()
+            where TValidator : IValidator<TExtension>
         {
-            if (!typeof(TResourceDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
-            {
-                throw new InvalidOperationException(
-                    string.Format(
-                        @"To use type '{0}' as a schema extension, it must have a single property 
-                        of type '{1}' with a JsonPropertyAttribute whose PropertyName is equal to '{2}'.".RemoveMultipleSpaces(),
-                        typeof(TResourceDerivative).Name,
-                        typeof(TExtension).Name,
-                        schemaIdentifier));
-            }
-
             var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(ScimServerConfiguration);
 
             ((IScimResourceTypeDefinition)this)
@@ -106,13 +90,9 @@ namespace Owin.Scim.Configuration
                         schemaIdentifier,
                         required,
                         extensionDefinition,
-                        typeof(TResourceDerivative),
+                        typeof(TExtension),
                         typeof(TValidator)));
-
-            ScimServerConfiguration
-                .SchemaBindingRules
-                .Insert(0, new SchemaBindingRule(schemaBindingRule, typeof(TResourceDerivative)));
-
+            
             extensionBuilder?.Invoke(extensionDefinition);
 
             return this;
@@ -120,7 +100,14 @@ namespace Owin.Scim.Configuration
 
         void IScimResourceTypeDefinition.AddExtension(ScimResourceTypeExtension extension)
         {
-            _SchemaExtensions.Add(extension);
+            _SchemaExtensions.Add(extension.Schema, extension);
+        }
+
+        ScimResourceTypeExtension IScimResourceTypeDefinition.GetExtension(string schemaIdentifier)
+        {
+            if (!_SchemaExtensions.ContainsKey(schemaIdentifier)) return null;
+
+            return _SchemaExtensions[schemaIdentifier];
         }
     }
 }

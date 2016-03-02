@@ -2,9 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
     using System.Web.Http.Controllers;
@@ -18,18 +15,23 @@
 
     using Model;
 
+    using NContext.Common;
+
     using Newtonsoft.Json;
 
-    using Patching.Helpers;
-
-    public class SchemaBaseParameterBinding : HttpParameterBinding
+    public class ResourceParameterBinding : HttpParameterBinding
     {
+        private readonly ScimServerConfiguration _ServerConfiguration;
+
         private readonly ISchemaTypeFactory _SchemaTypeFactory;
 
-        public SchemaBaseParameterBinding(
+        public ResourceParameterBinding(
             HttpParameterDescriptor parameter,
-            ISchemaTypeFactory schemaTypeFactory) : base(parameter)
+            ScimServerConfiguration serverConfiguration,
+            ISchemaTypeFactory schemaTypeFactory) 
+            : base(parameter)
         {
+            _ServerConfiguration = serverConfiguration;
             _SchemaTypeFactory = schemaTypeFactory;
         }
 
@@ -57,9 +59,10 @@
             var schemaType = _SchemaTypeFactory.GetSchemaType(((JArray)schemasValue).ToObject<ISet<string>>());
             if (!Descriptor.ParameterType.IsAssignableFrom(schemaType))
                 throw new Exception(""); // TODO: (DG) binding rules resolved to a type which is not assignable to the action parameter's type
+
+            //_ServerConfiguration.GetScimResourceTypeDefinition(schemaType)
             
-            actionContext.ActionArguments[Descriptor.ParameterName] =
-                JsonConvert.DeserializeObject(
+            var resource = JsonConvert.DeserializeObject(
                     jsonString,
                     schemaType,
                     Descriptor
@@ -67,6 +70,8 @@
                         .Formatters
                         .JsonFormatter
                         .SerializerSettings);
+
+            actionContext.ActionArguments[Descriptor.ParameterName] = resource;
         }
     }
 }

@@ -61,7 +61,7 @@
                     if (rtd.SchemaExtensions.Any())
                     {
                         rtd.SchemaExtensions
-                           .ForEach(ext => container.Register(ext.ResourceValidatorType, reuse: Reuse.Singleton));
+                           .ForEach(ext => container.Register(ext.ExtensionValidatorType, reuse: Reuse.Singleton));
                     }
                 });
 

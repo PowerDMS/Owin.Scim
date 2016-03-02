@@ -4,12 +4,9 @@
 
     using Model.Users;
 
-    public class with_enterprise_users : when_generating_a_User_etags<EnterpriseUser>
+    public class with_enterprise_users : when_generating_a_User_etags<User>
     {
-        Establish ctx = () => User = new EnterpriseUser
-        {
-            Enterprise = new EnterpriseUserExtension()
-        };
+        Establish ctx = () => User = new User();
 
         Because of = () =>
         {
@@ -18,7 +15,7 @@
             User1ETag = User.CalculateVersion();
 
             User.UserName = "daniel";
-            User.Enterprise.Manager = new Manager { Value = "Chi Ho" };
+            User.Extension<EnterpriseUserExtension>().Manager = new Manager { Value = "Chi Ho" };
 
             User2ETag = User.CalculateVersion();
         };

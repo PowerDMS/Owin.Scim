@@ -10,13 +10,13 @@ namespace Owin.Scim.Configuration
             string schema,
             bool required,
             IScimTypeDefinition extensionDefinition, 
-            Type resourceType, 
-            Type resourceValidatorType)
+            Type extensionType, 
+            Type extensionValidatorType)
         {
             Schema = schema;
             Required = required;
-            ResourceType = resourceType;
-            ResourceValidatorType = resourceValidatorType;
+            ExtensionType = extensionType;
+            ExtensionValidatorType = extensionValidatorType;
             ExtensionDefinition = extensionDefinition;
         }
 
@@ -27,10 +27,10 @@ namespace Owin.Scim.Configuration
         public bool Required { get; private set; }
 
         [JsonIgnore]
-        public Type ResourceType { get; private set; }
+        public Type ExtensionType { get; private set; }
 
         [JsonIgnore]
-        public Type ResourceValidatorType { get; private set; }
+        public Type ExtensionValidatorType { get; private set; }
 
         [JsonIgnore]
         public IScimTypeDefinition ExtensionDefinition { get; private set; }

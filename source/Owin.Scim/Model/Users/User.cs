@@ -11,10 +11,12 @@
     [Description("User accounts")]
     public class User : Resource
     {
-        public User()
+        public User() : this(null)
         {
-            AddSchema(ScimConstants.Schemas.User);
+        }
 
+        public User(params Type[] withExtensionTypes)
+        {
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute
              * "resourceType" SHALL be set by the HTTP service provider to the
@@ -23,8 +25,21 @@
              * "/Groups" will set "resourceType" to "Group".
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User);
+
+            if (withExtensionTypes != null)
+            {
+                foreach (var extensionType in withExtensionTypes)
+                {
+                    AddExtension(extensionType);
+                }
+            }
         }
-        
+
+        public override string SchemaIdentifier
+        {
+            get { return ScimConstants.Schemas.User; }
+        }
+
         [Description(@"
         Unique identifier for the User, typically used by the user to directly 
         authenticate to the service provider. Each User MUST include a non-empty 
@@ -142,20 +157,14 @@
         [Description(@"A list of certificates issued to the User.")]
         [JsonProperty(PropertyName = "x509Certificates")]
         public IEnumerable<X509Certificate> X509Certificates { get; set; }
-
-        public override string CalculateVersion()
-        {
-            return CalculateVersionInternal().ToString();
-        }
-
-        protected int CalculateVersionInternal()
+        
+        public override int CalculateVersion()
         {
             return new
             {
+                Base = base.CalculateVersion(),
                 Active,
-                ExternalId,
                 Locale,
-                Id,
                 Name = Name?.CalculateVersion(),
                 NickName,
                 DisplayName,

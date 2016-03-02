@@ -46,14 +46,22 @@
 
         It should_return_created = () => StatusCode.ShouldEqual(HttpStatusCode.Created);
 
-        It should_ignore_enterprise_schema = () =>
+        //   "This attribute ("schemas") may be used by parsers to define the attributes present 
+        //    in the JSON structure that is the body to an HTTP request or response."
+        // 
+        // NOTE FROM AUTHOR: SCIM Interpretation
+        // Resource extensions are always validated on the server.  Therefore, I've made "schemas"
+        // a dynamic value based upon the resource instance and its extensions.  Extensions may be 
+        // added with or without the schema identifier present in the schemas collection.
+        // -Daniel Gioulakis
+        It should_interpret_enterprise_schema = () =>
         {
             var createdUser = Response.Content
                 .ReadAsAsync<MyUser>(ScimJsonMediaTypeFormatter.AsArray())
                 .Result;
 
             createdUser.Id.ShouldNotBeNull();
-            createdUser.Enterprise.ShouldBeNull();
+            createdUser.Enterprise.ShouldNotBeNull();
         };
 
         protected static MyUser UserDto;

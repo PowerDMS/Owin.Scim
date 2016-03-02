@@ -15,10 +15,10 @@
             // Insert the first user so there's one already in-memory.
             var userRecord = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<EnterpriseUser>(UserToUpdate, new JsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<User>(UserToUpdate, new JsonMediaTypeFormatter()))
                 .Result;
 
-            _UserId = userRecord.Content.ReadAsAsync<EnterpriseUser>().Result.Id;
+            _UserId = userRecord.Content.ReadAsAsync<User>().Result.Id;
 
             PatchResponse = Server
                 .HttpClient
@@ -31,7 +31,7 @@
                 .Result;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = PatchResponse.Content.ReadAsAsync<EnterpriseUser>().Result;
+                UpdatedUser = PatchResponse.Content.ReadAsAsync<User>().Result;
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -39,13 +39,13 @@
             }
         };
 
-        protected static EnterpriseUser UserToUpdate;
+        protected static User UserToUpdate;
 
         protected static HttpContent PatchContent;
 
         protected static HttpResponseMessage PatchResponse;
 
-        protected static EnterpriseUser UpdatedUser;
+        protected static User UpdatedUser;
 
         private static string _UserId;
     }

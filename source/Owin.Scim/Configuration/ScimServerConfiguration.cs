@@ -12,6 +12,7 @@
     using Model;
     using Model.Users;
 
+    using NContext.Common;
     using NContext.Extensions;
 
     using PhoneNumbers;
@@ -62,16 +63,19 @@
             RequireSsl = true;
         }
 
-        public static explicit operator ServiceProviderConfig(ScimServerConfiguration config)
+        public static explicit operator ServiceProviderConfig(ScimServerConfiguration scimConfig)
         {
-            return new ServiceProviderConfig(
-                config.GetFeature(ScimFeatureType.Patch),
-                config.GetFeature<ScimFeatureBulk>(ScimFeatureType.Bulk),
-                config.GetFeature<ScimFeatureFilter>(ScimFeatureType.Filter),
-                config.GetFeature(ScimFeatureType.ChangePassword),
-                config.GetFeature(ScimFeatureType.Sort),
-                config.GetFeature(ScimFeatureType.ETag),
-                config.AuthenticationSchemes);
+            // TODO: (DG) move this to a service and set meta version
+            var config = new ServiceProviderConfig(
+                scimConfig.GetFeature(ScimFeatureType.Patch),
+                scimConfig.GetFeature<ScimFeatureBulk>(ScimFeatureType.Bulk),
+                scimConfig.GetFeature<ScimFeatureFilter>(ScimFeatureType.Filter),
+                scimConfig.GetFeature(ScimFeatureType.ChangePassword),
+                scimConfig.GetFeature(ScimFeatureType.Sort),
+                scimConfig.GetFeature(ScimFeatureType.ETag),
+                scimConfig.AuthenticationSchemes);
+
+            return config;
         }
 
         public bool RequireSsl { get; set; }
@@ -106,6 +110,27 @@
         internal IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
         {
             get { return _ResourceTypeDefinitions.Values; }
+        }
+        
+        public static Type GetResourceExtensionType(Type resourceType, string extensionSchemaIdentifier)
+        {
+            IScimResourceTypeDefinition rtd;
+            if (!_ResourceTypeDefinitions.TryGetValue(resourceType, out rtd)) return null;
+            
+            return rtd.GetExtension(extensionSchemaIdentifier)?.ExtensionType;
+        }
+
+        public static string GetSchemaIdentifierForResourceExtensionType(Type extensionType)
+        {
+            // TODO: (DG) Cache this
+            foreach (var rtd in _ResourceTypeDefinitions.Values)
+            {
+                var ext = rtd.SchemaExtensions.SingleOrDefault(e => e.ExtensionType == extensionType);
+                if (ext != null)
+                    return ext.Schema;
+            }
+
+            return null;
         }
 
         public ScimServerConfiguration AddAuthenticationScheme(AuthenticationScheme authenticationScheme)
@@ -242,15 +267,22 @@
                 : null;
         }
 
-        public Type GetScimResourceValidatorType(Type type)
+        public bool GetScimResourceTypeDefinition(Type resourceType)
         {
-            // TODO: (DG) Cache this!
-            return _ResourceTypeDefinitions.ContainsKey(type)
-                ? _ResourceTypeDefinitions[type].ValidatorType
-                : (from rtd in _ResourceTypeDefinitions.Values
-                   let ext = rtd.SchemaExtensions.SingleOrDefault(ext => ext.ResourceType == type)
-                   where ext != null
-                   select ext.ResourceValidatorType).SingleOrDefault();
+            return false;
+           
+//            if (_ResourceTypeDefinitions.ContainsKey(resourceType))
+
+//                ? _ResourceTypeDefinitions[resourceType]
+//                : (from rtd in _ResourceTypeDefinitions.Values
+//                   let ext = rtd.SchemaExtensions.SingleOrDefault(ext => ext.ResourceType == resourceType)
+//                   where ext != null
+//                   select ext.R).SingleOrDefault();
+        }
+
+        public Type GetScimResourceValidatorType(Type resourceType)
+        {
+            return _ResourceTypeDefinitions[resourceType].ValidatorType;
         }
         
         private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()
@@ -281,8 +313,7 @@
                             ScimConstants.Endpoints.Users,
                             schemaIdentifiers =>
                             {
-                                if (schemaIdentifiers.Count == 1 &&
-                                    schemaIdentifiers.Contains(ScimConstants.Schemas.User))
+                                if (schemaIdentifiers.Contains(ScimConstants.Schemas.User))
                                     return true;
 
                                 return false;
@@ -387,18 +418,9 @@
                         .For(c => c.Display)
                             .SetMutability(Mutability.ReadOnly))
                 
-                .AddSchemaExtension<EnterpriseUser, EnterpriseUserValidator, EnterpriseUserExtension>(
+                .AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(
                     ScimConstants.Schemas.UserEnterprise, 
                     false,
-                    schemaIdentifiers =>
-                    {
-                        if (schemaIdentifiers.Count == 2 &&
-                            schemaIdentifiers.Contains(ScimConstants.Schemas.User) &&
-                            schemaIdentifiers.Contains(ScimConstants.Schemas.UserEnterprise))
-                            return true;
-
-                        return false;
-                    },
                     config => config
                         .For(ext => ext.Manager))
 ;

@@ -1,6 +1,7 @@
 namespace Owin.Scim.Model.Users
 {
-    public class EnterpriseUserExtension
+    [SchemaIdentifier(ScimConstants.Schemas.UserEnterprise)]
+    public class EnterpriseUserExtension : ResourceExtension
     {
         public string EmployeeNumber { get; set; }
 
@@ -13,5 +14,18 @@ namespace Owin.Scim.Model.Users
         public string Department { get; set; }
 
         public Manager Manager { get; set; }
+
+        public override int CalculateVersion()
+        {
+            return new
+            {
+                CostCenter,
+                Department,
+                Division,
+                EmployeeNumber,
+                Organization,
+                Manager?.Value
+            }.GetHashCode();
+        }
     }
 }

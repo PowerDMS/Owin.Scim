@@ -18,7 +18,7 @@
         {
             var autoFixture = new Fixture();
 
-            MutableUserPayload = autoFixture.Build<EnterpriseUser>()
+            MutableUserPayload = autoFixture.Build<User>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -29,13 +29,13 @@
                 .With(x => x.Ims, null)
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
-                .Create();
+                .Create(seed: new User(typeof(EnterpriseUserExtension)));
 
 
             // Insert the first user so there's one already in-memory.
             var userRecord = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<EnterpriseUser>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<User>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
                 .Result;
 
             await userRecord.DeserializeTo(() => OriginalUserRecord); // capture original user record
@@ -44,14 +44,14 @@
             MutableUserPayload.Id = OriginalUserRecord.Id; // set server-assigned ID
             MutableUserPayload.UserName = UserNameUtility.GenerateUserName(); // new userName
             MutableUserPayload.Password = "someOtherPass"; // newPassword
-            MutableUserPayload.Enterprise.EmployeeNumber = "007";
+            MutableUserPayload.Extension<EnterpriseUserExtension>().EmployeeNumber = "007";
         };
 
         Because of = async () =>
         {
             Response = await Server
                 .HttpClient
-                .PutAsync("users/" + MutableUserPayload.Id, new ObjectContent<EnterpriseUser>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("users/" + MutableUserPayload.Id, new ObjectContent<User>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
@@ -63,7 +63,10 @@
         It should_contain_the_new_values = () =>
         {
             UpdatedUserRecord.UserName.ShouldNotEqual(OriginalUserRecord.UserName);
-            UpdatedUserRecord.Enterprise.EmployeeNumber.ShouldNotEqual(OriginalUserRecord.Enterprise.EmployeeNumber);
+            UpdatedUserRecord
+                .Extension<EnterpriseUserExtension>()
+                .EmployeeNumber
+                .ShouldNotEqual(OriginalUserRecord.Extension<EnterpriseUserExtension>().EmployeeNumber);
         };
 
         It should_not_return_password = () => UpdatedUserRecord.Password.ShouldBeNull();
@@ -80,11 +83,11 @@
             UpdatedUserRecord.Meta.LastModified.ShouldBeGreaterThan(OriginalUserRecord.Meta.LastModified);
         };
 
-        protected static EnterpriseUser OriginalUserRecord;
+        protected static User OriginalUserRecord;
 
-        protected static EnterpriseUser UpdatedUserRecord;
+        protected static User UpdatedUserRecord;
 
-        protected static EnterpriseUser MutableUserPayload;
+        protected static User MutableUserPayload;
 
         protected static HttpResponseMessage Response;
     }

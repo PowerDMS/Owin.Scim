@@ -15,7 +15,7 @@
         {
             var autoFixture = new Fixture();
 
-            var existingUser = autoFixture.Build<EnterpriseUser>()
+            var existingUser = autoFixture.Build<User>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -26,18 +26,18 @@
                 .With(x => x.Ims, null)
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
-                .Create();
+                .Create(seed: new User(typeof(EnterpriseUserExtension)));
 
             // Insert the first user so there's one already in-memory.
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<EnterpriseUser>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
                 .Result;
 
             if (Response.StatusCode == HttpStatusCode.Created)
             {
                 JsonData = Response.Content.ReadAsStringAsync().Result;
-                User = Newtonsoft.Json.JsonConvert.DeserializeObject<EnterpriseUser>(JsonData);
+                User = Newtonsoft.Json.JsonConvert.DeserializeObject<User>(JsonData);
             }
 
             var client = Server.HttpClient;

@@ -190,28 +190,16 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddSchemaExtension<TResourceDerivative, TValidator, TExtension>(
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddSchemaExtension<TExtension, TValidator>(
             string schemaIdentifier, 
-            bool required,
-            Predicate<ISet<string>> schemaBindingRule,
+            bool required = false,
             Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
-            where TResourceDerivative : Resource, T
-            where TExtension : class
-            where TValidator : IValidator<TResourceDerivative>
+            where TExtension : ResourceExtension, new()
+            where TValidator : IValidator<TExtension>
         {
             if (!typeof (Resource).IsAssignableFrom(typeof (T)))
                 throw new InvalidOperationException("You cannot add schema extensions to non-resource types.");
-
-            if (!typeof (TResourceDerivative).ContainsSchemaExtension<TExtension>(schemaIdentifier))
-                throw new InvalidOperationException(
-                    string.Format(
-                        @"To use type '{0}' as a schema extension, it must have a single property 
-                        of type '{1}' with a JsonPropertyAttribute whose PropertyName is equal to '{2}'."
-                            .RemoveMultipleSpaces(),
-                        typeof (TResourceDerivative).Name,
-                        typeof (TExtension).Name,
-                        schemaIdentifier));
-
+            
             var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(_ScimTypeDefinitionBuilder.ScimServerConfiguration);
 
             ((IScimResourceTypeDefinition)_ScimTypeDefinitionBuilder)
@@ -220,13 +208,8 @@ namespace Owin.Scim.Configuration
                     schemaIdentifier,
                     required,
                     extensionDefinition,
-                    typeof(TResourceDerivative),
+                    typeof(TExtension),
                     typeof(TValidator)));
-
-            _ScimTypeDefinitionBuilder
-                .ScimServerConfiguration
-                .SchemaBindingRules
-                .Insert(0, new SchemaBindingRule(schemaBindingRule, typeof(TResourceDerivative)));
 
             extensionBuilder?.Invoke(extensionDefinition);
 

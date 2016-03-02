@@ -16,7 +16,9 @@ namespace Owin.Scim.Configuration
         Type ValidatorType { get; }
 
         IEnumerable<ScimResourceTypeExtension> SchemaExtensions { get; }
-
+        
         void AddExtension(ScimResourceTypeExtension extension);
+
+        ScimResourceTypeExtension GetExtension(string schemaIdentifier);
     }
 }

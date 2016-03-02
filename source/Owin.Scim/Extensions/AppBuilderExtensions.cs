@@ -121,9 +121,10 @@
                 0,
                 descriptor =>
                 {
-                    if (typeof(SchemaBase).IsAssignableFrom(descriptor.ParameterType))
-                        return new SchemaBaseParameterBinding(
-                            descriptor, 
+                    if (typeof(Resource).IsAssignableFrom(descriptor.ParameterType))
+                        return new ResourceParameterBinding(
+                            descriptor,
+                            descriptor.Configuration.DependencyResolver.GetService(typeof(ScimServerConfiguration)) as ScimServerConfiguration,
                             descriptor.Configuration.DependencyResolver.GetService(typeof(ISchemaTypeFactory)) as ISchemaTypeFactory);
 
                     return null;

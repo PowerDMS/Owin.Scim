@@ -5,7 +5,6 @@
     using FluentValidation;
 
     using Model;
-    using Model.Users;
 
     using Repository;
 
@@ -39,14 +38,6 @@
                 _UserRepository,
                 _PasswordComplexityVerifier,
                 _PasswordManager);
-
-            if (resource is EnterpriseUser)
-            {
-                return Task.FromResult(
-                    (IValidator)new EnterpriseUserValidator(
-                        _UserRepository,
-                        userValidator));
-            }
 
             return Task.FromResult((IValidator)userValidator);
         }

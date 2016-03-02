@@ -12,19 +12,16 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
     {
         Establish context = () =>
         {
-            UserToUpdate = new EnterpriseUser
+            UserToUpdate = new User
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Name = new Name
                 {
                     FamilyName = "Smith",
                     GivenName = "John"
-                },
-                Enterprise = new EnterpriseUserExtension
-                {
-                    Department = "Hello"
                 }
             };
+            UserToUpdate.Extension<EnterpriseUserExtension>().Department = "Hello";
 
             PatchContent = new StringContent(
                 @"
@@ -47,6 +44,6 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UserToUpdate.Meta.LastModified);
 
-        It should_replace_employee_number = () => UpdatedUser.Enterprise.Department.ShouldEqual("1234");
+        It should_replace_employee_number = () => UpdatedUser.Extension<EnterpriseUserExtension>().Department.ShouldEqual("1234");
     }
 }

@@ -1,7 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
     using System.Net;
-    using System.Net.Http;
 
     using Machine.Specifications;
 
@@ -11,14 +10,11 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     {
         Establish context = () =>
         {
-            UserDto = new EnterpriseUser
+            UserDto = new User
             {
-                UserName = UserNameUtility.GenerateUserName(),
-                Enterprise =
-                {
-                    Department = "Sales"
-                }
+                UserName = UserNameUtility.GenerateUserName()
             };
+            UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
         };
 
         It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);

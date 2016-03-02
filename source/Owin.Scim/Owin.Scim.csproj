@@ -122,7 +122,7 @@
     <Compile Include="Configuration\Mutability.cs" />
     <Compile Include="Configuration\Returned.cs" />
     <Compile Include="Canonicalization\CanonicalizationRule.cs" />
-    <Compile Include="Configuration\SchemaBaseParameterBinding.cs" />
+    <Compile Include="Configuration\ResourceParameterBinding.cs" />
     <Compile Include="Configuration\SchemaBindingRule.cs" />
     <Compile Include="Configuration\ScimFeatureType.cs" />
     <Compile Include="Configuration\ScimResourceTypeDefinitionBuilder.cs" />
@@ -160,15 +160,18 @@
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Extensions\ValidationResultExtensions.cs" />
     <Compile Include="Model\AuthenticationScheme.cs" />
+    <Compile Include="Model\ResourceExtensions.cs" />
     <Compile Include="Model\ResourceType.cs" />
     <Compile Include="Model\SchemaExtension.cs" />
+    <Compile Include="Model\SchemaIdentifierAttribute.cs" />
     <Compile Include="Model\ScimFeatureBulk.cs" />
     <Compile Include="Model\ScimFeatureETag.cs" />
     <Compile Include="Model\ScimFeatureFilter.cs" />
     <Compile Include="Model\ScimFeature.cs" />
-    <Compile Include="Model\SchemaBase.cs" />
     <Compile Include="Model\ServiceProviderConfig.cs" />
+    <Compile Include="SometimesLazy.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtension.cs" />
+    <Compile Include="Model\ResourceExtension.cs" />
     <Compile Include="Patching\Helpers\PatchMember.cs" />
     <Compile Include="Patching\PatchOperationResult.cs" />
     <Compile Include="Patching\PatchResult.cs" />
@@ -183,7 +186,6 @@
     <Compile Include="Serialization\ScimErrorTypeConverter.cs" />
     <Compile Include="Model\Users\Address.cs" />
     <Compile Include="Model\Users\Email.cs" />
-    <Compile Include="Model\Users\EnterpriseUser.cs" />
     <Compile Include="Model\Users\Entitlement.cs" />
     <Compile Include="Model\Users\Manager.cs" />
     <Compile Include="Model\Users\Role.cs" />

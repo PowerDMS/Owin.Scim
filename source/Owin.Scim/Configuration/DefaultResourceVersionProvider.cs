@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Configuration
 {
     using System.Security.Cryptography;
+    using System.Text;
 
     using Model;
 
@@ -22,7 +23,7 @@
 
         public virtual string GenerateVersion(Resource resource)
         {
-            return HashProvider.CreateHash<SHA1Cng>(resource.CalculateVersion(), 0);
+            return HashProvider.CreateHash<SHA1Cng>(resource.CalculateVersion().ToString(), 0);
         }
     }
 }

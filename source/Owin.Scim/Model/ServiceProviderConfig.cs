@@ -32,8 +32,6 @@
             ScimFeature featureETag,
             IEnumerable<AuthenticationScheme> authenticationSchemes = null)
         {
-            AddSchema(ScimConstants.Schemas.ServiceProviderConfig);
-
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute
              * "resourceType" SHALL be set by the HTTP service provider to the
@@ -99,8 +97,13 @@
         {
             get { return _AuthenticationSchemes; }
         }
+        
+        public override string SchemaIdentifier
+        {
+            get { return ScimConstants.Schemas.ServiceProviderConfig; }
+        }
 
-        public override string CalculateVersion()
+        public override int CalculateVersion()
         {
             return new
             {
@@ -114,7 +117,7 @@
                 Sort = Sort.GetETagHashCode(),
                 ETag = ETag.GetETagHashCode(),
                 AuthenticationSchemes = AuthenticationSchemes.GetMultiValuedAttributeCollectionVersion()
-            }.GetHashCode().ToString();
+            }.GetHashCode();
         }
 
         public override bool ShouldSerializeId()
