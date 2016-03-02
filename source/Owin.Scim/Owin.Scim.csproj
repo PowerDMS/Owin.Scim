@@ -143,6 +143,7 @@
     <Compile Include="Endpoints\ResourceTypesController.cs" />
     <Compile Include="Endpoints\ServiceProviderConfigurationController.cs" />
     <Compile Include="Endpoints\ControllerBase.cs" />
+    <Compile Include="Endpoints\Users\GroupsController.cs" />
     <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="ErrorHandling\ErrorDetail.cs" />
     <Compile Include="ErrorHandling\ScimErrorExtensions.cs" />
@@ -161,6 +162,8 @@
     <Compile Include="Extensions\ValidationResultExtensions.cs" />
     <Compile Include="Model\AuthenticationScheme.cs" />
     <Compile Include="Model\ResourceExtensions.cs" />
+    <Compile Include="Model\Groups\Group.cs" />
+    <Compile Include="Model\Groups\Member.cs" />
     <Compile Include="Model\ResourceType.cs" />
     <Compile Include="Model\SchemaExtension.cs" />
     <Compile Include="Model\SchemaIdentifierAttribute.cs" />
@@ -181,6 +184,8 @@
     <Compile Include="Model\BulkRequest.cs" />
     <Compile Include="Patching\PatchRequest.cs" />
     <Compile Include="Model\ScimError.cs" />
+    <Compile Include="Repository\IGroupRepository.cs" />
+    <Compile Include="Repository\InMemory\InMemoryGroupRepository.cs" />
     <Compile Include="ScimResponse.cs" />
     <Compile Include="Model\ScimErrorType.cs" />
     <Compile Include="Serialization\ScimErrorTypeConverter.cs" />
@@ -230,12 +235,15 @@
     <Compile Include="IScimResponse.cs" />
     <Compile Include="Configuration\DefaultResourceVersionProvider.cs" />
     <Compile Include="Configuration\IResourceVersionProvider.cs" />
+    <Compile Include="Services\GroupService.cs" />
+    <Compile Include="Services\IGroupService.cs" />
     <Compile Include="Services\IUserService.cs" />
     <Compile Include="ScimDataResponse.cs" />
     <Compile Include="ScimErrorResponse.cs" />
     <Compile Include="Canonicalization\Canonicalization.cs" />
     <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\UserService.cs" />
+    <Compile Include="Validation\Groups\GroupValidator.cs" />
     <Compile Include="Validation\IScimValidationContext.cs" />
     <Compile Include="Validation\Users\EnterpriseUserValidator.cs" />
     <Compile Include="Validation\IResourceValidatorFactory.cs" />

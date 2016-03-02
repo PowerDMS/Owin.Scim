@@ -109,6 +109,8 @@
   <ItemGroup>
     <Compile Include="Extensions\HttpResponseMessageExtensions.cs" />
     <Compile Include="Extensions\ShouldExtensions.cs" />
+    <Compile Include="Integration\Groups\Create\when_creating_a_group.cs" />
+    <Compile Include="Integration\Groups\Create\with_a_valid_group.cs" />
     <Compile Include="Integration\ResourceTypes\when_retrieving_resource_types.cs" />
     <Compile Include="Integration\ServiceProviderConfig\when_retrieving_service_provider_configuration.cs" />
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
