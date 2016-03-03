@@ -13,7 +13,7 @@
         {
             GroupDto = new Group
             {
-                DisplayName = "hello",
+                //DisplayName = "hello",
                 ExternalId = "hello"
             };
         };
