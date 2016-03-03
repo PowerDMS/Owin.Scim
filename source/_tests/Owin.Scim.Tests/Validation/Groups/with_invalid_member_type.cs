@@ -24,7 +24,7 @@
 
         It should_indicate_type_is_wrong =
             () => Result.Errors
-                    .First(e => e.Detail.Contains("members.type"))
+                    .First(e => e.Detail.Contains("member.type"))
                     .ScimType
                     .ShouldEqual(Model.ScimErrorType.InvalidSyntax);
     }

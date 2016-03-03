@@ -16,7 +16,7 @@
 
     public class GroupValidator : ResourceValidatorBase<Group>
     {
-        private const string _pathSeparator = @"/";
+        private const string PathSeparator = @"/";
         private readonly ScimServerConfiguration _scimServerConfiguration;
         private readonly IUserRepository _userRepository;
         private readonly IGroupRepository _groupRepository;
@@ -60,7 +60,7 @@
                                             .WithState(u =>
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
-                                                    ScimErrorType.InvalidValue,
+                                                    ScimErrorType.InvalidSyntax,
                                                     "The attribute 'member.type' must have a valid value."))
                                     },
                                     {
@@ -72,13 +72,12 @@
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
                                                     "The attribute 'member.$ref' (or 'member.value' and 'member.type') must be provided."))
-                                            // TODO: value and type must be a valid resource
                                             .MustAsync(async (member, token) => await IsValidResourceValue(member))
                                             .WithState(u =>
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
-                                                    ScimErrorType.InvalidValue,
-                                                    "The attribute 'members.$ref' must be a valid resource."))
+                                                    ScimErrorType.InvalidSyntax,
+                                                    "The attribute 'member.$ref' (or 'member.value' and 'member.type') must be a valid resource."))
                                     }
                                 });
                     });
@@ -178,8 +177,8 @@
 
             if (!rootUri.Segments.SequenceEqual(prefixPath, StringComparer.InvariantCultureIgnoreCase)) return false;
 
-            var endpoint = uri.Segments[uri.Segments.Length - 2].Replace(_pathSeparator, string.Empty);
-            value = uri.Segments[uri.Segments.Length - 1].Replace(_pathSeparator, string.Empty);
+            var endpoint = uri.Segments[uri.Segments.Length - 2].Replace(PathSeparator, string.Empty);
+            value = uri.Segments[uri.Segments.Length - 1].Replace(PathSeparator, string.Empty);
 
             return _endpointToTypeDictionary.TryGetValue(endpoint, out type);
         }

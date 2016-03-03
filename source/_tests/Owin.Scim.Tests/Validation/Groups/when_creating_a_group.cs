@@ -22,8 +22,8 @@
             var scimServerConfiguration = A.Fake<ScimServerConfiguration>();
 
             scimServerConfiguration.PublicOrigin = "http://local/Scim/V2/";
-            A.CallTo(() => userRepository.GetUser(ValidUserId)).Returns(new User());
-            A.CallTo(() => groupRepository.GetGroup(ValidGroupId)).Returns(new Group());
+            A.CallTo(() => userRepository.GetUser(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidUserId ? new User() : null);
+            A.CallTo(() => groupRepository.GetGroup(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidGroupId ? new Group() : null);
 
             Validator = new GroupValidator(scimServerConfiguration, userRepository, groupRepository);
         };

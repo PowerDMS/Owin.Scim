@@ -226,6 +226,7 @@
     <Compile Include="Validation\Groups\when_creating_a_group.cs" />
     <Compile Include="Validation\Groups\with_no_display_name.cs" />
     <Compile Include="Validation\Groups\with_invalid_member_type.cs" />
+    <Compile Include="Validation\Groups\with_invalid_resources.cs" />
     <Compile Include="Validation\Groups\with_valid_members.cs" />
     <Compile Include="Validation\Users\UserValidatorFactory.cs" />
     <Compile Include="Validation\Users\when_validating_an_existing_user.cs" />
