@@ -11,10 +11,13 @@
 
         public ResourceExtensionValidators(IEnumerable<IResourceExtensionValidator> validators)
         {
-            _Validators = validators
-                .ToDictionary(
-                    v => v.ExtensionSchema,
-                    v => v);
+            if (validators != null)
+            {
+                _Validators = validators
+                    .ToDictionary(
+                        v => v.ExtensionSchema,
+                        v => v);
+            }
         }
 
         public IValidator this[string schemaIdentifier]

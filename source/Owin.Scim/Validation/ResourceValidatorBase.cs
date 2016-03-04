@@ -18,8 +18,11 @@ namespace Owin.Scim.Validation
     public abstract class ResourceValidatorBase<T> : ValidatorBase<T>, IValidator
         where T : Resource
     {
+        private readonly ResourceExtensionValidators _ExtensionValidators;
+
         protected ResourceValidatorBase(ResourceExtensionValidators extensionValidators)
         {
+            _ExtensionValidators = extensionValidators;
             CascadeMode = CascadeMode.StopOnFirstFailure;
             
             // Virtual member call from ctor but derived types should not require 
@@ -39,7 +42,7 @@ namespace Owin.Scim.Validation
                             v.When(ext => ext.Value.IsValueCreated, () =>
                             {
                                 v.RuleFor(ext => ext.Value.Value)
-                                    .SetValidator2(ext => extensionValidators[ext.Key]);
+                                    .SetValidator2(ext => _ExtensionValidators[ext.Key]);
                             }));
                 });
         }

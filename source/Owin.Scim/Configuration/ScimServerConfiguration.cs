@@ -445,10 +445,21 @@
         {
             builder
                 .For(u => u.Id)
-                .SetMutability(Mutability.ReadOnly)
-                .SetReturned(Returned.Always)
-                .SetUniqueness(Uniqueness.Server)
-                .SetCaseExact(true);
+                    .SetMutability(Mutability.ReadOnly)
+                    .SetReturned(Returned.Always)
+                    .SetUniqueness(Uniqueness.Server)
+                    .SetCaseExact(true)
+                .For(u => u.DisplayName)
+                    .SetRequired(true)
+                .For(u => u.Members)
+                    .DefineSubAttributes(config => config
+                        .For(p => p.Value)
+                        .SetMutability(Mutability.Immutable)
+                        .For(p => p.Ref)
+                        .SetMutability(Mutability.Immutable)
+                        .For(p => p.Type)
+                        .SetMutability(Mutability.Immutable)
+                    );
         }
     }
 }

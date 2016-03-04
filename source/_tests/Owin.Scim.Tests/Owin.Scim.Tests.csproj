@@ -223,6 +223,11 @@
     <Compile Include="Services\UserService\Update\with_a_new_password.cs" />
     <Compile Include="Services\UserService\Update\with_client_supplied_groups.cs" />
     <Compile Include="TaskExtensions.cs" />
+    <Compile Include="Validation\Groups\when_creating_a_group.cs" />
+    <Compile Include="Validation\Groups\with_no_display_name.cs" />
+    <Compile Include="Validation\Groups\with_invalid_member_type.cs" />
+    <Compile Include="Validation\Groups\with_invalid_resources.cs" />
+    <Compile Include="Validation\Groups\with_valid_members.cs" />
     <Compile Include="Validation\Users\UserValidatorFactory.cs" />
     <Compile Include="Validation\Users\when_validating_an_existing_user.cs" />
     <Compile Include="Validation\Users\when_validating_a_new_user.cs" />
@@ -265,6 +270,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
