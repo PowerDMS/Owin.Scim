@@ -20,11 +20,6 @@
         private readonly ScimServerConfiguration _scimServerConfiguration;
         private readonly IUserRepository _userRepository;
         private readonly IGroupRepository _groupRepository;
-        private readonly IDictionary<string, string> _endpointToTypeDictionary = new Dictionary<string, string>()
-        {
-            { ScimConstants.Endpoints.Users, ScimConstants.ResourceTypes.User },
-            { ScimConstants.Endpoints.Groups, ScimConstants.ResourceTypes.Group }
-        };
 
         public GroupValidator(
             ResourceExtensionValidators extensionValidators,
@@ -40,7 +35,7 @@
 
         protected override void ConfigureDefaultRuleSet()
         {
-            RuleFor(g => g.DisplayName)
+                RuleFor(g => g.DisplayName)
                     .NotEmpty()
                     .WithState(u =>
                         new ScimError(
@@ -48,12 +43,12 @@
                             ScimErrorType.InvalidValue,
                             ErrorDetail.AttributeRequired("displayName")));
 
-            When(@group => @group.Members != null && @group.Members.Any(), () =>
-            {
-                RuleFor(@group => @group.Members)
-                    .SetCollectionValidator(
-                        new GenericExpressionValidator<Member>
-                        {
+                When(@group => @group.Members != null && @group.Members.Any(), () =>
+                    {
+                        RuleFor(@group => @group.Members)
+                            .SetCollectionValidator(
+                                new GenericExpressionValidator<Member>
+                                {
                                     {
                                         g => g.Type,
                                         config => config
@@ -80,8 +75,8 @@
                                                     ScimErrorType.InvalidSyntax,
                                                     "The attribute 'member.$ref' (or 'member.value' and 'member.type') must be a valid resource."))
                                     }
-                        });
-            });
+                                });
+                    });
         }
 
         protected override void ConfigureCreateRuleSet()
@@ -103,9 +98,9 @@
 
         protected virtual bool IsValidMemberType(string type)
         {
-            return type == null ||
-                string.Compare(type, ScimConstants.ResourceTypes.User, StringComparison.InvariantCultureIgnoreCase) == 0 ||
-                string.Compare(type, ScimConstants.ResourceTypes.Group, StringComparison.InvariantCultureIgnoreCase) == 0;
+            return type == null || 
+                type.Equals(ScimConstants.ResourceTypes.User) || 
+                type.Equals(ScimConstants.ResourceTypes.Group);
         }
 
         private async Task<bool> IsValidResourceValue(Member member)
@@ -170,10 +165,10 @@
 
             if (!rootUri.Segments.SequenceEqual(prefixPath, StringComparer.InvariantCultureIgnoreCase)) return false;
 
-            var endpoint = uri.Segments[uri.Segments.Length - 2].Replace(PathSeparator, string.Empty);
+            var endpoint = uri.Segments[uri.Segments.Length - 2].Replace(PathSeparator, string.Empty).ToLower();
             value = uri.Segments[uri.Segments.Length - 1].Replace(PathSeparator, string.Empty);
 
-            return _endpointToTypeDictionary.TryGetValue(endpoint, out type);
+            return ScimConstants.Maps.EndpointToTypeDictionary.TryGetValue(endpoint, out type);
         }
     }
 }
