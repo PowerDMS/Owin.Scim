@@ -25,7 +25,7 @@
             A.CallTo(() => userRepository.GetUser(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidUserId ? new User() : null);
             A.CallTo(() => groupRepository.GetGroup(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidGroupId ? new Group() : null);
 
-            Validator = new GroupValidator(scimServerConfiguration, userRepository, groupRepository);
+            Validator = new GroupValidator(new ResourceExtensionValidators(null), scimServerConfiguration, userRepository, groupRepository);
         };
 
         Because of = () =>

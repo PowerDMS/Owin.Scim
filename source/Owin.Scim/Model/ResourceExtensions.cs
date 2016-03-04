@@ -1,6 +1,7 @@
 namespace Owin.Scim.Model
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
@@ -11,7 +12,7 @@ namespace Owin.Scim.Model
 
     using Newtonsoft.Json.Linq;
 
-    public class ResourceExtensions
+    public class ResourceExtensions : IEnumerable<KeyValuePair<string, SometimesLazy<ResourceExtension>>>
     {
         private readonly IDictionary<string, SometimesLazy<ResourceExtension>> _Extensions;
 
@@ -75,6 +76,16 @@ namespace Owin.Scim.Model
             }
 
             return hash;
+        }
+
+        public IEnumerator<KeyValuePair<string, SometimesLazy<ResourceExtension>>> GetEnumerator()
+        {
+            return _Extensions.GetEnumerator();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator()
+        {
+            return GetEnumerator();
         }
     }
 }

@@ -1,5 +1,8 @@
 namespace Owin.Scim.Validation
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Runtime.Remoting.Messaging;
     using System.Threading;
     using System.Threading.Tasks;
@@ -10,16 +13,38 @@ namespace Owin.Scim.Validation
 
     using NContext.Common;
 
-    public abstract class ResourceValidatorBase<T> : ValidatorBase<T>, IValidator 
+    using Owin.Scim.Extensions;
+
+    public abstract class ResourceValidatorBase<T> : ValidatorBase<T>, IValidator
         where T : Resource
     {
-        private bool _IsConfigured;
+        private readonly ResourceExtensionValidators _ExtensionValidators;
 
-        private readonly object _SyncLock = new object();
-        
-        protected ResourceValidatorBase()
+        protected ResourceValidatorBase(ResourceExtensionValidators extensionValidators)
         {
+            _ExtensionValidators = extensionValidators;
             CascadeMode = CascadeMode.StopOnFirstFailure;
+            
+            // Virtual member call from ctor but derived types should not require 
+            // construction to configure rulesets. This MAY be short-sighted, however, 
+            // dependencies should not need to be used during construction; but referenced from 
+            // lambdas defined during construction yet invoked during validation.
+            // -DGioulakis
+            RuleSet("default", ConfigureDefaultRuleSet);
+            RuleSet("create", ConfigureCreateRuleSet);
+            RuleSet("update", ConfigureUpdateRuleSet);
+
+            When(res => res.Extensions != null && res.Extensions.Any(),
+                () =>
+                {
+                    RuleFor(res => res.Extensions)
+                        .NestedRules(v =>
+                            v.When(ext => ext.Value.IsValueCreated, () =>
+                            {
+                                v.RuleFor(ext => ext.Value.Value)
+                                    .SetValidator2(ext => _ExtensionValidators[ext.Key]);
+                            }));
+                });
         }
 
         protected abstract void ConfigureDefaultRuleSet();
@@ -57,8 +82,6 @@ namespace Owin.Scim.Validation
             ValidationContext<T> context,
             CancellationToken token = new CancellationToken())
         {
-            Configure();
-
             var svc = context as ScimValidationContext<T>;
             if (svc != null)
             {
@@ -76,22 +99,9 @@ namespace Owin.Scim.Validation
             return validationResult;
         }
 
-        internal void Configure()
+        public Type TargetType
         {
-            if (!_IsConfigured)
-            {
-                lock (_SyncLock)
-                {
-                    if (!_IsConfigured)
-                    {
-                        ConfigureDefaultRuleSet();
-                        ConfigureCreateRuleSet();
-                        ConfigureUpdateRuleSet();
-
-                        _IsConfigured = true;
-                    }
-                }
-            }
+            get { return typeof (T); }
         }
     }
 }

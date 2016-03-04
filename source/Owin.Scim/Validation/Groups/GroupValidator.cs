@@ -22,9 +22,11 @@
         private readonly IGroupRepository _groupRepository;
 
         public GroupValidator(
+            ResourceExtensionValidators extensionValidators,
             ScimServerConfiguration scimServerConfiguration,
             IUserRepository userRepository, 
             IGroupRepository groupRepository)
+            : base(extensionValidators)
         {
             _scimServerConfiguration = scimServerConfiguration;
             _userRepository = userRepository;
@@ -33,8 +35,6 @@
 
         protected override void ConfigureDefaultRuleSet()
         {
-            RuleSet("default", () =>
-            {
                 RuleFor(g => g.DisplayName)
                     .NotEmpty()
                     .WithState(u =>
@@ -42,6 +42,7 @@
                             HttpStatusCode.BadRequest,
                             ScimErrorType.InvalidValue,
                             ErrorDetail.AttributeRequired("displayName")));
+
                 When(@group => @group.Members != null && @group.Members.Any(), () =>
                     {
                         RuleFor(@group => @group.Members)
@@ -76,8 +77,6 @@
                                     }
                                 });
                     });
-
-            });
         }
 
         protected override void ConfigureCreateRuleSet()
@@ -94,16 +93,15 @@
         /// </summary>
         private bool IsResourceProvided(Member member)
         {
-            return member.Ref != null
-                || (!string.IsNullOrWhiteSpace(member.Value)
-                    && !string.IsNullOrWhiteSpace(member.Type));
+            return member.Ref != null || 
+                (!string.IsNullOrWhiteSpace(member.Value) && !string.IsNullOrWhiteSpace(member.Type));
         }
 
         private bool IsValidMemberType(string type)
         {
-            return type == null
-                   || type.Equals(ScimConstants.ResourceTypes.User)
-                   || type.Equals(ScimConstants.ResourceTypes.Group);
+            return type == null || 
+                type.Equals(ScimConstants.ResourceTypes.User) || 
+                type.Equals(ScimConstants.ResourceTypes.Group);
         }
 
         private async Task<bool> IsValidResourceValue(Member member)

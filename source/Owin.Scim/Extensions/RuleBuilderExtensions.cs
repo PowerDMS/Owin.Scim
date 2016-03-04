@@ -6,9 +6,20 @@
     using System.Threading.Tasks;
 
     using FluentValidation;
+    using FluentValidation.Validators;
 
     public static class RuleBuilderExtensions
     {
+        public static void NestedRules<T, TCollectionElement>(
+            this IRuleBuilder<T, IEnumerable<TCollectionElement>> ruleBuilder,
+            Action<InlineValidator<TCollectionElement>> setup)
+        {
+            var inlineValidator = new InlineValidator<TCollectionElement>();
+            setup(inlineValidator);
+            var adaptor = new ChildCollectionValidatorAdaptor(inlineValidator);
+            ruleBuilder.SetValidator(adaptor);
+        }
+
         public static IRuleBuilderOptions<T, TProperty> Immutable<T, TProperty>(
             this IRuleBuilder<T, TProperty> ruleBuilder,
             Func<TProperty> toCompare,
@@ -73,6 +84,24 @@
                     var compareValue = await toCompare(entity);
                     return await Task.FromResult(comparer.Equals(val, compareValue));
                 });
+        }
+
+        /// <summary>
+        /// Associates a validator provider with the current property rule. 
+        /// </summary>
+        /// <param name="ruleBuilder"></param>
+        /// <param name="validatorProvider">The validator provider to use</param>
+        public static IRuleBuilderOptions<T, TProperty> SetValidator2<T, TProperty, TValidator>(
+            this IRuleBuilderInitial<T, TProperty> ruleBuilder,
+            Func<T, TValidator> validatorProvider)
+            where TValidator : IValidator
+        {
+            if (validatorProvider == null)
+                throw new ArgumentNullException("validatorProvider", "Cannot pass a null validatorProvider to SetValidator");
+
+            ruleBuilder.SetValidator(new ChildValidatorAdaptor(t => validatorProvider((T)t) as IValidator, typeof(TProperty)));
+
+            return (IRuleBuilderOptions<T, TProperty>)ruleBuilder;
         }
     }
 }

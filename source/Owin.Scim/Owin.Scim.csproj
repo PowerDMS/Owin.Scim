@@ -244,7 +244,10 @@
     <Compile Include="Services\ServiceBase.cs" />
     <Compile Include="Services\UserService.cs" />
     <Compile Include="Validation\Groups\GroupValidator.cs" />
+    <Compile Include="Validation\IResourceExtensionValidator.cs" />
     <Compile Include="Validation\IScimValidationContext.cs" />
+    <Compile Include="Validation\ResourceExtensionValidatorBase.cs" />
+    <Compile Include="Validation\ResourceExtensionValidators.cs" />
     <Compile Include="Validation\Users\EnterpriseUserValidator.cs" />
     <Compile Include="Validation\IResourceValidatorFactory.cs" />
     <Compile Include="Validation\ResourceValidatorBase.cs" />
