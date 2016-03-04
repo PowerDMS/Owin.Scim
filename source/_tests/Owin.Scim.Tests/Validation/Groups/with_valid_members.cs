@@ -19,8 +19,8 @@
                 DisplayName = "blue man",
                 Members = new []
                 {
-                    new Member {Ref = new Uri(@"http://local/Scim/V2/users/" + ValidUserId) },
-                    new Member {Value = ValidGroupId, Type = "group" }
+                    new Member {Value = ValidUserId, Type = "User" },
+                    new Member {Value = ValidGroupId, Type = "Group" }
                 }
             };
         };

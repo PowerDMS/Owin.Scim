@@ -452,7 +452,6 @@
                 .For(u => u.DisplayName)
                     .SetRequired(true)
                 .For(u => u.Members)
-                    .AddCanonicalizationRule(CanonizeResourceReference)
                     .DefineSubAttributes(config => config
                         .For(p => p.Value)
                             .SetMutability(Mutability.Immutable)
@@ -460,49 +459,9 @@
                             .SetMutability(Mutability.Immutable)
                         .For(p => p.Type)
                             .AddCanonicalValues(new []{ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group})
-                            .AddCanonicalizationRule(PascalCase)
+                            .AddCanonicalizationRule(Extensions.StringExtensions.ToPascalCase)
                             .SetMutability(Mutability.Immutable)
                     );
-        }
-
-        private Member CanonizeResourceReference(Member member)
-        {
-            // I want $ref to override what is in value/type
-            if (member.Ref != null && member.Ref.IsAbsoluteUri)
-            {
-                string type, value;
-                if (TryReadTypeAndValue(new Uri(PublicOrigin), member.Ref, out type, out value))
-                {
-                    member.Type = type;
-                    member.Value = value;
-                }
-            }
-            // TODO: in order to resolve a relative Uri, I need to know the request path, which for create it does not have id, but for update it does
-            return member;
-        }
-
-        private bool TryReadTypeAndValue(Uri rootUri, Uri uri, out string type, out string value)
-        {
-            const string pathSeparator = @"/";
-            type = value = null;
-
-            if (rootUri.Host != uri.Host) return false;
-
-            if (rootUri.Segments.Length != uri.Segments.Length - 2) return false;
-
-            var prefixPath = uri.Segments.ToList().GetRange(0, rootUri.Segments.Length);
-
-            if (!rootUri.Segments.SequenceEqual(prefixPath, StringComparer.InvariantCultureIgnoreCase)) return false;
-
-            var endpoint = uri.Segments[uri.Segments.Length - 2].Replace(pathSeparator, string.Empty).ToLower();
-            value = uri.Segments[uri.Segments.Length - 1].Replace(pathSeparator, string.Empty);
-
-            return ScimConstants.Maps.EndpointToTypeDictionary.TryGetValue(endpoint, out type);
-        }
-
-        private string PascalCase(string text)
-        {
-            return text.Substring(0, 1).ToUpper() + text.Substring(1).ToLower();
         }
     }
 }

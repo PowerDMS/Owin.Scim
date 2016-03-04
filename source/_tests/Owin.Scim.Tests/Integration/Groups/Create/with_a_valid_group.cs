@@ -11,10 +11,19 @@
     {
         Establish context = () =>
         {
+            // must test:
+            // validation + canonization:
+            // 1. displayName required
+            // 2. members not required
+            // 3. member.value and member.type required
+            // 4. member.type canonical values = User/Group
+            // 5. member.type/value must refer to a valid user or group
+
             GroupDto = new Group
             {
-                //DisplayName = "hello",
-                ExternalId = "hello"
+                DisplayName = "hello",
+                ExternalId = "hello",
+                //Members = new []{new Member {}, }
             };
         };
 

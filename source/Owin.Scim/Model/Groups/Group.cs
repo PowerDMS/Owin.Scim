@@ -3,6 +3,8 @@
     using System;
     using System.Collections.Generic;
 
+    using Extensions;
+
     public class Group : Resource
     {
         public Group() : this(null)
@@ -44,7 +46,7 @@
             {
                 Base = base.CalculateVersion(),
                 DisplayName,
-                // TODO: add hash for Members
+                Members =  Members.GetMultiValuedAttributeCollectionVersion()
             }.GetHashCode();
         }
     }

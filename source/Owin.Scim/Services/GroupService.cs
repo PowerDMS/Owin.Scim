@@ -6,6 +6,7 @@
 
     using Microsoft.FSharp.Core;
 
+    using Canonicalization;
     using Configuration;
     using Extensions;
     using ErrorHandling;
@@ -16,6 +17,7 @@
 
     public class GroupService : ServiceBase, IGroupService
     {
+        private readonly DefaultCanonicalizationService _canonicalizationService;
         private readonly IResourceValidatorFactory _resourceValidatorFactory;
 
         private readonly IGroupRepository _groupRepository;
@@ -23,17 +25,19 @@
         public GroupService(
             ScimServerConfiguration scimServerConfiguration,
             IResourceValidatorFactory resourceValidatorFactory,
+            DefaultCanonicalizationService canonicalizationService,
             IGroupRepository groupRepository) 
             : base(scimServerConfiguration)
         {
             // TODO: validation and metadata population
             _groupRepository = groupRepository;
             _resourceValidatorFactory = resourceValidatorFactory;
+            _canonicalizationService = canonicalizationService;
         }
 
         public async Task<IScimResponse<Group>> CreateGroup(Group group)
         {
-            // TODO: (CY) should I canonize $ref to absolute uri? how about type to pascal case?
+            _canonicalizationService.Canonicalize(group, ScimServerConfiguration.GetScimTypeDefinition(typeof(Group)));
 
             var validator = await _resourceValidatorFactory.CreateValidator(group);
             var validationResult = (await validator.ValidateAsync(group, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
@@ -68,7 +72,8 @@
                         detail: ErrorDetail.NotFound(@group.Id)));
             }
 
-            // TODO: (CY) should I canonize $ref to absolute uri? how about type to pascal case?
+            _canonicalizationService.Canonicalize(group, ScimServerConfiguration.GetScimTypeDefinition(typeof(Group)));
+
             var validator = await _resourceValidatorFactory.CreateValidator(group);
             var validationResult = (await validator.ValidateAsync(group, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
 
