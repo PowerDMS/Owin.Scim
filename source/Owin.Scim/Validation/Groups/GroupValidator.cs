@@ -98,11 +98,10 @@
         /// </summary>
         private bool IsResourceProvided(Member member)
         {
-            return member.Ref != null || 
-                (!string.IsNullOrWhiteSpace(member.Value) && !string.IsNullOrWhiteSpace(member.Type));
+            return member.Ref != null || (!string.IsNullOrWhiteSpace(member.Value) && !string.IsNullOrWhiteSpace(member.Type));
         }
 
-        private bool IsValidMemberType(string type)
+        protected virtual bool IsValidMemberType(string type)
         {
             return type == null ||
                 string.Compare(type, ScimConstants.ResourceTypes.User, StringComparison.InvariantCultureIgnoreCase) == 0 ||
