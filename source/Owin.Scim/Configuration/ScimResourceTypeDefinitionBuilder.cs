@@ -105,9 +105,10 @@ namespace Owin.Scim.Configuration
 
         ScimResourceTypeExtension IScimResourceTypeDefinition.GetExtension(string schemaIdentifier)
         {
-            if (!_SchemaExtensions.ContainsKey(schemaIdentifier)) return null;
+            ScimResourceTypeExtension extension;
+            if (_SchemaExtensions.TryGetValue(schemaIdentifier, out extension)) return extension;
 
-            return _SchemaExtensions[schemaIdentifier];
+            return null;
         }
     }
 }

@@ -4,6 +4,13 @@
 
     public class GroupValidator : ResourceValidatorBase<Group>
     {
+        public GroupValidator(
+            ResourceExtensionValidators extensionValidators)
+            : base(extensionValidators)
+        {
+            
+        }
+
         protected override void ConfigureDefaultRuleSet()
         {
         }

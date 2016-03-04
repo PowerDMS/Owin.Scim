@@ -2,6 +2,7 @@ namespace Owin.Scim.Validation.Users
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Globalization;
     using System.Linq;
     using System.Net;
@@ -28,9 +29,11 @@ namespace Owin.Scim.Validation.Users
         private readonly IManagePasswords _PasswordManager;
         
         public UserValidator(
+            ResourceExtensionValidators extensionValidators,
             IUserRepository userRepository,
             IVerifyPasswordComplexity passwordComplexityVerifier,
             IManagePasswords passwordManager)
+            : base(extensionValidators)
         {
             _UserRepository = userRepository;
             _PasswordComplexityVerifier = passwordComplexityVerifier;
@@ -39,69 +42,67 @@ namespace Owin.Scim.Validation.Users
 
         protected override void ConfigureDefaultRuleSet()
         {
-            RuleSet("default", () =>
-            {
-                RuleFor(u => u.UserName)
-                    .NotEmpty()
-                    .WithState(u => 
-                        new ScimError(
-                            HttpStatusCode.BadRequest, 
-                            ScimErrorType.InvalidValue, 
-                            ErrorDetail.AttributeRequired("userName")));
+            RuleFor(u => u.UserName)
+                       .NotEmpty()
+                       .WithState(u =>
+                           new ScimError(
+                               HttpStatusCode.BadRequest,
+                               ScimErrorType.InvalidValue,
+                               ErrorDetail.AttributeRequired("userName")));
 
-                When(user => !string.IsNullOrWhiteSpace(user.PreferredLanguage),
-                    () =>
-                    {
-                        RuleFor(user => user.PreferredLanguage)
-                            .Must(ValidatePreferredLanguage)
-                            .WithState(u =>
-                                new ScimError(
-                                    HttpStatusCode.BadRequest,
-                                    ScimErrorType.InvalidValue,
-                                    "The attribute 'preferredLanguage' is formatted the same " +
-                                    "as the HTTP Accept-Language header field. (e.g., da, en-gb;q=0.8, en;q=0.7)"));
-                    });
-                When(user => user.ProfileUrl != null,
-                    () =>
-                    {
-                        RuleFor(user => user.ProfileUrl)
-                            .Must(uri => uri.IsAbsoluteUri)
-                            .WithState(u =>
-                                new ScimError(
-                                    HttpStatusCode.BadRequest,
-                                    ScimErrorType.InvalidValue,
-                                    "The attribute 'profileUrl' must be a valid absolute URI."));
-                    });
-                When(user => !string.IsNullOrWhiteSpace(user.Locale),
-                    () =>
-                    {
-                        RuleFor(user => user.Locale)
-                            .Must(locale =>
+            When(user => !string.IsNullOrWhiteSpace(user.PreferredLanguage),
+                () =>
+                {
+                    RuleFor(user => user.PreferredLanguage)
+                        .Must(ValidatePreferredLanguage)
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.BadRequest,
+                                ScimErrorType.InvalidValue,
+                                "The attribute 'preferredLanguage' is formatted the same " +
+                                "as the HTTP Accept-Language header field. (e.g., da, en-gb;q=0.8, en;q=0.7)"));
+                });
+            When(user => user.ProfileUrl != null,
+                () =>
+                {
+                    RuleFor(user => user.ProfileUrl)
+                        .Must(uri => uri.IsAbsoluteUri)
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.BadRequest,
+                                ScimErrorType.InvalidValue,
+                                "The attribute 'profileUrl' must be a valid absolute URI."));
+                });
+            When(user => !string.IsNullOrWhiteSpace(user.Locale),
+                () =>
+                {
+                    RuleFor(user => user.Locale)
+                        .Must(locale =>
+                        {
+                            try
                             {
-                                try
-                                {
-                                    CultureInfo.GetCultureInfo(locale);
-                                    return true;
-                                }
-                                catch (Exception)
-                                {
-                                }
+                                CultureInfo.GetCultureInfo(locale);
+                                return true;
+                            }
+                            catch (Exception)
+                            {
+                            }
 
-                                return false;
-                            })
-                            .WithState(u =>
-                                new ScimError(
-                                    HttpStatusCode.BadRequest,
-                                    ScimErrorType.InvalidValue,
-                                    "The attribute 'locale' MUST be a valid language tag as defined in [RFC5646]."));
-                    });
-                When(user => user.Emails != null && user.Emails.Any(),
-                    () =>
-                    {
-                        RuleFor(user => user.Emails)
-                            .SetCollectionValidator(
-                                new GenericExpressionValidator<Email>
-                                {
+                            return false;
+                        })
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.BadRequest,
+                                ScimErrorType.InvalidValue,
+                                "The attribute 'locale' MUST be a valid language tag as defined in [RFC5646]."));
+                });
+            When(user => user.Emails != null && user.Emails.Any(),
+                () =>
+                {
+                    RuleFor(user => user.Emails)
+                        .SetCollectionValidator(
+                            new GenericExpressionValidator<Email>
+                            {
                                     {
                                         email => email.Value,
                                         config => config
@@ -118,15 +119,15 @@ namespace Owin.Scim.Validation.Users
                                                     ScimErrorType.InvalidValue,
                                                     "The attribute 'email.value' must be a valid email as defined in [RFC5321]."))
                                     }
-                                });
-                    });
-                When(user => user.Ims != null && user.Ims.Any(),
-                    () =>
-                    {
-                        RuleFor(user => user.Ims)
-                            .SetCollectionValidator(
-                                new GenericExpressionValidator<InstantMessagingAddress>
-                                {
+                            });
+                });
+            When(user => user.Ims != null && user.Ims.Any(),
+                () =>
+                {
+                    RuleFor(user => user.Ims)
+                        .SetCollectionValidator(
+                            new GenericExpressionValidator<InstantMessagingAddress>
+                            {
                                     {
                                         im => im.Value,
                                         config => config
@@ -137,17 +138,17 @@ namespace Owin.Scim.Validation.Users
                                                     ScimErrorType.InvalidValue,
                                                     ErrorDetail.AttributeRequired("im.value")))
                                     }
-                                });
-                    });
-                When(user => user.PhoneNumbers != null && user.PhoneNumbers.Any(),
-                    () =>
-                    {
+                            });
+                });
+            When(user => user.PhoneNumbers != null && user.PhoneNumbers.Any(),
+                () =>
+                {
                         // The value SHOULD be specified according to the format defined 
                         // in [RFC3966], e.g., 'tel:+1-201-555-0123'.
                         RuleFor(user => user.PhoneNumbers)
-                            .SetCollectionValidator(
-                                new GenericExpressionValidator<PhoneNumber>
-                                {
+                        .SetCollectionValidator(
+                            new GenericExpressionValidator<PhoneNumber>
+                            {
                                     {
                                         pn => pn.Value,
                                         config => config
@@ -164,15 +165,15 @@ namespace Owin.Scim.Validation.Users
                                                     ScimErrorType.InvalidValue,
                                                     "The attribute 'phoneNumber.value' must be a valid phone number as defined in [RFC3966]."))
                                     }
-                                });
-                    });
-                When(user => user.Photos != null && user.Photos.Any(),
-                    () =>
-                    {
-                        RuleFor(user => user.Photos)
-                            .SetCollectionValidator(
-                                new GenericExpressionValidator<Photo>
-                                {
+                            });
+                });
+            When(user => user.Photos != null && user.Photos.Any(),
+                () =>
+                {
+                    RuleFor(user => user.Photos)
+                        .SetCollectionValidator(
+                            new GenericExpressionValidator<Photo>
+                            {
                                     {
                                         photo => photo.Value,
                                         config => config
@@ -189,15 +190,15 @@ namespace Owin.Scim.Validation.Users
                                                     ScimErrorType.InvalidValue,
                                                     "The attribute 'photo.value' must be a valid URI."))
                                     }
-                                });
-                    });
-                When(user => user.Addresses != null && user.Addresses.Any(),
-                    () =>
-                    {
-                        RuleFor(user => user.Addresses)
-                            .SetCollectionValidator(
-                                new GenericExpressionValidator<Address>
-                                {
+                            });
+                });
+            When(user => user.Addresses != null && user.Addresses.Any(),
+                () =>
+                {
+                    RuleFor(user => user.Addresses)
+                        .SetCollectionValidator(
+                            new GenericExpressionValidator<Address>
+                            {
                                     v => v.When(a => !string.IsNullOrWhiteSpace(a.Country),
                                         () =>
                                         {
@@ -221,15 +222,15 @@ namespace Owin.Scim.Validation.Users
                                                         ScimErrorType.InvalidValue,
                                                         "The attribute 'address.country' must be a valid country code as defined by [ISO3166-1 alpha-2]."));
                                         })
-                                });
-                    });
-                When(user => user.Entitlements != null && user.Entitlements.Any(),
-                    () =>
-                    {
-                        RuleFor(user => user.Entitlements)
-                            .SetCollectionValidator(
-                                new GenericExpressionValidator<Entitlement>
-                                {
+                            });
+                });
+            When(user => user.Entitlements != null && user.Entitlements.Any(),
+                () =>
+                {
+                    RuleFor(user => user.Entitlements)
+                        .SetCollectionValidator(
+                            new GenericExpressionValidator<Entitlement>
+                            {
                                     {
                                         entitlement => entitlement.Value,
                                         config => config
@@ -240,15 +241,15 @@ namespace Owin.Scim.Validation.Users
                                                     ScimErrorType.InvalidValue,
                                                     ErrorDetail.AttributeRequired("entitlement.value")))
                                     }
-                                });
-                    });
-                When(user => user.Roles != null && user.Roles.Any(),
-                    () =>
-                    {
-                        RuleFor(user => user.Roles)
-                            .SetCollectionValidator(
-                                new GenericExpressionValidator<Role>
-                                {
+                            });
+                });
+            When(user => user.Roles != null && user.Roles.Any(),
+                () =>
+                {
+                    RuleFor(user => user.Roles)
+                        .SetCollectionValidator(
+                            new GenericExpressionValidator<Role>
+                            {
                                     {
                                         role => role.Value,
                                         config => config
@@ -259,83 +260,76 @@ namespace Owin.Scim.Validation.Users
                                                     ScimErrorType.InvalidValue,
                                                     ErrorDetail.AttributeRequired("role.value")))
                                     }
-                                });
-                    });
-            });
+                            });
+                });
         }
 
         protected override void ConfigureCreateRuleSet()
         {
-            RuleSet("create", () =>
-            {
-                When(user => !string.IsNullOrWhiteSpace(user.UserName),
-                    () =>
-                    {
-                        RuleFor(user => user.UserName)
-                            .MustAsync(async (userName, token) => await _UserRepository.IsUserNameAvailable(userName))
-                            .WithState(u =>
-                                new ScimError(
-                                    HttpStatusCode.Conflict,
-                                    ScimErrorType.Uniqueness,
-                                    ErrorDetail.AttributeUnique("userName")));
-                    });
+            When(user => !string.IsNullOrWhiteSpace(user.UserName),
+                () =>
+                {
+                    RuleFor(user => user.UserName)
+                        .MustAsync(async (userName, token) => await _UserRepository.IsUserNameAvailable(userName))
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.Conflict,
+                                ScimErrorType.Uniqueness,
+                                ErrorDetail.AttributeUnique("userName")));
+                });
 
-                When(user => !string.IsNullOrWhiteSpace(user.Password),
-                    () =>
-                    {
-                        RuleFor(user => user.Password)
-                            .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
-                            .WithState(u =>
-                                new ScimError(
-                                    HttpStatusCode.BadRequest,
-                                    ScimErrorType.InvalidValue,
-                                    "The attribute 'password' does not meet the security requirements set by the provider."));
-                    });
-            });
+            When(user => !string.IsNullOrWhiteSpace(user.Password),
+                () =>
+                {
+                    RuleFor(user => user.Password)
+                        .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.BadRequest,
+                                ScimErrorType.InvalidValue,
+                                "The attribute 'password' does not meet the security requirements set by the provider."));
+                });
         }
 
         protected override void ConfigureUpdateRuleSet()
         {
-            RuleSet("update", () =>
-            {
-                RuleFor(user => user.Id)
-                    .Immutable(() => ExistingRecord.Id, StringComparer.OrdinalIgnoreCase)
-                    .WithState(u =>
-                        new ScimError(
-                            HttpStatusCode.BadRequest,
-                            ScimErrorType.Mutability,
-                            ErrorDetail.AttributeImmutable("id")));
+            RuleFor(user => user.Id)
+                .Immutable(() => ExistingRecord.Id, StringComparer.OrdinalIgnoreCase)
+                .WithState(u =>
+                    new ScimError(
+                        HttpStatusCode.BadRequest,
+                        ScimErrorType.Mutability,
+                        ErrorDetail.AttributeImmutable("id")));
 
-                // Updating a username validation
-                When(user =>
-                    !string.IsNullOrWhiteSpace(user.UserName) &&
-                    !user.UserName.Equals(ExistingRecord.UserName, StringComparison.OrdinalIgnoreCase),
-                    () =>
-                    {
-                        RuleFor(user => user.UserName)
-                            .MustAsync(async (user, userName, token) => await _UserRepository.IsUserNameAvailable(userName))
-                            .WithState(user =>
-                                new ScimError(
-                                    HttpStatusCode.Conflict,
-                                    ScimErrorType.Uniqueness,
-                                    ErrorDetail.AttributeUnique("userName")));
-                    });
+            // Updating a username validation
+            When(user =>
+                !string.IsNullOrWhiteSpace(user.UserName) &&
+                !user.UserName.Equals(ExistingRecord.UserName, StringComparison.OrdinalIgnoreCase),
+                () =>
+                {
+                    RuleFor(user => user.UserName)
+                        .MustAsync(async (user, userName, token) => await _UserRepository.IsUserNameAvailable(userName))
+                        .WithState(user =>
+                            new ScimError(
+                                HttpStatusCode.Conflict,
+                                ScimErrorType.Uniqueness,
+                                ErrorDetail.AttributeUnique("userName")));
+                });
 
-                // Updating a user password
-                When(user =>
-                    !string.IsNullOrWhiteSpace(user.Password) &&
-                    (ExistingRecord.Password == null || !_PasswordManager.VerifyHash(user.Password, ExistingRecord.Password)),
-                    () =>
-                    {
-                        RuleFor(user => user.Password)
-                            .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
-                            .WithState(u =>
-                                new ScimError(
-                                    HttpStatusCode.BadRequest,
-                                    ScimErrorType.InvalidValue,
-                                    "The attribute 'password' does not meet the security requirements set by the provider."));
-                    });
-            });
+            // Updating a user password
+            When(user =>
+                !string.IsNullOrWhiteSpace(user.Password) &&
+                (ExistingRecord.Password == null || !_PasswordManager.VerifyHash(user.Password, ExistingRecord.Password)),
+                () =>
+                {
+                    RuleFor(user => user.Password)
+                        .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
+                        .WithState(u =>
+                            new ScimError(
+                                HttpStatusCode.BadRequest,
+                                ScimErrorType.InvalidValue,
+                                "The attribute 'password' does not meet the security requirements set by the provider."));
+                });
         }
 
         /// <summary>

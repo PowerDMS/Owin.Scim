@@ -124,7 +124,6 @@
 
         public static string GetSchemaIdentifierForResourceExtensionType(Type extensionType)
         {
-            // TODO: (DG) Cache this
             foreach (var rtd in _ResourceTypeDefinitions.Values)
             {
                 var ext = rtd.SchemaExtensions.SingleOrDefault(e => e.ExtensionType == extensionType);

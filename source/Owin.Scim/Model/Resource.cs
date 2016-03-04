@@ -44,6 +44,12 @@
         [JsonIgnore]
         public abstract string SchemaIdentifier { get; }
 
+        [JsonIgnore]
+        internal ResourceExtensions Extensions
+        {
+            get { return _Extensions; }
+        }
+
         public virtual int CalculateVersion()
         {
             return new

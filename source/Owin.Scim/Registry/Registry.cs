@@ -52,20 +52,21 @@
             container.Register<IResourceValidatorFactory, ServiceLocatorResourceValidatorFactory>();
             container.Register<DefaultCanonicalizationService>(Reuse.Singleton);
 
-            // register all resource and extension validators
+            // validation
+            container.Register<ResourceExtensionValidators>(Reuse.Singleton);
             _ServerConfiguration
                 .ResourceTypeDefinitions
                 .ForEach(rtd =>
                 {
-                    container.Register(rtd.ValidatorType, reuse: Reuse.Singleton);
                     if (rtd.SchemaExtensions.Any())
                     {
                         rtd.SchemaExtensions
-                           .ForEach(ext => container.Register(ext.ExtensionValidatorType, reuse: Reuse.Singleton));
+                           .ForEach(ext => container.Register(typeof(IResourceExtensionValidator), ext.ExtensionValidatorType, reuse: Reuse.Singleton));
                     }
-                });
 
-            // users
+                    container.Register(rtd.ValidatorType, reuse: Reuse.Singleton);
+                });
+            
 #if DEBUG
             container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton);
             container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton);
