@@ -1,5 +1,8 @@
 ﻿namespace Owin.Scim
 {
+    using System.Collections.Generic;
+    using System.Collections.ObjectModel;
+
     public static class ScimConstants
     {
         public static class Schemas
@@ -55,6 +58,16 @@
             public const string Users = @"users";
 
             public const string Groups = @"groups";
+        }
+
+        public static class Maps
+        {
+            public static readonly IReadOnlyDictionary<string, string> EndpointToTypeDictionary =
+                new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
+                {
+                    {Endpoints.Users, ResourceTypes.User},
+                    {Endpoints.Groups, ResourceTypes.Group}
+                });
         }
     }
 }
