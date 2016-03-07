@@ -7,7 +7,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
 
     using Model.Groups;
 
-    public class when_creating_a_group : using_a_scim_server
+    public class when_creating_a_group : using_existing_user_and_group
     {
         Because of = async () =>
         {

@@ -79,7 +79,7 @@
                                 {
                                     g => g.Ref,
                                     config => config
-                                        .Must(r => Uri.IsWellFormedUriString(r, UriKind.RelativeOrAbsolute))
+                                        .Must(r => r == null || Uri.IsWellFormedUriString(r, UriKind.RelativeOrAbsolute))
                                         .WithState(u =>
                                             new ScimError(
                                                 HttpStatusCode.BadRequest,

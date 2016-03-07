@@ -34,11 +34,11 @@ Roadmap
 4. [ ] Add support for mutability rule-processing.
 5. [ ] Add support for bulk processing
 6. [ ] Add groups endpoints
-  1. [ ] Create (IN PROGRESS)
-  2. [ ] Retrieve (IN PROGRESS)
+  1. [x] Create
+  2. [x] Retrieve
   3. [ ] Replace (IN PROGRESS)
   4. [ ] Update (Patch) (IN PROGRESS)
-  5. [ ] Delete (IN PROGRESS)
+  5. [x] Delete
 7. [ ] Add support for querying
   1. [ ] Filtering (parsing into an expression tree is already done)
   2. [ ] Sorting
