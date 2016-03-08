@@ -133,7 +133,17 @@
     <Compile Include="Integration\Groups\Retrieve\when_retrieving_a_group.cs" />
     <Compile Include="Integration\Groups\Retrieve\with_invalid_user_member.cs" />
     <Compile Include="Integration\Groups\Retrieve\with_a_valid_user_member.cs" />
+    <Compile Include="Integration\Groups\Update\add\with_path_direct_no_change.cs" />
+    <Compile Include="Integration\Groups\Update\add\with_path_direct_attribute.cs" />
+    <Compile Include="Integration\Groups\Update\add\with_no_path_no_changes.cs" />
     <Compile Include="Integration\Groups\Update\add\with_no_path.cs" />
+    <Compile Include="Integration\Groups\Update\remove\with_path_direct_no_change.cs" />
+    <Compile Include="Integration\Groups\Update\remove\with_path_direct_attribute.cs" />
+    <Compile Include="Integration\Groups\Update\remove\with_no_path.cs" />
+    <Compile Include="Integration\Groups\Update\replace\with_no_path_no_changes.cs" />
+    <Compile Include="Integration\Groups\Update\replace\with_no_path.cs" />
+    <Compile Include="Integration\Groups\Update\replace\with_path_direct_no_changes.cs" />
+    <Compile Include="Integration\Groups\Update\replace\with_path_direct_attribute.cs" />
     <Compile Include="Integration\Groups\Update\when_updating_a_group.cs" />
     <Compile Include="Integration\Groups\using_existing_user_and_group.cs" />
     <Compile Include="Integration\ResourceTypes\when_retrieving_resource_types.cs" />

@@ -117,7 +117,7 @@
                 .BindAsync(group => _groupService.UpdateGroup(group)))
                 .ToHttpResponseMessage(Request, (groupDto, response) =>
                 {
-                    SetLocationHeader(response, groupDto, "RetrieveGroup", new { userId = groupDto.Id });
+                    SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
                     SetETagHeader(response, groupDto);
                 });
         }
