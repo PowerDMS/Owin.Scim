@@ -82,8 +82,11 @@
             if (!validationResult)
                 return new ScimErrorResponse<Group>(validationResult.Errors.First());
 
-            @group.Meta.Created = groupRecord.Meta.Created;
-            @group.Meta.LastModified = System.DateTime.UtcNow;
+            @group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group)
+            {
+                Created = groupRecord.Meta.Created,
+                LastModified = System.DateTime.UtcNow
+            };
 
             SetResourceVersion(@group);
 

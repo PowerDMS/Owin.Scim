@@ -133,6 +133,8 @@
     <Compile Include="Integration\Groups\Retrieve\when_retrieving_a_group.cs" />
     <Compile Include="Integration\Groups\Retrieve\with_invalid_user_member.cs" />
     <Compile Include="Integration\Groups\Retrieve\with_a_valid_user_member.cs" />
+    <Compile Include="Integration\Groups\Update\add\with_no_path.cs" />
+    <Compile Include="Integration\Groups\Update\when_updating_a_group.cs" />
     <Compile Include="Integration\Groups\using_existing_user_and_group.cs" />
     <Compile Include="Integration\ResourceTypes\when_retrieving_resource_types.cs" />
     <Compile Include="Integration\ServiceProviderConfig\when_retrieving_service_provider_configuration.cs" />
@@ -293,9 +295,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Integration\Groups\Update\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
