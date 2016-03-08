@@ -120,6 +120,16 @@
     <Compile Include="Integration\Groups\Delete\with_no_id.cs" />
     <Compile Include="Integration\Groups\Delete\with_invalid_id.cs" />
     <Compile Include="Integration\Groups\Delete\with_a_valid_user_member.cs" />
+    <Compile Include="Integration\Groups\Replace\when_replacing_a_group.cs" />
+    <Compile Include="Integration\Groups\Replace\with_invalid_member_value.cs" />
+    <Compile Include="Integration\Groups\Replace\with_invalid_member_ref.cs" />
+    <Compile Include="Integration\Groups\Replace\with_invalid_member_type.cs" />
+    <Compile Include="Integration\Groups\Replace\with_missing_display_name.cs" />
+    <Compile Include="Integration\Groups\Replace\with_no_id_body.cs" />
+    <Compile Include="Integration\Groups\Replace\with_invalid_id.cs" />
+    <Compile Include="Integration\Groups\Replace\with_no_id_in_url.cs" />
+    <Compile Include="Integration\Groups\Replace\with_a_valid_group_with_members.cs" />
+    <Compile Include="Integration\Groups\Replace\with_a_valid_group_no_members.cs" />
     <Compile Include="Integration\Groups\Retrieve\when_retrieving_a_group.cs" />
     <Compile Include="Integration\Groups\Retrieve\with_invalid_user_member.cs" />
     <Compile Include="Integration\Groups\Retrieve\with_a_valid_user_member.cs" />
@@ -284,7 +294,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Integration\Groups\Replace\" />
     <Folder Include="Integration\Groups\Update\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

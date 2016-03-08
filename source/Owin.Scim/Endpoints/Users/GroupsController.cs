@@ -60,6 +60,7 @@
                 return new ScimErrorResponse<Group>(
                     new ScimError(
                         HttpStatusCode.BadRequest,
+                        ScimErrorType.InvalidSyntax,
                         detail: "The request path 'groupId' MUST match the group.id in the request body."))
                     .ToHttpResponseMessage(Request);
             }

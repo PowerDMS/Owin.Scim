@@ -36,7 +36,7 @@ Roadmap
 6. [ ] Add groups endpoints
   1. [x] Create
   2. [x] Retrieve
-  3. [ ] Replace (IN PROGRESS)
+  3. [x] Replace
   4. [ ] Update (Patch) (IN PROGRESS)
   5. [x] Delete
 7. [ ] Add support for querying
