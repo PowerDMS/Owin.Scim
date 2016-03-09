@@ -37,7 +37,7 @@ Roadmap
   1. [x] Create
   2. [x] Retrieve
   3. [x] Replace
-  4. [ ] Update (Patch) (IN PROGRESS)
+  4. [x] Update (Patch)
   5. [x] Delete
 7. [ ] Add support for querying
   1. [ ] Filtering (parsing into an expression tree is already done)
