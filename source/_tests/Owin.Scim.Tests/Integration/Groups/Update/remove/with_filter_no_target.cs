@@ -43,10 +43,14 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
                 Encoding.UTF8,
                 "application/json");
         };
+        
+        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+        It should_not_update_version = () => UpdatedGroup.Meta.Version.ShouldEqual(GroupToUpdate.Meta.Version);
 
-        It should_indicate_no_target = () => Error?.ScimType.ShouldEqual(Model.ScimErrorType.NoTarget);
+        It should_not_update_last_modified = () => UpdatedGroup.Meta.LastModified.ShouldEqual(GroupToUpdate.Meta.LastModified);
+
+        It should_not_change_resource = () => UpdatedGroup.ShouldBeLike(GroupToUpdate);
 
         private static Group GroupToUpdate;
         private static User ExistingUser;

@@ -35,8 +35,12 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
                 "application/json");
         };
 
-        It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_indicate_no_target = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.NoTarget);
+        It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
+
+        It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
+
+        It should_not_change_resource = () => UpdatedUser.ShouldBeLike(UserToUpdate);
     }
 }
