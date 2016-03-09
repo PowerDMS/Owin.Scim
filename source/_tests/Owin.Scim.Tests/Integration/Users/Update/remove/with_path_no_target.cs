@@ -35,6 +35,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
                 "application/json");
         };
 
-        It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
+        It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
+
+        It should_indicate_no_target = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.NoTarget);
     }
 }
