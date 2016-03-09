@@ -31,6 +31,8 @@
 
         private readonly IUserRepository _UserRepository;
 
+        private readonly IGroupRepository _groupRepository;
+
         private readonly IManagePasswords _PasswordManager;
 
         private readonly IResourceValidatorFactory _ResourceValidatorFactory;
@@ -39,12 +41,14 @@
             ScimServerConfiguration scimServerConfiguration,
             DefaultCanonicalizationService canonicalizationService,
             IUserRepository userRepository,
+            IGroupRepository groupRepository,
             IManagePasswords passwordManager,
             IResourceValidatorFactory resourceValidatorFactory)
             : base(scimServerConfiguration)
         {
             _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
+            _groupRepository = groupRepository;
             _PasswordManager = passwordManager;
             _ResourceValidatorFactory = resourceValidatorFactory;
         }
@@ -68,6 +72,8 @@
 
             var userRecord = await _UserRepository.CreateUser(user);
 
+            user.Groups = await _groupRepository.GetGroupsUserBelongsTo(user.Id);
+
             SetResourceVersion(user);
 
             return new ScimDataResponse<User>(userRecord);
@@ -81,6 +87,8 @@
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ErrorDetail.NotFound(userId)));
+
+            userRecord.Groups = await _groupRepository.GetGroupsUserBelongsTo(userId);
 
             return new ScimDataResponse<User>(userRecord);
         }
@@ -118,11 +126,13 @@
                     Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
             }
 
+            user.Groups = await _groupRepository.GetGroupsUserBelongsTo(user.Id);
+
             SetResourceVersion(user);
 
             // if both versions are equal, bypass persistence
             if (user.Meta.Version.Equals(userRecord.Meta.Version))
-                return new ScimDataResponse<User>(user); // TODO: (DG) is this proper behavior?
+                return new ScimDataResponse<User>(user); // TODO: (DG) is this proper behavior? (CY) Yes
 
             user.Meta.LastModified = DateTime.UtcNow;
 
