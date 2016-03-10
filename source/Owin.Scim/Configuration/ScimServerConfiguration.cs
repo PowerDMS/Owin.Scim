@@ -451,14 +451,19 @@
                 .For(u => u.DisplayName)
                     .SetRequired(true)
                 .For(u => u.Members)
+                    .AddCanonicalizationRule(member =>
+                        member.Canonicalize(
+                            e => e.Type,
+                            e => e.Type,
+                            Extensions.StringExtensions.ToPascalCase))
                     .DefineSubAttributes(config => config
                         .For(p => p.Value)
                             .SetMutability(Mutability.Immutable)
                         .For(p => p.Ref)
                             .SetMutability(Mutability.Immutable)
                         .For(p => p.Type)
-                            .AddCanonicalValues(new []{ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group})
-                            .AddCanonicalizationRule(Extensions.StringExtensions.ToPascalCase)
+                            //.AddCanonicalValues(new []{ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group})
+                            //.AddCanonicalizationRule(Extensions.StringExtensions.ToPascalCase)
                             .SetMutability(Mutability.Immutable)
                     );
         }

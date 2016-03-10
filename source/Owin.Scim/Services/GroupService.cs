@@ -45,6 +45,8 @@
             if (!validationResult)
                 return new ScimErrorResponse<Group>(validationResult.Errors.First());
 
+            SetResourceVersion(group);
+
             var groupRecord = await _groupRepository.CreateGroup(group);
             return new ScimDataResponse<Group>(SetResourceVersion(groupRecord));
         }
@@ -79,6 +81,12 @@
 
             if (!validationResult)
                 return new ScimErrorResponse<Group>(validationResult.Errors.First());
+
+            @group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group)
+            {
+                Created = groupRecord.Meta.Created,
+                LastModified = System.DateTime.UtcNow
+            };
 
             SetResourceVersion(@group);
 

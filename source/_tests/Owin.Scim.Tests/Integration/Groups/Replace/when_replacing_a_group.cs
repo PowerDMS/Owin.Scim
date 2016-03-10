@@ -1,4 +1,4 @@
-namespace Owin.Scim.Tests.Integration.Groups.Create
+namespace Owin.Scim.Tests.Integration.Groups.Replace
 {
     using System.Net;
     using System.Net.Http;
@@ -7,17 +7,17 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
 
     using Model.Groups;
 
-    public class when_creating_a_group : using_existing_user_and_group
+    public class when_replacing_a_group : using_existing_user_and_group
     {
         Because of = async () =>
         {
             Response = await Server
                 .HttpClient
-                .PostAsync("groups", new ObjectContent<Group>(GroupDto, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("groups/" + GroupId, new ObjectContent<Group>(GroupDto, new ScimJsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
-            var bodyText = Response.StatusCode == HttpStatusCode.Created
+            var bodyText = Response.StatusCode == HttpStatusCode.OK
                 ? await Response.Content.ReadAsStringAsync()
                 : null;
 
@@ -29,7 +29,9 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
                 ? await Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray())
                 : null;
         };
-        
+
+        protected static string GroupId;
+
         protected static Group GroupDto;
 
         protected static Group CreatedGroup;

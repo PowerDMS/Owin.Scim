@@ -15,7 +15,7 @@ This project is in active development with the goal of completing basic protocol
 Roadmap
 -------
 
-1. Finish users endpoints
+1. [ ] Finish users endpoints
   1. [x] Create  
   2. [x] Retrieve  
   3. [x] Replace  
@@ -25,30 +25,31 @@ Roadmap
     3. [x] Replace  
     4. [x] Remove  
   5. [x] Delete  
-2. Schema extensions
+2. [x] Schema extensions
   1. [x] Add custom parameter binding for schema extension deserialization
-3. Add SCIM server configuration endpoints
+3. [ ] Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
   2. [ ] /Schemas (IN PROGRESS)
   3. [x] /ResourceTypes
-4. Add support for bulk processing
-5. Add groups endpoints
-  1. [ ] Create
-  2. [ ] Retrieve
-  3. [ ] Replace
-  4. [ ] Update (Patch)
-  5. [ ] Delete
-6. Add support for querying
+4. [ ] Add support for mutability rule-processing.
+5. [ ] Add support for bulk processing
+6. [ ] Add groups endpoints
+  1. [x] Create
+  2. [x] Retrieve
+  3. [x] Replace
+  4. [x] Update (Patch)
+  5. [x] Delete
+7. [ ] Add support for querying
   1. [ ] Filtering (parsing into an expression tree is already done)
   2. [ ] Sorting
   3. [ ] Ordering
   4. [ ] Pagination
   5. [ ] Projection
-7. Add more extensiblity options
+8. [ ] Add more extensiblity options
   1. [x] Canonicalization  
   2. [x] Validation  
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
-8. Add authN / authZ
+9. [ ] Add authN / authZ
 
 Getting Started
 ===============
@@ -139,7 +140,6 @@ private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> buil
         .SetMutability(Mutable.ReadOnly)
 }
 ```
-In the example provided, I have made a User.Name.FamilyName required.  This is against the default SCIM rule and will enforce clients to submit a FamilyName when creating/modifying users.  These qualities define metadata which is then used to create validation and canonicalization rules.
 
 #####Adding Canonicalization Rules (c-rule)
 Owin.Scim allows the developer to specify canonicalization rules (delegates) as rules for resource type attributes. Some rules are built-in by default.

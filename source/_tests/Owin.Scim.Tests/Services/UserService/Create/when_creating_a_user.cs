@@ -29,6 +29,7 @@
         {
             ServerConfiguration = A.Fake<ScimServerConfiguration>();
             UserRepository = A.Fake<IUserRepository>();
+            GroupRepository = A.Fake<IGroupRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
             PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
 
@@ -50,6 +51,7 @@
                 ServerConfiguration,
                 canonicalizationService,
                 UserRepository, 
+                GroupRepository,
                 PasswordManager,
                 new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
             {
@@ -64,6 +66,8 @@
         protected static ScimServerConfiguration ServerConfiguration;
 
         protected static IUserRepository UserRepository;
+
+        protected static IGroupRepository GroupRepository;
 
         protected static IManagePasswords PasswordManager;
 

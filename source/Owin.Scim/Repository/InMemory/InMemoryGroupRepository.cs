@@ -71,7 +71,7 @@ namespace Owin.Scim.Repository.InMemory
             // TODO: (CY) need to add indirect groups too
             return Task.FromResult(_groups
                 .Values
-                .Where(g => g.Members.Any(m => m.Value.Equals(userId)))
+                .Where(g => g.Members != null && g.Members.Any(m => m.Value.Equals(userId)))
                 .Select(group => new UserGroup
                 {
                     Value = group.Id,

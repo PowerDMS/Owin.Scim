@@ -36,5 +36,11 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
         };
 
         It should_return_ok = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.OK);
+
+        It should_not_update_version = () => UpdatedUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
+
+        It should_not_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldEqual(UserToUpdate.Meta.LastModified);
+
+        It should_not_change_resource = () => UpdatedUser.ShouldBeLike(UserToUpdate);
     }
 }

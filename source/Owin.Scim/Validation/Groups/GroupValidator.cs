@@ -41,7 +41,9 @@
                         HttpStatusCode.BadRequest,
                         ScimErrorType.InvalidValue,
                         ErrorDetail.AttributeRequired("displayName")));
-
+            
+            // TODO: (CY) because spec does not really specify whether to use value/type or $ref
+            // TODO: I'll rather the implementor decide.
             When(@group => @group.Members != null && @group.Members.Any(), () =>
                 {
                     RuleFor(@group => @group.Members)
@@ -75,6 +77,16 @@
                                                 "The attribute 'member.type' must have a valid value."))
                                 },
                                 {
+                                    g => g.Ref,
+                                    config => config
+                                        .Must(r => r == null || Uri.IsWellFormedUriString(r, UriKind.RelativeOrAbsolute))
+                                        .WithState(u =>
+                                            new ScimError(
+                                                HttpStatusCode.BadRequest,
+                                                ScimErrorType.InvalidSyntax,
+                                                "The attribute 'member.$ref' must have a valid url."))
+                                },
+                                {
                                     g => g,
                                     config => config
                                         .MustAsync(async (member, token) => await IsValidResourceValue(member))
@@ -82,7 +94,7 @@
                                             new ScimError(
                                                 HttpStatusCode.BadRequest,
                                                 ScimErrorType.InvalidSyntax,
-                                                "The attribute 'member.$ref' (or 'member.value' and 'member.type') must be a valid resource."))
+                                                "The attribute 'member.value' and 'member.type' must be a valid resource."))
                                 }
                             });
                 });
