@@ -14,6 +14,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
+
             UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
         };
 

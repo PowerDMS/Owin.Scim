@@ -208,9 +208,19 @@
     <Compile Include="Querying\Filtering\lessthanorequal_with_datetime.cs" />
     <Compile Include="Querying\Filtering\lessthan_with_datetime.cs" />
     <Compile Include="Querying\Filtering\lessthan_with_string.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_complex_attribute_and_filter.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_complex_attribute_and_grouped_filter.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_complex_attribute_and_grouped_filter_and_subattribute.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_complex_attribute_no_filter.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_multiple_groups_and_period_within_value_path.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_resource_extension_attribute.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_filter.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_grouped_filter.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_no_filter.cs" />
     <Compile Include="Querying\Filtering\or_brackets_equals_and_contains.cs" />
     <Compile Include="Querying\Filtering\or_present_equals.cs" />
     <Compile Include="Querying\Filtering\startswith.cs" />
+    <Compile Include="Querying\Filtering\Normalization\when_normalizing_a_path_filter.cs" />
     <Compile Include="Querying\Filtering\when_parsing_a_filter_expression.cs" />
     <Compile Include="Querying\Filtering\equals_with_boolean.cs" />
     <Compile Include="Querying\Filtering\equals_with_complex_property.cs" />
@@ -254,6 +264,7 @@
     <Compile Include="Validation\Users\with_invalid_emails.cs" />
     <Compile Include="Validation\Users\with_no_username.cs" />
     <Compile Include="Validation\Users\with_valid_emails.cs" />
+    <Compile Include="Validation\when_validating_resources_with_extensions.cs" />
     <Compile Include="Versioning\when_generating_etag_version.cs" />
     <Compile Include="Versioning\with_alternate_property_values.cs" />
     <Compile Include="Versioning\with_different_default_multi_valued_attributes.cs" />

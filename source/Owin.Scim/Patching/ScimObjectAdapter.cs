@@ -98,7 +98,7 @@
                 throw new ArgumentNullException(nameof(operation));
 
             /* 
-                ScimObjectTreeAnalysisResult.cs will handle resolving the actual 
+                ScimPatchObjectAnalysis.cs will handle resolving the actual 
                 path and parsing any filters including,
 
                 Examples:
@@ -108,25 +108,24 @@
                 "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"]"
                 "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"].displayName"
             */
-            var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
+            var patchAnalysis = new ScimPatchObjectAnalysis(
                 objectToApplyTo,
                 path, 
                 ContractResolver,
                 operation);
 
-            if (treeAnalysisResult.ErrorType != null)
+            if (patchAnalysis.ErrorType != null)
             {
                 throw new ScimPatchException(
-                    treeAnalysisResult.ErrorType,
+                    patchAnalysis.ErrorType,
                     operation);
             }
             
             var operations = new List<PatchOperationResult>();
-            foreach (var patchMember in treeAnalysisResult.PatchMembers)
+            foreach (var patchMember in patchAnalysis.PatchMembers)
             {
-                if (treeAnalysisResult.UseDynamicLogic)
+                if (patchAnalysis.UseDynamicLogic)
                     throw new NotSupportedException(); // TODO: (DG) Add support if needed.
-                    //operations.AddRange(AddDynamic(value, treeAnalysisResult, patchMember));
                 else
                     operations.AddRange(AddNonDynamic(value, operation, patchMember));
             }
@@ -182,8 +181,6 @@
             // Here we are going to be modifying an existing enumerable:
 
             /*
-                TODO: (DG) Handle case when:
-
                     o  If the target location already contains the value specified, no
                         changes SHOULD be made to the resource, and a success response
                         SHOULD be returned.  Unless other operations change the resource,
@@ -241,83 +238,7 @@
                     array)
             };
         }
-
-        /*
-        private IEnumerable<PatchOperationResult> AddDynamic(object value, ScimObjectTreeAnalysisResult treeAnalysisResult, PatchMember patchMember)
-        {
-            // TODO: (DG) NOT SURE IF THIS IS EVER NEEDED!
-            
-                    o  If the target location specifies an attribute that does not exist
-                        (has no value), the attribute is added with the new value.
-            
-            // possibly with resource extensions like enterpriseuser support
-
-            var container = treeAnalysisResult.Container;
-            if (container.ContainsCaseInsensitiveKey(patchMember.PropertyPathInParent))
-            {
-                // Existing property.  
-                // If it's not an array, we need to check if the value fits the property type
-                // 
-                // If it's an array, we need to check if the value fits in that array type,
-                // and add it at the correct position (if allowed).
-                if (patchMember.JsonPatchProperty.Property.PropertyType.IsNonStringEnumerable())
-                {
-                    // get the actual type
-                    var propertyValue =
-                        container.GetValueForCaseInsensitiveKey(patchMember.PropertyPathInParent);
-                    var typeOfPathProperty = propertyValue.GetType();
-
-                    if (!typeOfPathProperty.IsNonStringEnumerable())
-                    {
-                        throw new Exception();
-                    }
-
-                    // now, get the generic type of the enumerable
-                    var genericTypeOfArray = typeOfPathProperty.GetEnumerableType();
-                    var conversionResult = ConvertToActualType(genericTypeOfArray, value);
-                    if (!conversionResult.CanBeConverted)
-                    {
-                        throw new Exception();
-                    }
-
-                    // get value (it can be cast, we just checked that) 
-                    var array = treeAnalysisResult.Container.GetValueForCaseInsensitiveKey(
-                        patchMember.PropertyPathInParent) as IList;
-
-                    array.Add(conversionResult.ConvertedInstance);
-                    treeAnalysisResult.Container.SetValueForCaseInsensitiveKey(
-                        patchMember.PropertyPathInParent, array);
-                }
-                else
-                {
-                    // get the actual type
-                    var typeOfPathProperty = treeAnalysisResult.Container
-                        .GetValueForCaseInsensitiveKey(patchMember.PropertyPathInParent).GetType();
-
-                    // can the value be converted to the actual type?
-                    var conversionResult = ConvertToActualType(typeOfPathProperty, value);
-                    if (conversionResult.CanBeConverted)
-                    {
-                        treeAnalysisResult.Container.SetValueForCaseInsensitiveKey(
-                            patchMember.PropertyPathInParent,
-                            conversionResult.ConvertedInstance);
-                    }
-                    else
-                    {
-                        throw new Exception();
-                    }
-                }
-            }
-            else
-            {
-                // New property - add it.  
-                treeAnalysisResult.Container.Add(patchMember.PropertyPathInParent, value);
-            }
-
-            return null;
-        }
-    */
-
+        
         /// <summary>
         /// The "remove" operation removes the value at the target location 
         /// specified by the required attribute "path". 
@@ -338,7 +259,7 @@
             if (string.IsNullOrWhiteSpace(operation.Path))
                 throw new ScimPatchException(ScimErrorType.NoTarget, operation);
 
-            var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
+            var treeAnalysisResult = new ScimPatchObjectAnalysis(
                 objectToApplyTo,
                 operation.Path,
                 ContractResolver,
@@ -468,7 +389,7 @@
 
         private IEnumerable<PatchOperationResult> ReplaceInternal(string path, object value, object objectToApplyTo, Operation operation)
         {
-            var treeAnalysisResult = new ScimObjectTreeAnalysisResult(
+            var treeAnalysisResult = new ScimPatchObjectAnalysis(
                 objectToApplyTo,
                 path,
                 ContractResolver,

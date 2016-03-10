@@ -172,6 +172,7 @@
     <Compile Include="Model\ScimFeatureFilter.cs" />
     <Compile Include="Model\ScimFeature.cs" />
     <Compile Include="Model\ServiceProviderConfig.cs" />
+    <Compile Include="Querying\PathFilterExpression.cs" />
     <Compile Include="SometimesLazy.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtension.cs" />
     <Compile Include="Model\ResourceExtension.cs" />
@@ -211,7 +212,7 @@
     <Compile Include="Patching\Helpers\ExpandoObjectDictionaryExtensions.cs" />
     <Compile Include="Patching\Helpers\ExpressionHelpers.cs" />
     <Compile Include="Patching\Helpers\JsonPatchProperty.cs" />
-    <Compile Include="Patching\Helpers\ScimObjectTreeAnalysisResult.cs" />
+    <Compile Include="Patching\Helpers\ScimPatchObjectAnalysis.cs" />
     <Compile Include="Patching\Helpers\RemovedPropertyTypeResult.cs" />
     <Compile Include="Patching\IJsonPatchDocument.cs" />
     <Compile Include="Patching\JsonPatchDocumentOfT.cs" />

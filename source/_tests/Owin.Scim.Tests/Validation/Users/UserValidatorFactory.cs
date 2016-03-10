@@ -35,7 +35,7 @@
             where TResource : Resource
         {
             var userValidator = new UserValidator(
-                new ResourceExtensionValidators(new [] { new EnterpriseUserExtensionValidator(_UserRepository) }), 
+                new ResourceExtensionValidators(new [] { new EnterpriseUserExtensionValidator() }), 
                 _UserRepository,
                 _PasswordComplexityVerifier,
                 _PasswordManager);

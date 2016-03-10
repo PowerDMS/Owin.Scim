@@ -1,17 +1,20 @@
 ﻿namespace Owin.Scim.Querying
 {
     using System.Collections.Generic;
-    using System.Diagnostics;
+    using System.Linq;
     using System.Text;
+
+    using Extensions;
 
     public class ScimFilter
     {
-        private IEnumerable<string> _Paths;
+        private readonly IList<PathFilterExpression> _Paths;
 
         private string _NormalizedFilterExpression;
 
         public ScimFilter(string filterExpression)
         {
+            _Paths = new List<PathFilterExpression>();
             ProcessFilter(filterExpression);
         }
 
@@ -20,7 +23,7 @@
             return filter.NormalizedFilterExpression;
         }
 
-        public IEnumerable<string> Paths
+        public IEnumerable<PathFilterExpression> Paths
         {
             get { return _Paths; }
         }
@@ -33,12 +36,13 @@
         private void ProcessFilter(string filterExpression)
         {
             /*
-            Processing a SCIM filter SHOULD support search query filters and patch path filters.
+            This processing of a SCIM filter adds support for both search query filters and patch path filters.
             See: https://tools.ietf.org/html/rfc7644#section-3.4.2
 
             Query Examples
 
-            filter=meta.lastModified gt "2011-05-13T04:42:34Z"
+            filter=name.givenName eq "Daniel"
+            filter=meta[lastModified gt "2011-05-13T04:42:34Z"]
             filter=userType eq "Employee" and (emails co "example.com" or emails.value co "example.org")
             filter=userType eq "Employee" and (emails.type eq "work")            
             filter=userType eq "Employee" and emails[type eq "work" and value co "@example.com"]
@@ -47,98 +51,171 @@
 
             "path":"name.familyName"
             "path":"addresses[type eq \"work\"]"
-            "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"]"
+            "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\" or ]"
             "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"].displayName"
+            "path":"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber"
 
             In the below code, we look to differentiate a '.' from a path after a filter expression and one
-            that's placed before a potential filter expression.  We replace the '.' with a temporary '/' - 
-            used as a marker.  This way we can normalize our filters with brackets.
-
-            This is very important because if we just did a string.Split('.') then:
-
-            string.Split(members[value eq \"2819c223-7f76-453a-919d-413861904646\"].displayName)
-                becomes [2] { "members[value eq \"2819c223-7f76-453a-919d-413861904646\"]", "displayName" } ... VALID!
-
-            string.Split(meta.lastModified gt "2011-05-13T04:42:34Z")
-                becomes [2] { "meta", "lastModified gt "2011-05-13T04:42:34Z" } ............................... INVALID!
-
-            The second example there shows that we'd have TWO paths instead of ONE + filter. The approach taken here
-            normalizes the second expression into: meta[lastModified gt "2011-05-13T04:42:34Z]"
-
-            The third issue handled here is treating a '.' within quotes as a string literal and not part of a path.
+            that's used before a potential filter expression.
             */
+            filterExpression = filterExpression.Trim(' ');
+            var expressionBuilder = new StringBuilder();
+            var boundaryStack = new Stack<char>();
+            var boundaryDelimiters = new Dictionary<char, char>
+            {
+                { '"', '"' },
+                { '[', ']' },
+                { '(', ')' }
+            };
 
-            var pathList = new List<string>();
-            var pathBuilder = new StringBuilder();
-            var openQuoteFound = false;
-            var closing = false;
-            var separatorIndex = -1;
+            var pathFilterSeparators = new HashSet<char>
+            {
+                '[',
+                '.'
+            };
+
+            var isPathOnly = true;
+            var pathEndIndex = -1; // TODO: (DG) this should be a list to support > 1 depth 
             for (int index = 0; index < filterExpression.Length; index++)
             {
-                var pathChar = filterExpression[index];
-                var isQuote = pathChar == '"';
-                if (isQuote && openQuoteFound)
+                var currentChar = filterExpression[index];
+
+                // if we're in a boundary and the current char is the closing boundary char
+                // example:
+                // boundaryStack -> { '[' }
+                // charAt[index] == ']'
+                if (boundaryStack.Any() &&
+                    boundaryDelimiters[boundaryStack.Peek()] == currentChar)
                 {
-                    closing = true;
+                    boundaryStack.Pop();
+                }
+                else if (boundaryDelimiters.ContainsKey(currentChar))
+                {
+                    // if we've hit a boundary opener (e.g. '"', '(', '[')
+                    boundaryStack.Push(currentChar);
+                }
+
+                // determine whether we're still parsing a path-only expression
+                if (isPathOnly)
+                {
+                    // we only can have a path end if there's actually a path (ie. length > 0)
+                    if (expressionBuilder.Length > 0 && pathFilterSeparators.Contains(currentChar))
+                        pathEndIndex = index;
+
+                    if (boundaryStack.Any()) // shortcut
+                        isPathOnly = false;
+                    else if (
+                        index > 0 &&
+                        index + 1 < filterExpression.Length &&
+                        filterExpression[index - 1] == ' ')
+                    {
+                        // do we have a valid operator?
+                        switch (filterExpression.Substring(index, 2))
+                        {
+                            case "eq":
+                            case "ne":
+                            case "pr":
+                            case "co":
+                            case "sw":
+                            case "ew":
+                            case "lt":
+                            case "le":
+                            case "gt":
+                            case "ge":
+                                isPathOnly = false;
+                                break;
+                        }
+                    }
                 }
                 
-                if (pathChar == '.' && filterExpression[index - 1] != ']' && !openQuoteFound)
+                // this is used for post-filter, sub-attributes (ie. emails[type eq "work"].value
+                if (currentChar == '.' && filterExpression[index - 1] == ']')
                 {
-                    // we are most likely parsing an attrPath, not subAttr (as per the SCIM RFC filtering ABNF)
-                    separatorIndex = index;
-                    pathBuilder.Append('/');
+                    var path = expressionBuilder.ToString(0, pathEndIndex);
+                    var filter = expressionBuilder[pathEndIndex] == '.'
+                        ? expressionBuilder.ToString(pathEndIndex + 1, expressionBuilder.Length - (pathEndIndex + 1))
+                        : expressionBuilder.ToString(pathEndIndex + 1, expressionBuilder.Length - (pathEndIndex + 2));
+
+                    _Paths.Add(new PathFilterExpression(path, filter));
+
+                    // reset, we're starting at a new path
+                    expressionBuilder.Clear();
+                    pathEndIndex = -1;
+                    isPathOnly = true;
+
+                    continue; // we don't want to append this '.' character as part of the expression because it represents a path boundary
                 }
-                else
+
+                // determine whether we need to replace an inner filter expression '.' with a bracket grouping
+                if (currentChar == '.' && 
+                    !isPathOnly &&
+                    boundaryStack.Peek() != '"')
                 {
-                    if (pathChar != '.' || (pathChar == '.' && openQuoteFound))
+                    // we are in a filter expression but not a string literal (valuePath)
+                    // (e.g. userType ne \"Employee\" and not (emails co \"example.com\" or emails.value co \"example.org\")
+                    //                                                                           ^^^
+                    // what we want to do here is normalize our expression to use brackets instead of periods!
+                    currentChar = '[';
+                    var bracketBoundaryEnd = filterExpression.NthIndexOf('"', index, 2) + 1;
+                    filterExpression = filterExpression.Insert(bracketBoundaryEnd, "]");
+                    boundaryStack.Push(currentChar);
+                }
+
+                expressionBuilder.Append(currentChar);
+            }
+
+            if (expressionBuilder.Length > 0)
+            {
+                if (pathEndIndex > -1)
+                {
+                    if (isPathOnly)
                     {
-                        pathBuilder.Append(pathChar);
-
-                        if (separatorIndex > -1)
+                        foreach (var pathExp in expressionBuilder.ToString().Split('.'))
                         {
-                            // if we're at the end of a filter expression value (end quote) OR 
-                            // if we're filtering with the 'pr' operator
-                            // then let's close out our sub-attribute filter expression and reset
-                            if ((isQuote && openQuoteFound) ||
-                                (pathChar == 'r' && filterExpression[index - 1] == 'p'))
-                            {
-                                pathBuilder.Replace('/', '[', separatorIndex, 1);
-                                pathBuilder.Append(']');
-                                pathList.Add(pathBuilder.ToString());
-
-                                // reset
-                                pathBuilder.Clear();
-                                separatorIndex = -1;
-                            }
-                        }
-
-                        if (isQuote)
-                        {
-                            if (!openQuoteFound)
-                            {
-                                openQuoteFound = true; // set marker
-                            }
-                            else if (closing)
-                            {
-                                openQuoteFound = false; // reset
-                                closing = false;
-                            }
+                            _Paths.Add(new PathFilterExpression(pathExp, null));
                         }
                     }
                     else
                     {
-                        pathBuilder.Append('/');
+                        var path = expressionBuilder.ToString(0, pathEndIndex);
+                        var filter = expressionBuilder[pathEndIndex] == '.'
+                            ? expressionBuilder.ToString(pathEndIndex + 1, expressionBuilder.Length - (pathEndIndex + 1))
+                            : expressionBuilder.ToString(pathEndIndex + 1, expressionBuilder.Length - (pathEndIndex + 2));
+
+                        _Paths.Add(new PathFilterExpression(path, filter));
                     }
+                }
+                else
+                {
+                    if (expressionBuilder[0] == '[' && expressionBuilder[expressionBuilder.Length - 1] == ']')
+                    {
+                        expressionBuilder.Remove(0, 1);
+                        expressionBuilder.Remove(expressionBuilder.Length - 1, 1);
+                    }
+
+                    _Paths.Add(
+                        isPathOnly
+                            ? PathFilterExpression.CreatePathOnly(expressionBuilder.ToString())
+                            : PathFilterExpression.CreateFilterOnly(expressionBuilder.ToString()));
                 }
             }
 
-            // TODO: (DG) This is too fragile. We need a marker that is unique 
-            // and won't be found in a filter expression value string.
-            if (pathBuilder.Length > 0)
-                pathList.AddRange(pathBuilder.ToString().Split('/'));
-            
-            _NormalizedFilterExpression = string.Concat(pathList);
-            _Paths = pathList;
+            // normalize the filter expression by reversing our logic above
+            _NormalizedFilterExpression = 
+                string.Concat(
+                    _Paths.Select((expression, index) =>
+                    {
+                        if (expression.Filter == null)
+                        {
+                            return index == 0
+                                ? expression.Path
+                                : '.' + expression.Path;
+                        }
+
+                        return expression.Path == null
+                            ? expression.Filter
+                            : expression.Path + '[' + expression.Filter + ']';
+                    }));
         }
     }
 }

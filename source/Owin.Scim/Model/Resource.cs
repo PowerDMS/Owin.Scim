@@ -65,6 +65,11 @@
             return _Extensions.GetOrCreate<T>();
         }
 
+        internal object Extension(Type extensionType)
+        {
+            return _Extensions.GetOrCreate(extensionType);
+        }
+
         public virtual bool ShouldSerializeId()
         {
             return true;

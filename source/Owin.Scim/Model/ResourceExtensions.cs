@@ -57,6 +57,19 @@ namespace Owin.Scim.Model
             return _Extensions[ScimServerConfiguration.GetSchemaIdentifierForResourceExtensionType(typeof(T))].Value as T;
         }
 
+        public object GetOrCreate(Type extensionType)
+        {
+            if (!typeof(ResourceExtension).IsAssignableFrom(extensionType))
+                throw new ArgumentException("Extension must be a type assignable from ResourceExtension.", "extensionType");
+
+            if (!Contains(extensionType))
+            {
+                Add(extensionType);
+            }
+
+            return _Extensions[ScimServerConfiguration.GetSchemaIdentifierForResourceExtensionType(extensionType)].Value;
+        }
+
         public IDictionary<string, JToken> ToJsonDictionary()
         {
             return _Extensions
