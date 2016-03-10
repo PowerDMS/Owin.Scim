@@ -58,7 +58,7 @@
             await CanonicalizeUser(user);
 
             var validator = await _ResourceValidatorFactory.CreateValidator(user);
-            var validationResult = (await validator.ValidateAsync(user, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
+            var validationResult = (await validator.ValidateCreateAsync(user)).ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors.First());
@@ -113,8 +113,7 @@
             await CanonicalizeUser(user);
 
             var validator = await _ResourceValidatorFactory.CreateValidator(user);
-            var validationResult = (await validator.ValidateAsync(user, userRecord, ruleSet: RuleSetConstants.Update))
-                .ToScimValidationResult();
+            var validationResult = (await validator.ValidateUpdateAsync(user, userRecord)).ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors.First());

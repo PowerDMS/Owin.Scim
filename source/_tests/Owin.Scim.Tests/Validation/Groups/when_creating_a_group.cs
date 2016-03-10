@@ -30,7 +30,7 @@
 
         Because of = () =>
         {
-            Result = Validator.ValidateAsync(Group, ruleSet: RuleSetConstants.Create).Result.ToScimValidationResult();
+            Result = Validator.ValidateCreateAsync(Group).Result.ToScimValidationResult();
         };
 
         private static IValidator Validator;

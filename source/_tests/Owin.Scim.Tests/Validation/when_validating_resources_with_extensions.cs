@@ -48,7 +48,7 @@
             User.Extension<EnterpriseUserExtension>().Department = "sales";
         };
 
-        Because of = async () => (await _UserValidator.ValidateAsync(User, ruleSet: RuleSetConstants.Default).AwaitResponse().AsTask)
+        Because of = async () => (await _UserValidator.ValidateCreateAsync(User).AwaitResponse().AsTask)
             .ToScimValidationResult();
 
         It should_have_invoked_the_extension_validator = 

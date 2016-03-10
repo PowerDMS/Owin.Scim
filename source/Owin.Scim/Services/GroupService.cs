@@ -40,7 +40,7 @@
             _canonicalizationService.Canonicalize(group, ScimServerConfiguration.GetScimTypeDefinition(typeof(Group)));
 
             var validator = await _resourceValidatorFactory.CreateValidator(group);
-            var validationResult = (await validator.ValidateAsync(group, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
+            var validationResult = (await validator.ValidateCreateAsync(group)).ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<Group>(validationResult.Errors.First());
@@ -77,7 +77,7 @@
             _canonicalizationService.Canonicalize(group, ScimServerConfiguration.GetScimTypeDefinition(typeof(Group)));
 
             var validator = await _resourceValidatorFactory.CreateValidator(group);
-            var validationResult = (await validator.ValidateAsync(group, ruleSet: RuleSetConstants.Create)).ToScimValidationResult();
+            var validationResult = (await validator.ValidateUpdateAsync(group, groupRecord)).ToScimValidationResult();
 
             if (!validationResult)
                 return new ScimErrorResponse<Group>(validationResult.Errors.First());

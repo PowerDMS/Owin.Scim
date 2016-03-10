@@ -32,7 +32,7 @@ namespace Owin.Scim.Tests.Validation.Users
         Because of = async () =>
         {
             _Validator = await _ValidatorFactory.CreateValidator(User);
-            Result = (await _Validator.ValidateAsync(User, ExistingUserRecord, ruleSet: RuleSetConstants.Update).AwaitResponse().AsTask)
+            Result = (await _Validator.ValidateUpdateAsync(User, ExistingUserRecord).AwaitResponse().AsTask)
                 .ToScimValidationResult();
         };
 

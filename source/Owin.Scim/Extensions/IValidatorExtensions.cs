@@ -13,24 +13,12 @@
 
     public static class IValidatorExtensions
     {
-        public static Task<ValidationResult> ValidateAsync<T>(
+        public static Task<ValidationResult> ValidateCreateAsync<T>(
             this IValidator validator, 
-            T instance, 
-            IValidatorSelector selector = null, 
-            string ruleSet = null)
+            T instance)
         {
-            if (selector != null && ruleSet != null)
-                throw new InvalidOperationException("Cannot specify both an IValidatorSelector and a RuleSet.");
-
-            if (selector == null)
-                selector = new DefaultValidatorSelector();
-
-            if (ruleSet != null)
-                selector = new RulesetValidatorSelector(ruleSet.Split(new char[2]
-                {
-                    ',',
-                    ';'
-                }));
+            var ruleSet = RuleSetConstants.Create;
+            var selector = new RulesetValidatorSelector(ruleSet.Split(',', ';'));
             
             if (typeof(T) == instance.GetType())
             {
@@ -38,7 +26,7 @@
                     new ValidationContext<T>(instance, new PropertyChain(), selector));
             }
 
-            // we are dealing with a polymorphic type, typically a resource extension
+            // we are dealing with a polymorphic type
             var resourceType = instance.GetType();
             var validationContext = (ValidationContext)Activator.CreateInstance(
                 typeof(ValidationContext<>).MakeGenericType(resourceType),
@@ -49,25 +37,13 @@
             return validator.ValidateAsync(validationContext);
         }
 
-        public static Task<ValidationResult> ValidateAsync<T>(
+        public static Task<ValidationResult> ValidateUpdateAsync<T>(
             this IValidator validator,
             T instance,
-            T existingRecordInstance,
-            IValidatorSelector selector = null,
-            string ruleSet = null)
+            T existingRecordInstance)
         {
-            if (selector != null && ruleSet != null)
-                throw new InvalidOperationException("Cannot specify both an IValidatorSelector and a RuleSet.");
-
-            if (selector == null)
-                selector = new DefaultValidatorSelector();
-
-            if (ruleSet != null)
-                selector = new RulesetValidatorSelector(ruleSet.Split(new char[2]
-                {
-                    ',',
-                    ';'
-                }));
+            var ruleSet = RuleSetConstants.Update;
+            var selector = new RulesetValidatorSelector(ruleSet.Split(',', ';'));
 
             if (typeof(T) == instance.GetType())
             {
@@ -75,7 +51,7 @@
                     new ScimValidationContext<T>(instance, existingRecordInstance, new PropertyChain(), selector));
             }
 
-            // we are dealing with a polymorphic type, typically a resource extension
+            // we are dealing with a polymorphic type
             var resourceType = instance.GetType();
             var validationContext = (ValidationContext)Activator.CreateInstance(
                 typeof (ScimValidationContext<>).MakeGenericType(resourceType),

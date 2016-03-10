@@ -33,7 +33,7 @@
         Because of = async () =>
         {
             _Validator = await _ValidatorFactory.CreateValidator(User);
-            Result = (await _Validator.ValidateAsync(User, ruleSet: RuleSetConstants.Default).AwaitResponse().AsTask).ToScimValidationResult();
+            Result = (await _Validator.ValidateCreateAsync(User).AwaitResponse().AsTask).ToScimValidationResult();
         };
 
         protected static IUserRepository UserRepository;
