@@ -4,6 +4,7 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     using Antlr;
 
@@ -19,7 +20,9 @@
 
     using NContext.Common;
 
+    using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+    using Newtonsoft.Json.Utilities;
 
     using Operations;
 
@@ -70,62 +73,47 @@
 
             foreach (var node in nodes)
             {
-                if (node.Target is IDictionary<string, object>)
+                var attribute = node.Target as MultiValuedAttribute;
+                JsonProperty attemptedProperty;
+                if (attribute != null && PathIsMultiValuedEnumerable(pathTree[pathTree.Count - 1].Path, node, out attemptedProperty))
                 {
-                    UseDynamicLogic = true;
+                    /* Check if we're at a MultiValuedAttribute.
+                       If so, then we'll return a special PatchMember.  This is because our actual target is 
+                       an element within an enumerable. (e.g. User->Emails[element])
+                       So a PatchMember must have three pieces of information: (following the example above)
+                       > Parent (User)
+                       > PropertyPath (emails)
+                       > Actual Target (email instance/element)
+                    */
 
-                    Container = (IDictionary<string, object>)node.Target;
+                    UseDynamicLogic = false;
                     IsValidPathForAdd = true;
-
-                    var member = new PatchMember(pathTree[pathTree.Count - 1].Path, null);
-                    IsValidPathForRemove = Container.ContainsCaseInsensitiveKey(member.PropertyPathInParent);
-
-                    PatchMembers.Add(member);
+                    IsValidPathForRemove = true;
+                    PatchMembers.Add(
+                        new PatchMember(
+                            pathTree[pathTree.Count - 1].Path,
+                            new JsonPatchProperty(attemptedProperty, node.Parent),
+                            node.Target));
                 }
                 else
                 {
-                    var attribute = node.Target as MultiValuedAttribute;
-                    JsonProperty attemptedProperty;
-                    if (attribute != null && PathIsMultiValuedEnumerable(pathTree[pathTree.Count - 1].Path, node, out attemptedProperty))
-                    {
-                        /* Check if we're at a MultiValuedAttribute.
-                           If so, then we'll return a special PatchMember.  This is because our actual target is 
-                           an element within an enumerable. (e.g. User->Emails[element])
-                           So a PatchMember must have three pieces of information: (following the example above)
-                           > Parent (User)
-                           > PropertyPath (emails)
-                           > Actual Target (email instance/element)
-                        */
+                    UseDynamicLogic = false;
 
-                        UseDynamicLogic = false;
+                    var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Target.GetType());
+                    attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(pathTree[pathTree.Count - 1].Path);
+                    if (attemptedProperty == null)
+                    {
+                        IsValidPathForAdd = false;
+                        IsValidPathForRemove = false;
+                    }
+                    else
+                    {
                         IsValidPathForAdd = true;
                         IsValidPathForRemove = true;
                         PatchMembers.Add(
                             new PatchMember(
-                                pathTree[pathTree.Count - 1].Path, 
-                                new JsonPatchProperty(attemptedProperty, node.Parent),
-                                node.Target));
-                    }
-                    else
-                    {
-                        UseDynamicLogic = false;
-                        
-                        var jsonContract = (JsonObjectContract)contractResolver.ResolveContract(node.Target.GetType());
-                        attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(pathTree[pathTree.Count - 1].Path);
-                        if (attemptedProperty == null)
-                        {
-                            IsValidPathForAdd = false;
-                            IsValidPathForRemove = false;
-                        }
-                        else
-                        {
-                            IsValidPathForAdd = true;
-                            IsValidPathForRemove = true;
-                            PatchMembers.Add(
-                                new PatchMember(
-                                    pathTree[pathTree.Count - 1].Path, 
-                                    new JsonPatchProperty(attemptedProperty, node.Target)));
-                        }
+                                pathTree[pathTree.Count - 1].Path,
+                                new JsonPatchProperty(attemptedProperty, node.Target)));
                     }
                 }
             }
@@ -162,17 +150,29 @@
                 var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(pathTree[i].Path);
                 if (attemptedProperty == null)
                 {
-                    var extensionType = ScimServerConfiguration.GetResourceExtensionType(node.Target.GetType(), pathTree[i].Path);
-                    if (extensionType == null)
+                    if (!ScimServerConfiguration.ResourceExtensionExists(pathTree[i].Path))
                     {
                         // property cannot be found, and we're not working with an extension.
                         ErrorType = ScimErrorType.InvalidPath;
                         break;
                     }
 
-                    // this is an extension.
-                    // TODO: (DG)!
-                    throw new Exception();
+                    // this is a resource extension
+                    // TODO: (DG) the code below works as well and will remove once it's determined how 
+                    // repositories will access and persist extension data.  Currently, Extensions property is public.
+//                    var memberInfo = node.Target.GetType().GetProperty("Extensions", BindingFlags.NonPublic | BindingFlags.Instance);
+//                    var property = new JsonProperty
+//                    {
+//                        PropertyType = memberInfo.PropertyType,
+//                        DeclaringType = memberInfo.DeclaringType,
+//                        ValueProvider = new ReflectionValueProvider(memberInfo),
+//                        AttributeProvider = new ReflectionAttributeProvider(memberInfo),
+//                        Readable = true,
+//                        Writable = true,
+//                        ShouldSerialize = member => false
+//                    };
+
+                    attemptedProperty = jsonContract.Properties.GetProperty("extensions", StringComparison.Ordinal);
                 }
 
                 // if there's nothing to filter and we're not yet at the last path entry, continue
@@ -185,28 +185,44 @@
                         break;
                     }
 
-                    // TODO: (DG) if node.Target we need to initialize it UNLESS we're in a remove operation
-                    // e.g. user.name.givenName, when name == null
-                    var targetValue = attemptedProperty.ValueProvider.GetValue(node.Target);
-                    if (targetValue == null)
+                    object targetValue;
+                    var propertyType = attemptedProperty.PropertyType;
+
+                    // support for resource extensions
+                    if (propertyType == typeof (ResourceExtensions))
                     {
-                        if (_Operation.OperationType == OperationType.Remove)
+                        var resourceExtensions = (ResourceExtensions) attemptedProperty.ValueProvider.GetValue(node.Target);
+                        var extensionType = ScimServerConfiguration.GetResourceExtensionType(node.Target.GetType(), pathTree[i].Path);
+                        if (_Operation.OperationType == OperationType.Remove && !resourceExtensions.Contains(extensionType))
                             break;
 
-                        var propertyType = attemptedProperty.PropertyType;
-
-                        // if just a normal complex type, just create a new instance
-                        if (!propertyType.IsNonStringEnumerable())
-                            targetValue = propertyType.CreateInstance();
-                        else
+                        targetValue = resourceExtensions.GetOrCreate(extensionType);
+                    }
+                    else
+                    {
+                        // if targetValue is null, then we need to initialize it, UNLESS we're in a remove operation
+                        // e.g. user.name.givenName, when name == null
+                        targetValue = attemptedProperty.ValueProvider.GetValue(node.Target);
+                        if (targetValue == null)
                         {
-                            var enumerableInterface = propertyType.GetEnumerableType();
-                            var listArgumentType = enumerableInterface.GetGenericArguments()[0];
-                            var listType = typeof (List<>).MakeGenericType(listArgumentType);
-                            targetValue = listType.CreateInstance();
-                        }
+                            if (_Operation.OperationType == OperationType.Remove)
+                                break;
 
-                        attemptedProperty.ValueProvider.SetValue(node.Target, targetValue);
+                            if (!propertyType.IsNonStringEnumerable())
+                            {
+                                // if just a normal complex type, just create a new instance
+                                targetValue = propertyType.CreateInstance();
+                            }
+                            else
+                            {
+                                var enumerableInterface = propertyType.GetEnumerableType();
+                                var listArgumentType = enumerableInterface.GetGenericArguments()[0];
+                                var listType = typeof (List<>).MakeGenericType(listArgumentType);
+                                targetValue = listType.CreateInstance();
+                            }
+
+                            attemptedProperty.ValueProvider.SetValue(node.Target, targetValue);
+                        }
                     }
 
                     // the Target becomes the Target's child property value

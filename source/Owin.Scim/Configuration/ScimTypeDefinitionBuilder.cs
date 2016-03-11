@@ -8,6 +8,8 @@ namespace Owin.Scim.Configuration
 
     using Extensions;
 
+    using Newtonsoft.Json;
+
     public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinition
     {
         private readonly ScimServerConfiguration _ScimServerConfiguration;
@@ -88,6 +90,7 @@ namespace Owin.Scim.Configuration
         {
             return TypeDescriptor.GetProperties(typeof(T))
                 .Cast<PropertyDescriptor>()
+                .Where(d => !d.Attributes.Contains(new ScimInternalAttribute()))
                 .ToDictionary(
                     d => d,
                     d => CreateTypeMemberDefinitionBuilder(d));

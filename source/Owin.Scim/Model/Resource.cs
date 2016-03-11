@@ -45,7 +45,8 @@
         public abstract string SchemaIdentifier { get; }
 
         [JsonIgnore]
-        internal ResourceExtensions Extensions
+        [ScimInternal]
+        public ResourceExtensions Extensions
         {
             get { return _Extensions; }
         }

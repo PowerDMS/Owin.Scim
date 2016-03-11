@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Configuration
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
@@ -26,6 +27,11 @@
     {
         private static readonly IDictionary<Type, IScimResourceTypeDefinition> _ResourceTypeDefinitions = 
             new Dictionary<Type, IScimResourceTypeDefinition>();
+
+        private static readonly Lazy<ISet<string>> _ResourceExtensions = 
+            new Lazy<ISet<string>>(
+                () => 
+                new HashSet<string>(_ResourceTypeDefinitions.SelectMany(rtd => rtd.Value.SchemaExtensions).Select(e => e.Schema)));
 
         private readonly object _SyncLock = new object();
 
@@ -111,6 +117,11 @@
         internal IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
         {
             get { return _ResourceTypeDefinitions.Values; }
+        }
+
+        public static bool ResourceExtensionExists(string extensionSchemaIdentifier)
+        {
+            return _ResourceExtensions.Value.Contains(extensionSchemaIdentifier);
         }
         
         public static Type GetResourceExtensionType(Type resourceType, string extensionSchemaIdentifier)

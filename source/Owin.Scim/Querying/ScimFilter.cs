@@ -1,8 +1,11 @@
 ﻿namespace Owin.Scim.Querying
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
+
+    using Configuration;
 
     using Extensions;
 
@@ -75,7 +78,8 @@
             };
 
             var isPathOnly = true;
-            var pathEndIndex = -1; // TODO: (DG) this should be a list to support > 1 depth 
+            var pathEndIndex = -1; // TODO: (DG) this should be a list to support > 1 depth
+            var possibleResourceExtension = new Lazy<bool>(() => expressionBuilder.StartsWith("urn:ietf:params:scim:schemas:"));
             for (int index = 0; index < filterExpression.Length; index++)
             {
                 var currentChar = filterExpression[index];
@@ -128,7 +132,7 @@
                     }
                 }
                 
-                // this is used for post-filter, sub-attributes (ie. emails[type eq "work"].value
+                // determine if we've identified a post-filter, sub-attribute (e.g. emails[type eq "work"].value
                 if (currentChar == '.' && filterExpression[index - 1] == ']')
                 {
                     var path = expressionBuilder.ToString(0, pathEndIndex);
@@ -144,6 +148,43 @@
                     isPathOnly = true;
 
                     continue; // we don't want to append this '.' character as part of the expression because it represents a path boundary
+                }
+
+                // determine if we've identified a resource extension
+                // the goal here is to break-up an extension from its sub-attribute into multiple paths
+                if (expressionBuilder.Length >= 29 && possibleResourceExtension.Value)
+                {
+                    // As per SCIM specification of extension namespacing
+                    // urn:ietf:params:scim:{type}:{name}{:other}
+                    // type: is either 'schemas' or 'api'
+                    // name: is anything except the reserved 'core'
+                    // other: [see below]
+                    /*
+                        Any US-ASCII string that conforms to the URN syntax
+                        requirements (see [RFC2141]) and defines the sub-namespace
+                        (which MAY be further broken down in namespaces delimited by
+                        colons) as needed to uniquely identify a schema.
+                    */
+                    // Therefore, we must constantly check our ScimServerConfiguration to 
+                    // determine if we've found a valid extension.
+                    var possibleExtensionSchema = expressionBuilder.ToString() + currentChar;
+                    if (ScimServerConfiguration.ResourceExtensionExists(possibleExtensionSchema))
+                    {
+                        _Paths.Add(new PathFilterExpression(possibleExtensionSchema, null));
+
+                        // reset, we're starting at a new path
+                        expressionBuilder.Clear();
+                        pathEndIndex = -1;
+                        isPathOnly = true;
+
+                        if (filterExpression[index + 1] == ':')
+                        {
+                            // we have a sub-attribute. ignore the colon
+                            ++index;
+                        }
+
+                        continue;
+                    }
                 }
 
                 // determine whether we need to replace an inner filter expression '.' with a bracket grouping

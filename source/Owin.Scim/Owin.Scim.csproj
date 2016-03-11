@@ -125,6 +125,7 @@
     <Compile Include="Configuration\ResourceParameterBinding.cs" />
     <Compile Include="Configuration\SchemaBindingRule.cs" />
     <Compile Include="Configuration\ScimFeatureType.cs" />
+    <Compile Include="Configuration\ScimInternalAttribute.cs" />
     <Compile Include="Configuration\ScimResourceTypeDefinitionBuilder.cs" />
     <Compile Include="Configuration\ScimResourceTypeExtension.cs" />
     <Compile Include="Configuration\ScimServerConfiguration.cs" />
@@ -157,6 +158,7 @@
     <Compile Include="Extensions\MultiValuedAttributesExtensions.cs" />
     <Compile Include="Extensions\RuleBuilderExtensions.cs" />
     <Compile Include="Extensions\ScimResponseExtensions.cs" />
+    <Compile Include="Extensions\StringBuilderExtensions.cs" />
     <Compile Include="Extensions\StringExtensions.cs" />
     <Compile Include="Extensions\TypeExtensions.cs" />
     <Compile Include="Extensions\ValidationResultExtensions.cs" />

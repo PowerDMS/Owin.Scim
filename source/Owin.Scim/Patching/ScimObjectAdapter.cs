@@ -97,17 +97,8 @@
             if (operation == null)
                 throw new ArgumentNullException(nameof(operation));
 
-            /* 
-                ScimPatchObjectAnalysis.cs will handle resolving the actual 
-                path and parsing any filters including,
-
-                Examples:
-                "path":"members"
-                "path":"name.familyName"
-                "path":"addresses[type eq \"work\"]"
-                "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"]"
-                "path":"members[value eq \"2819c223-7f76-453a-919d-413861904646\"].displayName"
-            */
+            // ScimPatchObjectAnalysis.cs will handle resolving the actual 
+            // path to object members and parsing any filters.
             var patchAnalysis = new ScimPatchObjectAnalysis(
                 objectToApplyTo,
                 path, 
@@ -126,8 +117,8 @@
             {
                 if (patchAnalysis.UseDynamicLogic)
                     throw new NotSupportedException(); // TODO: (DG) Add support if needed.
-                else
-                    operations.AddRange(AddNonDynamic(value, operation, patchMember));
+
+                operations.AddRange(AddNonDynamic(value, operation, patchMember));
             }
 
             return operations;
