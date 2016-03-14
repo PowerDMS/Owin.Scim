@@ -66,10 +66,11 @@
 
                     container.Register(rtd.ValidatorType, reuse: Reuse.Singleton);
                 });
-            
+
 #if DEBUG
-            container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton);
-            container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton);
+            // TODO: (CY) because of this, should I set priority higher? so my custom IConfigureDryIoc runs first
+            container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton, ifAlreadyRegistered:IfAlreadyRegistered.Keep);
+            container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
 #endif
             container.Register<IUserService, UserService>(
                 made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));

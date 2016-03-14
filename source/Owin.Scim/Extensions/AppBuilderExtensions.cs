@@ -47,7 +47,7 @@
                 new AsyncExecutionFlowScopeContext())
                 .WithWebApi(httpConfig);
 
-            // TODO: (DG) Is this needed? Was it just to create location headers before using WebAPI linking?
+            // TODO: (DG) Is this needed? Was it just to create location headers before using WebAPI linking? (CY) Yes, for location headers, in case we are behind a load balancer
             // TODO: CY is there a better way to obtain host address from Owin?
             if (String.IsNullOrEmpty(serverConfig.PublicOrigin) && app.Properties.ContainsKey("host.Addresses"))
             {
