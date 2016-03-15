@@ -5,6 +5,7 @@
     using System.Net.Http.Formatting;
 
     using Machine.Specifications;
+    using Newtonsoft.Json;
 
     using Model.Users;
 
@@ -30,12 +31,11 @@
                     })
                 .Result;
 
-            if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = PatchResponse.Content.ReadAsAsync<User>().Result;
+            var body = PatchResponse.Content.ReadAsStringAsync().Result;
 
-            if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
+            if (PatchResponse.StatusCode == HttpStatusCode.OK)
             {
-                var errorText = PatchResponse.Content.ReadAsStringAsync();
+                UpdatedUser = JsonConvert.DeserializeObject<User>(body);
             }
         };
 
