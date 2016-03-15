@@ -1,3 +1,5 @@
+using System.Linq;
+
 namespace Owin.Scim.Tests.Integration.CustomSchemas
 {
     using System;
@@ -9,53 +11,53 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
     using Newtonsoft.Json;
 
     using Model;
-    using Model.Users;
+    using Model.Groups;
     using Users;
 
-    public class with_patch_custom_user : using_a_scim_server
+    public class with_patch_custom_group : using_a_scim_server
     {
         Establish context = () =>
         {
-            var existingUser = new User
+            var existingGroup = new Group
             {
-                UserName = UserNameUtility.GenerateUserName()
+                DisplayName = UserNameUtility.GenerateUserName()
             };
 
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("groups", new ObjectContent<Group>(existingGroup, new ScimJsonMediaTypeFormatter()))
                 .Result;
 
-            UserDto = Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result;
+            GroupDto = Response.Content.ReadAsAsync<Group>(ScimJsonMediaTypeFormatter.AsArray()).Result;
 
-           
             PatchContent = new StringContent(
                 @"
                     {
                         ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp"",
-                                      ""urn:scim:mycustom:schema:1.0:User""],
+                                      ""urn:scim:mycustom:schema:1.0:Group""],
                         ""Operations"": [{
                             ""op"": ""add"",
-                            ""path"": ""urn:scim:mycustom:schema:1.0:User:guid"",
+                            ""path"": ""urn:scim:mycustom:schema:1.0:Group:anothername"",
                             ""value"": ""something new""
                         },
                         {
                             ""op"": ""replace"",
-                            ""path"": ""urn:scim:mycustom:schema:1.0:User:enablehelp"",
+                            ""path"": ""urn:scim:mycustom:schema:1.0:Group:IsGood"",
                             ""value"": false
                         },
                         {
                             ""op"": ""remove"",
-                            ""path"": ""urn:scim:mycustom:schema:1.0:User:enddate""
+                            ""path"": ""urn:scim:mycustom:schema:1.0:Group:enddate""
                         },
                         {
                             ""op"": ""add"",
-                            ""path"": ""urn:scim:mycustom:schema:1.0:User:complexdata.value"",
-                            ""value"": ""its complicated""
+                            ""path"": ""urn:scim:mycustom:schema:1.0:Group:complexdata"",
+                            ""value"": {""value"":""world"", ""displayname"":""hello""}
                        }]
                     }",
                 Encoding.UTF8,
                 "application/json");
+
         };
 
         Because of = () =>
@@ -64,7 +66,7 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
-                        new HttpMethod("PATCH"), "users/" + UserDto.Id)
+                        new HttpMethod("PATCH"), "groups/" + GroupDto.Id)
                     {
                         Content = PatchContent
                     })
@@ -74,47 +76,47 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
 
             if (Response.StatusCode == HttpStatusCode.OK)
             {
-                UpdatedUser = JsonConvert.DeserializeObject<User>(body);
+                UpdatedGroup = JsonConvert.DeserializeObject<Group>(body);
             }
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_return_new_version = () => UpdatedUser.Meta.Version.ShouldNotEqual(UserDto.Meta.Version);
+        It should_return_new_version = () => UpdatedGroup.Meta.Version.ShouldNotEqual(GroupDto.Meta.Version);
 
         It should_return_guid = () =>
-            UpdatedUser
-                .Extension<MyUserSchema>()
-                .Guid
+            UpdatedGroup
+                .Extension<MyGroupSchema>()
+                .AnotherName
                 .ShouldEqual("something new");
 
         It should_replace_enablehelp = () =>
-            UpdatedUser
-                .Extension<MyUserSchema>()
-                .EnableHelp
+            UpdatedGroup
+                .Extension<MyGroupSchema>()
+                .IsGood
                 .ShouldEqual(false);
 
         [Ignore("Are we going to support nullable DateTime?")]
         It should_delete_enddate = () =>
-            UpdatedUser
-                .Extension<MyUserSchema>()
+            UpdatedGroup
+                .Extension<MyGroupSchema>()
                 .EndDate
                 .ShouldBeNull();
 
         It should_add_complexdata = () =>
-            UpdatedUser
-                .Extension<MyUserSchema>()
+            UpdatedGroup
+                .Extension<MyGroupSchema>()
                 .ComplexData
                 .Value
-                .ShouldEqual("its complicated");
+                .ShouldEqual("world");
 
-        protected static User UserDto;
+        protected static Group GroupDto;
 
-        protected static User UpdatedUser;
-
-        protected static HttpContent PatchContent;
+        protected static Group UpdatedGroup;
 
         protected static HttpResponseMessage Response;
+
+        protected static HttpContent PatchContent;
 
         protected static ScimError Error;
     }

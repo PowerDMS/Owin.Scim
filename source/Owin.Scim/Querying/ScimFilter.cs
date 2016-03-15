@@ -79,7 +79,9 @@
 
             var isPathOnly = true;
             var pathEndIndex = -1; // TODO: (DG) this should be a list to support > 1 depth
-            var possibleResourceExtension = new Lazy<bool>(() => expressionBuilder.StartsWith("urn:ietf:params:scim:schemas:"));
+
+            // TODO: (CY) modified this to start with "urn:", in order to allow any custom schema
+            var possibleResourceExtension = new Lazy<bool>(() => expressionBuilder.StartsWith("urn:"));
             for (int index = 0; index < filterExpression.Length; index++)
             {
                 var currentChar = filterExpression[index];

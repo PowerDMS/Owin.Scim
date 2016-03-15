@@ -114,6 +114,7 @@
     <Compile Include="Integration\CustomSchemas\MyUserSchema.cs" />
     <Compile Include="Integration\CustomSchemas\MyUserSchemaValidator.cs" />
     <Compile Include="Integration\CustomSchemas\with_patch_custom_user.cs" />
+    <Compile Include="Integration\CustomSchemas\with_patch_custom_group.cs" />
     <Compile Include="Integration\CustomSchemas\with_replace_custom_user.cs" />
     <Compile Include="Integration\CustomSchemas\with_replace_custom_group.cs" />
     <Compile Include="Integration\CustomSchemas\with_add_custom_group.cs" />

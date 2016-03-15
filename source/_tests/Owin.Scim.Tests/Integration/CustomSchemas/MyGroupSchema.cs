@@ -14,6 +14,9 @@
 
         public bool IsGood { get; set; }
 
+        /// <summary>
+        /// TODO: (CY) defining nullable DateTime or array of classed causes configuration to fail
+        /// </summary>
         public MySubClass ComplexData { get; set; }
 
         public override int CalculateVersion()
