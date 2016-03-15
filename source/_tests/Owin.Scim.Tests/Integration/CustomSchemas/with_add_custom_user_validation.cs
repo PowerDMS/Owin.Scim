@@ -11,7 +11,7 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
     using Model.Users;
     using Users;
 
-    public class with_add_custom_user : using_a_scim_server
+    public class with_add_custom_user_validation : using_a_scim_server
     {
         Establish context = () =>
         {
@@ -20,11 +20,7 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                 UserName = UserNameUtility.GenerateUserName()
             };
 
-            UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
-            UserDto.Extension<MyUserSchema>().Guid = "anything";
-            UserDto.Extension<MyUserSchema>().Ref = "./users/1234";
-            UserDto.Extension<MyUserSchema>().EnableHelp = true;
-            UserDto.Extension<MyUserSchema>().EndDate = DateTime.Today;
+            UserDto.Extension<MyUserSchema>().Ref = @"\\badUri";
             UserDto.Extension<MyUserSchema>().ComplexData = new MyUserSchema.MySubClass
             {
                 DisplayName = "hello",
@@ -50,19 +46,11 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                 : null;
         };
 
-        It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);
+        It should_return_badrequest = () => Response.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_return_the_user = () => CreatedUser.Id.ShouldNotBeEmpty();
+        It should_return_invalid_syntax = () => Error.ScimType.ShouldEqual(ScimErrorType.InvalidSyntax);
 
-        It should_return_enterprise_user = () =>
-            CreatedUser
-                .Extension<EnterpriseUserExtension>()
-                .ShouldBeLike(UserDto.Extension<EnterpriseUserExtension>());
-
-        It should_return_custom_schema = () =>
-            CreatedUser
-                .Extension<MyUserSchema>()
-                .ShouldBeLike(UserDto.Extension<MyUserSchema>());
+        It should_return_detail = () => Error.Detail.ShouldContain("$ref");
 
         protected static User UserDto;
 

@@ -1,5 +1,11 @@
 ﻿namespace Owin.Scim.Tests.Integration.CustomSchemas
 {
+    using System;
+    using System.Net;
+
+    using FluentValidation;
+
+    using Model;
     using Model.Users;
     using Scim.Validation;
 
@@ -7,6 +13,12 @@
     {
         protected override void ConfigureDefaultRuleSet()
         {
+            RuleFor(user => user.Ref)
+                .Must(_ref => _ref == null || Uri.IsWellFormedUriString(_ref, UriKind.RelativeOrAbsolute))
+                .WithState(user => new ScimError(
+                    HttpStatusCode.BadRequest,
+                    ScimErrorType.InvalidSyntax,
+                    "The attribute '$ref' must have a valid url."));
         }
 
         protected override void ConfigureCreateRuleSet()

@@ -1,6 +1,9 @@
 ﻿namespace Owin.Scim.Tests.Integration.CustomSchemas
 {
     using System;
+
+    using Newtonsoft.Json;
+
     using Model;
 
     [SchemaIdentifier(Schema)]
@@ -13,6 +16,9 @@
         public DateTime EndDate { get; set; }
 
         public bool EnableHelp { get; set; }
+
+        [JsonProperty("$ref")]
+        public string Ref { get; set; }
 
         public MySubClass ComplexData { get; set; }
 

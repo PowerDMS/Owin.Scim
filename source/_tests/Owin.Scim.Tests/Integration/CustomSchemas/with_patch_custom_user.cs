@@ -1,6 +1,5 @@
 namespace Owin.Scim.Tests.Integration.CustomSchemas
 {
-    using System;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -38,6 +37,11 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                             ""op"": ""add"",
                             ""path"": ""urn:scim:mycustom:schema:1.0:User:guid"",
                             ""value"": ""something new""
+                        },
+                        {
+                            ""op"": ""add"",
+                            ""path"": ""urn:scim:mycustom:schema:1.0:User:$ref"",
+                            ""value"": ""http://localhost/users/12345""
                         },
                         {
                             ""op"": ""replace"",
