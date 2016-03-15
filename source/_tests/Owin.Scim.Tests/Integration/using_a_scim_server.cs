@@ -9,6 +9,7 @@
     using Microsoft.Owin.Testing;
 
     using Model;
+    using Model.Groups;
     using Model.Users;
 
     using Scim.Extensions;
@@ -44,6 +45,7 @@
                             isPrimary: true))
                     .ConfigureETag(supported: true, isWeak: true)
                     .ModifyResourceType<User>(ModifyUserResourceType)
+                    .ModifyResourceType<Group>(ModifyGroupResourceType)
                 );
             });
             // ncrunch: no coverage end
@@ -51,6 +53,16 @@
 
         private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
+            // this adds custom schemas, need play with custom validation next
+            builder.AddSchemaExtension<CustomSchemas.MyUserSchema, CustomSchemas.MyUserSchemaValidator>(
+                CustomSchemas.MyUserSchema.Schema);
+        }
+
+        private void ModifyGroupResourceType(ScimResourceTypeDefinitionBuilder<Group> builder)
+        {
+            // this adds custom schemas, need play with custom validation next
+            builder.AddSchemaExtension<CustomSchemas.MyGroupSchema, CustomSchemas.MyGroupSchemaValidator>(
+                CustomSchemas.MyGroupSchema.Schema);
         }
 
         public void OnAssemblyComplete()

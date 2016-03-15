@@ -109,6 +109,15 @@
   <ItemGroup>
     <Compile Include="Extensions\HttpResponseMessageExtensions.cs" />
     <Compile Include="Extensions\ShouldExtensions.cs" />
+    <Compile Include="Integration\CustomSchemas\MyGroupSchema.cs" />
+    <Compile Include="Integration\CustomSchemas\MyGroupSchemaValidator.cs" />
+    <Compile Include="Integration\CustomSchemas\MyUserSchema.cs" />
+    <Compile Include="Integration\CustomSchemas\MyUserSchemaValidator.cs" />
+    <Compile Include="Integration\CustomSchemas\with_patch_custom_user.cs" />
+    <Compile Include="Integration\CustomSchemas\with_replace_custom_user.cs" />
+    <Compile Include="Integration\CustomSchemas\with_replace_custom_group.cs" />
+    <Compile Include="Integration\CustomSchemas\with_add_custom_group.cs" />
+    <Compile Include="Integration\CustomSchemas\with_add_custom_user.cs" />
     <Compile Include="Integration\Groups\Create\when_creating_a_group.cs" />
     <Compile Include="Integration\Groups\Create\with_invalid_member_value.cs" />
     <Compile Include="Integration\Groups\Create\with_invalid_member_ref.cs" />

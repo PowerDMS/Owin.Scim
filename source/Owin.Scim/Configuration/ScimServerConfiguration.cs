@@ -337,8 +337,7 @@
                             ScimConstants.Endpoints.Groups,
                             schemaIdentifiers =>
                             {
-                                if (schemaIdentifiers.Count == 1 &&
-                                    schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
+                                if (schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
                                     return true;
 
                                 return false;
