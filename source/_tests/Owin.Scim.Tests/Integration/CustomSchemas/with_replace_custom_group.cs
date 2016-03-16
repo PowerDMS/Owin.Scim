@@ -30,11 +30,11 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
             GroupDto.Extension<MyGroupSchema>().AnotherName = "anything";
             GroupDto.Extension<MyGroupSchema>().IsGood = true;
             GroupDto.Extension<MyGroupSchema>().EndDate = DateTime.Today;
-            GroupDto.Extension<MyGroupSchema>().ComplexData = new MyGroupSchema.MySubClass
+            GroupDto.Extension<MyGroupSchema>().ComplexData = new [] { new MyGroupSchema.MySubClass
             {
                 DisplayName = "hello",
                 Value = "world"
-            };
+            }};
         };
 
         Because of = () =>

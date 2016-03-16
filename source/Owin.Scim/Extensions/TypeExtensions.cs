@@ -59,6 +59,7 @@
             return type.IsPrimitive || 
                    type.IsEnum || 
                    type.IsPointer || 
+                   Nullable.GetUnderlyingType(type) != null ||
                    type == typeof (string) || 
                    type == typeof (DateTime) || 
                    type == typeof (decimal) || 

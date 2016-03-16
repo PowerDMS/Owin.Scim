@@ -98,7 +98,6 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                 .EnableHelp
                 .ShouldEqual(false);
 
-        [Ignore("Are we going to support nullable DateTime?")]
         It should_delete_enddate = () =>
             UpdatedUser
                 .Extension<MyUserSchema>()

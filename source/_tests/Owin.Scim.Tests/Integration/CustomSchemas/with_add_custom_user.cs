@@ -24,7 +24,6 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
             UserDto.Extension<MyUserSchema>().Guid = "anything";
             UserDto.Extension<MyUserSchema>().Ref = "./users/1234";
             UserDto.Extension<MyUserSchema>().EnableHelp = true;
-            UserDto.Extension<MyUserSchema>().EndDate = DateTime.Today;
             UserDto.Extension<MyUserSchema>().ComplexData = new MyUserSchema.MySubClass
             {
                 DisplayName = "hello",

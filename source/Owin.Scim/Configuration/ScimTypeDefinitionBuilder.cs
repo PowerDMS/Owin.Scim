@@ -115,8 +115,12 @@ namespace Owin.Scim.Configuration
             // multiValued complex attribute
             if (descriptor.PropertyType.IsNonStringEnumerable())
             {
+                var itemType = descriptor.PropertyType.IsArray
+                    ? descriptor.PropertyType.GetElementType()
+                    : descriptor.PropertyType.GetGenericArguments()[0];
+
                 builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>)
-                    .MakeGenericType(typeof(T), descriptor.PropertyType.GetGenericArguments()[0]);
+                    .MakeGenericType(typeof(T), itemType);
                 instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, true);
 
                 return instance;

@@ -52,7 +52,7 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                         {
                             ""op"": ""add"",
                             ""path"": ""urn:scim:mycustom:schema:1.0:Group:complexdata"",
-                            ""value"": {""value"":""world"", ""displayname"":""hello""}
+                            ""value"": [{""value"":""world"", ""displayname"":""hello""}]
                        }]
                     }",
                 Encoding.UTF8,
@@ -96,7 +96,6 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                 .IsGood
                 .ShouldEqual(false);
 
-        [Ignore("Are we going to support nullable DateTime?")]
         It should_delete_enddate = () =>
             UpdatedGroup
                 .Extension<MyGroupSchema>()
@@ -107,6 +106,7 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
             UpdatedGroup
                 .Extension<MyGroupSchema>()
                 .ComplexData
+                .First()
                 .Value
                 .ShouldEqual("world");
 

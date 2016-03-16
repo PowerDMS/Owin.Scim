@@ -13,7 +13,7 @@
 
         public string Guid { get; set; }
 
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
 
         public bool EnableHelp { get; set; }
 
