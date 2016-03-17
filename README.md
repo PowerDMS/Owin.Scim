@@ -19,21 +19,20 @@ Roadmap
   1. [x] Create  
   2. [x] Retrieve  
   3. [x] Replace  
-  4. [ ] Update (Patch) (IN PROGRESS)  
+  4. [x] Update (Patch)  
     1. [x] Support for path filters  
     2. [x] Add  
     3. [x] Replace  
     4. [x] Remove  
   5. [x] Delete  
 2. [x] Schema extensions
-  1. [x] Add custom parameter binding for schema extension deserialization
 3. [ ] Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
   2. [ ] /Schemas (IN PROGRESS)
   3. [x] /ResourceTypes
 4. [ ] Add support for mutability rule-processing.
 5. [ ] Add support for bulk processing
-6. [ ] Add groups endpoints
+6. [x] Add groups endpoints
   1. [x] Create
   2. [x] Retrieve
   3. [x] Replace
@@ -45,7 +44,7 @@ Roadmap
   3. [ ] Ordering
   4. [ ] Pagination
   5. [ ] Projection
-8. [ ] Add more extensiblity options
+8. [x] Add more extensiblity options
   1. [x] Canonicalization  
   2. [x] Validation  
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
