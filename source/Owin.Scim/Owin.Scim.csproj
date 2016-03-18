@@ -143,7 +143,7 @@
     <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />
     <Compile Include="Endpoints\ResourceTypesController.cs" />
     <Compile Include="Endpoints\ServiceProviderConfigurationController.cs" />
-    <Compile Include="Endpoints\ControllerBase.cs" />
+    <Compile Include="Endpoints\ScimControllerBase.cs" />
     <Compile Include="Endpoints\Users\GroupsController.cs" />
     <Compile Include="Endpoints\Users\UsersController.cs" />
     <Compile Include="ErrorHandling\ErrorDetail.cs" />

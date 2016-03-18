@@ -12,7 +12,7 @@
 
     using Model;
 
-    public class ResourceTypesController : ControllerBase
+    public class ResourceTypesController : ScimControllerBase
     {
         public ResourceTypesController(ScimServerConfiguration scimServerConfiguration) 
             : base(scimServerConfiguration)

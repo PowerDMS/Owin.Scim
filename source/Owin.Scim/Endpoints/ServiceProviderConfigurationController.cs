@@ -9,7 +9,7 @@
 
     using Model;
 
-    public class ServiceProviderConfigurationController : ControllerBase
+    public class ServiceProviderConfigurationController : ScimControllerBase
     {
         public ServiceProviderConfigurationController(ScimServerConfiguration scimServerConfiguration)
             : base(scimServerConfiguration)

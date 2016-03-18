@@ -16,7 +16,7 @@
     using Patching;
     using Services;
 
-    public class GroupsController : ControllerBase
+    public class GroupsController : ScimControllerBase
     {
         private readonly IGroupService _groupService;
 

@@ -22,7 +22,7 @@ namespace Owin.Scim.Endpoints.Users
 
     using Services;
 
-    public class UsersController : ControllerBase
+    public class UsersController : ScimControllerBase
     {
         private readonly IUserService _UserService;
 

@@ -7,11 +7,15 @@
     using System.Linq;
     using System.Reflection;
     using System.Web.Http;
+    using System.Web.Http.Controllers;
+    using System.Web.Http.Dispatcher;
 
     using Configuration;
 
     using DryIoc;
     using DryIoc.WebApi;
+
+    using Endpoints;
 
     using Middleware;
 
@@ -133,7 +137,30 @@
             // refer to https://tools.ietf.org/html/rfc7644#section-3.1
             httpConfiguration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("application/scim+json"));
 
+            httpConfiguration.Services.Replace(
+                typeof(IHttpControllerTypeResolver), 
+                new DefaultHttpControllerTypeResolver(IsControllerType));
+
             return httpConfiguration;
+        }
+
+        private static bool IsControllerType(Type t)
+        {
+            return
+                typeof(ScimControllerBase).IsAssignableFrom(t) &&
+                t != null &&
+                t.IsClass &&
+                t.IsVisible &&
+                !t.IsAbstract &&
+                typeof(IHttpController).IsAssignableFrom(t) &&
+                HasValidControllerName(t);
+        }
+
+        private static bool HasValidControllerName(Type controllerType)
+        {
+            string controllerSuffix = DefaultHttpControllerSelector.ControllerSuffix;
+            return controllerType.Name.Length > controllerSuffix.Length && 
+                controllerType.Name.EndsWith(controllerSuffix, StringComparison.OrdinalIgnoreCase);
         }
     }
 }

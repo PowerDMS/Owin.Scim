@@ -4,16 +4,14 @@
 
     public static class StringBuilderExtensions
     {
-        public static bool StartsWith(this StringBuilder builder, string text)
+        public static bool Contains(this StringBuilder builder, char value)
         {
-            if (builder.Length < text.Length) return false;
-
-            for (int i = 0; i < text.Length; i++)
+            for (int i = 0; i < builder.Length; i++)
             {
-                if (!builder[i].Equals(text[i])) return false;
+                if (builder[i].Equals(value)) return true;
             }
 
-            return true;
+            return false;
         }
     }
 }

@@ -9,9 +9,9 @@ namespace Owin.Scim.Endpoints
 
     using Model;
 
-    public class ControllerBase : ApiController
+    public class ScimControllerBase : ApiController
     {
-        public ControllerBase(ScimServerConfiguration scimServerConfiguration)
+        public ScimControllerBase(ScimServerConfiguration scimServerConfiguration)
         {
             ScimServerConfiguration = scimServerConfiguration;
         }
