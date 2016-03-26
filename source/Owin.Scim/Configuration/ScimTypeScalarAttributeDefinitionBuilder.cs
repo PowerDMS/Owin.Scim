@@ -6,9 +6,9 @@
         : ScimTypeAttributeDefinitionBuilder<T, TAttribute>
     {
         public ScimTypeScalarAttributeDefinitionBuilder(
-            ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
+            ScimTypeDefinitionBuilder<T> typeDefinition,
             PropertyDescriptor propertyDescriptor)
-            : base(scimTypeDefinitionBuilder, propertyDescriptor)
+            : base(typeDefinition, propertyDescriptor)
         {
         }
 

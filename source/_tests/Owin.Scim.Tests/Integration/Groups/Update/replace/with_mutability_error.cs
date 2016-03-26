@@ -49,7 +49,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.replace
 
         It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        private It should_indicate_mutability = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.Mutability);
+        It should_indicate_mutability = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.Mutability);
 
         private static Group GroupToUpdate;
         private static User ExistingUser;

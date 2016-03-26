@@ -4,6 +4,8 @@
     using System.Collections;
     using System.Collections.Generic;
 
+    using Configuration;
+
     using Exceptions;
 
     using Extensions;
@@ -127,6 +129,9 @@
         private IEnumerable<PatchOperationResult> AddNonDynamic(object value, Operation operation, PatchMember patchMember)
         {
             var patchProperty = patchMember.JsonPatchProperty;
+
+            EnforceMutability(operation, patchProperty);
+
             var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
             if (instanceValue == null || !patchProperty.Property.PropertyType.IsNonStringEnumerable())
             {
@@ -168,9 +173,7 @@
                         conversionResultTuple.ConvertedInstance)
                 };
             }
-
-            // Here we are going to be modifying an existing enumerable:
-
+            
             /*
                     o  If the target location already contains the value specified, no
                         changes SHOULD be made to the resource, and a success response
@@ -193,7 +196,11 @@
                 foreach (var kvp in resourcePatch)
                 {
                     var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(kvp.Key);
-                    var patch = new PatchMember(kvp.Key, new JsonPatchProperty(attemptedProperty, patchMember.Target));
+                    var pp = new JsonPatchProperty(attemptedProperty, patchMember.Target);
+                    var patch = new PatchMember(kvp.Key, pp);
+                    
+                    EnforceMutability(operation, pp);
+
                     operations.AddRange(
                         AddNonDynamic(
                             kvp.Value, 
@@ -203,7 +210,8 @@
                     
                 return operations;
             }
-
+            
+            // Here we are going to be modifying an existing enumerable:
             // The second case handles the following SCIM rule:
             // o If the target location specifies a multi-valued attribute, a new
             //   value is added to the attribute.
@@ -269,19 +277,21 @@
                 if (treeAnalysisResult.UseDynamicLogic)
                     throw new NotSupportedException(); // TODO: (DG) If actually needed.
                 else
-                    operations.Add(RemoveNonDynamic(patchMember));
+                    operations.Add(RemoveNonDynamic(operation, patchMember));
             }
 
             return operations;
         }
 
-        private PatchOperationResult RemoveNonDynamic(PatchMember patchMember)
+        private PatchOperationResult RemoveNonDynamic(Operation operation, PatchMember patchMember)
         {
             var patchProperty = patchMember.JsonPatchProperty;
             if (!patchProperty.Property.Writable)
             {
                 throw new Exception(); // TODO: (DG) This is int server error.
             }
+
+            EnforceMutability(operation, patchProperty);
 
             var defaultValue = patchProperty.Property.PropertyType.GetDefaultValue();
             var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
@@ -413,6 +423,8 @@
                 throw new Exception(); // TODO: (DG) This is int server error.
             }
 
+            EnforceMutability(operation, patchProperty);
+
             var instanceValue = patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent);
             // if the instance's property value is null or it is not an enumerable type
             if (instanceValue == null || !patchProperty.Property.PropertyType.IsNonStringEnumerable())
@@ -430,7 +442,7 @@
                            sub-attribute of all matching records is replaced.
                            (!patchProperty.Property.PropertyType.IsNonStringEnumerable())
                 */
-
+                
                 var conversionResultTuple = ConvertToActualType(
                     patchProperty.Property.PropertyType,
                     value,
@@ -476,7 +488,7 @@
                 {
                     return new[]
                     {
-                        RemoveNonDynamic(patchMember)
+                        RemoveNonDynamic(operation, patchMember)
                     };
                 }
 
@@ -487,7 +499,11 @@
                 foreach (var kvp in resourcePatch)
                 {
                     var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(kvp.Key);
-                    var patch = new PatchMember(kvp.Key, new JsonPatchProperty(attemptedProperty, patchMember.Target));
+                    var pp = new JsonPatchProperty(attemptedProperty, patchMember.Target);
+
+                    EnforceMutability(operation, pp);
+
+                    var patch = new PatchMember(kvp.Key, pp);
                     operations.AddRange(
                         AddNonDynamic(
                             kvp.Value,
@@ -522,6 +538,22 @@
                     instanceValue,
                     array)
             };
+        }
+
+        private static void EnforceMutability(Operation operation, JsonPatchProperty patchProperty)
+        {
+            IScimTypeAttributeDefinition attrDefinition;
+            var typeDefinition = ScimServerConfiguration.GetScimTypeDefinition(patchProperty.Parent.GetType());
+            var propertyInfo = patchProperty.Property.DeclaringType.GetProperty(patchProperty.Property.UnderlyingName);
+            if (typeDefinition != null &&
+                typeDefinition.AttributeDefinitions.TryGetValue(propertyInfo, out attrDefinition) &&
+                (attrDefinition.Mutability == Mutability.Immutable ||
+                 attrDefinition.Mutability == Mutability.ReadOnly))
+            {
+                throw new ScimPatchException(
+                    ScimErrorType.Mutability,
+                    operation);
+            }
         }
 
         private ConversionResult ConvertToActualType(Type propertyType, object value, object instanceValue = null)

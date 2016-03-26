@@ -23,7 +23,7 @@
 
         bool CaseExact { get; }
 
-        IScimTypeDefinition TypeDefinition { get; }
+        IScimTypeDefinition DeclaringTypeDefinition { get; }
 
         IEnumerable<ICanonicalizationRule> GetCanonicalizationRules();
     }

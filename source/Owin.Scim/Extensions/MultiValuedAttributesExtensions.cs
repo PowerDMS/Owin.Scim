@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Extensions
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     using Model;
 
@@ -10,7 +11,7 @@
             this IEnumerable<T> multiValuedAttributes)
             where T : MultiValuedAttribute
         {
-            if (multiValuedAttributes == null)
+            if (multiValuedAttributes == null || !multiValuedAttributes.Any())
                 return 0;
 
             unchecked

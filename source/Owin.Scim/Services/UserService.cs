@@ -31,7 +31,7 @@
 
         private readonly IUserRepository _UserRepository;
 
-        private readonly IGroupRepository _groupRepository;
+        private readonly IGroupRepository _GroupRepository;
 
         private readonly IManagePasswords _PasswordManager;
 
@@ -48,7 +48,7 @@
         {
             _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
-            _groupRepository = groupRepository;
+            _GroupRepository = groupRepository;
             _PasswordManager = passwordManager;
             _ResourceValidatorFactory = resourceValidatorFactory;
         }
@@ -72,8 +72,6 @@
 
             var userRecord = await _UserRepository.CreateUser(user);
 
-            user.Groups = await _groupRepository.GetGroupsUserBelongsTo(user.Id);
-
             SetResourceVersion(user);
 
             return new ScimDataResponse<User>(userRecord);
@@ -81,14 +79,16 @@
 
         public async Task<IScimResponse<User>> RetrieveUser(string userId)
         {
-            var userRecord = SetResourceVersion(await _UserRepository.GetUser(userId));
+            var userRecord = await _UserRepository.GetUser(userId);
             if (userRecord == null)
                 return new ScimErrorResponse<User>(
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ErrorDetail.NotFound(userId)));
 
-            userRecord.Groups = await _groupRepository.GetGroupsUserBelongsTo(userId);
+            userRecord.Groups = await _GroupRepository.GetGroupsUserBelongsTo(userId);
+
+            SetResourceVersion(userRecord);
 
             return new ScimDataResponse<User>(userRecord);
         }
@@ -119,19 +119,21 @@
                 return new ScimErrorResponse<User>(validationResult.Errors.First());
 
             // TODO: (DG) support password change properly, according to service prov config.
-            if (!string.IsNullOrWhiteSpace(userRecord.Password))
+            if (!string.IsNullOrWhiteSpace(user.Password))
             {
-                userRecord.Password = _PasswordManager.CreateHash(
-                    Encoding.UTF8.GetString(Encoding.Unicode.GetBytes(user.Password.Trim())));
+                user.Password = _PasswordManager.CreateHash(
+                    Encoding.UTF8.GetString(
+                        Encoding.Unicode.GetBytes(
+                            user.Password.Trim())));
             }
 
-            user.Groups = await _groupRepository.GetGroupsUserBelongsTo(user.Id);
+            user.Groups = await _GroupRepository.GetGroupsUserBelongsTo(user.Id);
 
             SetResourceVersion(user);
 
             // if both versions are equal, bypass persistence
             if (user.Meta.Version.Equals(userRecord.Meta.Version))
-                return new ScimDataResponse<User>(user); // TODO: (DG) is this proper behavior? (CY) Yes
+                return new ScimDataResponse<User>(user);
 
             user.Meta.LastModified = DateTime.UtcNow;
 

@@ -29,6 +29,8 @@
     using Newtonsoft.Json.Converters;
     using Newtonsoft.Json.Serialization;
 
+    using Serialization;
+
     public static class AppBuilderExtensions
     {
         public static IAppBuilder UseScimServer(this IAppBuilder app, ScimServerConfiguration serverConfig)
@@ -115,7 +117,7 @@
             var settings = httpConfiguration.Formatters.JsonFormatter.SerializerSettings;
             settings.Converters.Add(new StringEnumConverter());
             settings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
-            settings.ContractResolver = new CamelCasePropertyNamesContractResolver
+            settings.ContractResolver = new ScimContractResolver
             {
                 IgnoreSerializableAttribute = true,
                 IgnoreSerializableInterface = true

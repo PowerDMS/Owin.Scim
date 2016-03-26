@@ -14,17 +14,17 @@
         {
             foreach (var attribute in typeDefinition.AttributeDefinitions)
             {
-                var attributeDescriptor = attribute.Key;
+                var attributeMemberInfo = attribute.Key;
                 var attributeDefinition = attribute.Value;
 
                 var canonicalizationRules = attributeDefinition.GetCanonicalizationRules();
                 if (canonicalizationRules == null || !canonicalizationRules.Any()) continue;
 
-                var attributeValue = attributeDescriptor.GetValue(instance);
-                if (attributeValue == null || attributeValue == attributeDescriptor.PropertyType.GetDefaultValue()) continue;
+                var attributeValue = attributeMemberInfo.GetValue(instance);
+                if (attributeValue == null || attributeValue == attributeMemberInfo.PropertyType.GetDefaultValue()) continue;
 
                 object state = null;
-                if (attributeDescriptor.PropertyType.IsTerminalObject())
+                if (attributeMemberInfo.PropertyType.IsTerminalObject())
                 {
                     foreach (var canonicalizationRule in canonicalizationRules)
                     {
@@ -44,7 +44,7 @@
 
                     // canonicalize the complex object instance as it may have sub-attributes 
                     // with defined canonicalization rules
-                    Canonicalize(attributeDescriptor.GetValue(instance), attributeDefinition.TypeDefinition);
+                    Canonicalize(attributeMemberInfo.GetValue(instance), attributeDefinition.DeclaringTypeDefinition);
 
                     continue;
                 }
@@ -69,7 +69,7 @@
                     }
 
                     // recursively canonicalize each enumeration value as they may have sub-attributes with canonicalization rules
-                    Canonicalize(enumerator.Current, attributeDefinition.TypeDefinition);
+                    Canonicalize(enumerator.Current, attributeDefinition.DeclaringTypeDefinition);
                 }
             }
         }

@@ -27,7 +27,7 @@ namespace Owin.Scim.Tests.Integration.Groups
                 .HttpClient
                 .PostAsync("groups", new ObjectContent<Group>(group, new ScimJsonMediaTypeFormatter())).Result;
 
-            return (response.StatusCode == HttpStatusCode.Created)
+            return response.StatusCode == HttpStatusCode.Created
                 ? response.Content.ReadAsAsync<Group>(ScimJsonMediaTypeFormatter.AsArray()).Result
                 : null;
         }

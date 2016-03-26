@@ -1,6 +1,5 @@
 ﻿namespace Owin.Scim.Endpoints.Users
 {
-    using System;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
@@ -18,20 +17,20 @@
 
     public class GroupsController : ScimControllerBase
     {
-        private readonly IGroupService _groupService;
+        private readonly IGroupService _GroupService;
 
         public GroupsController(
             ScimServerConfiguration scimServerConfiguration,
             IGroupService groupService) 
             : base(scimServerConfiguration)
         {
-            _groupService = groupService;
+            _GroupService = groupService;
         }
 
         [Route("groups", Name = "CreateGroup")]
         public async Task<HttpResponseMessage> Post(Group group)
         {
-            return (await _groupService.CreateGroup(group))
+            return (await _GroupService.CreateGroup(group))
                 .ToHttpResponseMessage(Request, (groupDto, response) =>
                 {
                     response.StatusCode = HttpStatusCode.Created;
@@ -44,7 +43,7 @@
         [Route("groups/{groupId}", Name = "RetrieveGroup")]
         public async Task<HttpResponseMessage> Get(string groupId)
         {
-            return (await _groupService.RetrieveGroup(groupId))
+            return (await _GroupService.RetrieveGroup(groupId))
                 .ToHttpResponseMessage(Request, (groupDto, response) =>
                 {
                     SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
@@ -56,23 +55,12 @@
         [Route("groups/{groupId}", Name = "ReplaceGroup")]
         public async Task<HttpResponseMessage> Put(string groupId, Group group)
         {
-            if (String.IsNullOrWhiteSpace(groupId) ||
-                group == null ||
-                string.IsNullOrWhiteSpace(group.Id) ||
-                !group.Id.Equals(groupId, StringComparison.OrdinalIgnoreCase))
-            {
-                return new ScimErrorResponse<Group>(
-                    new ScimError(
-                        HttpStatusCode.BadRequest,
-                        ScimErrorType.InvalidSyntax,
-                        detail: "The request path 'groupId' MUST match the group.id in the request body."))
-                    .ToHttpResponseMessage(Request);
-            }
+            group.Id = groupId;
 
-            return (await _groupService.UpdateGroup(group))
+            return (await _GroupService.UpdateGroup(group))
                 .ToHttpResponseMessage(Request, (groupDto, response) =>
                 {
-                    SetLocationHeader(response, groupDto, "RetrieveGroup", new {groupId = groupDto.Id});
+                    SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
                     SetETagHeader(response, groupDto);
                 });
         }
@@ -80,7 +68,8 @@
         [Route("groups/{groupId}", Name = "DeleteGroup")]
         public async Task<HttpResponseMessage> Delete(string groupId)
         {
-            return (await _groupService.DeleteGroup(groupId)).ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
+            return (await _GroupService.DeleteGroup(groupId))
+                .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
         }
 
         [Route("groups/{groupId}", Name = "UpdateGroup")]
@@ -97,7 +86,7 @@
                     .ToHttpResponseMessage(Request);
             }
 
-            return (await (await _groupService.RetrieveGroup(groupId))
+            return (await (await _GroupService.RetrieveGroup(groupId))
                 .Bind<Group, Group>(group =>
                 {
                     try
@@ -114,13 +103,12 @@
                         return new ScimErrorResponse<Group>(ex.ToScimError());
                     }
                 })
-                .BindAsync(group => _groupService.UpdateGroup(group)))
+                .BindAsync(group => _GroupService.UpdateGroup(group)))
                 .ToHttpResponseMessage(Request, (groupDto, response) =>
                 {
                     SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
                     SetETagHeader(response, groupDto);
                 });
         }
-
     }
 }

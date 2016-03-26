@@ -136,7 +136,6 @@
     <Compile Include="Integration\Groups\Replace\with_invalid_member_ref.cs" />
     <Compile Include="Integration\Groups\Replace\with_invalid_member_type.cs" />
     <Compile Include="Integration\Groups\Replace\with_missing_display_name.cs" />
-    <Compile Include="Integration\Groups\Replace\with_no_id_body.cs" />
     <Compile Include="Integration\Groups\Replace\with_invalid_id.cs" />
     <Compile Include="Integration\Groups\Replace\with_no_id_in_url.cs" />
     <Compile Include="Integration\Groups\Replace\with_a_valid_group_with_members.cs" />

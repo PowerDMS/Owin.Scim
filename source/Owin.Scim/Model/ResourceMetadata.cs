@@ -3,7 +3,7 @@
     using System;
 
     using Newtonsoft.Json;
-
+    
     public sealed class ResourceMetadata
     {
         public ResourceMetadata(string resourceType)

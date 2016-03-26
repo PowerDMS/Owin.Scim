@@ -5,6 +5,7 @@ namespace Owin.Scim.Configuration
     using System.ComponentModel;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     using Canonicalization;
 
@@ -16,17 +17,17 @@ namespace Owin.Scim.Configuration
 
     public abstract class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinition
     {
-        private readonly ScimTypeDefinitionBuilder<T> _ScimTypeDefinitionBuilder;
+        private readonly ScimTypeDefinitionBuilder<T> _DeclaringTypeDefinition;
 
         private readonly PropertyDescriptor _PropertyDescriptor;
 
         private readonly IList<ICanonicalizationRule> _CanonicalizationRules; 
 
         protected ScimTypeAttributeDefinitionBuilder(
-            ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
+            ScimTypeDefinitionBuilder<T> typeDefinition,
             PropertyDescriptor propertyDescriptor)
         {
-            _ScimTypeDefinitionBuilder = scimTypeDefinitionBuilder;
+            _DeclaringTypeDefinition = typeDefinition;
             _PropertyDescriptor = propertyDescriptor;
             _CanonicalizationRules = new List<ICanonicalizationRule>();
 
@@ -47,13 +48,12 @@ namespace Owin.Scim.Configuration
                 Description = descriptionAttr.Description.RemoveMultipleSpaces();
             }
         }
-
-        public static implicit operator ScimServerConfiguration(ScimTypeAttributeDefinitionBuilder<T, TAttribute> builder)
-        {
-            return builder._ScimTypeDefinitionBuilder.ScimServerConfiguration;
-        }
+        
+        public bool CaseExact { get; protected set; }
 
         public string Description { get; protected set; }
+
+        public bool MultiValued { get; protected set; }
 
         public Mutability Mutability { get; protected set; }
 
@@ -63,21 +63,20 @@ namespace Owin.Scim.Configuration
 
         public Uniqueness Uniqueness { get; protected set; }
 
-        public bool CaseExact { get; protected set; }
-
-        public IEnumerable<ICanonicalizationRule> GetCanonicalizationRules()
-        {
-            return _CanonicalizationRules;
-        }
-
-        public bool MultiValued { get; protected set; }
-        
         public PropertyDescriptor AttributeDescriptor
         {
             get { return _PropertyDescriptor; }
         }
 
-        public virtual IScimTypeDefinition TypeDefinition { get { return _ScimTypeDefinitionBuilder; } }
+        public virtual IScimTypeDefinition DeclaringTypeDefinition
+        {
+            get { return _DeclaringTypeDefinition; }
+        }
+
+        public IEnumerable<ICanonicalizationRule> GetCanonicalizationRules()
+        {
+            return _CanonicalizationRules;
+        }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetDescription(string description)
         {
@@ -119,9 +118,8 @@ namespace Owin.Scim.Configuration
             {
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
-
-            var propertyDescriptor = TypeDescriptor.GetProperties(typeof (T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
+            
+            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_DeclaringTypeDefinition.AttributeDefinitions[(PropertyInfo)memberExpression.Member];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute> For<TOtherAttribute>(
@@ -134,9 +132,8 @@ namespace Owin.Scim.Configuration
             {
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
-
-            var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_ScimTypeDefinitionBuilder.AttributeDefinitions[propertyDescriptor];
+            
+            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_DeclaringTypeDefinition.AttributeDefinitions[(PropertyInfo)memberExpression.Member];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationAction<TAttribute> rule)
@@ -200,9 +197,9 @@ namespace Owin.Scim.Configuration
             if (!typeof (Resource).IsAssignableFrom(typeof (T)))
                 throw new InvalidOperationException("You cannot add schema extensions to non-resource types.");
             
-            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(_ScimTypeDefinitionBuilder.ScimServerConfiguration);
+            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>();
 
-            ((IScimResourceTypeDefinition)_ScimTypeDefinitionBuilder)
+            ((IScimResourceTypeDefinition)_DeclaringTypeDefinition)
                 .AddExtension(
                     new ScimResourceTypeExtension(
                     schemaIdentifier,

@@ -2,12 +2,12 @@ namespace Owin.Scim.Configuration
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
+    using System.Reflection;
 
     public interface IScimTypeDefinition
     {
-        Type ResourceType { get; }
+        Type DefinitionType { get; }
 
-        IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> AttributeDefinitions { get; }
+        IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> AttributeDefinitions { get; }
     }
 }

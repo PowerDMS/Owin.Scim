@@ -9,9 +9,9 @@ namespace Owin.Scim.Configuration
         where TMember : Uri
     {
         public ScimTypeUriAttributeDefinitionBuilder(
-            ScimTypeDefinitionBuilder<T> scimTypeDefinitionBuilder,
+            ScimTypeDefinitionBuilder<T> typeDefinition,
             PropertyDescriptor propertyDescriptor)
-            : base(scimTypeDefinitionBuilder, propertyDescriptor)
+            : base(typeDefinition, propertyDescriptor)
         {
         }
 

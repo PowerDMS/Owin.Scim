@@ -1,8 +1,6 @@
-﻿using System.Linq;
-
-namespace Owin.Scim.Endpoints.Users
+﻿namespace Owin.Scim.Endpoints.Users
 {
-    using System;
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -102,17 +100,7 @@ namespace Owin.Scim.Endpoints.Users
         [Route("users/{userId}", Name = "ReplaceUser")]
         public async Task<HttpResponseMessage> Put(string userId, User user)
         {
-            if (String.IsNullOrWhiteSpace(userId) ||
-                user == null ||
-                string.IsNullOrWhiteSpace(user.Id) ||
-                !user.Id.Equals(userId, StringComparison.OrdinalIgnoreCase))
-            {
-                return new ScimErrorResponse<User>(
-                    new ScimError(
-                        HttpStatusCode.BadRequest,
-                        detail: "The request path 'userId' MUST match the user.id in the request body."))
-                    .ToHttpResponseMessage(Request);
-            }
+            user.Id = userId;
 
             return (await _UserService.UpdateUser(user))
                 .ToHttpResponseMessage(Request, (userDto, response) =>

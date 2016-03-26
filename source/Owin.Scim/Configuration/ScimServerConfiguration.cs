@@ -3,35 +3,31 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.IO;
     using System.Linq;
-
-    using Canonicalization;
-
-    using FluentValidation;
 
     using Model;
     using Model.Users;
     using Model.Groups;
-    
+
+    using NContext.Common;
     using NContext.Extensions;
 
-    using PhoneNumbers;
-
     using Validation.Users;
-    using Validation.Groups;
-
-    using PhoneNumber = Model.Users.PhoneNumber;
 
     public class ScimServerConfiguration
     {
-        private static readonly IDictionary<Type, IScimResourceTypeDefinition> _ResourceTypeDefinitions = 
-            new Dictionary<Type, IScimResourceTypeDefinition>();
-
+        private static readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache =
+            new ConcurrentDictionary<Type, IScimTypeDefinition>();
+        
         private static readonly Lazy<ISet<string>> _ResourceExtensions = 
             new Lazy<ISet<string>>(
                 () => 
-                new HashSet<string>(_ResourceTypeDefinitions.SelectMany(rtd => rtd.Value.SchemaExtensions).Select(e => e.Schema)));
+                new HashSet<string>(_TypeDefinitionCache
+                    .Where(td => td.Value is IScimResourceTypeDefinition)
+                    .SelectMany(rtd => ((IScimResourceTypeDefinition)rtd.Value).SchemaExtensions)
+                    .Select(e => e.Schema)));
 
         private readonly object _SyncLock = new object();
 
@@ -46,14 +42,18 @@
         private readonly Lazy<IEnumerable<ResourceType>> _ResourceTypes = 
             new Lazy<IEnumerable<ResourceType>>(() =>
             {
-                return _ResourceTypeDefinitions
-                    .Values
-                    .Select(typeDef => new ResourceType
+                return _TypeDefinitionCache
+                    .Where(td => td.Value is IScimResourceTypeDefinition)
+                    .Select(td =>
                     {
-                        Description = typeDef.Description,
-                        Schema = typeDef.Schema,
-                        Name = typeDef.Name,
-                        Endpoint = typeDef.Endpoint
+                        var rtd = (IScimResourceTypeDefinition) td.Value;
+                        return new ResourceType
+                        {
+                            Description = rtd.Description,
+                            Schema = rtd.Schema,
+                            Name = rtd.Name,
+                            Endpoint = rtd.Endpoint
+                        };
                     });
             });
 
@@ -116,25 +116,36 @@
 
         internal IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
         {
-            get { return _ResourceTypeDefinitions.Values; }
+            get { return _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>(); }
+        }
+
+        public static IScimTypeDefinition GetScimTypeDefinition(Type type)
+        {
+            return _TypeDefinitionCache.GetOrAdd(
+                type,
+                t => TypeDescriptor.GetAttributes(t)
+                    .OfType<ScimTypeDefinitionAttribute>()
+                    .MaybeSingle()
+                    .Bind(a => ((IScimTypeDefinition) Activator.CreateInstance(a.DefinitionType)).ToMaybe())
+                    .FromMaybe(null));
         }
 
         public static bool ResourceExtensionExists(string extensionSchemaIdentifier)
         {
             return _ResourceExtensions.Value.Contains(extensionSchemaIdentifier);
         }
-        
+
         public static Type GetResourceExtensionType(Type resourceType, string extensionSchemaIdentifier)
         {
-            IScimResourceTypeDefinition rtd;
-            if (!_ResourceTypeDefinitions.TryGetValue(resourceType, out rtd)) return null;
-            
-            return rtd.GetExtension(extensionSchemaIdentifier)?.ExtensionType;
+            IScimTypeDefinition rtd;
+            if (!_TypeDefinitionCache.TryGetValue(resourceType, out rtd)) return null;
+
+            return (rtd as IScimResourceTypeDefinition)?.GetExtension(extensionSchemaIdentifier)?.ExtensionType;
         }
 
         public static string GetSchemaIdentifierForResourceExtensionType(Type extensionType)
         {
-            foreach (var rtd in _ResourceTypeDefinitions.Values)
+            foreach (var rtd in _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>())
             {
                 var ext = rtd.SchemaExtensions.SingleOrDefault(e => e.ExtensionType == extensionType);
                 if (ext != null)
@@ -221,7 +232,7 @@
 
             return (TScimFeature) _Features[feature];
         }
-        
+
         public bool IsFeatureSupported(ScimFeatureType feature)
         {
             if (!_Features.ContainsKey(feature)) throw new ArgumentOutOfRangeException();
@@ -229,71 +240,60 @@
             return _Features[feature].Supported;
         }
 
-        public ScimServerConfiguration AddResourceType<T, TValidator>(
-            string name, 
-            string schema, 
-            string endpoint,
+        public ScimServerConfiguration AddResourceType<T>(
             Predicate<ISet<string>> schemaBindingRule,
-            Action<ScimResourceTypeDefinitionBuilder<T>> builder)
+            Action<ScimResourceTypeDefinitionBuilder<T>> builder = null)
             where T : Resource
-            where TValidator : IValidator<T>
         {
-            if (string.IsNullOrWhiteSpace(name)) throw new ArgumentNullException("name");
-            if (string.IsNullOrWhiteSpace(schema)) throw new ArgumentNullException("schema");
-            if (string.IsNullOrWhiteSpace(endpoint)) throw new ArgumentNullException("endpoint");
+            var typeDefinition = TypeDescriptor.GetAttributes(typeof (T))
+                .OfType<ScimTypeDefinitionAttribute>()
+                .MaybeSingle()
+                .Bind(a =>
+                {
+                    if (!typeof(ScimResourceTypeDefinitionBuilder<T>).IsAssignableFrom(a.DefinitionType))
+                        throw new InvalidOperationException(string.Format("Type definition '{0}' must implement IScimResourceTypeDefinition.", a.DefinitionType.Name));
 
-            var rtb = new ScimResourceTypeDefinitionBuilder<T>(this, name, schema, endpoint, typeof(TValidator));
-            _ResourceTypeDefinitions.Add(rtb.ResourceType, rtb);
+                    return ((ScimResourceTypeDefinitionBuilder<T>) Activator.CreateInstance(a.DefinitionType)).ToMaybe();
+                })
+                .FromMaybe(null);
+
+            if (typeDefinition == null)
+                throw new InvalidOperationException(string.Format("Resource type '{0}' must have a ScimTypeDefinitionAttribute attribute defined.", typeof(T).Name));
+            
+            _TypeDefinitionCache.TryAdd(typeDefinition.DefinitionType, typeDefinition);
             _SchemaBindingRules.Insert(0, new SchemaBindingRule(schemaBindingRule, typeof(T)));
 
-            builder(rtb);
+            builder?.Invoke(typeDefinition);
 
             return this;
         }
 
         public ScimServerConfiguration ModifyResourceType<T>(Action<ScimResourceTypeDefinitionBuilder<T>> builder) where T : Resource
         {
-            if (!_ResourceTypeDefinitions.ContainsKey(typeof(T)))
+            IScimTypeDefinition td;
+            if (!_TypeDefinitionCache.TryGetValue(typeof(T), out td))
                 throw new Exception(string.Format("There is no resource type defined for type '{0}'.", typeof(T).FullName));
 
-            builder((ScimResourceTypeDefinitionBuilder<T>) _ResourceTypeDefinitions[typeof (T)]);
+            builder((ScimResourceTypeDefinitionBuilder<T>)td);
 
             return this;
         }
 
-        public ScimServerConfiguration RemoveResourceType<T>()
+        public ScimServerConfiguration RemoveResourceType<T>() where T : Resource
         {
-            if (_ResourceTypeDefinitions.ContainsKey(typeof (T)))
-            {
-                _ResourceTypeDefinitions.Remove(typeof (T));
-            }
+            IScimTypeDefinition td;
+            _TypeDefinitionCache.TryRemove(typeof (T), out td);
 
             return this;
-        }
-
-        public IScimTypeDefinition GetScimTypeDefinition(Type type)
-        {
-            return _ResourceTypeDefinitions.ContainsKey(type)
-                ? _ResourceTypeDefinitions[type]
-                : null;
-        }
-
-        public bool GetScimResourceTypeDefinition(Type resourceType)
-        {
-            return false;
-           
-//            if (_ResourceTypeDefinitions.ContainsKey(resourceType))
-
-//                ? _ResourceTypeDefinitions[resourceType]
-//                : (from rtd in _ResourceTypeDefinitions.Values
-//                   let ext = rtd.SchemaExtensions.SingleOrDefault(ext => ext.ResourceType == resourceType)
-//                   where ext != null
-//                   select ext.R).SingleOrDefault();
         }
 
         public Type GetScimResourceValidatorType(Type resourceType)
         {
-            return _ResourceTypeDefinitions[resourceType].ValidatorType;
+            IScimTypeDefinition td;
+
+            return _TypeDefinitionCache.TryGetValue(resourceType, out td) 
+                ? (td as IScimResourceTypeDefinition)?.ValidatorType 
+                : null;
         }
         
         private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()
@@ -312,16 +312,13 @@
         private void DefineCoreResourceTypes()
         {
             // this is mainly for unit tests to not try and keep creating resource types as they are static
-            if (!_ResourceTypeDefinitions.Any())
+            if (!_TypeDefinitionCache.Any())
             {
                 lock (_SyncLock)
                 {
-                    if (!_ResourceTypeDefinitions.Any())
+                    if (!_TypeDefinitionCache.Any())
                     {
-                        AddResourceType<User, UserValidator>(
-                            ScimConstants.ResourceTypes.User,
-                            ScimConstants.Schemas.User,
-                            ScimConstants.Endpoints.Users,
+                        AddResourceType<User>(
                             schemaIdentifiers =>
                             {
                                 if (schemaIdentifiers.Contains(ScimConstants.Schemas.User))
@@ -331,151 +328,22 @@
                             },
                             DefineUserResourceType);
 
-                        AddResourceType<Group, GroupValidator>(
-                            ScimConstants.ResourceTypes.Group,
-                            ScimConstants.Schemas.Group,
-                            ScimConstants.Endpoints.Groups,
+                        AddResourceType<Group>(
                             schemaIdentifiers =>
                             {
                                 if (schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
                                     return true;
 
                                 return false;
-                            },
-                            DefineGroupResourceType);
+                            });
                     }
                 }
             }
         }
-
+        
         private void DefineUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
-            builder
-                .For(u => u.Id)
-                    .SetMutability(Mutability.ReadOnly)
-                    .SetReturned(Returned.Always)
-                    .SetUniqueness(Uniqueness.Server)
-                    .SetCaseExact(true)
-
-                .For(u => u.UserName)
-                    .SetRequired(true)
-                    .SetUniqueness(Uniqueness.Server)
-
-                .For(u => u.Locale)
-                    .AddCanonicalizationRule(locale => !string.IsNullOrWhiteSpace(locale) ? locale.Replace('_', '-') : locale)
-
-                .For(u => u.ProfileUrl)
-                    .SetReferenceTypes("external")
-
-                .For(u => u.Password)
-                    .SetMutability(Mutability.WriteOnly)
-                    .SetReturned(Returned.Never)
-
-                .For(u => u.Emails)
-                    .AddCanonicalizationRule(email => 
-                        email.Canonicalize(
-                            e => e.Value, 
-                            e => e.Display, 
-                            value =>
-                        {
-                            if (string.IsNullOrWhiteSpace(value)) return null;
-
-                            var atIndex = value.IndexOf('@') + 1;
-                            if (atIndex == 0) return null; // IndexOf returned -1, invalid email
-                            
-                            return value.Substring(0, atIndex) + value.Substring(atIndex).ToLower();
-                        }))
-                    .AddCanonicalizationRule((Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(e => e.Display)
-                            .SetMutability(Mutability.ReadOnly))
-
-                .For(u => u.PhoneNumbers)
-                    .AddCanonicalizationRule(phone => phone.Canonicalize(p => p.Value, p => p.Display, PhoneNumberUtil.Normalize))
-                    .AddCanonicalizationRule((PhoneNumber phone, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(phone, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(p => p.Display)
-                            .SetMutability(Mutability.ReadOnly))
-
-                .For(u => u.Groups)
-                    .AddCanonicalizationRule((UserGroup group, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(group, ref state))
-                    .SetMutability(Mutability.ReadOnly)
-                    .DefineSubAttributes(config => config
-                        .For(g => g.Display)
-                            .SetMutability(Mutability.ReadOnly))
-
-                .For(u => u.Addresses)
-                    .AddCanonicalizationRule((Address address, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(address, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(a => a.Display)
-                            .SetMutability(Mutability.ReadOnly))
-
-                .For(u => u.Roles)
-                    .AddCanonicalizationRule((Role role, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(role, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(r => r.Display)
-                            .SetMutability(Mutability.ReadOnly))
-
-                .For(u => u.Entitlements)
-                    .AddCanonicalizationRule((Entitlement entitlement, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(entitlement, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(e => e.Display)
-                            .SetMutability(Mutability.ReadOnly))
-
-                .For(u => u.Ims)
-                    .AddCanonicalizationRule((InstantMessagingAddress im, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(im, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(im => im.Display)
-                            .SetMutability(Mutability.ReadOnly))
-
-                .For(u => u.Photos)
-                    .AddCanonicalizationRule((Photo photo, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(photo, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(p => p.Display)
-                            .SetMutability(Mutability.ReadOnly)
-                        .For(p => p.Value)
-                            .AddCanonicalizationRule(value => value.ToLower()))
-
-                .For(u => u.X509Certificates)
-                    .AddCanonicalizationRule((X509Certificate certificate, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(certificate, ref state))
-                    .DefineSubAttributes(config => config
-                        .For(c => c.Display)
-                            .SetMutability(Mutability.ReadOnly))
-                
-                .AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(
-                    ScimConstants.Schemas.UserEnterprise, 
-                    false,
-                    config => config
-                        .For(ext => ext.Manager))
-;
-        }
-
-        private void DefineGroupResourceType(ScimResourceTypeDefinitionBuilder<Group> builder)
-        {
-            builder
-                .For(u => u.Id)
-                    .SetMutability(Mutability.ReadOnly)
-                    .SetReturned(Returned.Always)
-                    .SetUniqueness(Uniqueness.Server)
-                    .SetCaseExact(true)
-                .For(u => u.DisplayName)
-                    .SetRequired(true)
-                .For(u => u.Members)
-                    .AddCanonicalizationRule(member =>
-                        member.Canonicalize(
-                            e => e.Type,
-                            e => e.Type,
-                            Extensions.StringExtensions.ToPascalCase))
-                    .DefineSubAttributes(config => config
-                        .For(p => p.Value)
-                            .SetMutability(Mutability.Immutable)
-                        .For(p => p.Ref)
-                            .SetMutability(Mutability.Immutable)
-                        .For(p => p.Type)
-                            //.AddCanonicalValues(new []{ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group})
-                            //.AddCanonicalizationRule(Extensions.StringExtensions.ToPascalCase)
-                            .SetMutability(Mutability.Immutable)
-                    );
+            builder.AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
         }
     }
 }

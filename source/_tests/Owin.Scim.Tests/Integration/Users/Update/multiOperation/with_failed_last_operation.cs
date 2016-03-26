@@ -51,6 +51,6 @@ namespace Owin.Scim.Tests.Integration.Users.Update.multiOperation
 
         It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_not_change_resource = () => ServerUser.ShouldBeLike(UserToUpdate);
+        It should_not_change_resource = () => ServerUser.Meta.Version.ShouldEqual(UserToUpdate.Meta.Version);
     }
 }

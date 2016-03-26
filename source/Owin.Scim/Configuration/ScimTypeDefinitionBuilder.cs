@@ -5,20 +5,16 @@ namespace Owin.Scim.Configuration
     using System.ComponentModel;
     using System.Linq;
     using System.Linq.Expressions;
+    using System.Reflection;
 
     using Extensions;
-
-    using Newtonsoft.Json;
-
+   
     public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinition
     {
-        private readonly ScimServerConfiguration _ScimServerConfiguration;
-
-        private readonly IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> _AttributeDefinitions;
+        private readonly IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> _AttributeDefinitions;
         
-        public ScimTypeDefinitionBuilder(ScimServerConfiguration configuration)
+        public ScimTypeDefinitionBuilder()
         {
-            _ScimServerConfiguration = configuration;
             _AttributeDefinitions = BuildDefaultTypeDefinitions();
             
             var descriptionAttr = TypeDescriptor
@@ -32,20 +28,14 @@ namespace Owin.Scim.Configuration
             }
         }
         
-        public Type ResourceType
+        public Type DefinitionType
         {
             get { return typeof(T); }
         }
 
         public string Description { get; private set; }
-
-        protected internal ScimServerConfiguration ScimServerConfiguration
-        {
-            get { return _ScimServerConfiguration; }
-        }
-
-        // TODO: (DG) Don't need to expose this as a dictionary.
-        public IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> AttributeDefinitions
+        
+        public IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> AttributeDefinitions
         {
             get { return _AttributeDefinitions; }
         }
@@ -66,9 +56,8 @@ namespace Owin.Scim.Configuration
             {
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
-
-            var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[propertyDescriptor];
+            
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
@@ -81,19 +70,18 @@ namespace Owin.Scim.Configuration
             {
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
-
-            var propertyDescriptor = TypeDescriptor.GetProperties(typeof(T)).Find(memberExpression.Member.Name, true);
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[propertyDescriptor];
+            
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
         }
 
-        private IDictionary<PropertyDescriptor, IScimTypeAttributeDefinition> BuildDefaultTypeDefinitions()
+        private IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> BuildDefaultTypeDefinitions()
         {
             return TypeDescriptor.GetProperties(typeof(T))
                 .Cast<PropertyDescriptor>()
                 .Where(d => !d.Attributes.Contains(new ScimInternalAttribute()))
                 .ToDictionary(
-                    d => d,
-                    d => CreateTypeMemberDefinitionBuilder(d));
+                    d => d.ComponentType.GetProperty(d.Name),
+                    CreateTypeMemberDefinitionBuilder);
         }
 
         private IScimTypeAttributeDefinition CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)

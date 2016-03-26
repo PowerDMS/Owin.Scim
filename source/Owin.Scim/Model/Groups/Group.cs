@@ -5,6 +5,7 @@
 
     using Extensions;
 
+    [ScimTypeDefinition(typeof(GroupDefinition))]
     public class Group : Resource
     {
         public Group() : this(null)

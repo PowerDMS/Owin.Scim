@@ -9,6 +9,7 @@
     using Newtonsoft.Json;
 
     [Description("User accounts")]
+    [ScimTypeDefinition(typeof(UserDefinition))]
     public class User : Resource
     {
         public User() : this(null)

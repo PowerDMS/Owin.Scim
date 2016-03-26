@@ -2,6 +2,7 @@
 {
     using System;
 
+    [ScimTypeDefinition(typeof(AuthenticationSchemeDefinition))]
     public class AuthenticationScheme : MultiValuedAttribute
     {
         public AuthenticationScheme(

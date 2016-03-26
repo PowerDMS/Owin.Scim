@@ -10,7 +10,7 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
-
+    
     public abstract class Resource
     {
         private readonly ResourceExtensions _Extensions = new ResourceExtensions();
@@ -101,7 +101,7 @@
             {
                 var extensionType = ScimServerConfiguration.GetResourceExtensionType(GetType(), kvp.Key);
                 if (extensionType == null)
-                    continue; // This is either a resource schema or an unsupported extension
+                    continue; // This is either an invalid attribute or an unsupported extension
 
                 _Extensions.Add(kvp.Key, (ResourceExtension)kvp.Value.ToObject(extensionType));
             }

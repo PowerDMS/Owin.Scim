@@ -1,9 +1,8 @@
-﻿using System.Linq;
-
-namespace Owin.Scim.Repository.InMemory
+﻿namespace Owin.Scim.Repository.InMemory
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Threading.Tasks;
 
     using Model.Groups;
@@ -24,13 +23,6 @@ namespace Owin.Scim.Repository.InMemory
         public Task<Group> CreateGroup(Group group)
         {
             group.Id = Guid.NewGuid().ToString("N");
-            
-            // TODO: (CY) who should be responsible for populating Meta (framework or implementer?)
-            group.Meta = new Model.ResourceMetadata(ScimConstants.ResourceTypes.Group)
-            {
-                Created = DateTime.UtcNow,
-                LastModified = DateTime.UtcNow
-            };
 
             _groups.Add(group.Id, group);
 

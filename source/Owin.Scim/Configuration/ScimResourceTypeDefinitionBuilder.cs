@@ -21,21 +21,18 @@ namespace Owin.Scim.Configuration
         private readonly Type _ValidatorType;
 
         private readonly IDictionary<string, ScimResourceTypeExtension> _SchemaExtensions;
-
-
+        
         public ScimResourceTypeDefinitionBuilder(
-            ScimServerConfiguration configuration, 
             string name, 
             string schema, 
             string endpoint,
             Type validatorType)
-            : base(configuration)
         {
             _SchemaExtensions = new Dictionary<string, ScimResourceTypeExtension>();
             _Name = name;
             _Schema = schema;
 
-            if (!endpoint.StartsWith("/"))
+            if (endpoint != null && !endpoint.StartsWith("/"))
             {
                 endpoint = endpoint.Insert(0, "/");
             }
@@ -82,7 +79,7 @@ namespace Owin.Scim.Configuration
             where TExtension : ResourceExtension, new()
             where TValidator : IValidator<TExtension>
         {
-            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>(ScimServerConfiguration);
+            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>();
 
             ((IScimResourceTypeDefinition)this)
                 .AddExtension(

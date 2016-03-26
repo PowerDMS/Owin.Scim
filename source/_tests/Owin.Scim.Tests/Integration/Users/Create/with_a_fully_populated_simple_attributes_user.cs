@@ -9,10 +9,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Model.Users;
 
     using Ploeh.AutoFixture;
-
-    /// <summary>
-    /// What gets popu
-    /// </summary>
+    
     public class with_a_fully_populated_simple_attributes_user : when_creating_a_user
     {
         Establish context = () =>
@@ -25,11 +22,10 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 .With(x => x.PreferredLanguage, "en-US,en,es")
                 .With(x => x.Locale, "en-US")
                 .With(x => x.Timezone, @"US/Eastern")
+                .With(x => x.Addresses, null)
                 .With(x => x.Emails, null)
                 .With(x => x.PhoneNumbers, null)
-                .With(x => x.Ims, null)
                 .With(x => x.Photos, null)
-                .With(x => x.Addresses, null)
                 .Create();
         };
 
@@ -41,7 +37,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_null_password = () => CreatedUser.Password.ShouldBeNull();
 
-        private It should_return_meta = () =>
+        It should_return_meta = () =>
         {
             CreatedUser.Meta.ShouldNotBeNull();
             CreatedUser.Meta.ResourceType.ShouldEqual("User");

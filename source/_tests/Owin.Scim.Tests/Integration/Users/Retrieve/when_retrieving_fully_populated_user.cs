@@ -11,7 +11,7 @@
 
     public class when_retrieving_fully_populated_user : using_a_scim_server
     {
-        Because of = () =>
+        Because of = async () =>
         {
             var autoFixture = new Fixture();
 
@@ -29,40 +29,40 @@
                 .Create(seed: new User(typeof(EnterpriseUserExtension)));
 
             // Insert the first user so there's one already in-memory.
-            Response = Server
+            Response = await Server
                 .HttpClient
                 .PostAsync("users", new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
-                .Result;
+                .AwaitResponse()
+                .AsTask;
 
             if (Response.StatusCode == HttpStatusCode.Created)
             {
-                JsonData = Response.Content.ReadAsStringAsync().Result;
-                User = Newtonsoft.Json.JsonConvert.DeserializeObject<User>(JsonData);
+                CreatedUser = await Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Await().AsTask;
             }
 
             var client = Server.HttpClient;
             client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/scim+json"));
 
-            Response = Server
+            Response = await Server
                 .HttpClient
-                .GetAsync("users/" + User.Id)
-                .Result;
+                .GetAsync("users/" + CreatedUser.Id)
+                .AwaitResponse()
+                .AsTask;
         };
 
-        private It should_return_same_data_echoed_during_create = () =>
+        It should_return_same_data_echoed_during_create = 
+            async () =>
         {
             Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
-            NewJsonData = Response.Content.ReadAsStringAsync().Result;
+            RetrievedUser = await Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).AwaitResponse().AsTask;
 
-            JsonData.ShouldEqual(NewJsonData);
+            RetrievedUser.Meta.Version.ShouldEqual(CreatedUser.Meta.Version);
         };
 
         protected static HttpResponseMessage Response;
 
-        protected static User User;
-
-        protected static string JsonData;
-
-        protected static string NewJsonData;
+        protected static User CreatedUser;
+        
+        protected static User RetrievedUser;
     }
 }

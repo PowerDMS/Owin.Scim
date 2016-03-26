@@ -3,7 +3,7 @@
     using System;
 
     using Newtonsoft.Json;
-
+    
     public abstract class MultiValuedAttribute : IEquatable<MultiValuedAttribute>
     {
         public string Type { get; set; }
