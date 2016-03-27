@@ -162,6 +162,8 @@
     <Compile Include="Integration\Groups\Update\replace\with_path_direct_attribute.cs" />
     <Compile Include="Integration\Groups\Update\when_updating_a_group.cs" />
     <Compile Include="Integration\Groups\using_existing_user_and_group.cs" />
+    <Compile Include="Integration\Querying\Projection\when_requesting_specific_attributes.cs" />
+    <Compile Include="Integration\Querying\Projection\with_minimal_attributes.cs" />
     <Compile Include="Integration\ResourceTypes\when_retrieving_resource_types.cs" />
     <Compile Include="Integration\ServiceProviderConfig\when_retrieving_service_provider_configuration.cs" />
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />

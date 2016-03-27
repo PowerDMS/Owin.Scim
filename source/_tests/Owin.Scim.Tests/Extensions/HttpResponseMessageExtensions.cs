@@ -13,6 +13,32 @@
 
     internal static class HttpResponseMessageExtensions
     {
+        public static async Task DeserializeTo(
+            this HttpResponseMessage response,
+            Expression<Func<IDictionary<string, object>>> jsonDataToSet = null)
+        {
+            var json = await response.Content.ReadAsByteArrayAsync();
+            var formatter = new ScimJsonMediaTypeFormatter();
+            var serializer = formatter.CreateJsonSerializer();
+            var dictReader = formatter.CreateJsonReader(typeof(IDictionary<string, object>), new MemoryStream(json), Encoding.UTF8);
+
+            var jsonData = (IDictionary<string, object>)serializer.Deserialize(dictReader, typeof(IDictionary<string, object>));
+            var jsonMemberExp = jsonDataToSet.Body as MemberExpression;
+            if (jsonMemberExp == null) throw new ArgumentException("Must be a MemberExpression!", "jsonDataToSet");
+
+            jsonMemberExp.Member
+                .DeclaringType
+                .GetField(
+                    jsonMemberExp.Member.Name,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                .SetValue(
+                    jsonMemberExp.Member.DeclaringType,
+                    jsonData,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy,
+                    null,
+                    CultureInfo.CurrentUICulture);
+        }
+
         public static async Task DeserializeTo<T>(
             this HttpResponseMessage response,
             Expression<Func<T>> instanceToSet,
@@ -24,17 +50,18 @@
             if (response.StatusCode != HttpStatusCode.OK && response.StatusCode != HttpStatusCode.Created) return;
 
             var result = await DeserializeResponse<T>(response, jsonDataToSet != null);
-            
             instMemberExp.Member
                 .DeclaringType
                 .GetField(
-                    instMemberExp.Member.Name, 
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy)
+                    instMemberExp.Member.Name,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
+                    BindingFlags.FlattenHierarchy)
                 .SetValue(
-                    instMemberExp.Member.DeclaringType, 
-                    result.Instance, 
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.FlattenHierarchy, 
-                    null, 
+                    instMemberExp.Member.DeclaringType,
+                    result.Instance,
+                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Static |
+                    BindingFlags.FlattenHierarchy,
+                    null,
                     CultureInfo.CurrentUICulture);
 
             if (jsonDataToSet == null) return;
