@@ -3,7 +3,6 @@ namespace Owin.Scim.Model
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
 
     using Configuration;
@@ -27,13 +26,9 @@ namespace Owin.Scim.Model
         {
             if (!typeof(ResourceExtension).IsAssignableFrom(extensionType))
                 throw new ArgumentException("Resource extension must inherit from ResourceExtension.", "extension");
-
-            var schemaIdentifier = TypeDescriptor.GetAttributes(extensionType).OfType<SchemaIdentifierAttribute>().SingleOrDefault();
-            if (schemaIdentifier == null)
-                throw new ArgumentException("Extension must have a valid SchemaIdentifierAttribute.");
             
             _Extensions.Add(
-                schemaIdentifier.Schema, 
+                ScimServerConfiguration.GetSchemaIdentifierForResourceExtensionType(extensionType), 
                 new SometimesLazy<ResourceExtension>(() => (ResourceExtension)extensionType.CreateInstance()));
         }
 
@@ -49,15 +44,15 @@ namespace Owin.Scim.Model
 
         public T GetOrCreate<T>() where T : ResourceExtension, new()
         {
-            if (!Contains(typeof(T)))
+            if (!Contains(typeof (T)))
             {
-                Add(typeof(T));
+                Add(typeof (T));
             }
 
             return _Extensions[ScimServerConfiguration.GetSchemaIdentifierForResourceExtensionType(typeof(T))].Value as T;
         }
 
-        public object GetOrCreate(Type extensionType)
+        internal object GetOrCreate(Type extensionType)
         {
             if (!typeof(ResourceExtension).IsAssignableFrom(extensionType))
                 throw new ArgumentException("Extension must be a type assignable from ResourceExtension.", "extensionType");

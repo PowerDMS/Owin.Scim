@@ -1,6 +1,5 @@
 ﻿namespace Owin.Scim.Model
 {
-    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
@@ -66,24 +65,9 @@
             return _Extensions.GetOrCreate<T>();
         }
 
-        internal object Extension(Type extensionType)
+        public void AddExtension<T>(T extension) where T : ResourceExtension
         {
-            return _Extensions.GetOrCreate(extensionType);
-        }
-
-        public virtual bool ShouldSerializeId()
-        {
-            return true;
-        }
-
-        public virtual bool ShouldSerializeExternalId()
-        {
-            return true;
-        }
-
-        protected void AddExtension(Type extensionType)
-        {
-            _Extensions.Add(extensionType);
+            _Extensions.Add(ScimServerConfiguration.GetSchemaIdentifierForResourceExtensionType(typeof (T)), extension);
         }
 
         [OnSerializing]

@@ -1,6 +1,5 @@
 namespace Owin.Scim.Model.Users
 {
-    [SchemaIdentifier(ScimConstants.Schemas.UserEnterprise)]
     public class EnterpriseUserExtension : ResourceExtension
     {
         public string EmployeeNumber { get; set; }
@@ -19,11 +18,11 @@ namespace Owin.Scim.Model.Users
         {
             return new
             {
-                CostCenter,
-                Department,
-                Division,
                 EmployeeNumber,
+                CostCenter,
                 Organization,
+                Division,
+                Department,
                 Manager?.Value
             }.GetHashCode();
         }

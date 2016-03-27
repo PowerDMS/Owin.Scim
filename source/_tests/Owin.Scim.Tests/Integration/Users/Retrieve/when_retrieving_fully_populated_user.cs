@@ -26,7 +26,7 @@
                 .With(x => x.Ims, null)
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
-                .Create(seed: new User(typeof(EnterpriseUserExtension)));
+                .Create(seed: new User());
 
             // Insert the first user so there's one already in-memory.
             Response = await Server

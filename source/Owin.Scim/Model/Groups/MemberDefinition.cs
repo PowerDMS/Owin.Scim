@@ -7,10 +7,10 @@ namespace Owin.Scim.Model.Groups
         public MemberDefinition()
         {
             For(p => p.Value)
-                .SetMutability(Mutability.Immutable)
-            .For(p => p.Ref)
-                .SetMutability(Mutability.Immutable)
-            .For(p => p.Type)
+                .SetMutability(Mutability.Immutable);
+            For(p => p.Ref)
+                .SetMutability(Mutability.Immutable);
+            For(p => p.Type)
                 .SetMutability(Mutability.Immutable);
         }
     }

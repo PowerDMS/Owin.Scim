@@ -7,6 +7,7 @@
 
     using Newtonsoft.Json;
 
+    [ScimTypeDefinition(typeof(ServiceProviderConfigDefinition))]
     public class ServiceProviderConfig : Resource
     {
         private readonly ScimFeature _Patch;
@@ -118,16 +119,6 @@
                 ETag = ETag.GetETagHashCode(),
                 AuthenticationSchemes = AuthenticationSchemes.GetMultiValuedAttributeCollectionVersion()
             }.GetHashCode();
-        }
-
-        public override bool ShouldSerializeId()
-        {
-            return false;
-        }
-
-        public override bool ShouldSerializeExternalId()
-        {
-            return false;
         }
     }
 }

@@ -61,6 +61,48 @@ namespace Owin.Scim.Configuration
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
+            Expression<Func<T, ISet<TAttribute>>> attrExp)
+        {
+            if (attrExp == null) throw new ArgumentNullException("attrExp");
+
+            var memberExpression = attrExp.Body as MemberExpression;
+            if (memberExpression == null)
+            {
+                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
+            }
+
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
+            Expression<Func<T, ICollection<TAttribute>>> attrExp)
+        {
+            if (attrExp == null) throw new ArgumentNullException("attrExp");
+
+            var memberExpression = attrExp.Body as MemberExpression;
+            if (memberExpression == null)
+            {
+                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
+            }
+
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+        }
+        
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
+            Expression<Func<T, IList<TAttribute>>> attrExp)
+        {
+            if (attrExp == null) throw new ArgumentNullException("attrExp");
+
+            var memberExpression = attrExp.Body as MemberExpression;
+            if (memberExpression == null)
+            {
+                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
+            }
+
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
             Expression<Func<T, IEnumerable<TAttribute>>> attrExp)
         {
             if (attrExp == null) throw new ArgumentNullException("attrExp");
@@ -100,15 +142,24 @@ namespace Owin.Scim.Configuration
                 return instance;
             }
 
-            // multiValued complex attribute
             if (descriptor.PropertyType.IsNonStringEnumerable())
             {
                 var itemType = descriptor.PropertyType.IsArray
                     ? descriptor.PropertyType.GetElementType()
                     : descriptor.PropertyType.GetGenericArguments()[0];
 
-                builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>)
-                    .MakeGenericType(typeof(T), itemType);
+                if (itemType.IsTerminalObject())
+                {
+                    builder = typeof(Uri).IsAssignableFrom(descriptor.PropertyType)
+                        ? typeof(ScimTypeUriAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType)
+                        : typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType);
+                    instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor);
+
+                    return instance;
+                }
+
+                // multiValued complex attribute
+                builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType);
                 instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, true);
 
                 return instance;

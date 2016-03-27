@@ -152,7 +152,8 @@
                     return ext.Schema;
             }
 
-            return null;
+            throw new InvalidOperationException(
+                string.Format("ExtensionType '{0}' is not a valid resource extension.", extensionType.Name));
         }
 
         public ScimServerConfiguration AddAuthenticationScheme(AuthenticationScheme authenticationScheme)

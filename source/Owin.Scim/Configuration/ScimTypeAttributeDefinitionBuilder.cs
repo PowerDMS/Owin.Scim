@@ -108,34 +108,6 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute> For<TOtherAttribute>(
-            Expression<Func<T, TOtherAttribute>> attrExp)
-        {
-            if (attrExp == null) throw new ArgumentNullException("attrExp");
-
-            var memberExpression = attrExp.Body as MemberExpression;
-            if (memberExpression == null)
-            {
-                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
-            }
-            
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_DeclaringTypeDefinition.AttributeDefinitions[(PropertyInfo)memberExpression.Member];
-        }
-
-        public ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute> For<TOtherAttribute>(
-            Expression<Func<T, IEnumerable<TOtherAttribute>>> attrExp)
-        {
-            if (attrExp == null) throw new ArgumentNullException("attrExp");
-
-            var memberExpression = attrExp.Body as MemberExpression;
-            if (memberExpression == null)
-            {
-                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
-            }
-            
-            return (ScimTypeAttributeDefinitionBuilder<T, TOtherAttribute>)_DeclaringTypeDefinition.AttributeDefinitions[(PropertyInfo)memberExpression.Member];
-        }
-
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationAction<TAttribute> rule)
         {
             var func = new StatefulCanonicalizationFunc<TAttribute>(

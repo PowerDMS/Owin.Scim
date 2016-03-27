@@ -8,11 +8,7 @@
     [ScimTypeDefinition(typeof(GroupDefinition))]
     public class Group : Resource
     {
-        public Group() : this(null)
-        {
-        }
-
-        public Group(params Type[] withExtensionTypes)
+        public Group()
         {
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute
@@ -22,14 +18,6 @@
              * "/Groups" will set "resourceType" to "Group".
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group);
-
-            if (withExtensionTypes != null)
-            {
-                foreach (var extensionType in withExtensionTypes)
-                {
-                    AddExtension(extensionType);
-                }
-            }
         }
 
         public override string SchemaIdentifier

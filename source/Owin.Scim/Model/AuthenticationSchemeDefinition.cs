@@ -7,15 +7,15 @@
         public AuthenticationSchemeDefinition()
         {
             For(s => s.Display)
-                .SetMutability(Mutability.ReadOnly)
-            .For(s => s.Name)
-                .SetMutability(Mutability.ReadOnly)
-            .For(s => s.Description)
-                .SetMutability(Mutability.ReadOnly)
-            .For(s => s.SpecUri)
-                .SetMutability(Mutability.ReadOnly)
-            .For(s => s.DocumentationUri)
                 .SetMutability(Mutability.ReadOnly);
+            For(s => s.Name)
+                .SetMutability(Mutability.ReadOnly);
+            For(s => s.Description)
+                .SetMutability(Mutability.ReadOnly);
+            For(s => s.SpecUri)
+                .SetMutability(Mutability.ReadOnly);
+            For(s => s.DocumentationUri)
+               .SetMutability(Mutability.ReadOnly);
         }
     }
 }

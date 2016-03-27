@@ -5,8 +5,7 @@
     using Newtonsoft.Json;
 
     using Model;
-
-    [SchemaIdentifier(Schema)]
+    
     public class MyUserSchema : ResourceExtension
     {
         public const string Schema = "urn:scim:mycustom:schema:1.0:User";

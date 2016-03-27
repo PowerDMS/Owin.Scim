@@ -21,14 +21,17 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
             };
 
             UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
-            UserDto.Extension<MyUserSchema>().Guid = "anything";
-            UserDto.Extension<MyUserSchema>().Ref = "./users/1234";
-            UserDto.Extension<MyUserSchema>().EnableHelp = true;
-            UserDto.Extension<MyUserSchema>().ComplexData = new MyUserSchema.MySubClass
+            UserDto.AddExtension(new MyUserSchema
             {
-                DisplayName = "hello",
-                Value = "world"
-            };
+                Guid = "anything",
+                Ref = "./users/1234",
+                EnableHelp = true,
+                ComplexData = new MyUserSchema.MySubClass
+                {
+                    DisplayName = "hello",
+                    Value = "world"
+                }
+            });
         };
 
         Because of = () =>

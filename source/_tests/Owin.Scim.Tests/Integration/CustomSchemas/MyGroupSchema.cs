@@ -1,10 +1,8 @@
 ﻿namespace Owin.Scim.Tests.Integration.CustomSchemas
 {
     using System;
-    using System.Collections.Generic;
     using Model;
-
-    [SchemaIdentifier(Schema)]
+    
     public class MyGroupSchema : ResourceExtension
     {
         public const string Schema = "urn:scim:mycustom:schema:1.0:Group";

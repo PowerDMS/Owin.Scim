@@ -5,6 +5,7 @@
 
     using Newtonsoft.Json;
 
+    [ScimTypeDefinition(typeof(ResourceTypeDefinition))]
     public sealed class ResourceType : Resource
     {
         public ResourceType()
@@ -50,16 +51,6 @@
                             return hashSeed * 31 + new { se.Schema, se.Required }.GetHashCode();
                         })
             }.GetHashCode();
-        }
-
-        public override bool ShouldSerializeId()
-        {
-            return false;
-        }
-
-        public override bool ShouldSerializeExternalId()
-        {
-            return false;
         }
     }
 }

@@ -169,9 +169,10 @@
     <Compile Include="Model\ResourceExtensions.cs" />
     <Compile Include="Model\Groups\Group.cs" />
     <Compile Include="Model\Groups\Member.cs" />
+    <Compile Include="Model\ResourceMetadataDefinition.cs" />
     <Compile Include="Model\ResourceType.cs" />
+    <Compile Include="Model\ResourceTypeDefinition.cs" />
     <Compile Include="Model\SchemaExtension.cs" />
-    <Compile Include="Model\SchemaIdentifierAttribute.cs" />
     <Compile Include="Model\ScimFeatureBulk.cs" />
     <Compile Include="Model\ScimFeatureETag.cs" />
     <Compile Include="Model\ScimFeatureFilter.cs" />
@@ -179,9 +180,11 @@
     <Compile Include="Model\ServiceProviderConfig.cs" />
     <Compile Include="Model\MultiValuedAttributeDefinition.cs" />
     <Compile Include="Model\ScimTypeDefinitionAttribute.cs" />
+    <Compile Include="Model\ServiceProviderConfigDefinition.cs" />
     <Compile Include="Model\Users\PhotoDefinition.cs" />
     <Compile Include="Model\Users\UserDefinition.cs" />
     <Compile Include="Querying\PathFilterExpression.cs" />
+    <Compile Include="Querying\ScimQueryOptions.cs" />
     <Compile Include="Repository\InMemory\ArrayExtensions.cs" />
     <Compile Include="Repository\InMemory\ArrayTraverse.cs" />
     <Compile Include="Repository\InMemory\ObjectExtensions.cs" />
@@ -190,6 +193,7 @@
     <Compile Include="Serialization\PropertyNameTable.cs" />
     <Compile Include="Serialization\ResolverContractKey.cs" />
     <Compile Include="Serialization\ScimContractResolver.cs" />
+    <Compile Include="Services\AmbientRequestMessageService.cs" />
     <Compile Include="SometimesLazy.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtension.cs" />
     <Compile Include="Model\ResourceExtension.cs" />

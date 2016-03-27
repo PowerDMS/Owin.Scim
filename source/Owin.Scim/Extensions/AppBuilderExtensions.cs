@@ -6,6 +6,7 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
+    using System.Runtime.Remoting.Messaging;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
@@ -27,9 +28,10 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
-    using Newtonsoft.Json.Serialization;
 
     using Serialization;
+
+    using Services;
 
     public static class AppBuilderExtensions
     {
@@ -43,6 +45,13 @@
             {
                 app.Use<RequireSslMiddleware>();
             }
+
+            app.Use((c, t) =>
+            {
+                AmbientRequestMessageService.SetRequestInformation(c);
+
+                return t.Invoke();
+            });
 
             var httpConfig = CreateHttpConfiguration();
             IContainer container = new Container(
@@ -142,6 +151,8 @@
             httpConfiguration.Services.Replace(
                 typeof(IHttpControllerTypeResolver), 
                 new DefaultHttpControllerTypeResolver(IsControllerType));
+
+//            httpConfiguration.MessageHandlers.Add(new AmbientRequestMessageHandler());
 
             return httpConfiguration;
         }

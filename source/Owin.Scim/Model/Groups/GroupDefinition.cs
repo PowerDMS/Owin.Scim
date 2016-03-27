@@ -17,22 +17,22 @@ namespace Owin.Scim.Model.Groups
                 ScimConstants.Endpoints.Groups,
                 typeof(GroupValidator))
         {
+            For(u => u.Schemas)
+                .SetReturned(Returned.Always);
+
             For(u => u.Id)
                 .SetMutability(Mutability.ReadOnly)
                 .SetReturned(Returned.Always)
                 .SetUniqueness(Uniqueness.Server)
-                .SetCaseExact(true)
-            
-            .For(u => u.DisplayName)
-                .SetRequired(true)
+                .SetCaseExact(true);
 
-            .For(u => u.Members)
-                .AddCanonicalizationRule(member =>
-                    member.Canonicalize(
-                        e => e.Type,
-                        StringExtensions.ToPascalCase))
+            For(u => u.DisplayName)
+                .SetRequired(true);
 
-            .For(u => u.Meta)
+            For(u => u.Members)
+                .AddCanonicalizationRule(member => member.Canonicalize(e => e.Type, StringExtensions.ToPascalCase));
+
+            For(u => u.Meta)
                 .SetMutability(Mutability.ReadOnly)
                 .SetReturned(Returned.Always);
         }

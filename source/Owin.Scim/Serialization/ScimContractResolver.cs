@@ -3,13 +3,20 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Net.Http;
     using System.Reflection;
+    using System.Runtime.Remoting.Messaging;
     using System.Threading;
 
     using Configuration;
 
+    using Extensions;
+
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
+    using Newtonsoft.Json.Utilities;
+
+    using Services;
 
     public class ScimContractResolver : CamelCasePropertyNamesContractResolver
     {
@@ -51,6 +58,7 @@
                         Monitor.Exit(obj);
                 }
             }
+
             return contract;
         }
 
@@ -88,10 +96,39 @@
                             property.Writable = attributeDefinition.Mutability != Mutability.ReadOnly;
                             property.Readable = attributeDefinition.Mutability != Mutability.WriteOnly;
 
-                            if (attributeDefinition.Mutability == Mutability.ReadOnly)
-                                property.ShouldDeserialize = o => false;
-                            else if (attributeDefinition.Mutability == Mutability.WriteOnly)
-                                property.ShouldSerialize = o => false;
+                            // Only attach a conditional deserialization delegate if the attribute is not ReadWrite.
+                            if (attributeDefinition.Mutability != Mutability.ReadWrite)
+                            {
+                                property.ShouldDeserialize = o =>
+                                {
+                                    if (attributeDefinition.Mutability == Mutability.ReadOnly)
+                                        return false;
+
+                                    return true;
+                                };
+                            }
+
+                            // Only attach a conditional serialization delegate if the attribute is not Always returned.
+                            if (attributeDefinition.Returned != Returned.Always)
+                            {
+                                property.ShouldSerialize = o =>
+                                {
+                                    if (attributeDefinition.Mutability == Mutability.WriteOnly || attributeDefinition.Returned == Returned.Never)
+                                        return false;
+                                    
+                                    var queryOptions = AmbientRequestMessageService.QueryOptions;
+                                    if (attributeDefinition.Returned == Returned.Default)
+                                    {
+                                        if (queryOptions.Attributes.Any() && !queryOptions.Attributes.Contains(property.PropertyName))
+                                            return false;
+
+                                        if (queryOptions.ExcludedAttributes.Any() && queryOptions.ExcludedAttributes.Contains(property.PropertyName))
+                                            return false;
+                                    }
+
+                                    return true;
+                                };
+                            }
                         }
                     }
                     finally
@@ -99,6 +136,7 @@
                         if (lockTaken)
                             Monitor.Exit(propertyNameTable);
                     }
+
                     propertyCollection.AddProperty(property);
                 }
             }
