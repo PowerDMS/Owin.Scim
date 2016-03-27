@@ -30,7 +30,7 @@ Roadmap
   1. [x] /ServiceProviderConfig
   2. [ ] /Schemas (IN PROGRESS)
   3. [x] /ResourceTypes
-4. [ ] Add support for mutability rule-processing.
+4. [x] Add support for mutability rule-processing.
 5. [ ] Add support for bulk processing
 6. [x] Add groups endpoints
   1. [x] Create
@@ -43,7 +43,7 @@ Roadmap
   2. [ ] Sorting
   3. [ ] Ordering
   4. [ ] Pagination
-  5. [ ] Projection
+  5. [ ] Projection (in progress - currently only works with top-level attributes / non-urn qualified references)
 8. [x] Add more extensiblity options
   1. [x] Canonicalization  
   2. [x] Validation  
