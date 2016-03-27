@@ -95,14 +95,7 @@ app.UserScimServer(
       "User",
       "urn:ietf:params:scim:schemas:core:2.0:User",
       "/users",
-      schemaIdentifiers =>
-      {
-          if (schemaIdentifiers.Count == 1 &&
-              schemaIdentifiers.Contains(ScimConstants.Schemas.User))
-              return true;
-
-          return false;
-      },
+      schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User),
       userResourceBuilder => {...});
 ```
 
