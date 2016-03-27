@@ -7,6 +7,7 @@
     using System.Linq;
     using System.Reflection;
     using System.Runtime.Remoting.Messaging;
+    using System.Runtime.Serialization;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
@@ -28,6 +29,7 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
+    using Newtonsoft.Json.Serialization;
 
     using Serialization;
 

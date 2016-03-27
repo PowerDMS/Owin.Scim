@@ -5,21 +5,20 @@
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
-    using System.Runtime.Remoting.Messaging;
+    using System.Runtime.Serialization;
     using System.Threading;
 
     using Configuration;
 
-    using Extensions;
-
     using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    using Newtonsoft.Json.Utilities;
 
     using Services;
 
     public class ScimContractResolver : CamelCasePropertyNamesContractResolver
     {
+        private static readonly HttpMethod _Patch = new HttpMethod("patch");
+
         private static readonly object _TypeContractCacheLock = new object();
 
         private readonly DefaultContractResolverState _InstanceState = new DefaultContractResolverState();
@@ -93,8 +92,14 @@
                         IScimTypeAttributeDefinition attributeDefinition;
                         if (typeDefinition != null && typeDefinition.AttributeDefinitions.TryGetValue(member, out attributeDefinition))
                         {
-                            property.Writable = attributeDefinition.Mutability != Mutability.ReadOnly;
-                            property.Readable = attributeDefinition.Mutability != Mutability.WriteOnly;
+                            // Internal json.net deserialization logic will hit the ShouldDeserialize delegate before checking property.Writable
+                            // Still, we'll set Writable to accurately reflect this
+                            property.Writable = attributeDefinition.Mutability != Mutability.ReadOnly;  // deserializable?
+
+                            // setting property.Readable will shortcut the ShouldSerialize delegate
+                            // INTERNAL JSON.NET LOGIC
+                            // if (!property.Ignored && property.Readable && ShouldSerialize(writer, property, value) && IsSpecified(writer, property, value))
+                            property.Readable = attributeDefinition.Mutability != Mutability.WriteOnly; // serializable?
 
                             // Only attach a conditional deserialization delegate if the attribute is not ReadWrite.
                             if (attributeDefinition.Mutability != Mutability.ReadWrite)
@@ -115,10 +120,12 @@
                                 {
                                     if (attributeDefinition.Mutability == Mutability.WriteOnly || attributeDefinition.Returned == Returned.Never)
                                         return false;
-                                    
-                                    var queryOptions = AmbientRequestMessageService.QueryOptions;
-                                    if (attributeDefinition.Returned == Returned.Default)
+
+                                    var httpMethod = AmbientRequestMessageService.HttpMethod;
+                                    if (attributeDefinition.Returned == Returned.Default ||
+                                        (attributeDefinition.Returned == Returned.Request && (httpMethod == HttpMethod.Post || httpMethod == _Patch || httpMethod == HttpMethod.Put)))
                                     {
+                                        var queryOptions = AmbientRequestMessageService.QueryOptions;
                                         if (queryOptions.Attributes.Any() && !queryOptions.Attributes.Contains(property.PropertyName))
                                             return false;
 

@@ -85,7 +85,7 @@
             {
                 var extensionType = ScimServerConfiguration.GetResourceExtensionType(GetType(), kvp.Key);
                 if (extensionType == null)
-                    continue; // This is either an invalid attribute or an unsupported extension
+                    continue; // This is either a readOnly attribute or an unknown/unsupported extension
 
                 _Extensions.Add(kvp.Key, (ResourceExtension)kvp.Value.ToObject(extensionType));
             }
