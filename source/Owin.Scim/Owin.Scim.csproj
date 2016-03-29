@@ -119,6 +119,7 @@
     <Compile Include="Configuration\IScimResourceTypeDefinition.cs" />
     <Compile Include="Configuration\IScimTypeDefinition.cs" />
     <Compile Include="Configuration\IScimTypeAttributeDefinition.cs" />
+    <Compile Include="Configuration\ModelBindingResponseAttribute.cs" />
     <Compile Include="Configuration\Mutability.cs" />
     <Compile Include="Configuration\Returned.cs" />
     <Compile Include="Canonicalization\CanonicalizationRule.cs" />

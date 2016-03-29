@@ -3,6 +3,7 @@
 namespace Owin.Scim.Querying
 {
     using System;
+    using System.Linq;
 
     [Serializable]
     public class ScimQueryOptions
@@ -18,9 +19,13 @@ namespace Owin.Scim.Querying
                 foreach (var kvp in queryNameValuePairs)
                 {
                     if (kvp.Key.Equals("attributes", StringComparison.OrdinalIgnoreCase))
-                        _Attributes = new HashSet<string>(kvp.Value.Split(new [] { ','}, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+                        _Attributes = new HashSet<string>(
+                            kvp.Value.Split(new [] { ','}, StringSplitOptions.RemoveEmptyEntries).Distinct(StringComparer.OrdinalIgnoreCase), 
+                            StringComparer.OrdinalIgnoreCase);
                     else if (kvp.Key.Equals("excludedAttributes", StringComparison.OrdinalIgnoreCase))
-                        _ExcludedAttributes = new HashSet<string>(kvp.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries), StringComparer.OrdinalIgnoreCase);
+                        _ExcludedAttributes = new HashSet<string>(
+                            kvp.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Distinct(StringComparer.OrdinalIgnoreCase), 
+                            StringComparer.OrdinalIgnoreCase);
                 }
             }
         }

@@ -143,6 +143,18 @@
             return (rtd as IScimResourceTypeDefinition)?.GetExtension(extensionSchemaIdentifier)?.ExtensionType;
         }
 
+        public static string GetSchemaIdentifierForResourceType(Type resourceType)
+        {
+            IScimTypeDefinition td;
+            if (_TypeDefinitionCache.TryGetValue(resourceType, out td))
+            {
+                return ((IScimResourceTypeDefinition) td).Schema;
+            }
+
+            throw new InvalidOperationException(
+                string.Format("Type '{0}' is not a valid resource.", resourceType.Name));
+        }
+
         public static string GetSchemaIdentifierForResourceExtensionType(Type extensionType)
         {
             foreach (var rtd in _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>())
@@ -153,7 +165,7 @@
             }
 
             throw new InvalidOperationException(
-                string.Format("ExtensionType '{0}' is not a valid resource extension.", extensionType.Name));
+                string.Format("Type '{0}' is not a valid resource extension.", extensionType.Name));
         }
 
         public ScimServerConfiguration AddAuthenticationScheme(AuthenticationScheme authenticationScheme)
@@ -252,7 +264,11 @@
                 .Bind(a =>
                 {
                     if (!typeof(ScimResourceTypeDefinitionBuilder<T>).IsAssignableFrom(a.DefinitionType))
-                        throw new InvalidOperationException(string.Format("Type definition '{0}' must implement IScimResourceTypeDefinition.", a.DefinitionType.Name));
+                        throw new InvalidOperationException(
+                            string.Format(
+                                "Type definition '{0}' must inherit from ScimResourceTypeDefinitionBuilder<{1}>.", 
+                                a.DefinitionType.Name,
+                                typeof(T).Name));
 
                     return ((ScimResourceTypeDefinitionBuilder<T>) Activator.CreateInstance(a.DefinitionType)).ToMaybe();
                 })
@@ -260,10 +276,11 @@
 
             if (typeDefinition == null)
                 throw new InvalidOperationException(string.Format("Resource type '{0}' must have a ScimTypeDefinitionAttribute attribute defined.", typeof(T).Name));
-            
-            _TypeDefinitionCache.TryAdd(typeDefinition.DefinitionType, typeDefinition);
-            _SchemaBindingRules.Insert(0, new SchemaBindingRule(schemaBindingRule, typeof(T)));
 
+            if (!_TypeDefinitionCache.TryAdd(typeDefinition.DefinitionType, typeDefinition))
+                throw new ApplicationException("Could not add resource type definition to cache.");
+
+            _SchemaBindingRules.Insert(0, new SchemaBindingRule(schemaBindingRule, typeof (T)));
             builder?.Invoke(typeDefinition);
 
             return this;

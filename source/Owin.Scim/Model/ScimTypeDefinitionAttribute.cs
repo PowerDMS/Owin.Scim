@@ -10,7 +10,7 @@ namespace Owin.Scim.Model
         public ScimTypeDefinitionAttribute(Type definitionType)
         {
             if (!typeof(IScimTypeDefinition).IsAssignableFrom(definitionType))
-                throw new ArgumentException("DefinitionType must be of type ScimTypeDefinition.");
+                throw new ArgumentException("DefinitionType must be of type IScimTypeDefinition.");
 
             DefinitionType = definitionType;
         }

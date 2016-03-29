@@ -6,11 +6,10 @@
     using System.IO;
     using System.Linq;
     using System.Reflection;
-    using System.Runtime.Remoting.Messaging;
-    using System.Runtime.Serialization;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
+    using System.Web.Http.Filters;
 
     using Configuration;
 
@@ -29,7 +28,6 @@
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
-    using Newtonsoft.Json.Serialization;
 
     using Serialization;
 
@@ -141,7 +139,6 @@
                     if (typeof(Resource).IsAssignableFrom(descriptor.ParameterType))
                         return new ResourceParameterBinding(
                             descriptor,
-                            descriptor.Configuration.DependencyResolver.GetService(typeof(ScimServerConfiguration)) as ScimServerConfiguration,
                             descriptor.Configuration.DependencyResolver.GetService(typeof(ISchemaTypeFactory)) as ISchemaTypeFactory);
 
                     return null;
@@ -154,7 +151,8 @@
                 typeof(IHttpControllerTypeResolver), 
                 new DefaultHttpControllerTypeResolver(IsControllerType));
 
-//            httpConfiguration.MessageHandlers.Add(new AmbientRequestMessageHandler());
+            httpConfiguration.Filters.Add(
+                new ModelBindingResponseAttribute());
 
             return httpConfiguration;
         }

@@ -4,7 +4,6 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 {
     using System;
     using System.Net;
-    using System.Net.Http;
 
     using Machine.Specifications;
 
