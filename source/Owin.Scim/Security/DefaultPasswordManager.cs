@@ -1,8 +1,6 @@
 ﻿namespace Owin.Scim.Security
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Security.Cryptography;
     using System.Text;
     using System.Text.RegularExpressions;
@@ -11,25 +9,29 @@
     using NContext.Extensions;
     using NContext.Security.Cryptography;
 
+    /// <summary>
+    /// The default behavior of this class uses <see cref="Rfc2898DeriveBytes"/> to create and verify password hashes.
+    /// </summary>
     public class DefaultPasswordManager : IManagePasswords
     {
-        private readonly IEnumerable<Regex> _ComplexityRules = new[]
-        {
-            new Regex(@"[a-z]", RegexOptions.Compiled | RegexOptions.Singleline),
-            new Regex(@"[A-Z]", RegexOptions.Compiled | RegexOptions.Singleline),
-            new Regex(@"[0-9]", RegexOptions.Compiled | RegexOptions.Singleline)
-        };
+        private readonly Regex _DefaultComplexityRule =
+            new Regex(
+                @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}",
+                RegexOptions.Compiled | RegexOptions.Singleline);
 
+        /// <summary>
+        /// Gets the length of the password salt. Defaults to 32 bytes.
+        /// </summary>
         protected virtual int SaltLength
         {
             get { return 32; }
         }
 
-        protected virtual int IterationCount
-        {
-            get { return 1000; }
-        }
-
+        /// <summary>
+        /// Returns the hashed value as hexidecimal.
+        /// </summary>
+        /// <param name="plainTextPassword"></param>
+        /// <returns></returns>
         public virtual string CreateHash(string plainTextPassword)
         {
             if (string.IsNullOrWhiteSpace(plainTextPassword))
@@ -38,15 +40,18 @@
             return CreateHashBytes(new UTF8Encoding(false).GetBytes(plainTextPassword)).ToHexadecimal();
         }
 
-        protected virtual byte[] CreateHashBytes(byte[] plainTextPassword)
+        protected virtual byte[] CreateHashBytes(byte[] plainTextPassword, byte[] salt = null)
         {
-            var salt = new byte[SaltLength];
-            using (var rngCsp = new RNGCryptoServiceProvider())
+            if (salt == null)
             {
-                rngCsp.GetNonZeroBytes(salt);
+                salt = new byte[SaltLength];
+                using (var rngCsp = new RNGCryptoServiceProvider())
+                {
+                    rngCsp.GetNonZeroBytes(salt);
+                }
             }
 
-            var rfc2898DeriveBytes = new Rfc2898DeriveBytes(plainTextPassword, salt, IterationCount);
+            var rfc2898DeriveBytes = new Rfc2898DeriveBytes(plainTextPassword, salt, 1000);
             var hash = rfc2898DeriveBytes.GetBytes(20);
 
             return CryptographyUtility.CombineBytes(salt, hash);
@@ -61,20 +66,22 @@
                 throw new ArgumentNullException("passwordHash");
             
             var passwordHashBytes = passwordHash.ToBytesFromHexadecimal();
-
-            byte[] saltBytes = CryptographyUtility.GetBytes(passwordHashBytes, SaltLength);
-            var rfc2898DeriveBytes = new Rfc2898DeriveBytes(plainTextPassword, saltBytes, IterationCount);
-            var plainTextHashBytes = rfc2898DeriveBytes.GetBytes(20);
-            byte[] saltedPlainTextHashBytes = CryptographyUtility.CombineBytes(saltBytes, plainTextHashBytes);
+            var saltBytes = CryptographyUtility.GetBytes(passwordHashBytes, SaltLength);
+            var saltedPlainTextHashBytes = CreateHashBytes(new UTF8Encoding(false).GetBytes(plainTextPassword), saltBytes);
 
             return CryptographyUtility.CompareBytes(passwordHashBytes, saltedPlainTextHashBytes);
         }
 
+        /// <summary>
+        /// Default passowrd complexity must the following requirements: minimum 8 characters, at least 1 uppercase, at least 1 lowercase, 1 number, and 1 special character.
+        /// </summary>
+        /// <param name="plainTextPassword"></param>
+        /// <returns></returns>
         public virtual Task<bool> MeetsRequirements(string plainTextPassword)
         {
             if (string.IsNullOrWhiteSpace(plainTextPassword)) return Task.FromResult(false);
             
-            return Task.FromResult(_ComplexityRules.All(x => x.IsMatch(plainTextPassword)));
+            return Task.FromResult(_DefaultComplexityRule.IsMatch(plainTextPassword));
         }
 
         public bool PasswordIsDifferent(string plainTextPassword, string existingPasswordHash)

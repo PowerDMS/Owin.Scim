@@ -9,7 +9,7 @@
         Establish context = () =>
         {
             PasswordManager = new DefaultPasswordManager();
-            PlainText = "invalidpassword";
+            PlainText = "PASSWORD";
             CypherText = PasswordManager.CreateHash("password");
         };
 
