@@ -1,7 +1,6 @@
 ﻿namespace Owin.Scim.Configuration
 {
     using System.Security.Cryptography;
-    using System.Text;
 
     using Model;
 

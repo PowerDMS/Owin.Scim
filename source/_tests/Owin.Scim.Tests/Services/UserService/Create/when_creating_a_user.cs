@@ -11,13 +11,12 @@
 
     using Machine.Specifications;
 
-    using Model;
     using Model.Users;
 
     using Repository;
 
+    using Scim.Security;
     using Scim.Services;
-    using Scim.Validation.Users;
 
     using Security;
 
@@ -31,7 +30,6 @@
             UserRepository = A.Fake<IUserRepository>();
             GroupRepository = A.Fake<IGroupRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
-            PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
 
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(true);
@@ -53,7 +51,7 @@
                 UserRepository, 
                 GroupRepository,
                 PasswordManager,
-                new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager))
+                new UserValidatorFactory(UserRepository, PasswordManager))
             {
                 VersionProvider = etagProvider
             };
@@ -70,8 +68,6 @@
         protected static IGroupRepository GroupRepository;
 
         protected static IManagePasswords PasswordManager;
-
-        protected static IVerifyPasswordComplexity PasswordComplexityVerifier;
 
         protected static IScimResponse<User> Result;
 

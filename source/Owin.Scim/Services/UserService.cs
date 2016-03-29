@@ -117,14 +117,22 @@
 
             if (!validationResult)
                 return new ScimErrorResponse<User>(validationResult.Errors.First());
-
-            // TODO: (DG) support password change properly, according to service prov config.
-            if (!string.IsNullOrWhiteSpace(user.Password))
+            
+            // check if we're changing a password
+            if (_PasswordManager.PasswordIsDifferent(user.Password, userRecord.Password))
             {
-                user.Password = _PasswordManager.CreateHash(
-                    Encoding.UTF8.GetString(
-                        Encoding.Unicode.GetBytes(
-                            user.Password.Trim())));
+                if (!ScimServerConfiguration.GetFeature(ScimFeatureType.ChangePassword).Supported)
+                {
+                    return new ScimErrorResponse<User>(
+                        new ScimError(
+                            HttpStatusCode.BadRequest,
+                            ScimErrorType.InvalidValue,
+                            "Password change is not supported."));
+                }
+
+                // if we're not setting password to null, then hash the plainText
+                if (user.Password != null)
+                    user.Password = _PasswordManager.CreateHash(user.Password);
             }
 
             user.Groups = await _GroupRepository.GetGroupsUserBelongsTo(user.Id);

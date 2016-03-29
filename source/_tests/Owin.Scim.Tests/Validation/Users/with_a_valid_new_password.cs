@@ -17,7 +17,7 @@ namespace Owin.Scim.Tests.Validation.Users
                 Password = "oldPass"
             };
 
-            A.CallTo(() => PasswordComplexityVerifier.MeetsRequirements(A<string>._))
+            A.CallTo(() => PasswordManager.MeetsRequirements(A<string>._))
                 .Returns(true);
 
             A.CallTo(() => PasswordManager.VerifyHash(A<string>._, A<string>._))

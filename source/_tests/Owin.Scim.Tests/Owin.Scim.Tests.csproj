@@ -280,6 +280,9 @@
     <Compile Include="Querying\Filtering\present_with_enumerable.cs" />
     <Compile Include="Querying\Filtering\equals_with_string.cs" />
     <Compile Include="ScimJsonMediaTypeFormatter.cs" />
+    <Compile Include="Security\when_hashing_passwords.cs" />
+    <Compile Include="Security\with_different_passwords.cs" />
+    <Compile Include="Security\with_same_passwords.cs" />
     <Compile Include="Services\UserService\Create\when_creating_a_user.cs" />
     <Compile Include="Services\UserService\Create\with_non_canonicalized_attributes.cs" />
     <Compile Include="Services\UserService\Update\when_updating_a_user.cs" />

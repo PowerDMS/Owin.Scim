@@ -24,19 +24,15 @@ namespace Owin.Scim.Validation.Users
     {
         private readonly IUserRepository _UserRepository;
 
-        private readonly IVerifyPasswordComplexity _PasswordComplexityVerifier;
-
         private readonly IManagePasswords _PasswordManager;
         
         public UserValidator(
             ResourceExtensionValidators extensionValidators,
             IUserRepository userRepository,
-            IVerifyPasswordComplexity passwordComplexityVerifier,
             IManagePasswords passwordManager)
             : base(extensionValidators)
         {
             _UserRepository = userRepository;
-            _PasswordComplexityVerifier = passwordComplexityVerifier;
             _PasswordManager = passwordManager;
         }
 
@@ -278,11 +274,11 @@ namespace Owin.Scim.Validation.Users
                                 ErrorDetail.AttributeUnique("userName")));
                 });
 
-            When(user => !string.IsNullOrWhiteSpace(user.Password),
+            When(user => user.Password != null,
                 () =>
                 {
                     RuleFor(user => user.Password)
-                        .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
+                        .MustAsync(async (password, token) => await _PasswordManager.MeetsRequirements(password))
                         .WithState(u =>
                             new ScimError(
                                 HttpStatusCode.BadRequest,
@@ -317,13 +313,11 @@ namespace Owin.Scim.Validation.Users
                 });
 
             // Updating a user password
-            When(user =>
-                !string.IsNullOrWhiteSpace(user.Password) &&
-                (ExistingRecord.Password == null || !_PasswordManager.VerifyHash(user.Password, ExistingRecord.Password)),
+            When(user => user.Password != null && _PasswordManager.PasswordIsDifferent(user.Password, ExistingRecord.Password),
                 () =>
                 {
                     RuleFor(user => user.Password)
-                        .MustAsync(async (password, token) => await _PasswordComplexityVerifier.MeetsRequirements(password))
+                        .MustAsync(async (password, token) => await _PasswordManager.MeetsRequirements(password))
                         .WithState(u =>
                             new ScimError(
                                 HttpStatusCode.BadRequest,

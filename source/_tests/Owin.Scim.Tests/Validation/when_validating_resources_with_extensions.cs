@@ -13,17 +13,15 @@
     using Repository;
 
     using Scim.Extensions;
+    using Scim.Security;
     using Scim.Validation;
     using Scim.Validation.Users;
-
-    using Security;
 
     public class when_validating_resources_with_extensions
     {
         Establish context = async () =>
         {
             var userRepository = A.Fake<IUserRepository>();
-            var passwordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
             var passwordManager = A.Fake<IManagePasswords>();
             var validatorFactory = A.Fake<IResourceValidatorFactory>();
 
@@ -38,7 +36,6 @@
                                 _ExtensionValidator
                             }),
                         userRepository,
-                        passwordComplexityVerifier,
                         passwordManager));
 
 

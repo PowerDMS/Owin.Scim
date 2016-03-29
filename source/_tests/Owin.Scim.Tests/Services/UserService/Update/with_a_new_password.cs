@@ -15,7 +15,10 @@ namespace Owin.Scim.Tests.Services.UserService.Update
             A.CallTo(() => PasswordManager.CreateHash(A<string>._))
                 .Returns("passhash");
 
-            A.CallTo(() => PasswordComplexityVerifier.MeetsRequirements(A<string>._))
+            A.CallTo(() => PasswordManager.MeetsRequirements(A<string>._))
+                .Returns(true);
+
+            A.CallTo(() => PasswordManager.PasswordIsDifferent(A<string>._, A<string>._))
                 .Returns(true);
             
             A.CallTo(() => UserRepository.GetUser(A<string>._))

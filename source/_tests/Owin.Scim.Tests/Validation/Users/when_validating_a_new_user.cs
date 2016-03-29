@@ -11,20 +11,17 @@
     using Repository;
 
     using Scim.Extensions;
+    using Scim.Security;
     using Scim.Validation;
-    using Scim.Validation.Users;
-
-    using Security;
-
+    
     public class when_validating_a_new_user
     {
         Establish context = () =>
         {
             UserRepository = A.Fake<IUserRepository>();
-            PasswordComplexityVerifier = A.Fake<IVerifyPasswordComplexity>();
             PasswordManager = A.Fake<IManagePasswords>();
 
-            _ValidatorFactory = new UserValidatorFactory(UserRepository, PasswordComplexityVerifier, PasswordManager);
+            _ValidatorFactory = new UserValidatorFactory(UserRepository, PasswordManager);
 
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(true);
@@ -37,8 +34,6 @@
         };
 
         protected static IUserRepository UserRepository;
-
-        protected static IVerifyPasswordComplexity PasswordComplexityVerifier;
 
         protected static IManagePasswords PasswordManager;
 

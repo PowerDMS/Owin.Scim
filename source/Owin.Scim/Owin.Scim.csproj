@@ -281,8 +281,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Repository\IUserRepository.cs" />
     <Compile Include="ScimConstants.cs" />
-    <Compile Include="Security\DefaultPasswordComplexityVerifier.cs" />
-    <Compile Include="Security\IVerifyPasswordComplexity.cs" />
     <Compile Include="Validation\RuleSetConstants.cs" />
     <Compile Include="Validation\GenericExpressionValidator.cs" />
     <Compile Include="Validation\ValidatorBase.cs" />

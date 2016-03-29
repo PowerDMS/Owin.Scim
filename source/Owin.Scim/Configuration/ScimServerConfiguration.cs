@@ -361,6 +361,7 @@
         
         private void DefineUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
+            builder.SetValidator<UserValidator>();
             builder.AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
         }
     }

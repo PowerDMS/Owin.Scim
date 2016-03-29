@@ -12,16 +12,16 @@ namespace Owin.Scim.Configuration
     public class ScimResourceTypeDefinitionBuilder<T> : ScimTypeDefinitionBuilder<T>, IScimResourceTypeDefinition
         where T : Resource
     {
+        private readonly IDictionary<string, ScimResourceTypeExtension> _SchemaExtensions;
+
         private readonly string _Endpoint;
 
         private readonly string _Name;
 
         private readonly string _Schema;
 
-        private readonly Type _ValidatorType;
+        private Type _ValidatorType;
 
-        private readonly IDictionary<string, ScimResourceTypeExtension> _SchemaExtensions;
-        
         public ScimResourceTypeDefinitionBuilder(
             string name, 
             string schema, 
@@ -92,6 +92,13 @@ namespace Owin.Scim.Configuration
             
             extensionBuilder?.Invoke(extensionDefinition);
 
+            return this;
+        }
+
+        public ScimTypeDefinitionBuilder<T> SetValidator<TValidator>()
+            where TValidator : IValidator<T>
+        {
+            _ValidatorType = typeof (TValidator);
             return this;
         }
 

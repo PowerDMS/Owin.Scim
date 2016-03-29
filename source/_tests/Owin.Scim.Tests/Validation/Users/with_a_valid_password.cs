@@ -10,7 +10,7 @@ namespace Owin.Scim.Tests.Validation.Users
     {
         Establish ctx = () =>
         {
-            A.CallTo(() => PasswordComplexityVerifier.MeetsRequirements(A<string>._))
+            A.CallTo(() => PasswordManager.MeetsRequirements(A<string>._))
                 .Returns(true);
 
             User = new User

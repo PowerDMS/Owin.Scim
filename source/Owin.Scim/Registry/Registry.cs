@@ -47,7 +47,6 @@
             container.RegisterDelegate<IProvideHashing>(r => _CryptograhyManager.HashProvider);
             container.Register<ISchemaTypeFactory, DefaultSchemaTypeFactory>(Reuse.Singleton);
             container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
-            container.Register<IVerifyPasswordComplexity, DefaultPasswordComplexityVerifier>(Reuse.Singleton);
             container.Register<IResourceVersionProvider, DefaultResourceVersionProvider>(Reuse.Singleton);
             container.Register<IResourceValidatorFactory, ServiceLocatorResourceValidatorFactory>();
             container.Register<DefaultCanonicalizationService>(Reuse.Singleton);
