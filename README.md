@@ -92,15 +92,19 @@ app.UserScimServer(
   new ScimServerConfiguration()
     .RemoveResourceType<User>
     .AddResourceType<User, UserValidator>(
-      "User",
-      "urn:ietf:params:scim:schemas:core:2.0:User",
-      "/users",
       schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User),
-      userResourceBuilder => {...});
+      userResourceBuilder => { ... });
 ```
 
 ######Schema Binding Rules
-In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate the associated type argument of type `User`.
+In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate an instance of the associated type argument `User`.
+
+######Resource Type Definitions / Type Definitions
+In order to process rules concerning mutability and attribute serialization, Owin.Scim requires all resource types and complex types to define their metadata schema representations.  Without this, Owin.Scim will interpret each attribute with the default SCIM attribute behaviors: Mutability.ReadWrite, Returned.Default, etc.
+
+To define your metadata, each object must specify a `ScimTypeDefinitionAttribute`. (e.g. [ScimTypeDefinition(typeof(UserDefinition))])
+
+A type definition must implement IScimTypeDefinition and furthermore, inherit from either `ScimResourceTypeDefinitionBuilder<T>` or `ScimTypeDefinitionBuilder<T>`.  Inherit from the former when you are defining resource types and the latter when defining any other object. See the `UserDefinition` class for additional clarification.
 
 ####Modifying core resource types
 ```csharp
@@ -113,27 +117,12 @@ app.UseScimServer(
 private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
 {
   builder
-    .For(u => u.UserName)
-        .SetRequired(true)
-        .SetUniqueness(Unique.Server)
-    .For(u => u.Name)
-        .DefineSubAttributes(nameCofig => nameCofig
-            .For(name => name.FamilyName)
-                .SetRequired(true))
-    .For(u => u.Id)
-        .SetMutability(Mutable.ReadOnly)
-        .SetReturned(Return.Always)
-        .SetUniqueness(Unique.Server)
-        .SetCaseExact(true)
-    .For(u => u.Password)
-        .SetMutability(Mutable.WriteOnly)
-        .SetReturned(Return.Never)
-    .For(u => u.Groups)
-        .SetMutability(Mutable.ReadOnly)
+    .SetValidator<UserValidator>() // allows you to change the validator for the resource
+    .AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false); // add optional or required schema extensions
 }
 ```
 
-#####Adding Canonicalization Rules (c-rule)
+#####Adding Canonicalization Rules
 Owin.Scim allows the developer to specify canonicalization rules (delegates) as rules for resource type attributes. Some rules are built-in by default.
 
 ```csharp
@@ -153,25 +142,20 @@ builder
           }))
       .AddCanonicalizationRule((Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state))
 ```
-This example illustrates setting c-rules on multi-valued attributes for email.  Here, we are taking the email.Value attribute and canonicalizing it to the email.Display attribute.  Since this rule requires access to multiple email attributes, we add this rule to the Emails attribute of User.  Next, we will look at canonicalization rules for scalar attributes.
+This example illustrates setting canonicalization rules on multi-valued attributes for email.  Here, we are taking the email.Value attribute and canonicalizing it to the email.Display attribute.  Since this rule requires access to multiple email attributes, we add this rule to the Emails attribute of User.  Next, we will look at canonicalization rules for scalar attributes.
 
 *By default, all core resource types with multi-valued attributes have a canonicalization rule to* `EnforceSinglePrimaryAttribute`*.  This complies with the specification's rules.*
 
 #####Scalar Attributes
-It may be you're only canonicalizing a single scalar valued attribute or do not need to reference it's parent object's other attributes. (e.g. value and display).  In that case, just apply the "c-rule" 
+It may be you're only canonicalizing a single scalar-valued attribute or do not need to reference it's parent object's other attributes. (e.g. value and display).  In that case, just apply the canonicalization rule:
+
 ```csharp
-builder
-  .For(u => u.Photos)
-    .AddCanonicalizationRule((Photo photo, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(photo, ref   state))
-      .DefineSubAttributes(config => config
-        .For(p => p.Display)
-          .SetMutability(Mutability.ReadOnly)
-        .For(p => p.Value)
-          .AddCanonicalizationRule(value => value.ToLower()))
+  For(photo => photo.Value)
+      .AddCanonicalizationRule(value => value.ToLower()))
 ```
 
 *You do not need to check for null (reference-type) or default (value-type) values being passed in.*  Owin.Scim saves time by doing this for you.
 
 ######Canonical Values
-Owin.Scim does not include any default acceptable attribute values; canonical values.  
-The SCIM specification frequently references canonical values for multi-valued attribute's type.  Items like: `work`, `home`, `other`, etc.  Owin.Scim does not view this as canonicalization, but validation.  Canonicalization should be viewed strictly in terms of normalization of data.
+Owin.Scim does not include or define any acceptable attribute values (SCIM "canonical values").  
+The SCIM specification frequently references "canonical values" for multi-valued attribute's `type` attribute.  Values like: `work`, `home`, `other`, etc.  Owin.Scim does not view this as canonicalization but rather validation.  In this light, canonicalization should be viewed strictly in terms of normalization of data.
