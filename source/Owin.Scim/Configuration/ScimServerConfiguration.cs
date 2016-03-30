@@ -258,6 +258,10 @@
             Action<ScimResourceTypeDefinitionBuilder<T>> builder = null)
             where T : Resource
         {
+            if (_TypeDefinitionCache.ContainsKey(typeof(T)))
+                throw new InvalidOperationException(
+                    string.Format("Scim server already contains a resource type for type '{0}'.", typeof(T).Name));
+
             var typeDefinition = TypeDescriptor.GetAttributes(typeof (T))
                 .OfType<ScimTypeDefinitionAttribute>()
                 .MaybeSingle()
@@ -337,23 +341,11 @@
                     if (!_TypeDefinitionCache.Any())
                     {
                         AddResourceType<User>(
-                            schemaIdentifiers =>
-                            {
-                                if (schemaIdentifiers.Contains(ScimConstants.Schemas.User))
-                                    return true;
-
-                                return false;
-                            },
+                            schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User),
                             DefineUserResourceType);
 
                         AddResourceType<Group>(
-                            schemaIdentifiers =>
-                            {
-                                if (schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
-                                    return true;
-
-                                return false;
-                            });
+                            schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group));
                     }
                 }
             }
@@ -361,7 +353,6 @@
         
         private void DefineUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
-            builder.SetValidator<UserValidator>();
             builder.AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
         }
     }

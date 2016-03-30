@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Groups.Update.remove
 {
+    using System;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -52,7 +53,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
 
         It should_update_version = () => UpdatedGroup.Meta.Version.ShouldNotEqual(GroupToUpdate.Meta.Version);
 
-        It should_update_last_modified = () => UpdatedGroup.Meta.LastModified.ShouldBeGreaterThan(GroupToUpdate.Meta.LastModified);
+        It should_update_last_modified = () => UpdatedGroup.Meta.LastModified.CompareTo(GroupToUpdate.Meta.LastModified).ShouldEqual(1);
 
         It should_clear_members = () => UpdatedGroup.Members.ShouldBeNull();
 

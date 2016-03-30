@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Endpoints.Users
+﻿namespace Owin.Scim.Endpoints
 {
     using System.Linq;
     using System.Net;

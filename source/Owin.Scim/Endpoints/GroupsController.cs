@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Endpoints.Users
+﻿namespace Owin.Scim.Endpoints
 {
     using System.Linq;
     using System.Net;
@@ -6,13 +6,17 @@
     using System.Threading.Tasks;
     using System.Web.Http;
 
-    using Newtonsoft.Json.Serialization;
-
     using Configuration;
+
     using Extensions;
+
     using Model;
     using Model.Groups;
+
+    using Newtonsoft.Json.Serialization;
+
     using Patching;
+
     using Services;
 
     public class GroupsController : ScimControllerBase

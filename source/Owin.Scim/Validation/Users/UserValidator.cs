@@ -299,7 +299,7 @@ namespace Owin.Scim.Validation.Users
 
             // Updating a username validation
             When(user =>
-                !string.IsNullOrWhiteSpace(user.UserName) &&
+                user.UserName != null &&
                 !user.UserName.Equals(ExistingRecord.UserName, StringComparison.OrdinalIgnoreCase),
                 () =>
                 {
