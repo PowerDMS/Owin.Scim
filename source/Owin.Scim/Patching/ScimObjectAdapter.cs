@@ -545,10 +545,14 @@
             IScimTypeAttributeDefinition attrDefinition;
             var typeDefinition = ScimServerConfiguration.GetScimTypeDefinition(patchProperty.Parent.GetType());
             var propertyInfo = patchProperty.Property.DeclaringType.GetProperty(patchProperty.Property.UnderlyingName);
+
+            // if attribute is readOnly OR (immutable and isReferenceType and current value is not null)
             if (typeDefinition != null &&
                 typeDefinition.AttributeDefinitions.TryGetValue(propertyInfo, out attrDefinition) &&
-                (attrDefinition.Mutability == Mutability.Immutable ||
-                 attrDefinition.Mutability == Mutability.ReadOnly))
+                (attrDefinition.Mutability == Mutability.ReadOnly || 
+                 (attrDefinition.Mutability == Mutability.Immutable &&
+                  !attrDefinition.AttributeDescriptor.PropertyType.IsValueType &&
+                  patchProperty.Property.ValueProvider.GetValue(patchProperty.Parent) != null)))
             {
                 throw new ScimPatchException(
                     ScimErrorType.Mutability,
