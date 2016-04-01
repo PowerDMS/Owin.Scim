@@ -92,8 +92,7 @@ app.UserScimServer(
   new ScimServerConfiguration()
     .RemoveResourceType<User>
     .AddResourceType<User, UserValidator>(
-      schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User),
-      userResourceBuilder => { ... });
+      schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User));
 ```
 
 ######Schema Binding Rules
@@ -122,6 +121,8 @@ public class UserDefinition : ScimResourceTypeDefinitionBuilder<User>
             ScimConstants.Endpoints.Users,
             typeof(UserValidator))
     {
+        AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false); // add optional or required schema extensions
+        
         For(u => u.Schemas)
             .SetReturned(Returned.Always);
 
@@ -204,8 +205,7 @@ app.UseScimServer(
 private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
 {
   builder
-    .SetValidator<UserValidator>() // allows you to change the validator for the resource
-    .AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false); // add optional or required schema extensions
+    .SetValidator<UserValidator>(); // allows you to change the validator for the resource
 }
 ```
 
