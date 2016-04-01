@@ -91,12 +91,11 @@ Owin.Scim auto-assigns all core attribute qualities as per https://tools.ietf.or
 app.UserScimServer(
   new ScimServerConfiguration()
     .RemoveResourceType<User>
-    .AddResourceType<User, UserValidator>(
-      schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User));
+    .AddResourceType<User>(schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User));
 ```
 
 ######Schema Binding Rules
-In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate an instance of the associated type argument `User`.
+In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate (deserialize) an instance of the associated type argument `User` when a SCIM client is sending a POST or PUT request.
 
 ######Resource Type Definitions / Type Definitions
 In order to process rules concerning mutability and attribute serialization, Owin.Scim requires all resource types and complex types to define their metadata schema representations.  Without this, Owin.Scim will interpret each attribute with the default SCIM attribute behaviors: Mutability.ReadWrite, Returned.Default, etc.
