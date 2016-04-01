@@ -163,33 +163,33 @@ public class UserDefinition : ScimResourceTypeDefinitionBuilder<User>
 
                         return value.Substring(0, atIndex) + value.Substring(atIndex).ToLower();
                     }))
-            .AddCanonicalizationRule((Email attribute, ref object state) => nicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
+            .AddCanonicalizationRule((Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
 
         For(u => u.PhoneNumbers)
             .AddCanonicalizationRule(phone => phone.Canonicalize(p => p.Value, p => p.Display, eNumberUtil.Normalize))
-            .AddCanonicalizationRule((PhoneNumber phone, ref object state) => nicalization.EnforceSinglePrimaryAttribute(phone, ref state));
+            .AddCanonicalizationRule((PhoneNumber phone, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(phone, ref state));
 
         For(u => u.Groups)
-            .AddCanonicalizationRule((UserGroup group, ref object state) => nicalization.EnforceSinglePrimaryAttribute(group, ref state))
+            .AddCanonicalizationRule((UserGroup group, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(group, ref state))
             .SetMutability(Mutability.ReadOnly);
 
         For(u => u.Addresses)
-            .AddCanonicalizationRule((Address address, ref object state) => nicalization.EnforceSinglePrimaryAttribute(address, ref state));
+            .AddCanonicalizationRule((Address address, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(address, ref state));
 
         For(u => u.Roles)
-            .AddCanonicalizationRule((Role role, ref object state) => nicalization.EnforceSinglePrimaryAttribute(role, ref state));
+            .AddCanonicalizationRule((Role role, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(role, ref state));
 
         For(u => u.Entitlements)
-            .AddCanonicalizationRule((Entitlement entitlement, ref object state) => nicalization.EnforceSinglePrimaryAttribute(entitlement, ref state));
+            .AddCanonicalizationRule((Entitlement entitlement, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(entitlement, ref state));
 
         For(u => u.Ims)
-            .AddCanonicalizationRule((InstantMessagingAddress im, ref object state) => nicalization.EnforceSinglePrimaryAttribute(im, ref state));
+            .AddCanonicalizationRule((InstantMessagingAddress im, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(im, ref state));
 
         For(u => u.Photos)
-            .AddCanonicalizationRule((Photo photo, ref object state) => nicalization.EnforceSinglePrimaryAttribute(photo, ref state));
+            .AddCanonicalizationRule((Photo photo, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(photo, ref state));
 
         For(u => u.X509Certificates)
-            .AddCanonicalizationRule((X509Certificate certificate, ref object state) => nicalization.EnforceSinglePrimaryAttribute(certificate, ref state));
+            .AddCanonicalizationRule((X509Certificate certificate, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(certificate, ref state));
     }
 }
 ```
