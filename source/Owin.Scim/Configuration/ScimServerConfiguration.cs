@@ -253,10 +253,7 @@
             return _Features[feature].Supported;
         }
 
-        public ScimServerConfiguration AddResourceType<T>(
-            Predicate<ISet<string>> schemaBindingRule,
-            Action<ScimResourceTypeDefinitionBuilder<T>> builder = null)
-            where T : Resource
+        public ScimServerConfiguration AddResourceType<T>(Predicate<ISet<string>> schemaBindingRule) where T : Resource
         {
             if (_TypeDefinitionCache.ContainsKey(typeof(T)))
                 throw new InvalidOperationException(
@@ -285,7 +282,6 @@
                 throw new ApplicationException("Could not add resource type definition to cache.");
 
             _SchemaBindingRules.Insert(0, new SchemaBindingRule(schemaBindingRule, typeof (T)));
-            builder?.Invoke(typeDefinition);
 
             return this;
         }
@@ -340,20 +336,11 @@
                 {
                     if (!_TypeDefinitionCache.Any())
                     {
-                        AddResourceType<User>(
-                            schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User),
-                            DefineUserResourceType);
-
-                        AddResourceType<Group>(
-                            schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group));
+                        AddResourceType<User>(schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User));
+                        AddResourceType<Group>(schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group));
                     }
                 }
             }
-        }
-        
-        private void DefineUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
-        {
-            builder.AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
         }
     }
 }

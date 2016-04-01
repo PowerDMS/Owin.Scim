@@ -17,6 +17,8 @@
                 ScimConstants.Endpoints.Users,
                 typeof(UserValidator))
         {
+            AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
+
             For(u => u.Schemas)
                 .SetReturned(Returned.Always);
 

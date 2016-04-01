@@ -9,7 +9,6 @@
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
-    using System.Web.Http.Filters;
 
     using Configuration;
 
@@ -49,7 +48,6 @@
             app.Use((c, t) =>
             {
                 AmbientRequestMessageService.SetRequestInformation(c);
-
                 return t.Invoke();
             });
 
@@ -87,7 +85,7 @@
             var executionDirectory = Assembly.GetEntryAssembly() == null
                 ? AppDomain.CurrentDomain.BaseDirectory
                 : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
-
+            
             ApplicationConfiguration appConfig = new ApplicationConfigurationBuilder()
                 .ComposeWith(
                     new[] { executionDirectory },
