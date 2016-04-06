@@ -227,7 +227,6 @@
     <Compile Include="Integration\Users\Update\replace\with_path_and_filter_with_null.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_filter_with_subattribute.cs" />
     <Compile Include="Integration\Users\Update\replace\with_path_and_null_multivaluedattribute.cs" />
-    <Compile Include="Integration\Users\Update\when_updating_enterprise_user.cs" />
     <Compile Include="Integration\Users\Update\when_updating_a_user.cs" />
     <Compile Include="Integration\Users\Update\add\with_an_invalid_path.cs" />
     <Compile Include="Integration\Users\Update\add\with_no_patch_request.cs" />

@@ -8,7 +8,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
-    public class with_path_enterprise_attributes : when_updating_enterprise_user
+    public class with_path_enterprise_attributes : when_updating_a_user
     {
         Establish context = () =>
         {

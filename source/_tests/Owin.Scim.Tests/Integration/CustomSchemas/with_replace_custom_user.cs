@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
 
     public class with_replace_custom_user : using_a_scim_server
     {
-        Establish context = () =>
+        private Establish context = () =>
         {
             var existingUser = new User
             {
@@ -28,14 +28,18 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
             UserDto = Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result;
 
             UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
-            UserDto.Extension<MyUserSchema>().Guid = "anything";
-            UserDto.Extension<MyUserSchema>().EnableHelp = true;
-            UserDto.Extension<MyUserSchema>().EndDate = DateTime.Today;
-            UserDto.Extension<MyUserSchema>().ComplexData = new MyUserSchema.MySubClass
-            {
-                DisplayName = "hello",
-                Value = "world"
-            };
+            UserDto.AddExtension(
+                new MyUserSchema
+                {
+                    Guid = "anything",
+                    EnableHelp = true,
+                    EndDate = DateTime.Today.ToUniversalTime(),
+                    ComplexData = new MyUserSchema.MySubClass
+                    {
+                        DisplayName = "hello",
+                        Value = "world"
+                    }
+                });
         };
 
         Because of = () =>

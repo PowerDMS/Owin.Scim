@@ -3,6 +3,7 @@
     using System.Net;
     using System.Net.Http;
     using System.Net.Http.Formatting;
+    using System.Threading.Tasks;
 
     using Machine.Specifications;
 
@@ -19,7 +20,9 @@
                 .AwaitResponse()
                 .AsTask;
 
-            UserToUpdate = userRecord.Content.ReadAsAsync<User>().Result;
+            UserToUpdate = await userRecord.Content.ReadAsAsync<User>().AwaitResponse().AsTask;
+
+            Task.Delay(200).Await();
 
             PatchResponse = await Server
                 .HttpClient

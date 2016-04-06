@@ -1,14 +1,11 @@
-﻿using System.Linq;
-
-namespace Owin.Scim.Tests.Integration.Groups.Create
+﻿namespace Owin.Scim.Tests.Integration.Groups.Create
 {
     using System;
+    using System.Linq;
     using System.Net;
-    using System.Net.Http;
 
     using Machine.Specifications;
 
-    using Extensions;
     using Model.Users;
     using Model.Groups;
 
@@ -16,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
     {
         Establish context = () =>
         {
-            TestStartTime = DateTime.Now;
+            TestStartTime = DateTime.UtcNow;
 
             ExistingUser = CreateUser(new User { UserName = Users.UserNameUtility.GenerateUserName() });
             ExistingGroup = CreateGroup(new Group {DisplayName = Users.UserNameUtility.GenerateUserName()});

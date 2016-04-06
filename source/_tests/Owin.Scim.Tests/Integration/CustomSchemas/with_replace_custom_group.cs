@@ -29,7 +29,7 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
 
             GroupDto.Extension<MyGroupSchema>().AnotherName = "anything";
             GroupDto.Extension<MyGroupSchema>().IsGood = true;
-            GroupDto.Extension<MyGroupSchema>().EndDate = DateTime.Today;
+            GroupDto.Extension<MyGroupSchema>().EndDate = DateTime.Today.ToUniversalTime();
             GroupDto.Extension<MyGroupSchema>().ComplexData = new [] { new MyGroupSchema.MySubClass
             {
                 DisplayName = "hello",

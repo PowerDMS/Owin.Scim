@@ -11,7 +11,7 @@
     {
         Establish context = () =>
         {
-            TestStartTime = DateTime.Now;
+            TestStartTime = DateTime.UtcNow;
 
             GroupDto = new Group
             {

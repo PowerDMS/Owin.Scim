@@ -123,7 +123,7 @@
 
             var settings = httpConfiguration.Formatters.JsonFormatter.SerializerSettings;
             settings.Converters.Add(new StringEnumConverter());
-            settings.DateTimeZoneHandling = DateTimeZoneHandling.Local;
+            settings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
             settings.ContractResolver = new ScimContractResolver
             {
                 IgnoreSerializableAttribute = true,

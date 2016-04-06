@@ -20,14 +20,21 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                 DisplayName = UserNameUtility.GenerateUserName()
             };
 
-            GroupDto.Extension<MyGroupSchema>().AnotherName = "anything";
-            GroupDto.Extension<MyGroupSchema>().IsGood = true;
-            GroupDto.Extension<MyGroupSchema>().EndDate = DateTime.Today;
-            GroupDto.Extension<MyGroupSchema>().ComplexData = new [] { new MyGroupSchema.MySubClass
-            {
-                DisplayName = "hello",
-                Value = "world"
-            }};
+            GroupDto.AddExtension(
+                new MyGroupSchema
+                {
+                    AnotherName = "anything",
+                    IsGood = true,
+                    EndDate = DateTime.Today.ToUniversalTime(),
+                    ComplexData = new[]
+                    {
+                        new MyGroupSchema.MySubClass
+                        {
+                            DisplayName = "hello",
+                            Value = "world"
+                        }
+                    }
+                });
         };
 
         Because of = () =>
