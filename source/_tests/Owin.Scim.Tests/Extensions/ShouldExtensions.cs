@@ -1,5 +1,7 @@
-﻿namespace Owin.Scim.Tests.Extensions
+﻿namespace Owin.Scim.Tests
 {
+    using System;
+
     using Machine.Specifications;
 
     public static class ShouldExtensions
@@ -15,6 +17,17 @@
             }
 
             return true;
+        }
+
+        public static IComparable ShouldBeGreaterThan(this DateTime arg1, DateTime arg2)
+        {
+            if (arg2 == null)
+                throw new ArgumentNullException("arg2");
+            if (arg1 == null)
+                throw new SpecificationException(string.Format("Should be greater than {0} but is [null]", arg2));
+            if (DateTime.Compare(arg1, arg2) <= 0)
+                throw new SpecificationException(string.Format("Should be greater than {0} but is {1}", arg2, arg1));
+            return arg1;
         }
     }
 }

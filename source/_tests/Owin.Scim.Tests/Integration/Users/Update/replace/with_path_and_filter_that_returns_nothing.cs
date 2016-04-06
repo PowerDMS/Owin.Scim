@@ -41,8 +41,7 @@
 
         It should_return_an_error = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_return_no_target = async () => (await PatchResponse.Content.ReadAsAsync<IEnumerable<ScimError>>())
-            .Single()
+        It should_return_no_target = async () => (await PatchResponse.Content.ReadAsAsync<ScimError>())
             .ScimType
             .ShouldEqual(ScimErrorType.NoTarget);
 
