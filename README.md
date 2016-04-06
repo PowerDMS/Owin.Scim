@@ -1,8 +1,8 @@
 # Owin.Scim
-OWIN SCIM 2.0 implementation
+OWIN SCIM 2.0 implementation  
+[![Build status](https://ci.appveyor.com/api/projects/status/qgblu9mx4f53tvee/branch/master?svg=true)](https://ci.appveyor.com/project/powerdms/owin-scim/branch/master)
 
-RFC 7643
-
+RFC 7643  
 RFC 7644
 
 Looking for solid contributers to expedite this effort!  
