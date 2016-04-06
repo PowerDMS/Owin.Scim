@@ -23,7 +23,7 @@
 			<dependency id="Microsoft.AspNet.Cors" version="[5.2.3,)" />
 			<dependency id="DryIoC" version="[2.3.0,)" />
 			<dependency id="DryIoc.WebApi" version="[2.1.0,)" />
-			<dependency id="DryIoc.Owin" version="[4.3.0,)" />
+			<dependency id="DryIoc.Owin" version="[2.0.1,)" />
 			<dependency id="DryIoc.WebApi.Owin" version="[2.0.0,)" />
 			<dependency id="libphonenumber-csharp" version="[7.2.5,)" />
 	    </group>
