@@ -14,8 +14,6 @@
     using NContext.Common;
     using NContext.Extensions;
 
-    using Validation.Users;
-
     public class ScimServerConfiguration
     {
         private static readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache =

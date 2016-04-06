@@ -37,7 +37,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="FluentValidation, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\PowerDMS\src\services\api\packages\FluentValidation.6.2.1.0\lib\Net45\FluentValidation.dll</HintPath>
+      <HintPath>..\packages\FluentValidation.6.2.1.0\lib\Net45\FluentValidation.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FSharp.Core, Version=4.4.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
@@ -48,16 +48,16 @@
       <HintPath>..\packages\Microsoft.Owin.3.0.1\lib\net45\Microsoft.Owin.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NContext, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NContext.3.0.0\lib\net45\NContext.dll</HintPath>
+    <Reference Include="NContext, Version=4.0.0.8, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NContext.4.0.0.8\lib\net452\NContext.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NContext.Common, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NContext.Common.3.0.0\lib\portable-net45+windows8+wpa\NContext.Common.dll</HintPath>
+    <Reference Include="NContext.Common, Version=4.0.0.8, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\NContext.Common.4.0.0.8\lib\portable-net45+win8+wpa81\NContext.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\PowerDMS\src\services\api\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Owin, Version=1.0.0.0, Culture=neutral, PublicKeyToken=f0ebd12fd5e55cc5, processorArchitecture=MSIL">
@@ -139,6 +139,8 @@
     <Compile Include="Configuration\Uniqueness.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />
+    <Compile Include="DryIoc\FactoryCompiler.cs" />
+    <Compile Include="DryIoc\ImTools.cs" />
     <Compile Include="DryIoc\Owin\DryIocOwin.cs" />
     <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
     <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />

@@ -15,9 +15,9 @@
             _Container = container;
         }
 
-        public IHandleEvents CreateInstance<TEvent>(Type handler)
+        public IHandleEvent<TEvent> CreateInstance<TEvent>(Type handler)
         {
-            return _Container.Resolve(handler) as IHandleEvents;
+            return _Container.Resolve(handler) as IHandleEvent<TEvent>;
         }
     }
 }

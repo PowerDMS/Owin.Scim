@@ -1,7 +1,7 @@
 ﻿/*
 The MIT License (MIT)
 
-Copyright (c) 2013 Maksim Volkau
+Copyright (c) 2016 Maksim Volkau
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -41,35 +41,36 @@ namespace DryIoc.WebApi
     public static class DryIocWebApi
     {
         /// <summary>Configures container to work with ASP.NET WepAPI by: 
-        /// setting container scope context to <see cref="AsyncExecutionFlowScopeContext"/>,
+        /// setting container scope context to <see cref="AsyncExecutionFlowScopeContext"/> (if scope context is not set already),
         /// registering HTTP controllers, setting filter provider and dependency resolver.</summary>
         /// <param name="container">Original container.</param> <param name="config">Http configuration.</param>
         /// <param name="controllerAssemblies">(optional) Assemblies to look for controllers, default is ExecutingAssembly.</param>
-        /// <param name="scopeContext">(optional) Specific scope context to use, if not specified using
-        /// <see cref="AsyncExecutionFlowScopeContext"/> as default in NET 4.5. scope context.</param>
+        /// <param name="scopeContext">(optional) Specific scope context to use, by default method sets
+        /// <see cref="AsyncExecutionFlowScopeContext"/>, only if container does not have context specified already.</param>
+        /// <param name="throwIfUnresolved">(optional) Instructs DryIoc to throw exception
+        /// for unresolved type instead of fallback to default Resolver.</param>
         /// <returns>New container.</returns>
         public static IContainer WithWebApi(this IContainer container, HttpConfiguration config,
-            IEnumerable<Assembly> controllerAssemblies = null, IScopeContext scopeContext = null)
+            IEnumerable<Assembly> controllerAssemblies = null, IScopeContext scopeContext = null,
+            Func<Type, bool> throwIfUnresolved = null)
         {
             container.ThrowIfNull();
 
-            if (scopeContext == null && !(container.ScopeContext is AsyncExecutionFlowScopeContext))
-                scopeContext = new AsyncExecutionFlowScopeContext();
-            if (scopeContext != null)
-                container = container.With(scopeContext: scopeContext);
-
+            if (container.ScopeContext == null)
+                container = container.With(scopeContext: scopeContext ?? new AsyncExecutionFlowScopeContext());
+                
             container.RegisterWebApiControllers(config, controllerAssemblies);
 
             container.SetFilterProvider(config.Services);
 
             InsertRegisterRequestMessageHandler(config);
 
-            config.DependencyResolver = new DryIocDependencyResolver(container);
+            config.DependencyResolver = new DryIocDependencyResolver(container, throwIfUnresolved);
 
             return container;
         }
 
-        /// <summary>Registers controllers found in provided assemblies with per-request reuse.</summary>
+        /// <summary>Registers controllers found in provided assemblies with <see cref="Reuse.InWebRequest"/>.</summary>
         /// <param name="container">Container.</param>
         /// <param name="config">Http configuration.</param>
         /// <param name="assemblies">Assemblies to look for controllers.</param>
@@ -83,7 +84,25 @@ namespace DryIoc.WebApi
             var controllerTypeResolver = config.Services.GetHttpControllerTypeResolver();
             var controllerTypes = controllerTypeResolver.GetControllerTypes(assembliesResolver);
 
-            container.ThrowIfNull().RegisterMany(controllerTypes, Reuse.InWebRequest);
+            container.RegisterMany(controllerTypes, Reuse.InWebRequest);
+        }
+
+        /// <summary>Helps to find if type is controller type.</summary>
+        /// <param name="type">Type to check.</param>
+        /// <returns>True if controller type</returns>
+        public static bool IsController(this Type type)
+        {
+            return ControllerResolver.Default.IsController(type);
+        }
+
+        private sealed class ControllerResolver : DefaultHttpControllerTypeResolver
+        {
+            public static readonly ControllerResolver Default = new ControllerResolver();
+
+            public bool IsController(Type type)
+            {
+                return IsControllerTypePredicate(type);
+            }
         }
 
         private sealed class GivenAssembliesResolver : IAssembliesResolver
@@ -120,10 +139,16 @@ namespace DryIoc.WebApi
         /// <summary>Original DryIoc container.</summary>
         public readonly IContainer Container;
 
-        /// <summary>Creates dependency resolver.</summary> <param name="container">Container.</param>
-        internal DryIocDependencyResolver(IContainer container)
+        private readonly Func<Type, bool> _throwIfUnresolved;
+
+        /// <summary>Creates dependency resolver.</summary>
+        /// <param name="container">Container.</param>
+        /// <param name="throwIfUnresolved">(optional) Instructs DryIoc to throw exception
+        /// for unresolved type instead of fallback to default Resolver.</param>
+        internal DryIocDependencyResolver(IContainer container, Func<Type, bool> throwIfUnresolved = null)
         {
             Container = container;
+            _throwIfUnresolved = throwIfUnresolved;
         }
 
         /// <summary>Disposes container.</summary>
@@ -137,7 +162,8 @@ namespace DryIoc.WebApi
         /// <returns>The retrieved service.</returns> <param name="serviceType">The service to be retrieved.</param>
         public object GetService(Type serviceType)
         {
-            return Container.Resolve(serviceType, IfUnresolved.ReturnDefault);
+            var ifUnresolvedReturnDefault = _throwIfUnresolved == null || !_throwIfUnresolved(serviceType);
+            return Container.Resolve(serviceType, ifUnresolvedReturnDefault);
         }
 
         /// <summary>Retrieves a collection of services from the scope or empty collection.</summary>
@@ -153,7 +179,7 @@ namespace DryIoc.WebApi
         public IDependencyScope BeginScope()
         {
             var scope = Container.OpenScope(Reuse.WebRequestScopeName);
-            return new DryIocDependencyScope(scope);
+            return new DryIocDependencyScope(scope, _throwIfUnresolved);
         }
     }
 
@@ -163,11 +189,16 @@ namespace DryIoc.WebApi
         /// <summary>Wrapped DryIoc container.</summary>
         public readonly IContainer ScopedContainer;
 
-        /// <summary>Adapts input container.</summary> 
+        private readonly Func<Type, bool> _throwIfUnresolved;
+
+        /// <summary>Adapts input container.</summary>
         /// <param name="scopedContainer">Container returned by OpenScope method.</param>
-        public DryIocDependencyScope(IContainer scopedContainer)
+        /// <param name="throwIfUnresolved">(optional) Instructs DryIoc to throw exception
+        /// for unresolved type instead of fallback to default Resolver.</param>
+        public DryIocDependencyScope(IContainer scopedContainer, Func<Type, bool> throwIfUnresolved = null)
         {
             ScopedContainer = scopedContainer;
+            _throwIfUnresolved = throwIfUnresolved;
         }
 
         /// <summary>Disposed underlying scoped container.</summary>
@@ -181,7 +212,8 @@ namespace DryIoc.WebApi
         /// <returns>The retrieved service.</returns> <param name="serviceType">The service to be retrieved.</param>
         public object GetService(Type serviceType)
         {
-            return ScopedContainer.Resolve(serviceType, IfUnresolved.ReturnDefault);
+            var ifUnresolvedReturnDefault = _throwIfUnresolved == null || !_throwIfUnresolved(serviceType);
+            return ScopedContainer.Resolve(serviceType, ifUnresolvedReturnDefault);
         }
 
         /// <summary>Retrieves a collection of services from the scope or empty collection.</summary>
