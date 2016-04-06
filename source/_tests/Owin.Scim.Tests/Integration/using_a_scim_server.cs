@@ -12,6 +12,8 @@
     using Model.Groups;
     using Model.Users;
 
+    using SchemaExtensions;
+
     using Scim.Extensions;
 
     public class using_a_scim_server : IAssemblyContext
@@ -54,15 +56,15 @@
         private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
         {
             // this adds custom schemas, need play with custom validation next
-            builder.AddSchemaExtension<CustomSchemas.MyUserSchema, CustomSchemas.MyUserSchemaValidator>(
-                CustomSchemas.MyUserSchema.Schema);
+            builder.AddSchemaExtension<MyUserSchema, MyUserSchemaValidator>(
+                MyUserSchema.Schema);
         }
 
         private void ModifyGroupResourceType(ScimResourceTypeDefinitionBuilder<Group> builder)
         {
             // this adds custom schemas, need play with custom validation next
-            builder.AddSchemaExtension<CustomSchemas.MyGroupSchema, CustomSchemas.MyGroupSchemaValidator>(
-                CustomSchemas.MyGroupSchema.Schema);
+            builder.AddSchemaExtension<MyGroupSchema, MyGroupSchemaValidator>(
+                MyGroupSchema.Schema);
         }
 
         public void OnAssemblyComplete()

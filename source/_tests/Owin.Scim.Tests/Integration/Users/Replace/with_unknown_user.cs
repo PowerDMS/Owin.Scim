@@ -11,7 +11,6 @@
         Establish context = () =>
         {
             UserId = "bogus-user-id";
-
             UserDto = new User
             {
                 Id = UserId,
@@ -23,7 +22,7 @@
         It should_return_error = () =>
         {
             Response.StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-            var error = Response.Content.ReadAsAsync<Model.ScimError>().Result;
+            var error = Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray()).Result;
 
             // only 400 returns scimType
             error.ScimType.ShouldBeNull();
@@ -33,5 +32,7 @@
 
             error.Status.ShouldEqual(HttpStatusCode.NotFound);
         };
+
+        protected static string UserId;
     }
 }

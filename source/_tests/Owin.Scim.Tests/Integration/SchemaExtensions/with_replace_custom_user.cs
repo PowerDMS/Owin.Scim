@@ -1,49 +1,59 @@
-namespace Owin.Scim.Tests.Integration.CustomSchemas
+namespace Owin.Scim.Tests.Integration.SchemaExtensions
 {
     using System;
     using System.Net;
     using System.Net.Http;
 
     using Machine.Specifications;
-    using Newtonsoft.Json;
 
     using Model;
     using Model.Users;
+
+    using Newtonsoft.Json;
+
     using Users;
 
-    public class with_add_custom_user : using_a_scim_server
+    public class with_replace_custom_user : using_a_scim_server
     {
-        Establish context = () =>
+        private Establish context = () =>
         {
-            UserDto = new User
+            var existingUser = new User
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
 
+            Response = Server
+                .HttpClient
+                .PostAsync("users", new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .Result;
+
+            UserDto = Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result;
+
             UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
-            UserDto.AddExtension(new MyUserSchema
-            {
-                Guid = "anything",
-                Ref = "./users/1234",
-                EnableHelp = true,
-                ComplexData = new MyUserSchema.MySubClass
+            UserDto.AddExtension(
+                new MyUserSchema
                 {
-                    DisplayName = "hello",
-                    Value = "world"
-                }
-            });
+                    Guid = "anything",
+                    EnableHelp = true,
+                    EndDate = DateTime.Today.ToUniversalTime(),
+                    ComplexData = new MyUserSchema.MySubClass
+                    {
+                        DisplayName = "hello",
+                        Value = "world"
+                    }
+                });
         };
 
         Because of = () =>
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("users/" + UserDto.Id, new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
 
-            CreatedUser = Response.StatusCode == HttpStatusCode.Created
+            CreatedUser = Response.StatusCode == HttpStatusCode.OK
                 ? JsonConvert.DeserializeObject<User>(bodyText)
                 : null;
 
@@ -52,9 +62,9 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
                 : null;
         };
 
-        It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);
+        It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_return_the_user = () => CreatedUser.Id.ShouldNotBeEmpty();
+        It should_return_new_version = () => CreatedUser.Meta.Version.ShouldNotEqual(UserDto.Meta.Version);
 
         It should_return_enterprise_user = () =>
             CreatedUser

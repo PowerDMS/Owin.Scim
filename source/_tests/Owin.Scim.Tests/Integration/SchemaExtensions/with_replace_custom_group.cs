@@ -1,14 +1,16 @@
-namespace Owin.Scim.Tests.Integration.CustomSchemas
+namespace Owin.Scim.Tests.Integration.SchemaExtensions
 {
     using System;
     using System.Net;
     using System.Net.Http;
 
     using Machine.Specifications;
-    using Newtonsoft.Json;
 
     using Model;
     using Model.Groups;
+
+    using Newtonsoft.Json;
+
     using Users;
 
     public class with_replace_custom_group : using_a_scim_server
@@ -27,14 +29,21 @@ namespace Owin.Scim.Tests.Integration.CustomSchemas
 
             GroupDto = Response.Content.ReadAsAsync<Group>(ScimJsonMediaTypeFormatter.AsArray()).Result;
 
-            GroupDto.Extension<MyGroupSchema>().AnotherName = "anything";
-            GroupDto.Extension<MyGroupSchema>().IsGood = true;
-            GroupDto.Extension<MyGroupSchema>().EndDate = DateTime.Today.ToUniversalTime();
-            GroupDto.Extension<MyGroupSchema>().ComplexData = new [] { new MyGroupSchema.MySubClass
-            {
-                DisplayName = "hello",
-                Value = "world"
-            }};
+            GroupDto.AddExtension(
+                new MyGroupSchema
+                {
+                    AnotherName = "anything",
+                    IsGood = true,
+                    EndDate = DateTime.Today.ToUniversalTime(),
+                    ComplexData = new[]
+                    {
+                        new MyGroupSchema.MySubClass
+                        {
+                            DisplayName = "hello",
+                            Value = "world"
+                        }
+                    }
+                });
         };
 
         Because of = () =>

@@ -1,14 +1,16 @@
-namespace Owin.Scim.Tests.Integration.CustomSchemas
+namespace Owin.Scim.Tests.Integration.SchemaExtensions
 {
     using System;
     using System.Net;
     using System.Net.Http;
 
     using Machine.Specifications;
-    using Newtonsoft.Json;
 
     using Model;
     using Model.Groups;
+
+    using Newtonsoft.Json;
+
     using Users;
 
     public class with_add_custom_group : using_a_scim_server

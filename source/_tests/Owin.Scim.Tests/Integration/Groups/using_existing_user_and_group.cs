@@ -3,8 +3,6 @@ namespace Owin.Scim.Tests.Integration.Groups
     using System.Net;
     using System.Net.Http;
 
-    using Machine.Specifications;
-
     using Model.Users;
     using Model.Groups;
 

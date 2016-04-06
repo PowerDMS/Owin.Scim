@@ -22,7 +22,7 @@
 
             UserToUpdate = await userRecord.Content.ReadAsAsync<User>().AwaitResponse().AsTask;
 
-            Task.Delay(200).Await();
+            Task.Delay(100).Await();
 
             PatchResponse = await Server
                 .HttpClient

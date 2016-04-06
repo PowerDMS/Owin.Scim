@@ -2,6 +2,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 {
     using System.Net;
     using System.Net.Http;
+    using System.Threading.Tasks;
 
     using Machine.Specifications;
 
@@ -11,6 +12,8 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
     {
         Because of = async () =>
         {
+            Task.Delay(100).Await();
+
             Response = await Server
                 .HttpClient
                 .PutAsync("groups/" + GroupId, new ObjectContent<Group>(GroupDto, new ScimJsonMediaTypeFormatter()))

@@ -12,7 +12,7 @@
 
     using Ploeh.AutoFixture;
 
-    public class with_several_attribute_changes : using_a_scim_server
+    public class with_several_attribute_changes : when_replacing_a_user
     {
         Establish context = async () =>
         {
@@ -45,17 +45,8 @@
             MutableUserPayload.UserName = UserNameUtility.GenerateUserName(); // new userName
             MutableUserPayload.Password = "someOtherPass"; // newPassword
             MutableUserPayload.Extension<EnterpriseUserExtension>().EmployeeNumber = "007";
-        };
 
-        Because of = async () =>
-        {
-            Response = await Server
-                .HttpClient
-                .PutAsync("users/" + MutableUserPayload.Id, new ObjectContent<User>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
-                .AwaitResponse()
-                .AsTask;
-
-            await Response.DeserializeTo(() => UpdatedUserRecord); // capture updated user record
+            UserDto = MutableUserPayload;
         };
 
         It should_return_success = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
@@ -85,10 +76,6 @@
 
         protected static User OriginalUserRecord;
 
-        protected static User UpdatedUserRecord;
-
         protected static User MutableUserPayload;
-
-        protected static HttpResponseMessage Response;
     }
 }

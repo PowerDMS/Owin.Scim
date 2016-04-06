@@ -2,6 +2,7 @@
 {
     using System.Net;
     using System.Net.Http;
+    using System.Threading.Tasks;
 
     using Machine.Specifications;
     using Newtonsoft.Json;
@@ -10,9 +11,11 @@
 
     public class when_updating_a_group : using_existing_user_and_group
     {
-        Because of = () =>
+        Because of = async () =>
         {
-            PatchResponse = Server
+            Task.Delay(100).Await();
+
+            PatchResponse = await Server
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
@@ -20,7 +23,7 @@
                     {
                         Content = PatchContent
                     })
-                .Result;
+                .Await().AsTask;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
                 UpdatedGroup = PatchResponse.Content.ReadAsAsync<Group>().Result;

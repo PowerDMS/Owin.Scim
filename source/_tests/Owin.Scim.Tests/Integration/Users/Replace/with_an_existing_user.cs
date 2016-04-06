@@ -25,11 +25,11 @@
                 .AwaitResponse()
                 .AsTask;
 
-            UserId = (await userRecord.Content.ReadAsAsync<User>()).Id;
+            var userId = (await userRecord.Content.ReadAsAsync<User>()).Id;
 
             UserDto = new User
             {
-                Id = UserId,
+                Id = userId,
                 UserName = userName,
                 PreferredLanguage = "en-US"
             };
@@ -37,6 +37,6 @@
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_contain_the_new_values = async () => (await Response.Content.ReadAsAsync<User>()).PreferredLanguage.ShouldEqual("en-US");
+        It should_contain_the_new_values = () => UpdatedUserRecord.PreferredLanguage.ShouldEqual("en-US");
     }
 }

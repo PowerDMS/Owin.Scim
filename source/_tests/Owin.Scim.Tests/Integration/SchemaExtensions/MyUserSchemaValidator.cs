@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Tests.Integration.CustomSchemas
+﻿namespace Owin.Scim.Tests.Integration.SchemaExtensions
 {
     using System;
     using System.Net;
@@ -7,6 +7,7 @@
 
     using Model;
     using Model.Users;
+
     using Scim.Validation;
 
     public class MyUserSchemaValidator : ResourceExtensionValidatorBase<User, MyUserSchema>

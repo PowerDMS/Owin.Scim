@@ -1,6 +1,7 @@
-﻿namespace Owin.Scim.Tests.Integration.CustomSchemas
+﻿namespace Owin.Scim.Tests.Integration.SchemaExtensions
 {
     using Model.Groups;
+
     using Scim.Validation;
 
     public class MyGroupSchemaValidator : ResourceExtensionValidatorBase<Group, MyGroupSchema>

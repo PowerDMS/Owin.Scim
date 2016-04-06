@@ -1,7 +1,10 @@
 ﻿namespace Owin.Scim.Tests.Integration.Users.Replace
 {
+    using System.Net;
     using System.Net.Http;
-    using System.Net.Http.Formatting;
+    using System.Threading.Tasks;
+
+    using Extensions;
 
     using Machine.Specifications;
 
@@ -11,17 +14,22 @@
     {
         Because of = async () =>
         {
+            Task.Delay(100).Await();
+
             Response = await Server
                 .HttpClient
-                .PutAsync("users/" + UserId, new ObjectContent<User>(UserDto, new JsonMediaTypeFormatter()))
+                .PutAsync("users/" + UserDto.Id, new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
+
+            if (Response.StatusCode == HttpStatusCode.OK)
+                await Response.DeserializeTo(() => UpdatedUserRecord); // capture updated user record
         };
 
         protected static User UserDto;
 
-        protected static string UserId;
-
         protected static HttpResponseMessage Response;
+
+        protected static User UpdatedUserRecord;
     }
 }
