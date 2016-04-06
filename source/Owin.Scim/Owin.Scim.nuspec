@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-16"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Owin.Scim</id>
+    <version>$version$</version>
+    <authors>PowerDMS Inc.</authors>
+    <owners>PowerDMS Inc.</owners>
+    <copyright>PowerDMS Inc.</copyright>
+    <description>SCIM 2.0 server for OWIN.</description>
+    <licenseUrl>http://opensource.org/licenses/MIT</licenseUrl>
+    <projectUrl>https://github.com/PowerDMS/Owin.Scim</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <tags>SCIM</tags>
+    <dependencies>
+	    <group targetFramework="net452">
+			<dependency id="Antlr4.Runtime" version="[4.3.0,)" />
+			<dependency id="NContext" version="[4.0.0-alpha10,5.0.0]" />
+			<dependency id="Newtonsoft.Json" version="[8.0.0,)" />
+			<dependency id="Owin" version="[1.0.0,)" />
+			<dependency id="Microsoft.Owin" version="[3.0.1,)" />
+			<dependency id="FluentValidation" version="[6.2.1,)" />
+			<dependency id="Microsoft.AspNet.WebApi.Owin" version="[5.2.3,)" />
+			<dependency id="Microsoft.AspNet.Cors" version="[5.2.3,)" />
+			<dependency id="DryIoC" version="[2.3.0,)" />
+			<dependency id="DryIoc.WebApi" version="[2.1.0,)" />
+			<dependency id="DryIoc.Owin" version="[4.3.0,)" />
+			<dependency id="DryIoc.WebApi.Owin" version="[2.0.0,)" />
+			<dependency id="libphonenumber-csharp" version="[7.2.5,)" />
+	    </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$Configuration$\Owin.Scim.dll" target="lib\net452\" />
+    <file src="bin\$Configuration$\Owin.Scim.pdb" target="lib\net452\" />
+    <file src="bin\$Configuration$\Owin.Scim.xml" target="lib\net452\" />
+    <file src="**\*.cs" target="src" />
+  </files>
+</package>
