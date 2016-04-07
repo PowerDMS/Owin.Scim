@@ -12,6 +12,19 @@ PROJECT STATUS
 ==============
 This project is in active development with the goal of completing basic protocol implementation by mid-2016.
 
+Getting Started
+---------------
+In the coming weeks we will release a sample console OWIN application. For further understanding, please take a look at the integration test class `using_a_scim_server`.  In your own OWIN application, you may want to map a path to the scim server endpoints like shown below:  
+```csharp
+appBuilder.Map("/scim", app =>
+{
+    app.UseScimServer(
+        new ScimServerConfiguration { RequireSsl = false }
+            .AddCompositionConditions(
+                fileInfo => fileInfo.Name.StartsWith("YourProjectName") && fileInfo.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase)));
+});
+```
+
 Roadmap
 -------
 
