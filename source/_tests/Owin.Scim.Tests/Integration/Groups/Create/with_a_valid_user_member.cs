@@ -37,7 +37,7 @@
         It should_contain_meta = () =>
         {
             CreatedGroup.Meta.ShouldNotBeNull();
-            CreatedGroup.Meta.Created.ShouldBeGreaterThan(TestStartTime);
+            CreatedGroup.Meta.Created.ShouldBeGreaterThanOrEqualTo(TestStartTime);
             CreatedGroup.Meta.LastModified.ShouldEqual(CreatedGroup.Meta.Created);
             CreatedGroup.Meta.Location.ShouldNotBeNull();
             CreatedGroup.Meta.Location.ShouldEqual(Response.Headers.Location);
