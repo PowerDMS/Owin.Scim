@@ -12,19 +12,6 @@ PROJECT STATUS
 ==============
 This project is in active development with the goal of completing basic protocol implementation by mid-2016.
 
-Getting Started
----------------
-In the coming weeks we will release a sample console OWIN application. For further understanding, please take a look at the integration test class `using_a_scim_server`.  In your own OWIN application, you may want to map a path to the scim server endpoints like shown below:  
-```csharp
-appBuilder.Map("/scim", app =>
-{
-    app.UseScimServer(
-        new ScimServerConfiguration { RequireSsl = false }
-            .AddCompositionConditions(
-                fileInfo => fileInfo.Name.StartsWith("YourProjectName") && fileInfo.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase)));
-});
-```
-
 Roadmap
 -------
 
@@ -65,21 +52,23 @@ Roadmap
 
 Getting Started
 ===============
-Like most OWIN extensions, just configure your appBuilder.  
+In the coming weeks we will release a sample console OWIN application. For further understanding, please take a look at the integration test class `using_a_scim_server`.  In your own OWIN application, you may want to map a path to the scim server endpoints like shown below:  
 ```csharp
-app.UseScimServer(
-  new ScimServerConfiguration
-  {
-      RequireSsl = false
-  }
-  .AddAuthenticationScheme(
-      new AuthenticationScheme(
-          "oauthbearertoken",
-          "OAuth Bearer Token",
-          "Authentication scheme using the OAuth Bearer Token standard.", 
-          specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
-          isPrimary: true))
-  .ConfigureETag(supported: true, isWeak: true));
+appBuilder.Map("/scim", app =>
+{
+    app.UseScimServer(
+        new ScimServerConfiguration { RequireSsl = false }
+            .AddCompositionConditions(
+                fileInfo => fileInfo.Name.StartsWith("YourProjectName") && fileInfo.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
+            .AddAuthenticationScheme(
+                new AuthenticationScheme(
+                    "oauthbearertoken",
+                    "OAuth Bearer Token",
+                    "Authentication scheme using the OAuth Bearer Token standard.", 
+                    specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
+                    isPrimary: true))
+            .ConfigureETag(supported: true, isWeak: true)));
+});
 ```
 
 ##SCIM Extensibility  
