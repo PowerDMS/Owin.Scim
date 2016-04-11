@@ -3,8 +3,8 @@
     using System;
 
     using Owin;
-    using Owin.Scim.Configuration;
-    using Owin.Scim.Extensions;
+//    using Owin.Scim.Configuration;
+//    using Owin.Scim.Extensions;
 
     class Program
     {
@@ -22,14 +22,14 @@
     {
         public void Configuration(IAppBuilder appBuilder)
         {
-            appBuilder.Map("/scim", app =>
-            {
-                app.UseScimServer(
-                    new ScimServerConfiguration { RequireSsl = true }
-                        .AddCompositionConditions(
-                            fileInfo => fileInfo.Name.StartsWith("ConsoleHost", StringComparison.OrdinalIgnoreCase) && 
-                            fileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase)));
-            });
+//            appBuilder.Map("/scim", app =>
+//            {
+//                app.UseScimServer(
+//                    new ScimServerConfiguration { RequireSsl = true }
+//                        .AddCompositionConditions(
+//                            fileInfo => fileInfo.Name.StartsWith("ConsoleHost", StringComparison.OrdinalIgnoreCase) && 
+//                            fileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase)));
+//            });
         }
     }
 }
