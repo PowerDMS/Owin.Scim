@@ -12,6 +12,8 @@
 
     using Model;
 
+    using Services;
+
     public class ResourceTypesController : ScimControllerBase
     {
         public ResourceTypesController(ScimServerConfiguration scimServerConfiguration) 
@@ -22,6 +24,12 @@
         [Route("resourcetypes/{name?}", Name = "GetResourceTypes")]
         public Task<HttpResponseMessage> Get(string name = null)
         {
+            // TODO: (DG) Add when filters is supported.
+//            if (AmbientRequestMessageService.QueryOptions.Filter != null)
+//                return Task.FromResult(Request.CreateResponse(
+//                    HttpStatusCode.Forbidden,
+//                    new ScimError(HttpStatusCode.Forbidden)));
+
             HttpResponseMessage response;
             if (string.IsNullOrWhiteSpace(name))
             {

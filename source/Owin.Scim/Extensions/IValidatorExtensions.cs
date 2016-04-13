@@ -7,7 +7,6 @@
     using FluentValidation.Internal;
 
     using Validation;
-    using Validation.Users;
 
     using ValidationResult = FluentValidation.Results.ValidationResult;
 

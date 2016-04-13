@@ -82,7 +82,7 @@
 
             applicationConfiguration.CompositionContainer
                 .GetExportedValues<IConfigureDryIoc>()
-                .OrderBy(configurable => configurable.Priority)
+                .OrderByDescending(configurable => configurable.Priority)
                 .ForEach(configurable => configurable.ConfigureContainer(Container));
 
             _IsConfigured = true;

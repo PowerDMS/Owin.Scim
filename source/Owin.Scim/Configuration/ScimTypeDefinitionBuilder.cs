@@ -8,7 +8,7 @@ namespace Owin.Scim.Configuration
     using System.Reflection;
 
     using Extensions;
-   
+    
     public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinition
     {
         private readonly IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> _AttributeDefinitions;
@@ -28,13 +28,15 @@ namespace Owin.Scim.Configuration
             }
         }
         
-        public Type DefinitionType
+        public virtual Type DefinitionType
         {
             get { return typeof(T); }
         }
 
         public string Description { get; private set; }
-        
+
+        public string Name { get; private set; }
+
         public IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> AttributeDefinitions
         {
             get { return _AttributeDefinitions; }
@@ -45,7 +47,13 @@ namespace Owin.Scim.Configuration
             Description = description;
             return this;
         }
-        
+
+        public ScimTypeDefinitionBuilder<T> SetName(string name)
+        {
+            Name = name;
+            return this;
+        }
+
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
             Expression<Func<T, TAttribute>> attrExp)
         {
@@ -137,7 +145,7 @@ namespace Owin.Scim.Configuration
                 builder = typeof(Uri).IsAssignableFrom(descriptor.PropertyType)
                     ? typeof(ScimTypeUriAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType)
                     : typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
-                instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor);
+                instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, false);
 
                 return instance;
             }
@@ -153,7 +161,7 @@ namespace Owin.Scim.Configuration
                     builder = typeof(Uri).IsAssignableFrom(descriptor.PropertyType)
                         ? typeof(ScimTypeUriAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType)
                         : typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType);
-                    instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor);
+                    instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, true);
 
                     return instance;
                 }

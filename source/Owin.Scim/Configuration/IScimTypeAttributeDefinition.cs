@@ -9,21 +9,27 @@
     {
         PropertyDescriptor AttributeDescriptor { get; }
 
-        bool MultiValued { get; }
+        ISet<object> CanonicalValues { get; }
+
+        bool CaseExact { get; }
+
+        IScimTypeDefinition DeclaringTypeDefinition { get; }
 
         string Description { get; }
 
+        bool MultiValued { get; }
+
         Mutability Mutability { get; }
+
+        string Name { get; }
+
+        IEnumerable<string> ReferenceTypes { get; }
 
         bool Required { get; }
 
         Returned Returned { get; }
 
         Uniqueness Uniqueness { get; }
-
-        bool CaseExact { get; }
-
-        IScimTypeDefinition DeclaringTypeDefinition { get; }
 
         IEnumerable<ICanonicalizationRule> GetCanonicalizationRules();
     }

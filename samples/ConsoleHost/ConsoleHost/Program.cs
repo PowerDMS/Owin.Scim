@@ -1,12 +1,14 @@
 ﻿namespace ConsoleHost
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
+    using System.Net.Http;
+    using System.Net.Http.Formatting;
+    using System.Net.Http.Headers;
+    using System.Threading.Tasks;
 
-    using Owin;
-    using Owin.Scim.Configuration;
-    using Owin.Scim.Extensions;
+    using Nito.AsyncEx;
+
+    using Owin.Scim.Model.Users;
 
     class Program
     {
@@ -14,26 +16,36 @@
         {
             using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("http://localhost:8080"))
             {
+                AsyncContext.Run(TestScimApi);
                 Console.ReadLine();
             }
         }
-    }
 
-    internal class CompositionRoot
-    {
-        public void Configuration(IAppBuilder appBuilder)
+        private static async Task TestScimApi()
         {
-            appBuilder.Map("/scim", app =>
+            var client = new HttpClient
             {
-                app.UseScimServer(
-                    new ScimServerConfiguration { RequireSsl = false }
-                        .AddCompositionConditions(
-                            fileInfo => fileInfo.Name.StartsWith("ConsoleHost", StringComparison.OrdinalIgnoreCase) && 
-                            fileInfo.Extension.Equals(".exe", StringComparison.OrdinalIgnoreCase)));
-            });
+                BaseAddress = new Uri("http://localhost:8080/scim/")
+            };
 
-            var address = ((IList<IDictionary<string, object>>)appBuilder.Properties["host.Addresses"])[0];
-            Console.WriteLine(string.Format("SCIM server is listening at: {0}", new UriBuilder(address["scheme"].ToString(), address["host"].ToString(), Convert.ToInt32(address["port"]), address["path"].ToString() + "/scim")));
+            Write("");
+            Write("Creating user...");
+            var response = await client.PostAsync("users", new ObjectContent<User>(new User { UserName = "daniel" }, new JsonMediaTypeFormatter()));
+            var user = await response.Content.ReadAsAsync<User>(new[] { new JsonMediaTypeFormatter() });
+            Write(await response.Content.ReadAsStringAsync());
+            Write("");
+
+
+            Write("Getting user " + user.Id);
+            var users = await client.GetStringAsync("users/" + user.Id);
+            Write(users);
+            Write("");
+
+        }
+
+        private static void Write(string text)
+        {
+            Console.WriteLine(text);
         }
     }
 }

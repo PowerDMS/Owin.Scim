@@ -15,7 +15,8 @@ namespace Owin.Scim.Model.Groups
                 ScimConstants.ResourceTypes.Group,
                 ScimConstants.Schemas.Group,
                 ScimConstants.Endpoints.Groups,
-                typeof(GroupValidator))
+                typeof(GroupValidator),
+                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
         {
             For(u => u.Schemas)
                 .SetReturned(Returned.Always);
@@ -30,7 +31,7 @@ namespace Owin.Scim.Model.Groups
                 .SetRequired(true);
 
             For(u => u.Members)
-                .AddCanonicalizationRule(member => member.Canonicalize(e => e.Type, StringExtensions.ToPascalCase));
+                .AddCanonicalizationRule(member => member.Canonicalize(e => e.Type, StringExtensions.UppercaseFirstCharacter));
 
             For(u => u.Meta)
                 .SetMutability(Mutability.ReadOnly)

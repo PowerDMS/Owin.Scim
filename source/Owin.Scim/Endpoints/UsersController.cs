@@ -44,7 +44,7 @@
                     SetETagHeader(response, userDto);
                 });
         }
-
+        
         [Route("users/{userId}", Name = "RetrieveUser")]
         public async Task<HttpResponseMessage> Get(string userId)
         {

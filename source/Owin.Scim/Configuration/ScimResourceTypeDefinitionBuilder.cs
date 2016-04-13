@@ -2,13 +2,15 @@ namespace Owin.Scim.Configuration
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Linq;
 
     using FluentValidation;
 
     using Model;
 
-    using Newtonsoft.Json;
-
+    using NContext.Common;
+    
     public class ScimResourceTypeDefinitionBuilder<T> : ScimTypeDefinitionBuilder<T>, IScimResourceTypeDefinition
         where T : Resource
     {
@@ -16,9 +18,9 @@ namespace Owin.Scim.Configuration
 
         private readonly string _Endpoint;
 
-        private readonly string _Name;
-
         private readonly string _Schema;
+
+        private readonly Predicate<ISet<string>> _SchemaBindingRule;
 
         private Type _ValidatorType;
 
@@ -26,11 +28,13 @@ namespace Owin.Scim.Configuration
             string name, 
             string schema, 
             string endpoint,
-            Type validatorType)
+            Type validatorType,
+            Predicate<ISet<string>> schemaBindingRule)
         {
             _SchemaExtensions = new Dictionary<string, ScimResourceTypeExtension>();
-            _Name = name;
             _Schema = schema;
+
+            SetName(name);
 
             if (endpoint != null && !endpoint.StartsWith("/"))
             {
@@ -39,58 +43,64 @@ namespace Owin.Scim.Configuration
 
             _Endpoint = endpoint;
             _ValidatorType = validatorType;
-
+            _SchemaBindingRule = schemaBindingRule;
         }
-
-        [JsonProperty("endpoint")]
+        
         public string Endpoint
         {
             get { return _Endpoint; }
         }
-
-        [JsonProperty("name")]
-        public string Name
-        {
-            get { return _Name; }
-        }
-
-        [JsonProperty("schema")]
+        
         public string Schema
         {
             get { return _Schema; }
         }
-
-        [JsonIgnore]
+        
         public Type ValidatorType
         {
             get { return _ValidatorType; }
         }
         
-        [JsonProperty("schemaExtensions")]
         public IEnumerable<ScimResourceTypeExtension> SchemaExtensions
         {
             get { return _SchemaExtensions.Values; }
         }
 
+        public Predicate<ISet<string>> SchemaBindingRule
+        {
+            get { return _SchemaBindingRule; }
+        }
+
         public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TExtension, TValidator>(
             string schemaIdentifier,
-            bool required = false,
-            Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
+            bool required = false)
             where TExtension : ResourceExtension, new()
             where TValidator : IValidator<TExtension>
         {
-            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>();
+            var typeDefinition = TypeDescriptor.GetAttributes(typeof(TExtension))
+                .OfType<ScimTypeDefinitionAttribute>()
+                .MaybeSingle()
+                .Bind(a =>
+                {
+                    if (!typeof(ScimTypeDefinitionBuilder<TExtension>).IsAssignableFrom(a.DefinitionType))
+                        throw new InvalidOperationException(
+                            string.Format(
+                                "Type definition '{0}' must inherit from ScimTypeDefinitionBuilder<{1}>.",
+                                a.DefinitionType.Name,
+                                typeof(TExtension).Name));
 
-            ((IScimResourceTypeDefinition)this)
-                .AddExtension(
-                    new ScimResourceTypeExtension(
-                        schemaIdentifier,
-                        required,
-                        extensionDefinition,
-                        typeof(TExtension),
-                        typeof(TValidator)));
-            
-            extensionBuilder?.Invoke(extensionDefinition);
+                    return ((ScimTypeDefinitionBuilder<TExtension>)Activator.CreateInstance(a.DefinitionType)).ToMaybe();
+                })
+                .FromMaybe(new ScimTypeDefinitionBuilder<TExtension>());
+
+            var extension = new ScimResourceTypeExtension(
+                schemaIdentifier,
+                required,
+                typeDefinition,
+                typeof (TExtension),
+                typeof (TValidator));
+
+            _SchemaExtensions.Add(extension.Schema, extension);
 
             return this;
         }
@@ -100,11 +110,6 @@ namespace Owin.Scim.Configuration
         {
             _ValidatorType = typeof (TValidator);
             return this;
-        }
-
-        void IScimResourceTypeDefinition.AddExtension(ScimResourceTypeExtension extension)
-        {
-            _SchemaExtensions.Add(extension.Schema, extension);
         }
 
         ScimResourceTypeExtension IScimResourceTypeDefinition.GetExtension(string schemaIdentifier)

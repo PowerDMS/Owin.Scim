@@ -6,6 +6,9 @@
     {
         public ServiceProviderConfigDefinition()
         {
+            SetName("Service Provider Configuration");
+            SetDescription("Schema for representing the service provider's configuration");
+
             For(u => u.Schemas)
                 .SetReturned(Returned.Always);
 

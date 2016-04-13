@@ -1,11 +1,11 @@
 namespace Owin.Scim.Configuration
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Globalization;
     using System.Linq;
-    using System.Linq.Expressions;
-    using System.Reflection;
 
     using Canonicalization;
 
@@ -14,6 +14,8 @@ namespace Owin.Scim.Configuration
     using FluentValidation;
 
     using Model;
+
+    using Newtonsoft.Json;
 
     public abstract class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinition
     {
@@ -25,7 +27,8 @@ namespace Owin.Scim.Configuration
 
         protected ScimTypeAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> typeDefinition,
-            PropertyDescriptor propertyDescriptor)
+            PropertyDescriptor propertyDescriptor,
+            bool multiValued)
         {
             _DeclaringTypeDefinition = typeDefinition;
             _PropertyDescriptor = propertyDescriptor;
@@ -33,6 +36,7 @@ namespace Owin.Scim.Configuration
 
             // Initialize defaults
             CaseExact = false;
+            MultiValued = multiValued;
             Mutability = Mutability.ReadWrite;
             Required = false;
             Returned = Returned.Default;
@@ -48,7 +52,20 @@ namespace Owin.Scim.Configuration
                 Description = descriptionAttr.Description.RemoveMultipleSpaces();
             }
         }
-        
+
+        public string Name
+        {
+            get
+            {
+                var jsonPropertyAttribute = _PropertyDescriptor.Attributes.OfType<JsonPropertyAttribute>().SingleOrDefault();
+                if (jsonPropertyAttribute != null) return jsonPropertyAttribute.PropertyName;
+
+                return _PropertyDescriptor.Name.LowercaseFirstCharacter();
+            }
+        }
+
+        public ISet<object> CanonicalValues { get; protected set; }
+
         public bool CaseExact { get; protected set; }
 
         public string Description { get; protected set; }
@@ -56,6 +73,8 @@ namespace Owin.Scim.Configuration
         public bool MultiValued { get; protected set; }
 
         public Mutability Mutability { get; protected set; }
+
+        public IEnumerable<string> ReferenceTypes { get; protected set; }
 
         public bool Required { get; protected set; }
 
@@ -72,6 +91,8 @@ namespace Owin.Scim.Configuration
         {
             get { return _DeclaringTypeDefinition; }
         }
+
+        protected internal IEqualityComparer CanonicalValueComparer { get; protected set; }
 
         public IEnumerable<ICanonicalizationRule> GetCanonicalizationRules()
         {
@@ -151,36 +172,15 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalValues(
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetCanonicalValues(
             IEnumerable<TAttribute> acceptableValues,
-            IEqualityComparer<TAttribute> comparer = null)
+            EqualityComparer<TAttribute> comparer = null)
         {
-            // TODO: (DG) impl
-            return this;
-        }
+            if (comparer == null)
+                comparer = EqualityComparer<TAttribute>.Default;
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddSchemaExtension<TExtension, TValidator>(
-            string schemaIdentifier, 
-            bool required = false,
-            Action<ScimTypeDefinitionBuilder<TExtension>> extensionBuilder = null)
-            where TExtension : ResourceExtension, new()
-            where TValidator : IValidator<TExtension>
-        {
-            if (!typeof (Resource).IsAssignableFrom(typeof (T)))
-                throw new InvalidOperationException("You cannot add schema extensions to non-resource types.");
-            
-            var extensionDefinition = new ScimTypeDefinitionBuilder<TExtension>();
-
-            ((IScimResourceTypeDefinition)_DeclaringTypeDefinition)
-                .AddExtension(
-                    new ScimResourceTypeExtension(
-                    schemaIdentifier,
-                    required,
-                    extensionDefinition,
-                    typeof(TExtension),
-                    typeof(TValidator)));
-
-            extensionBuilder?.Invoke(extensionDefinition);
+            CanonicalValues = new HashSet<object>(acceptableValues.Distinct(comparer).Cast<object>());
+            CanonicalValueComparer = comparer;
 
             return this;
         }

@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Repository.InMemory
+﻿namespace ConsoleHost
 {
     using System;
     using System.Collections.Concurrent;
@@ -6,15 +6,16 @@
     using System.Text;
     using System.Threading.Tasks;
 
-    using Model.Users;
-
     using NContext.Security.Cryptography;
 
-    public class InMemoryUserRepository : IUserRepository
+    using Owin.Scim.Model.Users;
+    using Owin.Scim.Repository;
+
+    public class CustomInMemoryUserRepository : IUserRepository
     {
         private readonly ConcurrentDictionary<string, User> _Users;
 
-        public InMemoryUserRepository()
+        public CustomInMemoryUserRepository()
         {
             _Users = new ConcurrentDictionary<string, User>();
         }
@@ -30,12 +31,11 @@
 
         public async Task<User> GetUser(string userId)
         {
-            // return a deep-clone of the user object
-            // since this is in-memory, we don't want patches or other code to actually modify the
-            // simulated database record stored in the list, unless done through create,update,delete
-            return !_Users.ContainsKey(userId) 
-                ? null 
-                : _Users[userId].Copy();
+            // this should really return a deep-clone of the db record so it accurate represents in-memory
+            // and domain code can't mutate the in-memory db record 
+            return !_Users.ContainsKey(userId)
+                ? null
+                : _Users[userId];
         }
 
         public async Task UpdateUser(User user)
@@ -65,7 +65,7 @@
                specification [RFC7564]. */
 
             var userNameBytes = Encoding.UTF8.GetBytes(userName);
-            
+
             return Task.FromResult(
                 _Users
                 .Values

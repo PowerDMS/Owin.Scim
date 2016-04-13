@@ -39,7 +39,7 @@
 
         public int Priority
         {
-            get { return -1; }
+            get { return int.MaxValue; }
         }
 
         public void ConfigureContainer(IContainer container)
@@ -67,14 +67,20 @@
                 });
 
 #if DEBUG
-            // TODO: (CY) because of this, should I set priority higher? so my custom IConfigureDryIoc runs first
             container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton, ifAlreadyRegistered:IfAlreadyRegistered.Keep);
             container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
 #endif
+
+            container.Register<ISchemaService, SchemaService>(
+                reuse: Reuse.Singleton,
+                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
+
             container.Register<IUserService, UserService>(
+                reuse: Reuse.Singleton,
                 made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
 
             container.Register<IGroupService, GroupService>(
+                reuse: Reuse.Singleton,
                 made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
         }
     }

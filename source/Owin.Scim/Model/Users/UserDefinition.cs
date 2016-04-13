@@ -15,7 +15,8 @@
                 ScimConstants.ResourceTypes.User,
                 ScimConstants.Schemas.User,
                 ScimConstants.Endpoints.Users,
-                typeof(UserValidator))
+                typeof(UserValidator),
+                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User))
         {
             AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
 

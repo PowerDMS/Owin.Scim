@@ -14,9 +14,14 @@
         /// </summary>
         /// <param name="text"></param>
         /// <returns></returns>
-        public static string ToPascalCase(this string text)
+        public static string UppercaseFirstCharacter(this string text)
         {
             return text.Substring(0, 1).ToUpper() + text.Substring(1).ToLower();
+        }
+
+        public static string LowercaseFirstCharacter(this string text)
+        {
+            return text.Substring(0, 1).ToLower() + text.Substring(1);
         }
 
         public static int NthIndexOf(this string haystack, char needle, int startIndex, int occurence)

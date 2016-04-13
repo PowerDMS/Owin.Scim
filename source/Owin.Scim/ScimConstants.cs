@@ -18,6 +18,8 @@
             public const string ServiceProviderConfig = @"urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig";
 
             public const string ResourceType = @"urn:ietf:params:scim:schemas:core:2.0:ResourceType";
+
+            public const string Schema = @"urn:ietf:params:scim:schemas:core:2.0:Schema";
         }
 
         public static class Messages
@@ -38,6 +40,8 @@
             public const string ServiceProviderConfig = @"ServiceProviderConfig";
 
             public const string ResourceType = @"ResourceType";
+
+            public const string Schema = @"Schema";
 
             public const string User = @"User";
 

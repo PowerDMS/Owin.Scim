@@ -4,6 +4,7 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.ComponentModel.Composition.Hosting;
     using System.IO;
     using System.Linq;
 
@@ -12,6 +13,7 @@
     using Model.Groups;
 
     using NContext.Common;
+    using NContext.Configuration;
     using NContext.Extensions;
 
     public class ScimServerConfiguration
@@ -33,9 +35,7 @@
 
         private readonly ISet<AuthenticationScheme> _AuthenticationSchemes;
 
-        private readonly IList<SchemaBindingRule> _SchemaBindingRules;
-
-        private readonly ISet<Predicate<FileInfo>> _CompositionFileInfoConstraints;
+        private readonly Lazy<IList<SchemaBindingRule>> _SchemaBindingRules;
 
         private readonly Lazy<IEnumerable<ResourceType>> _ResourceTypes = 
             new Lazy<IEnumerable<ResourceType>>(() =>
@@ -58,12 +58,8 @@
         public ScimServerConfiguration()
         {
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
-            _CompositionFileInfoConstraints = new HashSet<Predicate<FileInfo>>();
-            _SchemaBindingRules = new List<SchemaBindingRule>();
-
+            _SchemaBindingRules = new Lazy<IList<SchemaBindingRule>>(() => ResourceTypeDefinitions.Select(rtd => new SchemaBindingRule(rtd.SchemaBindingRule, rtd.DefinitionType)).ToList());
             _Features = CreateDefaultFeatures();
-
-            DefineCoreResourceTypes();
 
             RequireSsl = true;
         }
@@ -85,16 +81,11 @@
 
         public bool RequireSsl { get; set; }
 
-        public string PublicOrigin { get; set; } // TODO: (CY) should we make this Uri instead of string?
+        public Uri PublicOrigin { get; set; }
 
         public IEnumerable<AuthenticationScheme> AuthenticationSchemes
         {
             get { return _AuthenticationSchemes; }
-        }
-
-        public IEnumerable<Predicate<FileInfo>> CompositionFileInfoConstraints
-        {
-            get { return _CompositionFileInfoConstraints; }
         }
 
         public IEnumerable<ResourceType> ResourceTypes
@@ -109,7 +100,7 @@
 
         internal IList<SchemaBindingRule> SchemaBindingRules
         {
-            get { return _SchemaBindingRules; }
+            get { return _SchemaBindingRules.Value; }
         }
 
         internal IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
@@ -181,12 +172,6 @@
             return this;
         }
 
-        public ScimServerConfiguration AddCompositionConditions(params Predicate<FileInfo>[] fileInfoConstraints)
-        {
-            _CompositionFileInfoConstraints.AddRange(fileInfoConstraints);
-            return this;
-        }
-
         public ScimServerConfiguration ConfigurePatch(bool supported = true)
         {
             _Features[ScimFeatureType.Patch] = new ScimFeature(supported);
@@ -250,40 +235,7 @@
 
             return _Features[feature].Supported;
         }
-
-        public ScimServerConfiguration AddResourceType<T>(Predicate<ISet<string>> schemaBindingRule) where T : Resource
-        {
-            if (_TypeDefinitionCache.ContainsKey(typeof(T)))
-                throw new InvalidOperationException(
-                    string.Format("Scim server already contains a resource type for type '{0}'.", typeof(T).Name));
-
-            var typeDefinition = TypeDescriptor.GetAttributes(typeof (T))
-                .OfType<ScimTypeDefinitionAttribute>()
-                .MaybeSingle()
-                .Bind(a =>
-                {
-                    if (!typeof(ScimResourceTypeDefinitionBuilder<T>).IsAssignableFrom(a.DefinitionType))
-                        throw new InvalidOperationException(
-                            string.Format(
-                                "Type definition '{0}' must inherit from ScimResourceTypeDefinitionBuilder<{1}>.", 
-                                a.DefinitionType.Name,
-                                typeof(T).Name));
-
-                    return ((ScimResourceTypeDefinitionBuilder<T>) Activator.CreateInstance(a.DefinitionType)).ToMaybe();
-                })
-                .FromMaybe(null);
-
-            if (typeDefinition == null)
-                throw new InvalidOperationException(string.Format("Resource type '{0}' must have a ScimTypeDefinitionAttribute attribute defined.", typeof(T).Name));
-
-            if (!_TypeDefinitionCache.TryAdd(typeDefinition.DefinitionType, typeDefinition))
-                throw new ApplicationException("Could not add resource type definition to cache.");
-
-            _SchemaBindingRules.Insert(0, new SchemaBindingRule(schemaBindingRule, typeof (T)));
-
-            return this;
-        }
-
+        
         public ScimServerConfiguration ModifyResourceType<T>(Action<ScimResourceTypeDefinitionBuilder<T>> builder) where T : Resource
         {
             IScimTypeDefinition td;
@@ -311,34 +263,35 @@
                 ? (td as IScimResourceTypeDefinition)?.ValidatorType 
                 : null;
         }
-        
-        private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()
-        {
-            var features = new Dictionary<ScimFeatureType, ScimFeature>();
-            features.Add(ScimFeatureType.Patch, new ScimFeature(true));
-            features.Add(ScimFeatureType.Bulk, ScimFeatureBulk.Create(ScimConstants.Defaults.BulkMaxOperations, ScimConstants.Defaults.BulkMaxPayload));
-            features.Add(ScimFeatureType.Filter, ScimFeatureFilter.Create(ScimConstants.Defaults.FilterMaxResults));
-            features.Add(ScimFeatureType.ChangePassword, new ScimFeature(true));
-            features.Add(ScimFeatureType.Sort, new ScimFeature(true));
-            features.Add(ScimFeatureType.ETag, new ScimFeatureETag(true, true));
 
-            return features;
+        internal void AddTypeDefiniton(IScimTypeDefinition scimTypeDefinition)
+        {
+            if (_TypeDefinitionCache.ContainsKey(scimTypeDefinition.DefinitionType))
+                throw new InvalidOperationException(
+                    string.Format(
+                        "ScimServerConfiguration already contains a type definition for type '{0}'.",
+                        scimTypeDefinition.DefinitionType.Name));
+
+            if (!_TypeDefinitionCache.TryAdd(scimTypeDefinition.DefinitionType, scimTypeDefinition))
+                throw new Exception(
+                    string.Format(
+                        "ScimServerConfiguration was unable to add a type definition for type '{0}'.",
+                        scimTypeDefinition.DefinitionType.Name));
         }
 
-        private void DefineCoreResourceTypes()
+        private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()
         {
-            // this is mainly for unit tests to not try and keep creating resource types as they are static
-            if (!_TypeDefinitionCache.Any())
+            var features = new Dictionary<ScimFeatureType, ScimFeature>
             {
-                lock (_SyncLock)
-                {
-                    if (!_TypeDefinitionCache.Any())
-                    {
-                        AddResourceType<User>(schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User));
-                        AddResourceType<Group>(schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group));
-                    }
-                }
-            }
+                { ScimFeatureType.Patch, new ScimFeature(true) },
+                { ScimFeatureType.Bulk, ScimFeatureBulk.Create(ScimConstants.Defaults.BulkMaxOperations, ScimConstants.Defaults.BulkMaxPayload) },
+                { ScimFeatureType.Filter, ScimFeatureFilter.Create(ScimConstants.Defaults.FilterMaxResults) },
+                { ScimFeatureType.ChangePassword, new ScimFeature(true) },
+                { ScimFeatureType.Sort, new ScimFeature(true) },
+                { ScimFeatureType.ETag, new ScimFeatureETag(true, true) }
+            };
+
+            return features;
         }
     }
 }

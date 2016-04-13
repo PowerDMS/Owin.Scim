@@ -9,11 +9,10 @@ namespace Owin.Scim.Configuration
             this ScimTypeAttributeDefinitionBuilder<T, string> attributeBuilder,
             bool caseExact)
         {
-            var stringBuilder = (ScimTypeScalarAttributeDefinitionBuilder<T, string>)attributeBuilder;
+            var stringBuilder = attributeBuilder as ScimTypeScalarAttributeDefinitionBuilder<T, string>;
+            if (stringBuilder == null) throw new InvalidOperationException("You cannot define caseExact on a non-string attribute type.");
 
-            stringBuilder.SetCaseExactInternal(caseExact);
-
-            return stringBuilder;
+            return stringBuilder.SetCaseExactInternal(caseExact);
         }
 
         public static ScimTypeAttributeDefinitionBuilder<T, TUri> SetReferenceTypes<T, TUri>(
@@ -24,9 +23,7 @@ namespace Owin.Scim.Configuration
             var uriBuilder = attributeBuilder as ScimTypeUriAttributeDefinitionBuilder<T, TUri>;
             if (uriBuilder == null) throw new InvalidOperationException("You cannot define reference types on a non-Uri attribute type.");
             
-            uriBuilder.AddReferenceTypes(referenceTypes.ToList());
-
-            return uriBuilder;
+            return uriBuilder.SetReferenceTypesInternal(referenceTypes.ToList());
         }
     }
 }

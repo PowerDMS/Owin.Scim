@@ -127,6 +127,7 @@
     <Compile Include="Canonicalization\CanonicalizationRule.cs" />
     <Compile Include="Configuration\ResourceParameterBinding.cs" />
     <Compile Include="Configuration\SchemaBindingRule.cs" />
+    <Compile Include="Configuration\ScimApplicationManager.cs" />
     <Compile Include="Configuration\ScimFeatureType.cs" />
     <Compile Include="Configuration\ScimInternalAttribute.cs" />
     <Compile Include="Configuration\ScimResourceTypeDefinitionBuilder.cs" />
@@ -158,6 +159,7 @@
     <Compile Include="Extensions\DelegateExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Extensions\IListExtensions.cs" />
+    <Compile Include="Extensions\IScimTypeAttributeDefinitionExtensions.cs" />
     <Compile Include="Extensions\IValidatorExtensions.cs" />
     <Compile Include="Extensions\JObjectExtensions.cs" />
     <Compile Include="Extensions\JsonPatchExceptionExtensions.cs" />
@@ -179,14 +181,19 @@
     <Compile Include="Model\ResourceType.cs" />
     <Compile Include="Model\ResourceTypeDefinition.cs" />
     <Compile Include="Model\SchemaExtension.cs" />
+    <Compile Include="Model\ScimAttributeSchema.cs" />
+    <Compile Include="Model\ScimDataType.cs" />
     <Compile Include="Model\ScimFeatureBulk.cs" />
     <Compile Include="Model\ScimFeatureETag.cs" />
     <Compile Include="Model\ScimFeatureFilter.cs" />
     <Compile Include="Model\ScimFeature.cs" />
+    <Compile Include="Model\ScimSchema.cs" />
+    <Compile Include="Model\ScimSchemaTypeDefinition.cs" />
     <Compile Include="Model\ServiceProviderConfig.cs" />
     <Compile Include="Model\MultiValuedAttributeDefinition.cs" />
     <Compile Include="Model\ScimTypeDefinitionAttribute.cs" />
     <Compile Include="Model\ServiceProviderConfigDefinition.cs" />
+    <Compile Include="Model\Users\EnterpriseUserExtensionDefinition.cs" />
     <Compile Include="Model\Users\PhotoDefinition.cs" />
     <Compile Include="Model\Users\UserDefinition.cs" />
     <Compile Include="Querying\PathFilterExpression.cs" />
@@ -200,6 +207,8 @@
     <Compile Include="Serialization\ResolverContractKey.cs" />
     <Compile Include="Serialization\ScimContractResolver.cs" />
     <Compile Include="Services\AmbientRequestMessageService.cs" />
+    <Compile Include="Services\ISchemaService.cs" />
+    <Compile Include="Services\SchemaService.cs" />
     <Compile Include="SometimesLazy.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtension.cs" />
     <Compile Include="Model\ResourceExtension.cs" />

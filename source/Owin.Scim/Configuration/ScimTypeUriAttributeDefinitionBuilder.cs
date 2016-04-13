@@ -3,23 +3,24 @@ namespace Owin.Scim.Configuration
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
 
-    public class ScimTypeUriAttributeDefinitionBuilder<T, TMember>
-        : ScimTypeScalarAttributeDefinitionBuilder<T, TMember>
-        where TMember : Uri
+    public class ScimTypeUriAttributeDefinitionBuilder<T, TAttribute>
+        : ScimTypeScalarAttributeDefinitionBuilder<T, TAttribute>
+        where TAttribute : Uri
     {
         public ScimTypeUriAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> typeDefinition,
-            PropertyDescriptor propertyDescriptor)
-            : base(typeDefinition, propertyDescriptor)
+            PropertyDescriptor propertyDescriptor,
+            bool multiValued = false)
+            : base(typeDefinition, propertyDescriptor, multiValued)
         {
         }
 
-        internal IEnumerable<string> ReferenceTypes { get; set; } 
-
-        internal void AddReferenceTypes(IEnumerable<string> referenceTypes)
+        internal ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetReferenceTypesInternal(IEnumerable<string> referenceTypes)
         {
-            ReferenceTypes = referenceTypes;
+            ReferenceTypes = referenceTypes.ToList();
+            return this;
         }
     }
 }

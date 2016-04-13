@@ -5,19 +5,15 @@ namespace Owin.Scim.Configuration
 
     public interface IScimResourceTypeDefinition : IScimTypeDefinition
     {
-        string Description { get; }
-
         string Endpoint { get; }
-
-        string Name { get; }
 
         string Schema { get; }
 
         Type ValidatorType { get; }
 
+        Predicate<ISet<string>> SchemaBindingRule { get; }
+
         IEnumerable<ScimResourceTypeExtension> SchemaExtensions { get; }
-        
-        void AddExtension(ScimResourceTypeExtension extension);
 
         ScimResourceTypeExtension GetExtension(string schemaIdentifier);
     }

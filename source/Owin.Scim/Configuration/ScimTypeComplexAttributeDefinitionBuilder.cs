@@ -10,9 +10,8 @@
             ScimTypeDefinitionBuilder<T> typeDefinition,
             PropertyDescriptor propertyDescriptor,
             bool multiValued = false)
-            : base (typeDefinition, propertyDescriptor)
+            : base (typeDefinition, propertyDescriptor, multiValued)
         {
-            MultiValued = multiValued;
         }
 
         public override IScimTypeDefinition DeclaringTypeDefinition

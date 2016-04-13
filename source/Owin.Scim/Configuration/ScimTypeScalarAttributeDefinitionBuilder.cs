@@ -7,8 +7,9 @@
     {
         public ScimTypeScalarAttributeDefinitionBuilder(
             ScimTypeDefinitionBuilder<T> typeDefinition,
-            PropertyDescriptor propertyDescriptor)
-            : base(typeDefinition, propertyDescriptor)
+            PropertyDescriptor propertyDescriptor,
+            bool multiValued = false)
+            : base(typeDefinition, propertyDescriptor, multiValued)
         {
         }
 

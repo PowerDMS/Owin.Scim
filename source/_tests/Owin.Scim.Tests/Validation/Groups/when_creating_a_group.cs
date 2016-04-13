@@ -1,5 +1,7 @@
 ﻿namespace Owin.Scim.Tests.Validation.Groups
 {
+    using System;
+
     using FakeItEasy;
     using FluentValidation;
 
@@ -21,7 +23,7 @@
             var groupRepository = A.Fake<IGroupRepository>();
             var scimServerConfiguration = A.Fake<ScimServerConfiguration>();
 
-            scimServerConfiguration.PublicOrigin = "http://local/Scim/V2/";
+            scimServerConfiguration.PublicOrigin = new Uri("http://local/Scim/V2/");
             A.CallTo(() => userRepository.GetUser(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidUserId ? new User() : null);
             A.CallTo(() => groupRepository.GetGroup(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidGroupId ? new Group() : null);
 
