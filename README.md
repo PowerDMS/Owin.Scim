@@ -89,17 +89,9 @@ The majority of SCIM's resource type attributes have qualities which default to:
 Owin.Scim auto-assigns all core attribute qualities as per https://tools.ietf.org/html/rfc7643#section-7.  Depending on your requirements as a SCIM service provider, you may need to modify these qualities as you see fit.  It is up to you to ensure any modifications remain in compliance of the SCIM standard.
 
 ####Adding resource types:
-```csharp
-app.UserScimServer(
-  new ScimServerConfiguration()
-    .RemoveResourceType<User>
-    .AddResourceType<User>(schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User));
-```
+Owin.Scim uses MEF to create a composition catalog of all type definitons.  To add new resource types, all you have to do is create a new class which inherits from `Resource` and create an associated resource type definition like described below.
 
-######Schema Binding Rules
-In the above example, if the predicate lambda function is satisfied (returns true) by the schemas collection passed into it as an argument, Owin.Scim will instantiate (deserialize) an instance of the associated type argument `User` when a SCIM client is sending a POST or PUT request.
-
-######Resource Type Definitions / Type Definitions
+#####Resource Type Definitions / Type Definitions
 In order to process rules concerning mutability and attribute serialization, Owin.Scim requires all resource types and complex types to define their metadata schema representations.  Without this, Owin.Scim will interpret each attribute with the default SCIM attribute behaviors: Mutability.ReadWrite, Returned.Default, etc.
 
 To define your metadata, each object must specify a `ScimTypeDefinitionAttribute`. (e.g. [ScimTypeDefinition(typeof(UserDefinition))])
@@ -120,7 +112,8 @@ public class UserDefinition : ScimResourceTypeDefinitionBuilder<User>
             ScimConstants.ResourceTypes.User,
             ScimConstants.Schemas.User,
             ScimConstants.Endpoints.Users,
-            typeof(UserValidator))
+            typeof(UserValidator),
+            schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User))
     {
         AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false); // add optional or required schema extensions
         
@@ -195,22 +188,10 @@ public class UserDefinition : ScimResourceTypeDefinitionBuilder<User>
 }
 ```
 
-####Modifying core resource types
-```csharp
-app.UseScimServer(
-  new ScimServerConfiguration()
-    .ModifyResourceType<User>(ModifyUserResourceType));
+######Schema Binding Rules
+For all POST, PUT, and PATCH operations Owin.Scim must interpret the request content and decide which concrete type to instantiate and deserialize to.  In the above resource type defininition constructor, if the predicate `schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User)` is satisfied by the schemas collection obtained from the request's json content, Owin.Scim will instantiate (deserialize) an instance of the associated type argument `User`.
 
-// ...
-
-private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
-{
-  builder
-    .SetValidator<UserValidator>(); // allows you to change the validator for the resource
-}
-```
-
-#####Adding Canonicalization Rules
+######Adding Canonicalization Rules
 Owin.Scim allows the developer to specify canonicalization rules (delegates) as rules for resource type attributes. Some rules are built-in by default.
 
 ```csharp
@@ -234,7 +215,7 @@ This example illustrates setting canonicalization rules on multi-valued attribut
 
 *By default, all core resource types with multi-valued attributes have a canonicalization rule to* `EnforceSinglePrimaryAttribute`*.  This complies with the specification's rules.*
 
-#####Scalar Attributes
+######Scalar Attributes
 It may be you're only canonicalizing a single scalar-valued attribute or do not need to reference it's parent object's other attributes. (e.g. value and display).  In that case, just apply the canonicalization rule:
 
 ```csharp
@@ -247,3 +228,18 @@ It may be you're only canonicalizing a single scalar-valued attribute or do not 
 ######Canonical Values
 Owin.Scim does not include or define any acceptable attribute values (SCIM "canonical values").  
 The SCIM specification frequently references "canonical values" for multi-valued attribute's `type` attribute.  Values like: `work`, `home`, `other`, etc.  Owin.Scim does not view this as canonicalization but rather validation.  In this light, canonicalization should be viewed strictly in terms of normalization of data.
+
+####Modifying core resource types
+```csharp
+app.UseScimServer(
+  new ScimServerConfiguration()
+    .ModifyResourceType<User>(ModifyUserResourceType));
+
+// ...
+
+private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
+{
+  builder
+    .SetValidator<UserValidator>(); // allows you to change the validator for the resource
+}
+```
