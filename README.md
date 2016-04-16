@@ -57,9 +57,10 @@ In the coming weeks we will release a sample console OWIN application. For furth
 appBuilder.Map("/scim", app =>
 {
     app.UseScimServer(
-        new ScimServerConfiguration { RequireSsl = false }
-            .AddCompositionConditions(
-                fileInfo => fileInfo.Name.StartsWith("YourProjectName") && fileInfo.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
+      new Predicate<FileInfo>[] { fileInfo => fileInfo.Name.Equals("YourProjectName") },
+      configuration => {
+        configuration.RequireSsl = false;
+        configuration
             .AddAuthenticationScheme(
                 new AuthenticationScheme(
                     "oauthbearertoken",
@@ -68,6 +69,7 @@ appBuilder.Map("/scim", app =>
                     specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
                     isPrimary: true))
             .ConfigureETag(supported: true, isWeak: true)));
+      }
 });
 ```
 
@@ -232,8 +234,10 @@ The SCIM specification frequently references "canonical values" for multi-valued
 ####Modifying core resource types
 ```csharp
 app.UseScimServer(
-  new ScimServerConfiguration()
-    .ModifyResourceType<User>(ModifyUserResourceType));
+      new Predicate<FileInfo>[] { fileInfo => fileInfo.Name.Equals("YourProjectName") },
+      configuration => {
+        configuration.ModifyResourceType<User>(ModifyUserResourceType));
+      }
 
 // ...
 
