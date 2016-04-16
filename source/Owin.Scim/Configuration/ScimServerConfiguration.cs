@@ -289,7 +289,7 @@
 
         internal bool ContainsTypeDefinition(Type scimTypeDefinition)
         {
-            return false;
+            return _TypeDefinitionCache.Values.Any(definition => definition.GetType() == scimTypeDefinition);
         }
 
         private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()

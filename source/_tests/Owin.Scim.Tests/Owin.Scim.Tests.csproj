@@ -174,6 +174,8 @@
     <Compile Include="Integration\Querying\Projection\with_minimal_attributes.cs" />
     <Compile Include="Integration\ResourceTypes\when_retrieving_resource_types.cs" />
     <Compile Include="Integration\Schemas\when_retrieving_schemas.cs" />
+    <Compile Include="Integration\Schemas\with_no_schema_id.cs" />
+    <Compile Include="Integration\Schemas\with_schema_id.cs" />
     <Compile Include="Integration\ServiceProviderConfig\when_retrieving_service_provider_configuration.cs" />
     <Compile Include="Integration\Users\Create\when_creating_a_user.cs" />
     <Compile Include="Integration\Users\Create\with_an_enterprise_user.cs" />

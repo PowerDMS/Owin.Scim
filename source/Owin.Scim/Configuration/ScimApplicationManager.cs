@@ -1,8 +1,10 @@
 ﻿namespace Owin.Scim.Configuration
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Linq;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.Dispatcher;
@@ -17,6 +19,7 @@
     using Model;
 
     using NContext.Configuration;
+    using NContext.Extensions;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
@@ -56,10 +59,19 @@
             var serverConfiguration = new ScimServerConfiguration();
             applicationConfiguration.CompositionContainer.ComposeExportedValue(serverConfiguration);
             _IocContainer.RegisterInstance(serverConfiguration, Reuse.Singleton);
+            
+            // discover and register all type definitions
+            var enumerator = applicationConfiguration.CompositionContainer.GetExportTypesThatImplement<IScimTypeDefinition>().GetEnumerator();
+            while (enumerator.MoveNext())
+            {
+                // creating type definitions may be expensive due to reflection
+                // when a type definition is instantiated, it may implicitly instantiate/register other type 
+                // definitions for complex attributes, therefore, no need to re-create the same definition more than once
+                if (serverConfiguration.ContainsTypeDefinition(enumerator.Current)) continue;
 
-            var typeDefinitions = applicationConfiguration.CompositionContainer.GetExportedValues<IScimTypeDefinition>();
-            foreach (var typeDefinition in typeDefinitions)
+                var typeDefinition = (IScimTypeDefinition)Activator.CreateInstance(enumerator.Current);
                 serverConfiguration.AddTypeDefiniton(typeDefinition);
+            }
 
             _ConfigureScimServerAction?.Invoke(serverConfiguration);
 
