@@ -108,15 +108,27 @@
             get { return _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>(); }
         }
 
+        internal IEnumerable<IScimSchemaTypeDefinition> SchemaTypeDefinitions
+        {
+            get
+            {
+                return _TypeDefinitionCache.Values.OfType<IScimSchemaTypeDefinition>();
+            }
+        }
+
         public static IScimTypeDefinition GetScimTypeDefinition(Type type)
         {
             return _TypeDefinitionCache.GetOrAdd(
                 type,
-                t => TypeDescriptor.GetAttributes(t)
-                    .OfType<ScimTypeDefinitionAttribute>()
-                    .MaybeSingle()
-                    .Bind(a => ((IScimTypeDefinition) Activator.CreateInstance(a.DefinitionType)).ToMaybe())
-                    .FromMaybe(null));
+                t =>
+                {
+                    var typeDefinitionType = typeof (ScimTypeDefinitionBuilder<>).MakeGenericType(type);
+                    return TypeDescriptor.GetAttributes(t)
+                        .OfType<ScimTypeDefinitionAttribute>()
+                        .MaybeSingle()
+                        .Bind(a => ((IScimTypeDefinition) Activator.CreateInstance(a.DefinitionType)).ToMaybe())
+                        .FromMaybe((IScimTypeDefinition) Activator.CreateInstance(typeDefinitionType));
+                });
         }
 
         public static bool ResourceExtensionExists(string extensionSchemaIdentifier)
@@ -266,17 +278,18 @@
 
         internal void AddTypeDefiniton(IScimTypeDefinition scimTypeDefinition)
         {
-            if (_TypeDefinitionCache.ContainsKey(scimTypeDefinition.DefinitionType))
-                throw new InvalidOperationException(
-                    string.Format(
-                        "ScimServerConfiguration already contains a type definition for type '{0}'.",
-                        scimTypeDefinition.DefinitionType.Name));
+            if (_TypeDefinitionCache.ContainsKey(scimTypeDefinition.DefinitionType)) return;
 
             if (!_TypeDefinitionCache.TryAdd(scimTypeDefinition.DefinitionType, scimTypeDefinition))
                 throw new Exception(
                     string.Format(
                         "ScimServerConfiguration was unable to add a type definition for type '{0}'.",
                         scimTypeDefinition.DefinitionType.Name));
+        }
+
+        internal bool ContainsTypeDefinition(Type scimTypeDefinition)
+        {
+            return false;
         }
 
         private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()

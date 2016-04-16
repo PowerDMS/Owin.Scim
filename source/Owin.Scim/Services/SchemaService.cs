@@ -46,37 +46,39 @@ namespace Owin.Scim.Services
         private IReadOnlyDictionary<string, ScimSchema> CreateSchemas()
         {
             var schemas = new Dictionary<string, ScimSchema>();
-            foreach (var rtd in ScimServerConfiguration.ResourceTypeDefinitions)
+            foreach (var std in ScimServerConfiguration.SchemaTypeDefinitions)
             {
                 var attributeDefinitions = new List<ScimAttributeSchema>();
-                foreach (var ad in rtd.AttributeDefinitions.Values)
+                foreach (var ad in std.AttributeDefinitions.Values)
                 {
                     attributeDefinitions.Add(ad.ToScimAttributeSchema());
                 }
 
-                schemas.Add(rtd.Schema, new ScimSchema(rtd.Schema, rtd.Name, rtd.Description, attributeDefinitions));
+                schemas.Add(std.Schema, new ScimSchema(std.Schema, std.Name, std.Description, attributeDefinitions));
 
-                foreach (var extension in rtd.SchemaExtensions)
+                var rtd = std as IScimResourceTypeDefinition;
+                if (rtd != null)
                 {
-                    attributeDefinitions = new List<ScimAttributeSchema>();
-                    foreach (var ad in extension.ExtensionDefinition.AttributeDefinitions.Values)
+                    foreach (var extension in rtd.SchemaExtensions)
                     {
-                        attributeDefinitions.Add(ad.ToScimAttributeSchema());
-                    }
+                        attributeDefinitions = new List<ScimAttributeSchema>();
+                        foreach (var ad in extension.ExtensionDefinition.AttributeDefinitions.Values)
+                        {
+                            attributeDefinitions.Add(ad.ToScimAttributeSchema());
+                        }
 
-                    schemas.Add(
-                        extension.Schema, 
-                        new ScimSchema(
-                            extension.Schema, 
-                            extension.ExtensionDefinition.Name,
-                            extension.ExtensionDefinition.Description, 
-                            attributeDefinitions));
+                        schemas.Add(
+                            extension.Schema,
+                            new ScimSchema(
+                                extension.Schema,
+                                extension.ExtensionDefinition.Name,
+                                extension.ExtensionDefinition.Description,
+                                attributeDefinitions));
+                    }
                 }
             }
 
             return schemas;
         }
-
-
     }
 }

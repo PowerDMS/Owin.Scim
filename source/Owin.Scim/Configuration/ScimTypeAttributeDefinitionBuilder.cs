@@ -4,29 +4,24 @@ namespace Owin.Scim.Configuration
     using System.Collections;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.Globalization;
     using System.Linq;
 
     using Canonicalization;
 
     using Extensions;
 
-    using FluentValidation;
-
-    using Model;
-
     using Newtonsoft.Json;
 
     public abstract class ScimTypeAttributeDefinitionBuilder<T, TAttribute> : IScimTypeAttributeDefinition
     {
-        private readonly ScimTypeDefinitionBuilder<T> _DeclaringTypeDefinition;
+        private readonly IScimTypeDefinition _DeclaringTypeDefinition;
 
         private readonly PropertyDescriptor _PropertyDescriptor;
 
         private readonly IList<ICanonicalizationRule> _CanonicalizationRules; 
 
         protected ScimTypeAttributeDefinitionBuilder(
-            ScimTypeDefinitionBuilder<T> typeDefinition,
+            IScimTypeDefinition typeDefinition,
             PropertyDescriptor propertyDescriptor,
             bool multiValued)
         {
@@ -87,7 +82,7 @@ namespace Owin.Scim.Configuration
             get { return _PropertyDescriptor; }
         }
 
-        public virtual IScimTypeDefinition DeclaringTypeDefinition
+        public IScimTypeDefinition DeclaringTypeDefinition
         {
             get { return _DeclaringTypeDefinition; }
         }

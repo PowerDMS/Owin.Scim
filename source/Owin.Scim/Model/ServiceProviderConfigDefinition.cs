@@ -2,9 +2,10 @@
 {
     using Configuration;
 
-    public class ServiceProviderConfigDefinition : ScimTypeDefinitionBuilder<ServiceProviderConfig>
+    public class ServiceProviderConfigDefinition : ScimSchemaTypeDefinitionBuilder<ServiceProviderConfig>
     {
         public ServiceProviderConfigDefinition()
+            : base(ScimConstants.Schemas.ServiceProviderConfig)
         {
             SetName("Service Provider Configuration");
             SetDescription("Schema for representing the service provider's configuration");

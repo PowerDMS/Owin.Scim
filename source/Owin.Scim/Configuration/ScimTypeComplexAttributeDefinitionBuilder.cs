@@ -7,16 +7,11 @@
         where TComplexAttribute : class
     {
         public ScimTypeComplexAttributeDefinitionBuilder(
-            ScimTypeDefinitionBuilder<T> typeDefinition,
+            IScimTypeDefinition typeDefinition,
             PropertyDescriptor propertyDescriptor,
             bool multiValued = false)
             : base (typeDefinition, propertyDescriptor, multiValued)
         {
-        }
-
-        public override IScimTypeDefinition DeclaringTypeDefinition
-        {
-            get { return ScimServerConfiguration.GetScimTypeDefinition(typeof(TComplexAttribute)); }
         }
     }
 }

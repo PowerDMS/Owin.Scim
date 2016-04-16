@@ -150,6 +150,7 @@ namespace Owin.Scim.Configuration
                 return instance;
             }
 
+            IScimTypeDefinition typeDefinition;
             if (descriptor.PropertyType.IsNonStringEnumerable())
             {
                 var itemType = descriptor.PropertyType.IsArray
@@ -167,15 +168,29 @@ namespace Owin.Scim.Configuration
                 }
 
                 // multiValued complex attribute
+                typeDefinition = itemType == typeof (T) // circular reference check
+                    ? this
+                    : ScimServerConfiguration.GetScimTypeDefinition(itemType);
                 builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType);
-                instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, true);
+                instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(
+                    builder, 
+                    typeDefinition, 
+                    descriptor, 
+                    true);
 
                 return instance;
             }
 
             // complex attribute
+            typeDefinition = descriptor.PropertyType == typeof(T) // circular reference check
+                ? this
+                : ScimServerConfiguration.GetScimTypeDefinition(descriptor.PropertyType);
             builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
-            instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, false);
+            instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(
+                builder, 
+                typeDefinition, 
+                descriptor, 
+                false);
 
             return instance;
         }

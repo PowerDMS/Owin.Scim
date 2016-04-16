@@ -3,11 +3,9 @@ namespace Owin.Scim.Configuration
     using System;
     using System.Collections.Generic;
 
-    public interface IScimResourceTypeDefinition : IScimTypeDefinition
+    public interface IScimResourceTypeDefinition : IScimSchemaTypeDefinition
     {
         string Endpoint { get; }
-
-        string Schema { get; }
 
         Type ValidatorType { get; }
 

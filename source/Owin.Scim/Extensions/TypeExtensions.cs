@@ -3,12 +3,7 @@
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
-
-    using NContext.Common;
-
-    using Newtonsoft.Json;
 
     public static class TypeExtensions
     {
@@ -58,15 +53,16 @@
 
             return type.IsPrimitive || 
                    type.IsEnum || 
-                   type.IsPointer || 
-                   Nullable.GetUnderlyingType(type) != null ||
+                   type.IsPointer ||
+                   type == typeof(object) ||
                    type == typeof (string) || 
                    type == typeof (DateTime) || 
                    type == typeof (decimal) || 
                    type == typeof(Uri) || 
                    type == typeof (Guid) || 
                    type == typeof (DateTimeOffset) || 
-                   type == typeof (TimeSpan);
+                   type == typeof (TimeSpan) ||
+                   Nullable.GetUnderlyingType(type) != null;
         }
     }
 }

@@ -13,7 +13,7 @@ namespace Owin.Scim.Model
         /// Initializes a new instance of the <see cref="ScimAttributeSchema"/> class.
         /// </summary>
         /// <param name="name">The name.</param>
-        /// <param name="dataType">Type of the data.</param>
+        /// <param name="type">Type of the data.</param>
         /// <param name="description">The description.</param>
         /// <param name="multiValued">if set to <c>true</c> [multi valued].</param>
         /// <param name="mutability">The mutability.</param>
@@ -26,7 +26,7 @@ namespace Owin.Scim.Model
         /// <param name="referenceTypes">The reference types.</param>
         public ScimAttributeSchema(
             string name, 
-            ScimDataType dataType, 
+            string type, 
             string description, 
             bool multiValued, 
             string mutability, 
@@ -39,7 +39,7 @@ namespace Owin.Scim.Model
             IEnumerable<string> referenceTypes)
         {
             Name = name;
-            Type = dataType;
+            Type = type.ToString();
             Description = description;
             MultiValued = multiValued;
             Mutability = mutability;
@@ -138,12 +138,12 @@ namespace Owin.Scim.Model
 
         public bool ShouldSerializeCaseExact()
         {
-            return Type == ScimDataType.String;
+            return Type.Equals(ScimConstants.DataTypes.String);
         }
 
         public bool ShouldSerializeReferenceTypes()
         {
-            return Type == ScimDataType.Reference;
+            return Type == ScimConstants.DataTypes.Reference;
         }
     }
 }

@@ -15,8 +15,10 @@
             var subAttributes = new List<ScimAttributeSchema>();
 
             var definitionType = definition.GetType();
+            Type[] genericTypeArguments;
             if (definitionType.IsGenericType &&
-                definitionType.GetGenericTypeDefinition() == typeof (ScimTypeComplexAttributeDefinitionBuilder<,>))
+                definitionType.GetGenericTypeDefinition() == typeof (ScimTypeComplexAttributeDefinitionBuilder<,>) &&
+                (genericTypeArguments = definitionType.GetGenericArguments())[0] != genericTypeArguments[1]) // circular reference check e.g <ScimAttributeSchema, ScimAttributeSchema>
             {
                 foreach (var subAttDefinition in definition.DeclaringTypeDefinition.AttributeDefinitions.Values)
                 {
@@ -39,31 +41,41 @@
                 definition.ReferenceTypes);
         }
         
-        private static ScimDataType GetScimDataType(PropertyDescriptor descriptor)
+        private static string GetScimDataType(PropertyDescriptor descriptor)
         {
-            if (descriptor.PropertyType == typeof(string))
-                return ScimDataType.String;
+            var attributeType = descriptor.PropertyType;
+            if (attributeType.IsNonStringEnumerable())
+                attributeType = descriptor.PropertyType.IsArray
+                    ? descriptor.PropertyType.GetElementType()
+                    : descriptor.PropertyType.GetGenericArguments()[0];
 
-            if (descriptor.PropertyType == typeof(Uri))
-                return ScimDataType.Reference;
+            if (attributeType == typeof(string))
+                return ScimConstants.DataTypes.String;
 
-            if (descriptor.PropertyType == typeof(bool) || descriptor.PropertyType == typeof(bool?))
-                return ScimDataType.Boolean;
+            if (attributeType == typeof(Uri))
+                return ScimConstants.DataTypes.Reference;
 
-            if (descriptor.PropertyType == typeof(DateTime) ||
-                descriptor.PropertyType == typeof(DateTime?) ||
-                descriptor.PropertyType == typeof(DateTimeOffset) ||
-                descriptor.PropertyType == typeof(DateTimeOffset?))
-                return ScimDataType.DateTime;
+            if (attributeType == typeof(bool) || attributeType == typeof(bool?))
+                return ScimConstants.DataTypes.Boolean;
 
-            if (descriptor.PropertyType == typeof(decimal) || descriptor.PropertyType == typeof(decimal?))
-                return ScimDataType.Decimal;
+            if (attributeType == typeof(DateTime) ||
+                attributeType == typeof(DateTime?) ||
+                attributeType == typeof(DateTimeOffset) ||
+                attributeType == typeof(DateTimeOffset?))
+                return ScimConstants.DataTypes.DateTime;
 
-            if (descriptor.PropertyType == typeof(int) || descriptor.PropertyType == typeof(int?))
-                return ScimDataType.Integer;
+            if (attributeType == typeof(decimal) || attributeType == typeof(decimal?))
+                return ScimConstants.DataTypes.Decimal;
 
-            if (!descriptor.PropertyType.IsTerminalObject())
-                return ScimDataType.Complex;
+            if (attributeType == typeof(int) || attributeType == typeof(int?))
+                return ScimConstants.DataTypes.Integer;
+
+            // you should avoid designing your classes with ambiguous datatypes like object
+            if (attributeType == typeof (object))
+                return ScimConstants.DataTypes.String; 
+
+            if (!attributeType.IsTerminalObject())
+                return ScimConstants.DataTypes.Complex;
 
             throw new ArgumentOutOfRangeException(
                 "SCIM specification requires that all attributes data types must be of the following " +

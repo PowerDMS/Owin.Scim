@@ -119,6 +119,7 @@
     <Compile Include="Configuration\IConfigureDryIoc.cs" />
     <Compile Include="Configuration\ISchemaTypeFactory.cs" />
     <Compile Include="Configuration\IScimResourceTypeDefinition.cs" />
+    <Compile Include="Configuration\IScimSchemaTypeDefinition.cs" />
     <Compile Include="Configuration\IScimTypeDefinition.cs" />
     <Compile Include="Configuration\IScimTypeAttributeDefinition.cs" />
     <Compile Include="Configuration\ModelBindingResponseAttribute.cs" />
@@ -132,6 +133,7 @@
     <Compile Include="Configuration\ScimInternalAttribute.cs" />
     <Compile Include="Configuration\ScimResourceTypeDefinitionBuilder.cs" />
     <Compile Include="Configuration\ScimResourceTypeExtension.cs" />
+    <Compile Include="Configuration\ScimSchemaTypeDefinitionBuilder.cs" />
     <Compile Include="Configuration\ScimServerConfiguration.cs" />
     <Compile Include="Configuration\ScimTypeAttributeDefinitionBuilderExtensions.cs" />
     <Compile Include="Configuration\ScimTypeDefinitionBuilder.cs" />
@@ -182,7 +184,6 @@
     <Compile Include="Model\ResourceTypeDefinition.cs" />
     <Compile Include="Model\SchemaExtension.cs" />
     <Compile Include="Model\ScimAttributeSchema.cs" />
-    <Compile Include="Model\ScimDataType.cs" />
     <Compile Include="Model\ScimFeatureBulk.cs" />
     <Compile Include="Model\ScimFeatureETag.cs" />
     <Compile Include="Model\ScimFeatureFilter.cs" />

@@ -2,23 +2,18 @@ namespace Owin.Scim.Configuration
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
 
     using FluentValidation;
 
     using Model;
 
-    using NContext.Common;
-    
-    public class ScimResourceTypeDefinitionBuilder<T> : ScimTypeDefinitionBuilder<T>, IScimResourceTypeDefinition
+    public class ScimResourceTypeDefinitionBuilder<T> : ScimSchemaTypeDefinitionBuilder<T>, IScimResourceTypeDefinition
         where T : Resource
     {
         private readonly IDictionary<string, ScimResourceTypeExtension> _SchemaExtensions;
 
         private readonly string _Endpoint;
-
-        private readonly string _Schema;
 
         private readonly Predicate<ISet<string>> _SchemaBindingRule;
 
@@ -30,9 +25,9 @@ namespace Owin.Scim.Configuration
             string endpoint,
             Type validatorType,
             Predicate<ISet<string>> schemaBindingRule)
+            : base(schema)
         {
             _SchemaExtensions = new Dictionary<string, ScimResourceTypeExtension>();
-            _Schema = schema;
 
             SetName(name);
 
@@ -49,11 +44,6 @@ namespace Owin.Scim.Configuration
         public string Endpoint
         {
             get { return _Endpoint; }
-        }
-        
-        public string Schema
-        {
-            get { return _Schema; }
         }
         
         public Type ValidatorType
@@ -77,22 +67,7 @@ namespace Owin.Scim.Configuration
             where TExtension : ResourceExtension, new()
             where TValidator : IValidator<TExtension>
         {
-            var typeDefinition = TypeDescriptor.GetAttributes(typeof(TExtension))
-                .OfType<ScimTypeDefinitionAttribute>()
-                .MaybeSingle()
-                .Bind(a =>
-                {
-                    if (!typeof(ScimTypeDefinitionBuilder<TExtension>).IsAssignableFrom(a.DefinitionType))
-                        throw new InvalidOperationException(
-                            string.Format(
-                                "Type definition '{0}' must inherit from ScimTypeDefinitionBuilder<{1}>.",
-                                a.DefinitionType.Name,
-                                typeof(TExtension).Name));
-
-                    return ((ScimTypeDefinitionBuilder<TExtension>)Activator.CreateInstance(a.DefinitionType)).ToMaybe();
-                })
-                .FromMaybe(new ScimTypeDefinitionBuilder<TExtension>());
-
+            var typeDefinition = ScimServerConfiguration.GetScimTypeDefinition(typeof (TExtension));
             var extension = new ScimResourceTypeExtension(
                 schemaIdentifier,
                 required,
@@ -104,6 +79,16 @@ namespace Owin.Scim.Configuration
 
             return this;
         }
+
+        public ScimTypeDefinitionBuilder<T> RemoveSchemaExtension<TExtension>()
+        {
+            var extension = SchemaExtensions.SingleOrDefault(e => e.ExtensionType == typeof (TExtension));
+            if (extension == null) return this;
+
+            _SchemaExtensions.Remove(extension.Schema);
+
+            return this;
+        } 
 
         public ScimTypeDefinitionBuilder<T> SetValidator<TValidator>()
             where TValidator : IValidator<T>

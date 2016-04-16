@@ -64,6 +64,25 @@
             public const string Groups = @"groups";
         }
 
+        public static class DataTypes
+        {
+            public const string String = @"string";
+
+            public const string Boolean = @"boolean";
+
+            public const string Decimal = @"decimal";
+
+            public const string Integer = @"integer";
+
+            public const string DateTime = @"datetime";
+
+            public const string Reference = @"reference";
+
+            public const string Binary = @"binary";
+
+            public const string Complex = @"complex";
+        }
+
         public static class Maps
         {
             public static readonly IReadOnlyDictionary<string, string> EndpointToTypeDictionary =

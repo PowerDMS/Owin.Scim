@@ -1,7 +1,6 @@
 ﻿namespace Owin.Scim.Tests.Integration
 {
     using System;
-    using System.IO;
 
     using Configuration;
 
@@ -50,6 +49,8 @@
                             .ModifyResourceType<Group>(ModifyGroupResourceType);
                     });
             });
+
+            _Server.HttpClient.Timeout = TimeSpan.FromMinutes(10); // for debugging.
         }
 
         private void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
