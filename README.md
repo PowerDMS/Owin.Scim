@@ -52,24 +52,7 @@ Roadmap
 
 Getting Started
 ===============
-In the coming weeks we will release a sample console OWIN application. For further understanding, please take a look at the integration test class `using_a_scim_server`.  In your own OWIN application, you may want to map a path to the scim server endpoints like shown below:  
-```csharp
-appBuilder.Map("/scim", app =>
-{
-    app.UseScimServer(
-        new ScimServerConfiguration { RequireSsl = false }
-            .AddCompositionConditions(
-                fileInfo => fileInfo.Name.StartsWith("YourProjectName") && fileInfo.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase))
-            .AddAuthenticationScheme(
-                new AuthenticationScheme(
-                    "oauthbearertoken",
-                    "OAuth Bearer Token",
-                    "Authentication scheme using the OAuth Bearer Token standard.", 
-                    specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
-                    isPrimary: true))
-            .ConfigureETag(supported: true, isWeak: true)));
-});
-```
+Please see the WIKI.
 
 ##SCIM Extensibility  
 ###Defining & Modifying Resource Types  
@@ -232,8 +215,10 @@ The SCIM specification frequently references "canonical values" for multi-valued
 ####Modifying core resource types
 ```csharp
 app.UseScimServer(
-  new ScimServerConfiguration()
-    .ModifyResourceType<User>(ModifyUserResourceType));
+      new Predicate<FileInfo>[] { fileInfo => fileInfo.Name.Equals("YourProjectName") },
+      configuration => {
+        configuration.ModifyResourceType<User>(ModifyUserResourceType));
+      }
 
 // ...
 
