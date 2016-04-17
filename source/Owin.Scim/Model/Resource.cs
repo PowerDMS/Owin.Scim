@@ -41,6 +41,7 @@
         private IDictionary<string, JToken> ExtensionSerialization { get; set; }
 
         [JsonIgnore]
+        [ScimInternal]
         public abstract string SchemaIdentifier { get; }
 
         [JsonIgnore]

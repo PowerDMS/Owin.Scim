@@ -15,7 +15,7 @@
         public string Value { get; set; }
 
         [JsonProperty("$ref")]
-        public string Ref { get; set; }
+        public Uri Ref { get; set; }
 
         protected internal virtual int CalculateVersion()
         {

@@ -1,9 +1,10 @@
 ﻿namespace Owin.Scim.Model.Groups
 {
-    using System;
     using System.Collections.Generic;
 
     using Extensions;
+
+    using Newtonsoft.Json;
 
     [ScimTypeDefinition(typeof(GroupDefinition))]
     public class Group : Resource
@@ -19,14 +20,16 @@
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group);
         }
-
+        
         public override string SchemaIdentifier
         {
             get { return ScimConstants.Schemas.Group; }
         }
 
+        [JsonProperty("displayName")]
         public string DisplayName { get; set; }
 
+        [JsonProperty("members")]
         public IEnumerable<Member> Members { get; set; }
 
         public override int CalculateVersion()

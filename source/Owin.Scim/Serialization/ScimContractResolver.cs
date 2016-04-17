@@ -116,6 +116,7 @@
                             // Only attach a conditional serialization delegate if the attribute is not Always returned.
                             if (attributeDefinition.Returned != Returned.Always)
                             {
+                                var existingShouldSerializeFunc = property.ShouldSerialize;
                                 property.ShouldSerialize = o =>
                                 {
                                     if (attributeDefinition.Mutability == Mutability.WriteOnly || attributeDefinition.Returned == Returned.Never)
@@ -132,6 +133,9 @@
                                         if (queryOptions.ExcludedAttributes.Any() && queryOptions.ExcludedAttributes.Contains(property.PropertyName))
                                             return false;
                                     }
+
+                                    if (existingShouldSerializeFunc != null)
+                                        return existingShouldSerializeFunc(o);
 
                                     return true;
                                 };

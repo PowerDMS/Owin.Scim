@@ -2,6 +2,7 @@
 
 namespace Owin.Scim.Tests.Integration.Groups.Replace
 {
+    using System;
     using System.Net;
 
     using Machine.Specifications;
@@ -35,7 +36,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
                 DisplayName = "updated group 2",
                 Members = new[]
                 {
-                    new Member {Value = ExistingUser2.Id, Type = "user", Ref = "\\badthing"}
+                    new Member { Value = ExistingUser2.Id, Type = "user", Ref = new UriBuilder { Fragment = "\\badthing" }.Uri }
                 }
             };
         };

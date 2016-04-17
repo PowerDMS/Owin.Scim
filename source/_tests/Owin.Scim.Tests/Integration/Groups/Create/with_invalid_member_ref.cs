@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.Tests.Integration.Groups.Create
 {
+    using System;
     using System.Net;
     using Machine.Specifications;
     using Model.Users;
@@ -17,7 +18,7 @@
                 ExternalId = "hello",
                 Members = new []
                 {
-                    new Member {Value = ExistingUser.Id, Type = "user", Ref = "\\hello"},
+                    new Member { Value = ExistingUser.Id, Type = "user", Ref = new UriBuilder { Fragment = "\\hello" }.Uri }
                 }
             };
         };

@@ -67,7 +67,7 @@
                 .Select(group => new UserGroup
                 {
                     Value = group.Id,
-                    Ref = "../Groups/" + group.Id,
+                    Ref = new Uri("../Groups/" + group.Id),
                     Display = group.DisplayName,
                     Type = "direct"
                 }));

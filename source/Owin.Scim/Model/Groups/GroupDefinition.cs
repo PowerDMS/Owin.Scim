@@ -18,6 +18,9 @@ namespace Owin.Scim.Model.Groups
                 typeof(GroupValidator),
                 schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
         {
+            SetName("Group");
+            SetDescription("Group resource.");
+
             For(u => u.Schemas)
                 .SetReturned(Returned.Always);
 
@@ -28,9 +31,11 @@ namespace Owin.Scim.Model.Groups
                 .SetCaseExact(true);
 
             For(u => u.DisplayName)
+                .SetDescription("A human-readable name for the group.")
                 .SetRequired(true);
 
             For(u => u.Members)
+                .SetDescription("A list of members of the group.")
                 .AddCanonicalizationRule(member => member.Canonicalize(e => e.Type, StringExtensions.UppercaseFirstCharacter));
 
             For(u => u.Meta)

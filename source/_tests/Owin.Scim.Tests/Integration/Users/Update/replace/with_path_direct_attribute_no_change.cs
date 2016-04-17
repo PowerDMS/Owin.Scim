@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Users.Update.replace
 {
+    using System;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
@@ -23,7 +24,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
                 },
                 PhoneNumbers = new []
                 {
-                    new PhoneNumber {Value = "8009991234", Type = "old", Ref = "http://hello.org/world"}
+                    new PhoneNumber {Value = "8009991234", Type = "old", Ref = new Uri("http://hello.org/world")}
                 }
             };
 

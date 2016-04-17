@@ -61,6 +61,8 @@ namespace Owin.Scim.Configuration
 
         public ISet<object> CanonicalValues { get; protected set; }
 
+        public IEqualityComparer CanonicalValueComparer { get; protected set; }
+
         public bool CaseExact { get; protected set; }
 
         public string Description { get; protected set; }
@@ -86,8 +88,6 @@ namespace Owin.Scim.Configuration
         {
             get { return _DeclaringTypeDefinition; }
         }
-
-        protected internal IEqualityComparer CanonicalValueComparer { get; protected set; }
 
         public IEnumerable<ICanonicalizationRule> GetCanonicalizationRules()
         {
@@ -167,15 +167,17 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetCanonicalValues(
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetCanonicalValues<TEqualityComparer>(
             IEnumerable<TAttribute> acceptableValues,
-            EqualityComparer<TAttribute> comparer = null)
+            TEqualityComparer comparer = null)
+            where TEqualityComparer : class, IEqualityComparer<TAttribute>, IEqualityComparer
         {
+            IEqualityComparer<TAttribute> equalityComparer = comparer;
             if (comparer == null)
-                comparer = EqualityComparer<TAttribute>.Default;
-
-            CanonicalValues = new HashSet<object>(acceptableValues.Distinct(comparer).Cast<object>());
-            CanonicalValueComparer = comparer;
+                equalityComparer = EqualityComparer<TAttribute>.Default;
+            
+            CanonicalValues = new HashSet<object>(acceptableValues.Distinct(equalityComparer).Cast<object>());
+            CanonicalValueComparer = (IEqualityComparer)equalityComparer;
 
             return this;
         }
