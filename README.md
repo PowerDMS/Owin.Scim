@@ -30,7 +30,7 @@ The list below doesn't necessarily denote priority or order.
 2. [x] Schema extensions
 3. [ ] Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
-  2. [x] /Schemas (IN PROGRESS)
+  2. [x] /Schemas
   3. [x] /ResourceTypes
 4. [x] Add support for mutability rule-processing.
 5. [ ] Add support for bulk processing
