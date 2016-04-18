@@ -2,6 +2,7 @@
 {
     using Newtonsoft.Json;
 
+    [ScimTypeDefinition(typeof(ScimFeatureBulkDefinition))]
     public class ScimFeatureBulk : ScimFeature
     {
         private ScimFeatureBulk(int maxOperations, int maxPayloadSize)
@@ -22,12 +23,12 @@
         [JsonProperty("maxPayloadSize")]
         public int MaxPayloadSize { get; private set; }
 
-        public static ScimFeature Create(int maxOperations, int maxPayloadSizeInBytes)
+        public static ScimFeatureBulk Create(int maxOperations, int maxPayloadSizeInBytes)
         {
             return new ScimFeatureBulk(maxOperations, maxPayloadSizeInBytes);
         }
 
-        public static ScimFeature CreateUnsupported()
+        public static ScimFeatureBulk CreateUnsupported()
         {
             return new ScimFeatureBulk();
         }

@@ -1,5 +1,6 @@
 namespace Owin.Scim.Model
 {
+    [ScimTypeDefinition(typeof(ScimFeatureDefinition))]
     public class ScimFeature
     {
         public ScimFeature(bool supported)

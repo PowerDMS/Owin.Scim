@@ -2,6 +2,7 @@
 {
     using Newtonsoft.Json;
 
+    [ScimTypeDefinition(typeof(ScimFeatureFilterDefinition))]
     public class ScimFeatureFilter : ScimFeature
     {
         private ScimFeatureFilter(int maxResults)
@@ -18,12 +19,12 @@
         [JsonProperty("maxResults")]
         public int MaxResults { get; private set; }
 
-        public static ScimFeature Create(int maxResults)
+        public static ScimFeatureFilter Create(int maxResults)
         {
             return new ScimFeatureFilter(maxResults);
         }
 
-        public static ScimFeature CreateUnsupported()
+        public static ScimFeatureFilter CreateUnsupported()
         {
             return new ScimFeatureFilter();
         }

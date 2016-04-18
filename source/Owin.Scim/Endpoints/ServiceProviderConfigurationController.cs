@@ -16,15 +16,15 @@
         {
         }
 
-        [Route("serviceproviderconfig", Name = "ServiceProviderConfig")]
+        [Route("serviceproviderconfig", Name = "ServiceProviderConfiguration")]
         public async Task<HttpResponseMessage> Get()
         {
-            var serviceProviderConfig = (ServiceProviderConfig) ScimServerConfiguration;
+            var serviceProviderConfig = (ServiceProviderConfiguration) ScimServerConfiguration;
             var response = Request.CreateResponse(
                 HttpStatusCode.OK, 
                 serviceProviderConfig);
 
-            SetLocationHeader(response, serviceProviderConfig, "ServiceProviderConfig");
+            SetLocationHeader(response, serviceProviderConfig, "ServiceProviderConfiguration");
 
             return response;
         }

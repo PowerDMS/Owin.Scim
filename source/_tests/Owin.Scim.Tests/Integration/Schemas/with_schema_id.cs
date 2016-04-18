@@ -6,13 +6,13 @@ namespace Owin.Scim.Tests.Integration.Schemas
 
     public class with_schema_id : when_retrieving_schemas
     {
-        Establish context = () => SchemaId = "urn:ietf:params:scim:schemas:core:2.0:Schema";
+        Establish context = () => SchemaId = "urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig";
 
         It should_return_specific_schema =
             () =>
                 Schemas
                     .Single()
                     .Id
-                    .ShouldEqual("urn:ietf:params:scim:schemas:core:2.0:Schema");
+                    .ShouldEqual("urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig");
     }
 }

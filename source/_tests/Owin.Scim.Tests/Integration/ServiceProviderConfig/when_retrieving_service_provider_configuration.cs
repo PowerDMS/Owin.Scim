@@ -20,17 +20,17 @@
                 .AsTask;
 
             await Response.DeserializeTo(
-                () => Config,
+                () => Configuration,
                 () => JsonData);
         };
 
         It should_not_serialize_id = () => JsonData.ContainsKey("id").ShouldBeFalse();
 
-        It should_list_authentication_schemes = () => Config.AuthenticationSchemes.ShouldNotBeEmpty();
+        It should_list_authentication_schemes = () => Configuration.AuthenticationSchemes.ShouldNotBeEmpty();
         
         protected static HttpResponseMessage Response;
 
-        protected static ServiceProviderConfig Config;
+        protected static ServiceProviderConfiguration Configuration;
 
         protected static IDictionary<string, object> JsonData;
     }

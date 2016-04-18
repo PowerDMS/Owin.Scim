@@ -6,16 +6,30 @@
     {
         public AuthenticationSchemeDefinition()
         {
-            For(s => s.Display)
-                .SetMutability(Mutability.ReadOnly);
+            For(s => s.Type)
+                .SetDescription(@"The authentication scheme.")
+                .SetMutability(Mutability.ReadOnly)
+                .SetRequired(true);
+
             For(s => s.Name)
-                .SetMutability(Mutability.ReadOnly);
+                .SetDescription(@"The common authentication scheme name, e.g., HTTP Basic.")
+                .SetMutability(Mutability.ReadOnly)
+                .SetRequired(true);
+
             For(s => s.Description)
-                .SetMutability(Mutability.ReadOnly);
+                .SetDescription(@"A description of the authentication scheme.")
+                .SetMutability(Mutability.ReadOnly)
+                .SetRequired(true);
+
             For(s => s.SpecUri)
-                .SetMutability(Mutability.ReadOnly);
+                .SetDescription(@"An HTTP-addressable URL pointing to the authentication scheme's specification.")
+                .SetMutability(Mutability.ReadOnly)
+                .SetReferenceTypes(ScimConstants.ReferenceTypes.External);
+
             For(s => s.DocumentationUri)
-               .SetMutability(Mutability.ReadOnly);
+                .SetDescription(@"An HTTP-addressable URL pointing to the authentication scheme's usage documentation.")
+                .SetMutability(Mutability.ReadOnly)
+                .SetReferenceTypes(ScimConstants.ReferenceTypes.External);
         }
     }
 }

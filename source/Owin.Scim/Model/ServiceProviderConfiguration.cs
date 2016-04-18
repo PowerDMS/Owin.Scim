@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.Model
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -7,14 +8,14 @@
 
     using Newtonsoft.Json;
 
-    [ScimTypeDefinition(typeof(ServiceProviderConfigDefinition))]
-    public class ServiceProviderConfig : Resource
+    [ScimTypeDefinition(typeof(ServiceProviderConfigurationDefinition))]
+    public class ServiceProviderConfiguration : Resource
     {
         private readonly ScimFeature _Patch;
 
-        private readonly ScimFeature _Bulk;
+        private readonly ScimFeatureBulk _Bulk;
 
-        private readonly ScimFeature _Filter;
+        private readonly ScimFeatureFilter _Filter;
 
         private readonly ScimFeature _ChangePassword;
 
@@ -24,7 +25,7 @@
 
         private readonly IEnumerable<AuthenticationScheme> _AuthenticationSchemes;
 
-        public ServiceProviderConfig(
+        public ServiceProviderConfiguration(
             ScimFeature featurePatch,
             ScimFeatureBulk featureBulk,
             ScimFeatureFilter featureFilter,
@@ -51,26 +52,8 @@
             _AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
         }
 
-        [JsonProperty("name")]
-        public string Name
-        {
-            get
-            {
-                return @"Service Provider Configuration";
-            }
-        }
-
-        [JsonProperty("description")]
-        public string Description
-        {
-            get
-            {
-                return @"Schema for representing the service provider's configuration";
-            }
-        }
-
         [JsonProperty("documentationUri")]
-        public string DocumentationUri
+        public Uri DocumentationUri
         {
             get { return null; }
         }
@@ -79,10 +62,10 @@
         public ScimFeature Patch { get { return _Patch; } }
 
         [JsonProperty("bulk")]
-        public ScimFeature Bulk { get { return _Bulk; } }
+        public ScimFeatureBulk Bulk { get { return _Bulk; } }
 
         [JsonProperty("filter")]
-        public ScimFeature Filter { get { return _Filter; } }
+        public ScimFeatureFilter Filter { get { return _Filter; } }
 
         [JsonProperty("changePassword")]
         public ScimFeature ChangePassword { get { return _ChangePassword; } }
@@ -108,8 +91,6 @@
         {
             return new
             {
-                Name,
-                Description,
                 DocumentationUri,
                 Patch = Patch.GetETagHashCode(),
                 Bulk = Bulk.GetETagHashCode(),
