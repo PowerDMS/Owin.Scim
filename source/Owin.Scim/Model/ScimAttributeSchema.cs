@@ -8,6 +8,7 @@ namespace Owin.Scim.Model
     /// <summary>
     /// A complex type that defines service provider attributes and their qualities.
     /// </summary>
+    [ScimTypeDefinition(typeof(ScimAttributeSchemaDefinition))]
     public sealed class ScimAttributeSchema
     {
         /// <summary>

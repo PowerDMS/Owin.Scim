@@ -138,7 +138,49 @@
             {
                 @"direct",
                 @"indirect"
-            }; 
+            };
+
+            public static IEnumerable<string> ScimDataTypes = new List<string>
+            {
+                @"string",
+                @"complex",
+                @"boolean",
+                @"decimal",
+                @"integer",
+                @"dateTime",
+                @"reference",
+                @"binary"
+            };
+
+            public static IEnumerable<string> ScimMutabilityOptions = new List<string>
+            {
+                @"readOnly",
+                @"readWrite",
+                @"immutable",
+                @"writeOnly"
+            };
+
+            public static IEnumerable<string> ScimReturnedOptions = new List<string>
+            {
+                @"always",
+                @"never",
+                @"default",
+                @"request"
+            };
+
+            public static IEnumerable<string> ScimUniquenessOptions = new List<string>
+            {
+                @"none",
+                @"server",
+                @"global"
+            };
+
+            public static IEnumerable<string> ScimReferenceOptions = new List<string>
+            {
+                @"A SCIM resource type (e.g., ""User"" or ""Group"")",
+                @"external",
+                @"uri"
+            };
         }
 
         public static class Maps

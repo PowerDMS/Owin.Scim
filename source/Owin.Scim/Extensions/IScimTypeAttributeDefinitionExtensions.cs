@@ -78,7 +78,9 @@
             // you should avoid designing your classes with ambiguous data types like object
             // Owin.Scim only uses this for CanonicalValues
             if (attributeType == typeof (object))
-                return ScimConstants.DataTypes.String; 
+                return descriptor.Name.Equals("CanonicalValues", StringComparison.OrdinalIgnoreCase)
+                    ? "SCIM data-type of the associated attribute type being defined."
+                    : ScimConstants.DataTypes.String;
 
             if (!attributeType.IsTerminalObject())
                 return ScimConstants.DataTypes.Complex;

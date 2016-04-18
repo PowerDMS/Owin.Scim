@@ -184,6 +184,7 @@
     <Compile Include="Model\ResourceTypeDefinition.cs" />
     <Compile Include="Model\SchemaExtension.cs" />
     <Compile Include="Model\ScimAttributeSchema.cs" />
+    <Compile Include="Model\ScimAttributeSchemaDefinition.cs" />
     <Compile Include="Model\ScimFeatureBulk.cs" />
     <Compile Include="Model\ScimFeatureETag.cs" />
     <Compile Include="Model\ScimFeatureFilter.cs" />

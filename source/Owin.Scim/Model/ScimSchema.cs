@@ -1,7 +1,6 @@
 ﻿namespace Owin.Scim.Model
 {
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
 
     using Newtonsoft.Json;
@@ -10,7 +9,6 @@
     /// The "ResourceType" schema specifies the metadata about a resource type.
     /// </summary>
     /// <seealso cref="Owin.Scim.Model.Resource" />
-    [Description("Specifies the schema that describes a SCIM schema.")]
     [ScimTypeDefinition(typeof(ScimSchemaTypeDefinition))]
     public class ScimSchema : Resource
     {
