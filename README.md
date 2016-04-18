@@ -14,6 +14,7 @@ This project is in active development with the goal of completing basic protocol
 
 Roadmap
 -------
+The list below doesn't necessarily denote priority or order.
 
 1. [ ] Finish users endpoints
   1. [x] Create  
@@ -25,6 +26,7 @@ Roadmap
     3. [x] Replace  
     4. [x] Remove  
   5. [x] Delete  
+  6. [ ] Query
 2. [x] Schema extensions
 3. [ ] Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
@@ -37,7 +39,8 @@ Roadmap
   2. [x] Retrieve
   3. [x] Replace
   4. [x] Update (Patch)
-  5. [x] Delete
+  5. [x] Delete  
+  6. [ ] Query
 7. [ ] Add support for querying
   1. [ ] Filtering (parsing into an expression tree is already done)
   2. [ ] Sorting
@@ -48,7 +51,7 @@ Roadmap
   1. [x] Canonicalization  
   2. [x] Validation  
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
-9. [ ] Add authN / authZ
+9. [ ] Add endpoint authorization support
 
 Getting Started
 ===============
