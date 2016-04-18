@@ -183,6 +183,7 @@
     <Compile Include="Model\ResourceType.cs" />
     <Compile Include="Model\ResourceTypeDefinition.cs" />
     <Compile Include="Model\SchemaExtension.cs" />
+    <Compile Include="Model\SchemaExtensionDefinition.cs" />
     <Compile Include="Model\ScimAttributeSchema.cs" />
     <Compile Include="Model\ScimAttributeSchemaDefinition.cs" />
     <Compile Include="Model\ScimFeatureBulk.cs" />

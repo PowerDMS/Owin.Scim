@@ -49,6 +49,9 @@
             For(u => u.Meta)
                 .SetMutability(Mutability.ReadOnly);
 
+            For(u => u.Groups)
+                .SetMutability(Mutability.ReadOnly);
+
             For(u => u.Emails)
                 .AddCanonicalizationRule(email =>
                     email.Canonicalize(
@@ -68,10 +71,6 @@
             For(u => u.PhoneNumbers)
                 .AddCanonicalizationRule(phone => phone.Canonicalize(p => p.Value, p => p.Display, PhoneNumberUtil.Normalize))
                 .AddCanonicalizationRule((PhoneNumber phone, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(phone, ref state));
-
-            For(u => u.Groups)
-                .AddCanonicalizationRule((UserGroup group, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(group, ref state))
-                .SetMutability(Mutability.ReadOnly);
 
             For(u => u.Addresses)
                 .AddCanonicalizationRule((MailingAddress address, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(address, ref state));

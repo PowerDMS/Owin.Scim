@@ -40,5 +40,20 @@
                 DocumentationUri
             }.GetHashCode();
         }
+
+        public bool ShouldSerializeValue()
+        {
+            return false;
+        }
+
+        public bool ShouldSerializeDisplay()
+        {
+            return false;
+        }
+
+        public bool ShouldSerializeRef()
+        {
+            return false;
+        }
     }
 }
