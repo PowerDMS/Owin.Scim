@@ -28,7 +28,7 @@ The list below doesn't necessarily denote priority or order.
   5. [x] Delete  
   6. [ ] Query
 2. [x] Schema extensions
-3. [ ] Add SCIM server configuration endpoints
+3. [x] Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
   2. [x] /Schemas
   3. [x] /ResourceTypes
