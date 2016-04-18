@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.IO;
 
     using Configuration;
 
@@ -70,7 +71,12 @@
             if (attributeType == typeof(int) || attributeType == typeof(int?))
                 return ScimConstants.DataTypes.Integer;
 
-            // you should avoid designing your classes with ambiguous datatypes like object
+            if (attributeType == typeof (byte) || attributeType == typeof (byte?) ||
+                attributeType == typeof (byte[]) || typeof (Stream).IsAssignableFrom(attributeType))
+                return ScimConstants.DataTypes.Binary;
+
+            // you should avoid designing your classes with ambiguous data types like object
+            // Owin.Scim only uses this for CanonicalValues
             if (attributeType == typeof (object))
                 return ScimConstants.DataTypes.String; 
 

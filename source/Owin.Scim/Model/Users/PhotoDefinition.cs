@@ -2,17 +2,25 @@
 {
     using System;
 
-    public class PhotoDefinition : MultiValuedAttributeDefinition
+    using Configuration;
+
+    public class PhotoDefinition : ScimTypeDefinitionBuilder<Photo>
     {
         public PhotoDefinition()
         {
             For(p => p.Value)
-                .AddCanonicalizationRule(value => value.ToLower());
-        }
+                .SetDescription(@"URL of a photo of the user.")
+                .SetReferenceTypes(ScimConstants.ReferenceTypes.External);
 
-        public override Type DefinitionType
-        {
-            get { return typeof(Photo); }
+            For(p => p.Type)
+                .SetDescription(@"A label indicating the attribute's function, i.e., 'photo' or 'thumbnail'.")
+                .SetCanonicalValues(ScimConstants.CanonicalValues.PhotoTypes, StringComparer.OrdinalIgnoreCase)
+                .AddCanonicalizationRule(type => type.ToLower());
+
+            For(p => p.Primary)
+                .SetDescription(
+                    @"A Boolean value indicating the 'primary' or preferred 
+                      attribute value for this attribute, e.g., the preferred photo or thumbnail.");
         }
     }
 }

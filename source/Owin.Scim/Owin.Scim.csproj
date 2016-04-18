@@ -194,9 +194,17 @@
     <Compile Include="Model\MultiValuedAttributeDefinition.cs" />
     <Compile Include="Model\ScimTypeDefinitionAttribute.cs" />
     <Compile Include="Model\ServiceProviderConfigDefinition.cs" />
+    <Compile Include="Model\Users\EmailDefinition.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtensionDefinition.cs" />
+    <Compile Include="Model\Users\EntitlementDefinition.cs" />
+    <Compile Include="Model\Users\InstantMessagingAddressDefinition.cs" />
+    <Compile Include="Model\Users\MailingAddressDefinition.cs" />
+    <Compile Include="Model\Users\PhoneNumberDefinition.cs" />
     <Compile Include="Model\Users\PhotoDefinition.cs" />
+    <Compile Include="Model\Users\RoleDefinition.cs" />
     <Compile Include="Model\Users\UserDefinition.cs" />
+    <Compile Include="Model\Users\UserGroupDefinition.cs" />
+    <Compile Include="Model\Users\X509CertificateDefinition.cs" />
     <Compile Include="Querying\PathFilterExpression.cs" />
     <Compile Include="Querying\ScimQueryOptions.cs" />
     <Compile Include="Repository\InMemory\ArrayExtensions.cs" />
@@ -227,7 +235,7 @@
     <Compile Include="ScimResponse.cs" />
     <Compile Include="Model\ScimErrorType.cs" />
     <Compile Include="Serialization\ScimErrorTypeConverter.cs" />
-    <Compile Include="Model\Users\Address.cs" />
+    <Compile Include="Model\Users\MailingAddress.cs" />
     <Compile Include="Model\Users\Email.cs" />
     <Compile Include="Model\Users\Entitlement.cs" />
     <Compile Include="Model\Users\Manager.cs" />

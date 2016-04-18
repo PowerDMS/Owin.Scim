@@ -27,7 +27,13 @@ namespace Owin.Scim.Configuration
                 Description = descriptionAttr.Description.RemoveMultipleSpaces();
             }
         }
-        
+
+        /// <summary>
+        /// Gets the type of which the definition corresponds to. Typically this will be the type argument <typeparamref name="T"/>, 
+        /// however, you may override this to make use of code reusability with type definition inheritance. 
+        /// See <see cref="Owin.Scim.Model.MultiValuedAttributeDefinition"/> for an example.
+        /// </summary>
+        /// <value>The type of the definition.</value>
         public virtual Type DefinitionType
         {
             get { return typeof(T); }
@@ -130,7 +136,17 @@ namespace Owin.Scim.Configuration
                 .Cast<PropertyDescriptor>()
                 .Where(d => !d.Attributes.Contains(new ScimInternalAttribute()))
                 .ToDictionary(
-                    d => d.ComponentType.GetProperty(d.Name),
+                    d =>
+                    {
+                        try
+                        {
+                            return d.ComponentType.GetProperty(d.Name, BindingFlags.Instance | BindingFlags.Public);
+                        }
+                        catch (AmbiguousMatchException)
+                        {
+                            return d.ComponentType.GetProperty(d.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+                        }
+                    },
                     CreateTypeMemberDefinitionBuilder);
         }
 
@@ -142,9 +158,11 @@ namespace Owin.Scim.Configuration
             // scalar attribute
             if (descriptor.PropertyType.IsTerminalObject())
             {
-                builder = typeof(Uri).IsAssignableFrom(descriptor.PropertyType)
-                    ? typeof(ScimTypeUriAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType)
-                    : typeof(ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
+                if (typeof (Uri).IsAssignableFrom(descriptor.PropertyType))
+                    builder = typeof (ScimTypeUriAttributeDefinitionBuilder<,>).MakeGenericType(typeof (T), descriptor.PropertyType);
+                else
+                    builder = typeof (ScimTypeScalarAttributeDefinitionBuilder<,>).MakeGenericType(typeof (T), descriptor.PropertyType);
+
                 instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(builder, this, descriptor, false);
 
                 return instance;

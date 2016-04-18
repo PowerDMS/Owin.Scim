@@ -96,7 +96,7 @@ namespace Owin.Scim.Configuration
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetDescription(string description)
         {
-            Description = description;
+            Description = description?.RemoveMultipleSpaces();
             return this;
         }
 
@@ -167,16 +167,21 @@ namespace Owin.Scim.Configuration
             return this;
         }
 
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetCanonicalValues(IEnumerable<TAttribute> canonicalValues)
+        {
+            return SetCanonicalValues(canonicalValues, EqualityComparer<TAttribute>.Default);
+        }
+
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetCanonicalValues<TEqualityComparer>(
-            IEnumerable<TAttribute> acceptableValues,
-            TEqualityComparer comparer = null)
+            IEnumerable<TAttribute> canonicalValues,
+            TEqualityComparer comparer)
             where TEqualityComparer : class, IEqualityComparer<TAttribute>, IEqualityComparer
         {
             IEqualityComparer<TAttribute> equalityComparer = comparer;
             if (comparer == null)
                 equalityComparer = EqualityComparer<TAttribute>.Default;
             
-            CanonicalValues = new HashSet<object>(acceptableValues.Distinct(equalityComparer).Cast<object>());
+            CanonicalValues = new HashSet<object>(canonicalValues.Distinct(equalityComparer).Cast<object>());
             CanonicalValueComparer = (IEqualityComparer)equalityComparer;
 
             return this;

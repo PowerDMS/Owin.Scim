@@ -40,14 +40,14 @@ namespace Owin.Scim.Model
             IEnumerable<string> referenceTypes)
         {
             Name = name;
-            Type = type.ToString();
+            Type = type;
             Description = description;
             MultiValued = multiValued;
             Mutability = mutability;
             Required = required;
             Returned = returned;
-            ReferenceTypes = referenceTypes;
-            SubAttributes = subAttributes;
+            ReferenceTypes = referenceTypes?.ToList();
+            SubAttributes = subAttributes?.ToList();
             Uniqueness = uniqueness;
             CaseExact = caseExact;
             CanonicalValues = canonicalValues;

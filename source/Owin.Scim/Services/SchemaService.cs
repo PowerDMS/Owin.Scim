@@ -9,7 +9,7 @@ namespace Owin.Scim.Services
     using Extensions;
 
     using Model;
-
+    
     public class SchemaService : ServiceBase, ISchemaService
     {
         private readonly Lazy<IReadOnlyDictionary<string, ScimSchema>> _Schemas;
@@ -23,11 +23,20 @@ namespace Owin.Scim.Services
             _Schemas = new Lazy<IReadOnlyDictionary<string, ScimSchema>>(CreateSchemas);
         }
 
-        protected IReadOnlyDictionary<string, ScimSchema> Schemas
+        /// <summary>
+        /// Gets the schemas.
+        /// </summary>
+        /// <value>The schemas.</value>
+        protected virtual IReadOnlyDictionary<string, ScimSchema> Schemas
         {
             get { return _Schemas.Value; }
         }
 
+        /// <summary>
+        /// Gets the <see cref="ScimSchema" /> associated with the specified <paramref name="schemaId" />.
+        /// </summary>
+        /// <param name="schemaId">The schema identifier.</param>
+        /// <returns>IScimResponse&lt;ScimSchema&gt;.</returns>
         public IScimResponse<ScimSchema> GetSchema(string schemaId)
         {
             ScimSchema schema;
@@ -38,12 +47,20 @@ namespace Owin.Scim.Services
             return new ScimDataResponse<ScimSchema>(schema);
         }
 
+        /// <summary>
+        /// Gets all defined <see cref="ScimSchema" />s.
+        /// </summary>
+        /// <returns>IScimResponse&lt;IEnumerable&lt;ScimSchema&gt;&gt;.</returns>
         public IScimResponse<IEnumerable<ScimSchema>> GetSchemas()
         {
             return new ScimDataResponse<IEnumerable<ScimSchema>>(Schemas.Values);
         }
 
-        private IReadOnlyDictionary<string, ScimSchema> CreateSchemas()
+        /// <summary>
+        /// Creates the schemas dictionary.
+        /// </summary>
+        /// <returns>IReadOnlyDictionary&lt;System.String, ScimSchema&gt;.</returns>
+        protected virtual IReadOnlyDictionary<string, ScimSchema> CreateSchemas()
         {
             var schemas = new Dictionary<string, ScimSchema>();
             foreach (var std in ScimServerConfiguration.SchemaTypeDefinitions)

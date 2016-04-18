@@ -1,6 +1,6 @@
 ﻿namespace Owin.Scim.Model.Users
 {
-    [ScimTypeDefinition(typeof(MultiValuedAttributeDefinition))]
+    [ScimTypeDefinition(typeof(PhoneNumberDefinition))]
     public class PhoneNumber : MultiValuedAttribute
     {
     }

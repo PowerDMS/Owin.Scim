@@ -83,6 +83,64 @@
             public const string Complex = @"complex";
         }
 
+        public static class ReferenceTypes
+        {
+            public const string External = @"external";
+
+            public const string Uri = @"uri";
+        }
+
+        public static class CanonicalValues
+        {
+            public static IEnumerable<string> AddressTypes = new List<string>
+            {
+                @"work",
+                @"home",
+                @"other"
+            };
+
+            public static IEnumerable<string> EmailAddressTypes = new List<string>
+            {
+                @"work",
+                @"home",
+                @"other"
+            };
+
+            public static IEnumerable<string> InstantMessagingProviders = new List<string>
+            {
+                @"aim",
+                @"gtalk",
+                @"icq",
+                @"xmpp",
+                @"msn",
+                @"skype",
+                @"qq",
+                @"yahoo"
+            };
+
+            public static IEnumerable<string> PhoneNumberTypes = new List<string>
+            {
+                @"work",
+                @"home",
+                @"mobile",
+                @"fax",
+                @"pager",
+                @"other"
+            };
+
+            public static IEnumerable<string> PhotoTypes = new List<string>
+            {
+                @"photo",
+                @"thumbnail"
+            }; 
+
+            public static IEnumerable<string> UserGroupTypes = new List<string>
+            {
+                @"direct",
+                @"indirect"
+            }; 
+        }
+
         public static class Maps
         {
             public static readonly IReadOnlyDictionary<string, string> EndpointToTypeDictionary =

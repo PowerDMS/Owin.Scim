@@ -18,8 +18,11 @@
                 typeof(UserValidator),
                 schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User))
         {
-            AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
+            SetName(ScimConstants.ResourceTypes.User);
+            SetDescription("User resource.");
 
+            AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
+            
             For(u => u.Schemas)
                 .SetReturned(Returned.Always);
 
@@ -37,7 +40,7 @@
                 .AddCanonicalizationRule(locale => !string.IsNullOrWhiteSpace(locale) ? locale.Replace('_', '-') : locale);
 
             For(u => u.ProfileUrl)
-                .SetReferenceTypes("external");
+                .SetReferenceTypes(ScimConstants.ReferenceTypes.External);
 
             For(u => u.Password)
                 .SetMutability(Mutability.WriteOnly)
@@ -71,7 +74,7 @@
                 .SetMutability(Mutability.ReadOnly);
 
             For(u => u.Addresses)
-                .AddCanonicalizationRule((Address address, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(address, ref state));
+                .AddCanonicalizationRule((MailingAddress address, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(address, ref state));
 
             For(u => u.Roles)
                 .AddCanonicalizationRule((Role role, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(role, ref state));

@@ -13,9 +13,9 @@ namespace Owin.Scim.Tests.Validation.Users
             User = new User
             {
                 UserName = "daniel",
-                Addresses = new List<Address>
+                Addresses = new List<MailingAddress>
                 {
-                    new Address { Country = "invalid" }
+                    new MailingAddress { Country = "invalid" }
                 }
             };
         };

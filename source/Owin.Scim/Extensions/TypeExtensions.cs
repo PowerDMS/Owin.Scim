@@ -35,9 +35,7 @@
                                 interfaceType.IsGenericType &&
                                 interfaceType.GetGenericTypeDefinition() == typeof (IEnumerable<>));
 
-            return genericEnumerableInterface == null
-                ? null
-                : genericEnumerableInterface;
+            return genericEnumerableInterface;
         }
 
         public static object GetDefaultValue(this Type type)
@@ -54,14 +52,16 @@
             return type.IsPrimitive || 
                    type.IsEnum || 
                    type.IsPointer ||
-                   type == typeof(object) ||
                    type == typeof (string) || 
-                   type == typeof (DateTime) || 
                    type == typeof (decimal) || 
-                   type == typeof(Uri) || 
-                   type == typeof (Guid) || 
+                   type == typeof (byte) ||
+                   type == typeof (byte[]) ||
+                   type == typeof (object) ||
+                   type == typeof (DateTime) || 
                    type == typeof (DateTimeOffset) || 
                    type == typeof (TimeSpan) ||
+                   type == typeof (Uri) || 
+                   type == typeof (Guid) || 
                    Nullable.GetUnderlyingType(type) != null;
         }
     }

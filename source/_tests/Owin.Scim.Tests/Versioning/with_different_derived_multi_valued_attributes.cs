@@ -15,7 +15,7 @@
 
         Because of = () =>
         {
-            _Addresses.Add(new Address
+            _Addresses.Add(new MailingAddress
             {
                 Type = "home",
                 Country = "USA",
@@ -27,7 +27,7 @@
 
             User1ETag = User.CalculateVersion();
 
-            _Addresses.Add(new Address
+            _Addresses.Add(new MailingAddress
             {
                 Type = "work",
                 Country = "USA",
@@ -42,6 +42,6 @@
 
         It should_be_different_values = () => User1ETag.ShouldNotEqual(User2ETag);
 
-        private static readonly List<Address> _Addresses = new List<Address>();
+        private static readonly List<MailingAddress> _Addresses = new List<MailingAddress>();
     }
 }

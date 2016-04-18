@@ -1,6 +1,6 @@
 ﻿namespace Owin.Scim.Model.Users
 {
-    [ScimTypeDefinition(typeof(MultiValuedAttributeDefinition))]
+    [ScimTypeDefinition(typeof(RoleDefinition))]
     public class Role : MultiValuedAttribute
     {
          

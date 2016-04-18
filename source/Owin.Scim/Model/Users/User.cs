@@ -7,8 +7,7 @@
     using Extensions;
 
     using Newtonsoft.Json;
-
-    [Description("User accounts")]
+    
     [ScimTypeDefinition(typeof(UserDefinition))]
     public class User : Resource
     {
@@ -105,15 +104,13 @@
 
         [Description(@"
         Email addresses for the user.  The value SHOULD be canonicalized by the service 
-        provider, e.g., 'bjensen@example.com' instead of 'bjensen@EXAMPLE.COM'. Canonical 
-        type values of 'work', 'home', and 'other'.")]
+        provider, e.g., 'bjensen@example.com' instead of 'bjensen@EXAMPLE.COM'.")]
         [JsonProperty(PropertyName = "emails")]
         public IEnumerable<Email> Emails { get; set; }
 
         [Description(@"
         Phone numbers for the User.  The value SHOULD be canonicalized by the service 
-        provider according to the format specified in RFC 3966, e.g., 'tel:+1-201-555-0123'.
-        Canonical type values of 'work', 'home', 'mobile', 'fax', 'pager', and 'other'.")]
+        provider according to the format specified in RFC 3966, e.g., 'tel:+1-201-555-0123'.")]
         [JsonProperty(PropertyName = "phoneNumbers")]
         public IEnumerable<PhoneNumber> PhoneNumbers { get; set; }
 
@@ -125,9 +122,9 @@
         [JsonProperty(PropertyName = "photos")]
         public IEnumerable<Photo> Photos { get; set; }
 
-        [Description(@"A physical mailing address for this User. Canonical type values of 'work', 'home', and 'other'.")]
+        [Description(@"A physical mailing address for this User.")]
         [JsonProperty(PropertyName = "addresses")]
-        public IEnumerable<Address> Addresses { get; set; }
+        public IEnumerable<MailingAddress> Addresses { get; set; }
 
         [Description(@"
         A list of groups to which the user belongs, either through direct membership, through 

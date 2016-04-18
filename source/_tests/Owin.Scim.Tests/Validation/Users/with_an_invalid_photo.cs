@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Validation.Users
 {
+    using System;
     using System.Collections.Generic;
 
     using Machine.Specifications;
@@ -15,7 +16,7 @@ namespace Owin.Scim.Tests.Validation.Users
                 UserName = "daniel",
                 Photos = new List<Photo>
                 {
-                    new Photo { Value = "invalidRelativeUri" }
+                    new Photo { Value = new Uri("invalidRelativeUri", UriKind.Relative) }
                 }
             };
         };

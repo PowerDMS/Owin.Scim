@@ -179,7 +179,7 @@ namespace Owin.Scim.Validation.Users
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
                                                     ErrorDetail.AttributeRequired("photo.value")))
-                                            .Must(uri => Uri.IsWellFormedUriString(uri, UriKind.Absolute))
+                                            .Must(uri => uri.IsAbsoluteUri) // TODO: (DG) validation incorrect
                                             .WithState(u =>
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
@@ -193,7 +193,7 @@ namespace Owin.Scim.Validation.Users
                 {
                     RuleFor(user => user.Addresses)
                         .SetCollectionValidator(
-                            new GenericExpressionValidator<Address>
+                            new GenericExpressionValidator<MailingAddress>
                             {
                                     v => v.When(a => !string.IsNullOrWhiteSpace(a.Country),
                                         () =>

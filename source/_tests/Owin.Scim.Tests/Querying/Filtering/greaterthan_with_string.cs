@@ -16,8 +16,8 @@
             Users = new List<User>
             {
                 new User {UserName = "DGioulakis" },
-                new User { UserName = "BJensen", Addresses = new List<Address> { new Address { PostalCode = "10010" } } },
-                new User { UserName = "ROMalley", Addresses = new List<Address> { new Address { PostalCode = "20005" } } }
+                new User { UserName = "BJensen", Addresses = new List<MailingAddress> { new MailingAddress { PostalCode = "10010" } } },
+                new User { UserName = "ROMalley", Addresses = new List<MailingAddress> { new MailingAddress { PostalCode = "20005" } } }
             };
 
             FilterExpression = new ScimFilter("addresses.postalCode gt \"20000\"");

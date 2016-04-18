@@ -7,17 +7,13 @@
     using Newtonsoft.Json;
 
     using Machine.Specifications;
-
-    /// <summary>
-    /// What gets popu
-    /// </summary>
+    
     public class with_a_fully_populated_multi_attributes_user : using_a_scim_server
     {
         Establish context = () =>
         {
             UserDto = new MyUser
             {
-                // older un-supported schema
                 Schemas = new[] { @"urn:ietf:params:scim:schemas:core:2.0:User" },
                 UserName = "Oops",
                 Emails = new[]
@@ -68,12 +64,7 @@
         };
 
         It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);
-
-        /// <summary>
-        /// Note on echoing values: per protocol, service provider is required to echo a full saved state of the resource
-        /// However, it is up to the service provider to decide what values to ignore, e.g. you might send multiple addresses
-        /// but the service provider might just save one, or it might ignore display or type attributes.
-        /// </summary>
+        
         It should_cannonize_email_values = () =>
         {
             CreatedUser.ShouldNotBeNull();
@@ -94,8 +85,7 @@
             for (int i = 0; i < CreatedUser.PhoneNumbers.Length; i++)
             {
                 CreatedUser.PhoneNumbers[i].Value.ShouldEqual(UserDto.PhoneNumbers[i].Value);
-                UserDto.PhoneNumbers[i].Value.ToCharArray()
-                    .ShouldContain(CreatedUser.PhoneNumbers[i].Display.ToCharArray());
+                UserDto.PhoneNumbers[i].Value.ToCharArray().ShouldContain(CreatedUser.PhoneNumbers[i].Display.ToCharArray());
                 CreatedUser.PhoneNumbers[i].Type.ShouldEqual(UserDto.PhoneNumbers[i].Type);
                 CreatedUser.PhoneNumbers[i].Primary.ShouldEqual(UserDto.PhoneNumbers[i].Primary ?? false);
             }

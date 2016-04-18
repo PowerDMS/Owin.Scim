@@ -1,5 +1,6 @@
 namespace Owin.Scim.Tests.Services.UserService.Create
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -17,7 +18,7 @@ namespace Owin.Scim.Tests.Services.UserService.Create
             {
                 UserName = "daniel",
                 Active = true,
-                Addresses = new List<Address>
+                Addresses = new List<MailingAddress>
                 {
                     
                 },
@@ -30,15 +31,15 @@ namespace Owin.Scim.Tests.Services.UserService.Create
                 {
                     new Email
                     {
-                        Display = "daniel", // not allowed, will be overwritten
+                        Display = "daniel", // readOnly, will be ignored
                         Value = "daniel.gioulakis@POWERDMS.com"
                     }
                 },
                 Photos = new List<Photo>
                 {
-                    new Photo { Value = "http://example.COM/me.jpg", Primary = true },
-                    new Photo { Value = "http://example.COM/me2.jpg", Primary = true },
-                    new Photo { Value = "http://example.COM/me3.jpg", Primary = true }
+                    new Photo { Value = new Uri("http://example.COM/me.jpg"), Primary = true },
+                    new Photo { Value = new Uri("http://example.COM/me2.jpg"), Primary = true },
+                    new Photo { Value = new Uri("http://example.COM/me3.jpg"), Primary = true }
                 }
             };
         };
@@ -50,7 +51,5 @@ namespace Owin.Scim.Tests.Services.UserService.Create
                 .All(email => ShouldExtensions.ShouldBeLowercase(email.Display.Substring(email.Display.IndexOf('@') + 1)));
 
         It should_contain_only_one_primary = () => Result.GetRight().Photos.Count(p => p.Primary).ShouldEqual(1);
-
-        It should_lowercase_the_value = () => Result.GetRight().Photos.All(photo => photo.Value.ShouldBeLowercase());
     }
 }

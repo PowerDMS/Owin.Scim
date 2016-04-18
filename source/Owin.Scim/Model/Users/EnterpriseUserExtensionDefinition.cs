@@ -6,8 +6,8 @@ namespace Owin.Scim.Model.Users
     {
         public EnterpriseUserExtensionDefinition()
         {
-            SetName("EnterpriseUser");
-            SetDescription("Enterprise user.");
+            SetName("Enterprise user");
+            SetDescription("Enterprise user resource extension.");
         }
     }
 }
