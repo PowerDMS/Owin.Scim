@@ -44,23 +44,6 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
                                 ""path"": ""name""
                             }]
                         }",
-                // TODO: value below caused 500
-                //@"
-                //        {
-                //            ""schemas"": [""urn:ietf:params:scim:api:messages:2.0:PatchOp""],
-                //            ""Operations"": [{
-                //                ""op"":""remove"",
-                //                ""path"": ""displayName"",
-                //            },
-                //            {
-                //                ""op"":""add"",
-                //                ""path"": ""phoneNumbers"",
-                //            },
-                //            {
-                //                ""op"":""add"",
-                //                ""path"": ""name"",
-                //            }]
-                //        }",
                 Encoding.UTF8,
                 "application/json");
         };
