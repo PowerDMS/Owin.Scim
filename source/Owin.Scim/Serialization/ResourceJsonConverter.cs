@@ -95,7 +95,16 @@
                       contain at mimimum, a default empty constructor (which may be private).".RemoveMultipleSpaces());
 
             var instance = contract.DefaultCreator();
-            serializer.Populate(reader, instance);
+
+            try
+            {
+                serializer.Populate(reader, instance);
+            }
+            catch (FormatException)
+            {
+                // TODO: (DG) implement exception handling
+                throw new Exception("Invalid json. Could not deserialize to objectType...");
+            }
             
             var resource = instance as Resource;
             if (resource?.ExtensionSerialization != null)
