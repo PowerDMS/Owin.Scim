@@ -7,8 +7,6 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Model.Users;
 
-    using Scim.Querying;
-
     public class equals_with_complex_property : when_parsing_a_filter_expression<User>
     {
         Establish context = () =>
@@ -19,7 +17,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
                 new User { UserName = "ROMalley", Active = true, Name = new Name { FamilyName = "O'Malley", GivenName = "Ryan" } }
             };
 
-            FilterExpression = new ScimFilter("name.familyName eq \"O'Malley\"");
+            FilterExpression = "name.familyName eq \"O'Malley\"";
         };
 
         It should_filter = () => Users.SingleOrDefault(Predicate).ShouldNotBeNull();

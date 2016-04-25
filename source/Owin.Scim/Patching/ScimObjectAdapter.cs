@@ -24,12 +24,17 @@
 
     public class ScimObjectAdapter<T> : IObjectAdapter where T : class
     {
+        private readonly ScimServerConfiguration _ServerConfiguration;
+
         /// <summary>
-        /// Initializes a new instance of <see cref="ScimObjectAdapter{T}"/>.
+        /// Initializes a new instance of <see cref="ScimObjectAdapter{T}" />.
         /// </summary>
-        /// <param name="contractResolver">The <see cref="IContractResolver"/>.</param>
-        public ScimObjectAdapter(IContractResolver contractResolver)
+        /// <param name="serverConfiguration">The server configuration.</param>
+        /// <param name="contractResolver">The <see cref="IContractResolver" />.</param>
+        /// <exception cref="System.ArgumentNullException"></exception>
+        public ScimObjectAdapter(ScimServerConfiguration serverConfiguration, IContractResolver contractResolver)
         {
+            _ServerConfiguration = serverConfiguration;
             if (contractResolver == null)
             {
                 throw new ArgumentNullException(nameof(contractResolver));
@@ -102,6 +107,7 @@
             // ScimPatchObjectAnalysis.cs will handle resolving the actual 
             // path to object members and parsing any filters.
             var patchAnalysis = new ScimPatchObjectAnalysis(
+                _ServerConfiguration,
                 objectToApplyTo,
                 path, 
                 ContractResolver,
@@ -259,6 +265,7 @@
                 throw new ScimPatchException(ScimErrorType.NoTarget, operation);
 
             var treeAnalysisResult = new ScimPatchObjectAnalysis(
+                _ServerConfiguration,
                 objectToApplyTo,
                 operation.Path,
                 ContractResolver,
@@ -391,6 +398,7 @@
         private IEnumerable<PatchOperationResult> ReplaceInternal(string path, object value, object objectToApplyTo, Operation operation)
         {
             var treeAnalysisResult = new ScimPatchObjectAnalysis(
+                _ServerConfiguration,
                 objectToApplyTo,
                 path,
                 ContractResolver,
@@ -540,10 +548,10 @@
             };
         }
 
-        private static void EnforceMutability(Operation operation, JsonPatchProperty patchProperty)
+        private void EnforceMutability(Operation operation, JsonPatchProperty patchProperty)
         {
             IScimTypeAttributeDefinition attrDefinition;
-            var typeDefinition = ScimServerConfiguration.GetScimTypeDefinition(patchProperty.Parent.GetType());
+            var typeDefinition = _ServerConfiguration.GetScimTypeDefinition(patchProperty.Parent.GetType());
             var propertyInfo = patchProperty.Property.DeclaringType.GetProperty(patchProperty.Property.UnderlyingName);
 
             // if attribute is readOnly OR (immutable and isReferenceType and current value is not null)

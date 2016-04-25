@@ -10,8 +10,9 @@
 
     public class UserDefinition : ScimResourceTypeDefinitionBuilder<User>
     {
-        public UserDefinition()
+        public UserDefinition(ScimServerConfiguration serverConfiguration)
             : base(
+                serverConfiguration,
                 ScimConstants.ResourceTypes.User,
                 ScimConstants.Schemas.User,
                 ScimConstants.Endpoints.Users,
@@ -66,7 +67,7 @@
 
                             return value.Substring(0, atIndex) + value.Substring(atIndex).ToLower();
                         }))
-                .AddCanonicalizationRule((Email attribute, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(attribute, ref state));
+                .AddCanonicalizationRule((Email email, ref object state) => Canonicalization.EnforceSinglePrimaryAttribute(email, ref state));
 
             For(u => u.PhoneNumbers)
                 .AddCanonicalizationRule(phone => phone.Canonicalize(p => p.Value, p => p.Display, PhoneNumberUtil.Normalize))

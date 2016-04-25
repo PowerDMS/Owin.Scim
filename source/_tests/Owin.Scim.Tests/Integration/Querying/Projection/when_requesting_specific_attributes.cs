@@ -2,7 +2,6 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Net.Http;
 
     using Extensions;
 
@@ -31,12 +30,18 @@
                 .With(x => x.Ims, null)
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
+                .With(x => x.X509Certificates, null)
                 .Create(seed: new User());
 
             // Insert the first user so there's one already in-memory.
             await (await Server
                 .HttpClient
-                .PostAsync(new UriBuilder(new Uri("http://localhost/users")) { Query = "attributes=" + string.Join(",", Attributes ?? new List<string>()) }.ToString(), new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .PostAsync(
+                    new UriBuilder(
+                        new Uri("http://localhost/users"))
+                    {
+                        Query = "attributes=" + string.Join(",", Attributes ?? new List<string>())
+                    }.ToString(), new ScimObjectContent<User>(existingUser))
                 .AwaitResponse()
                 .AsTask).DeserializeTo(() => JsonResponse);
         };

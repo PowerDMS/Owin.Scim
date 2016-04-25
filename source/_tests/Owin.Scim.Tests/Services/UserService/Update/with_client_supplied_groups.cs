@@ -16,6 +16,7 @@ namespace Owin.Scim.Tests.Services.UserService.Update
         {
             A.CallTo(() => UserRepository.GetUser(A<string>._))
                 .ReturnsLazily(GetUserRecord);
+
             A.CallTo(() => GroupRepository.GetGroupsUserBelongsTo(A<string>._))
                 .ReturnsLazily(() => _UserRecordGroups);
 

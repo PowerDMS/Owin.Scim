@@ -6,7 +6,8 @@
 
     public class PhotoDefinition : ScimTypeDefinitionBuilder<Photo>
     {
-        public PhotoDefinition()
+        public PhotoDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(p => p.Value)
                 .SetDescription(@"URL of a photo of the user.")

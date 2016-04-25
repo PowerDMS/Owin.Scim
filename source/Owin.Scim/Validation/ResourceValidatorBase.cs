@@ -8,15 +8,14 @@ namespace Owin.Scim.Validation
 
     using FluentValidation;
 
+    using Extensions;
     using Model;
-
-    using NContext.Common;
-
-    using Owin.Scim.Extensions;
 
     public abstract class ResourceValidatorBase<T> : ValidatorBase<T>, IValidator
         where T : Resource
     {
+        private const string _ResourceInstanceKey = @"ValidationInstance";
+
         private readonly ResourceExtensionValidators _ExtensionValidators;
 
         protected ResourceValidatorBase(ResourceExtensionValidators extensionValidators)
@@ -38,10 +37,10 @@ namespace Owin.Scim.Validation
                 {
                     RuleFor(res => res.Extensions)
                         .NestedRules(v =>
-                            v.When(ext => ext.Value.IsValueCreated, () =>
+                            v.When(ext => ext.Value != null, () =>
                             {
-                                v.RuleFor(ext => ext.Value.Value)
-                                    .SetValidator2(ext => _ExtensionValidators[ext.Key]);
+                                v.RuleFor(ext => ext.Value)
+                                    .SetValidatorNonGeneric(ext => _ExtensionValidators[ext.Value.SchemaIdentifier]);
                             }));
                 });
         }
@@ -54,14 +53,7 @@ namespace Owin.Scim.Validation
 
         protected T ExistingRecord
         {
-            get { return CallContext.LogicalGetData("resource") as T; }
-        }
-
-        protected virtual Task<FluentValidation.Results.ValidationResult> PreValidate(
-            ValidationContext<T> context, 
-            CancellationToken token = new CancellationToken())
-        {
-            return Task.FromResult(new FluentValidation.Results.ValidationResult());
+            get { return CallContext.LogicalGetData(_ResourceInstanceKey) as T; }
         }
         
         Task<FluentValidation.Results.ValidationResult> IValidator.ValidateAsync(ValidationContext context, CancellationToken cancellation)
@@ -74,28 +66,27 @@ namespace Owin.Scim.Validation
             if (vc != null)
                 return ValidateAsync(vc, cancellation);
 
-            return ValidateAsync(new ValidationContext<T>((T)context.InstanceToValidate, context.PropertyChain, context.Selector), cancellation);
+            return ValidateAsync(
+                new ValidationContext<T>((T)context.InstanceToValidate, context.PropertyChain, context.Selector), cancellation);
         }
 
-        public sealed override async Task<FluentValidation.Results.ValidationResult> ValidateAsync(
+        public sealed override Task<FluentValidation.Results.ValidationResult> ValidateAsync(
             ValidationContext<T> context,
             CancellationToken token = new CancellationToken())
         {
             var svc = context as ScimValidationContext<T>;
             if (svc != null)
             {
-                CallContext.LogicalSetData("resource", svc.ExistingResourceRecord);
+                CallContext.LogicalSetData(_ResourceInstanceKey, svc.ExistingResourceRecord);
             }
-            
-            var preValidationResult = await PreValidate(context, token);
 
-            if (CascadeMode == CascadeMode.StopOnFirstFailure && !preValidationResult.IsValid)
-                return preValidationResult;
+            return base.ValidateAsync(context, token)
+                .ContinueWith(task =>
+                {
+                    CallContext.FreeNamedDataSlot(_ResourceInstanceKey);
 
-            var validationResult = await base.ValidateAsync(context, token);
-            validationResult.Errors.AddRangeC(preValidationResult.Errors);
-
-            return validationResult;
+                    return task.Result;
+                },  token);
         }
 
         public Type TargetType

@@ -43,13 +43,6 @@
             }
         }
 
-        public static TProperty Canonicalize<TProperty>(
-            this TProperty property,
-            StatefulCanonicalizationFunc<TProperty> canonicalizationFunc)
-        {
-            return default(TProperty);// TODO : (DG) remove or impl this
-        }
-
         public static void Canonicalize<T, TProperty>(
             this T source,
             Expression<Func<T, TProperty>> property,

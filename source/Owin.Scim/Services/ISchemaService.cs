@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Services
 {
     using System.Collections.Generic;
+    using System.Threading.Tasks;
 
     using Model;
 
@@ -14,12 +15,12 @@
         /// </summary>
         /// <param name="schemaId">The schema identifier.</param>
         /// <returns>IScimResponse&lt;ScimSchema&gt;.</returns>
-        IScimResponse<ScimSchema> GetSchema(string schemaId);
+        Task<IScimResponse<ScimSchema>> GetSchema(string schemaId);
 
         /// <summary>
         /// Gets all defined <see cref="ScimSchema"/>s.
         /// </summary>
         /// <returns>IScimResponse&lt;IEnumerable&lt;ScimSchema&gt;&gt;.</returns>
-        IScimResponse<IEnumerable<ScimSchema>> GetSchemas();
+        Task<IScimResponse<IEnumerable<ScimSchema>>> GetSchemas();
     }
 }

@@ -1,5 +1,7 @@
 ﻿namespace Owin.Scim.Tests.Querying.Filtering.Normalization
 {
+    using System.Collections.Generic;
+
     using Machine.Specifications;
 
     using Scim.Querying;
@@ -8,7 +10,8 @@
     {
         Because of = () =>
         {
-            ScimFilter = new ScimFilter(PathFilter);
+            ScimFilter = new ScimFilter(
+                new HashSet<string>(new[]{ ScimConstants.Schemas.UserEnterprise }), PathFilter);
         };
 
         protected static ScimFilter ScimFilter;

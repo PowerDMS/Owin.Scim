@@ -107,7 +107,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLazy.cs" />
-    <Compile Include="Canonicalization\DefaultCanonicalizationService.cs" />
+    <Compile Include="Serialization\ResourceJsonConverter.cs" />
+    <Compile Include="Services\DefaultCanonicalizationService.cs" />
     <Compile Include="Canonicalization\CanonicalizationDelegates.cs" />
     <Compile Include="Configuration\CompositionContainerRegistry.cs" />
     <Compile Include="Configuration\CompositionContainerRegistryBuilder.cs" />
@@ -222,9 +223,11 @@
     <Compile Include="Serialization\ResolverContractKey.cs" />
     <Compile Include="Serialization\ScimContractResolver.cs" />
     <Compile Include="Services\AmbientRequestMessageService.cs" />
+    <Compile Include="Services\ICanonicalizationService.cs" />
+    <Compile Include="Services\IResourceTypeService.cs" />
     <Compile Include="Services\ISchemaService.cs" />
+    <Compile Include="Services\ResourceTypeService.cs" />
     <Compile Include="Services\SchemaService.cs" />
-    <Compile Include="SometimesLazy.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtension.cs" />
     <Compile Include="Model\ResourceExtension.cs" />
     <Compile Include="Patching\Helpers\PatchMember.cs" />

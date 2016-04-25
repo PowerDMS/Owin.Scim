@@ -11,27 +11,13 @@
     [ScimTypeDefinition(typeof(ServiceProviderConfigurationDefinition))]
     public class ServiceProviderConfiguration : Resource
     {
-        private readonly ScimFeature _Patch;
-
-        private readonly ScimFeatureBulk _Bulk;
-
-        private readonly ScimFeatureFilter _Filter;
-
-        private readonly ScimFeature _ChangePassword;
-
-        private readonly ScimFeature _Sort;
-
-        private readonly ScimFeature _ETag;
-
-        private readonly IEnumerable<AuthenticationScheme> _AuthenticationSchemes;
-
         public ServiceProviderConfiguration(
             ScimFeature featurePatch,
             ScimFeatureBulk featureBulk,
             ScimFeatureFilter featureFilter,
             ScimFeature featureChangePassword,
             ScimFeature featureSort,
-            ScimFeature featureETag,
+            ScimFeatureETag featureETag,
             IEnumerable<AuthenticationScheme> authenticationSchemes = null)
         {
             /* 3.3.1.Resource Types
@@ -43,44 +29,42 @@
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.ServiceProviderConfig);
 
-            _Bulk = featureBulk ?? ScimFeatureBulk.CreateUnsupported();
-            _Filter = featureFilter ?? ScimFeatureFilter.CreateUnsupported();
-            _Patch = featurePatch;
-            _ChangePassword = featureChangePassword;
-            _Sort = featureSort;
-            _ETag = featureETag;
-            _AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
+            Id = "blahblahblah";
+            Bulk = featureBulk ?? ScimFeatureBulk.CreateUnsupported();
+            Filter = featureFilter ?? ScimFeatureFilter.CreateUnsupported();
+            Patch = featurePatch;
+            ChangePassword = featureChangePassword;
+            Sort = featureSort;
+            ETag = featureETag;
+            AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
         }
+
+        [JsonConstructor]
+        private ServiceProviderConfiguration() { }
 
         [JsonProperty("documentationUri")]
-        public Uri DocumentationUri
-        {
-            get { return null; }
-        }
+        public Uri DocumentationUri { get; private set; }
 
         [JsonProperty("patch")]
-        public ScimFeature Patch { get { return _Patch; } }
+        public ScimFeature Patch { get; private set; }
 
         [JsonProperty("bulk")]
-        public ScimFeatureBulk Bulk { get { return _Bulk; } }
+        public ScimFeatureBulk Bulk { get; private set; }
 
         [JsonProperty("filter")]
-        public ScimFeatureFilter Filter { get { return _Filter; } }
+        public ScimFeatureFilter Filter { get; private set; }
 
         [JsonProperty("changePassword")]
-        public ScimFeature ChangePassword { get { return _ChangePassword; } }
+        public ScimFeature ChangePassword { get; private set; }
 
         [JsonProperty("sort")]
-        public ScimFeature Sort { get { return _Sort; } }
+        public ScimFeature Sort { get; private set; }
 
         [JsonProperty("etag")]
-        public ScimFeature ETag { get { return _ETag; } }
+        public ScimFeatureETag ETag { get; private set; }
 
         [JsonProperty("authenticationSchemes")]
-        public IEnumerable<AuthenticationScheme> AuthenticationSchemes
-        {
-            get { return _AuthenticationSchemes; }
-        }
+        public IEnumerable<AuthenticationScheme> AuthenticationSchemes { get; private set; }
         
         public override string SchemaIdentifier
         {

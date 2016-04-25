@@ -22,7 +22,7 @@
         It should_return_error = () =>
         {
             Response.StatusCode.ShouldEqual(HttpStatusCode.NotFound);
-            var error = Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray()).Result;
+            var error = Response.Content.ScimReadAsAsync<Model.ScimError>().Result;
 
             // only 400 returns scimType
             error.ScimType.ShouldBeNull();

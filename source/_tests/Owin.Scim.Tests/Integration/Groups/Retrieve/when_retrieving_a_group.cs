@@ -15,17 +15,13 @@ namespace Owin.Scim.Tests.Integration.Groups.Retrieve
                 .HttpClient
                 .GetAsync("groups/" + GroupId)
                 .Result;
-
-            var bodyText = Response.StatusCode == HttpStatusCode.OK
-                ? Response.Content.ReadAsStringAsync().Result
-                : null;
-
-            RetrievedGroup = bodyText != null
-                ? Newtonsoft.Json.JsonConvert.DeserializeObject<Group>(bodyText)
+            
+            RetrievedGroup = Response.StatusCode == HttpStatusCode.OK
+                ? Response.Content.ScimReadAsAsync<Group>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
-                ? Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                ? Response.Content.ScimReadAsAsync<Model.ScimError>().Result
                 : null;
         };
 

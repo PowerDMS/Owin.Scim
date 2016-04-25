@@ -4,7 +4,8 @@
 
     public class AuthenticationSchemeDefinition : ScimTypeDefinitionBuilder<AuthenticationScheme>
     {
-        public AuthenticationSchemeDefinition()
+        public AuthenticationSchemeDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(s => s.Type)
                 .SetDescription(@"The authentication scheme.")

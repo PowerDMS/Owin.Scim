@@ -20,12 +20,13 @@ namespace Owin.Scim.Configuration
         private Type _ValidatorType;
 
         public ScimResourceTypeDefinitionBuilder(
+            ScimServerConfiguration serverConfiguration,
             string name, 
             string schema, 
             string endpoint,
             Type validatorType,
             Predicate<ISet<string>> schemaBindingRule)
-            : base(schema)
+            : base(serverConfiguration, schema)
         {
             _SchemaExtensions = new Dictionary<string, ScimResourceTypeExtension>();
 
@@ -67,7 +68,7 @@ namespace Owin.Scim.Configuration
             where TExtension : ResourceExtension, new()
             where TValidator : IValidator<TExtension>
         {
-            var typeDefinition = ScimServerConfiguration.GetScimTypeDefinition(typeof (TExtension));
+            var typeDefinition = ServerConfiguration.GetScimTypeDefinition(typeof (TExtension));
             var extension = new ScimResourceTypeExtension(
                 schemaIdentifier,
                 required,

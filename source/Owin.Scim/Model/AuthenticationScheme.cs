@@ -2,6 +2,8 @@
 {
     using System;
 
+    using Newtonsoft.Json;
+
     [ScimTypeDefinition(typeof(AuthenticationSchemeDefinition))]
     public class AuthenticationScheme : MultiValuedAttribute
     {
@@ -21,12 +23,16 @@
             DocumentationUri = documentationUri;
         }
 
+        [JsonProperty("name")]
         public string Name { get; private set; }
 
+        [JsonProperty("description")]
         public string Description { get; private set; }
 
+        [JsonProperty("specUri")]
         public Uri SpecUri { get; private set; }
 
+        [JsonProperty("documentationUri")]
         public Uri DocumentationUri { get; private set; }
 
         protected internal override int CalculateVersion()

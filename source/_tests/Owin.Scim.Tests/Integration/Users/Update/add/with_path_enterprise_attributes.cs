@@ -21,6 +21,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                     GivenName = "John"
                 }
             };
+
             UserToUpdate.Extension<EnterpriseUserExtension>().Department = "Hello";
 
             PatchContent = new StringContent(

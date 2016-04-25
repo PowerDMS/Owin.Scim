@@ -4,7 +4,6 @@
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Reflection;
 
     using Antlr;
 
@@ -20,9 +19,7 @@
 
     using NContext.Common;
 
-    using Newtonsoft.Json;
     using Newtonsoft.Json.Serialization;
-    using Newtonsoft.Json.Utilities;
 
     using Operations;
 
@@ -33,16 +30,20 @@
     // for IEnumerable, SCIM query filters, and observe the rules surrounding SCIM Patch.
     public class ScimPatchObjectAnalysis
     {
+        private readonly ScimServerConfiguration _ServerConfiguration;
+
         private readonly IContractResolver _ContractResolver;
 
         private readonly Operation _Operation;
 
         public ScimPatchObjectAnalysis(
+            ScimServerConfiguration serverConfiguration,
             object objectToSearch, 
             string filter, 
             IContractResolver contractResolver,
             Operation operation)
         {
+            _ServerConfiguration = serverConfiguration;
             _ContractResolver = contractResolver;
             _Operation = operation;
             PatchMembers = new List<PatchMember>();
@@ -60,7 +61,7 @@
                 Once normalized, associate each resource member with its filter (if present).
                 This is represented as a PathMember, which is essentially a tuple of <memberName, memberFilter?>
             */
-            var pathTree = new ScimFilter(filter).Paths.ToList();
+            var pathTree = new ScimFilter(_ServerConfiguration.ResourceExtensionSchemas, filter).Paths.ToList();
             var lastPosition = 0;
             var nodes = GetAffectedMembers(pathTree, ref lastPosition, new Node(objectToSearch, null));
             
@@ -143,14 +144,14 @@
             for (int i = lastPosition; i < pathTree.Count; i++)
             {
                 // seems absurd, but this MAY be called recursively, OR simply
-                // interated via the for loop
+                // iterated via the for loop
                 lastPosition = i; 
                 
                 var jsonContract = (JsonObjectContract)_ContractResolver.ResolveContract(node.Target.GetType());
                 var attemptedProperty = jsonContract.Properties.GetClosestMatchProperty(pathTree[i].Path);
                 if (attemptedProperty == null)
                 {
-                    if (!ScimServerConfiguration.ResourceExtensionExists(pathTree[i].Path))
+                    if (!_ServerConfiguration.ResourceExtensionExists(pathTree[i].Path))
                     {
                         // property cannot be found, and we're not working with an extension.
                         ErrorType = ScimErrorType.InvalidPath;
@@ -192,7 +193,7 @@
                     if (propertyType == typeof (ResourceExtensions))
                     {
                         var resourceExtensions = (ResourceExtensions) attemptedProperty.ValueProvider.GetValue(node.Target);
-                        var extensionType = ScimServerConfiguration.GetResourceExtensionType(node.Target.GetType(), pathTree[i].Path);
+                        var extensionType = _ServerConfiguration.GetResourceExtensionType(node.Target.GetType(), pathTree[i].Path);
                         if (_Operation.OperationType == OperationType.Remove && !resourceExtensions.Contains(extensionType))
                             break;
 

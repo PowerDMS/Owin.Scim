@@ -23,7 +23,7 @@
     {
         Establish context = () =>
         {
-            ServerConfiguration = A.Fake<ScimServerConfiguration>();
+            ServerConfiguration = new ScimServerConfiguration();
             UserRepository = A.Fake<IUserRepository>();
             GroupRepository = A.Fake<IGroupRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
@@ -32,17 +32,15 @@
                 .ReturnsLazily(c => Task.FromResult((User)c.Arguments[0]));
 
             var etagProvider = A.Fake<IResourceVersionProvider>();
-            var canonicalizationService = A.Fake<DefaultCanonicalizationService>();
+            var canonicalizationService = A.Fake<DefaultCanonicalizationService>(o => o.CallsBaseMethods());
             _UserService = new UserService(
                 ServerConfiguration,
+                etagProvider,
                 canonicalizationService,
+                new UserValidatorFactory(UserRepository, PasswordManager),
                 UserRepository,
                 GroupRepository,
-                PasswordManager,
-                new UserValidatorFactory(UserRepository, PasswordManager))
-            {
-                VersionProvider = etagProvider
-            };
+                PasswordManager);
         };
 
         Because of = async () => Result = await _UserService.UpdateUser(ClientUserDto).AwaitResponse().AsTask;

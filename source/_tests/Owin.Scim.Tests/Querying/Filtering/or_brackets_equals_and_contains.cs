@@ -41,8 +41,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
                 }
             };
 
-            FilterExpression = new ScimFilter(
-                "emails[type eq \"work\" and value co \"@example.com\"] or ims[type eq \"xmpp\" and value co \"@foo.com\"]");
+            FilterExpression = "emails[type eq \"work\" and value co \"@example.com\"] or ims[type eq \"xmpp\" and value co \"@foo.com\"]";
         };
 
         It should_filter = () => Users.Where(Predicate).Select(u => u.UserName).ShouldContainOnly("ROMalley", "DGioulakis");

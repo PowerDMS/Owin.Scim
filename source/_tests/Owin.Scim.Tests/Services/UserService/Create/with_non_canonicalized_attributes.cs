@@ -4,8 +4,6 @@ namespace Owin.Scim.Tests.Services.UserService.Create
     using System.Collections.Generic;
     using System.Linq;
 
-    using Extensions;
-
     using Machine.Specifications;
 
     using Model.Users;
@@ -48,7 +46,7 @@ namespace Owin.Scim.Tests.Services.UserService.Create
             () => Result
                 .GetRight()
                 .Emails
-                .All(email => ShouldExtensions.ShouldBeLowercase(email.Display.Substring(email.Display.IndexOf('@') + 1)));
+                .All(email => email.Display.Substring(email.Display.IndexOf('@') + 1).ShouldBeLowercase());
 
         It should_contain_only_one_primary = () => Result.GetRight().Photos.Count(p => p.Primary).ShouldEqual(1);
     }

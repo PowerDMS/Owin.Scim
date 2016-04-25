@@ -24,10 +24,10 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<User>(existingUser))
                 .Result;
 
-            UserDto = Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result;
+            UserDto = Response.Content.ScimReadAsAsync<User>().Result;
 
             UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
             UserDto.AddExtension(
@@ -48,13 +48,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PutAsync("users/" + UserDto.Id, new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("users/" + UserDto.Id, new ScimObjectContent<User>(UserDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
 
             CreatedUser = Response.StatusCode == HttpStatusCode.OK
-                ? JsonConvert.DeserializeObject<User>(bodyText)
+                ? Response.Content.ScimReadAsAsync<User>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

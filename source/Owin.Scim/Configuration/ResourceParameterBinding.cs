@@ -30,16 +30,20 @@
 
         private static readonly HttpMethod _Patch = new HttpMethod("patch");
 
+        private readonly ScimServerConfiguration _ServerConfiguration;
+
         private readonly ISchemaTypeFactory _SchemaTypeFactory;
 
         public ResourceParameterBinding(
+            ScimServerConfiguration serverConfiguration,
             HttpParameterDescriptor parameter,
             ISchemaTypeFactory schemaTypeFactory) 
             : base(parameter)
         {
+            _ServerConfiguration = serverConfiguration;
             _SchemaTypeFactory = schemaTypeFactory;
         }
-        
+
         public override async Task ExecuteBindingAsync(
             ModelMetadataProvider metadataProvider,
             HttpActionContext actionContext,
@@ -66,7 +70,7 @@
                 throw new Exception(""); // TODO: (DG) binding rules resolved to a type which is not assignable to the action parameter's type
 
             // Enforce the request contains all required extensions for the resource.
-            var resourceTypeDefinition = (IScimResourceTypeDefinition)ScimServerConfiguration.GetScimTypeDefinition(schemaType);
+            var resourceTypeDefinition = (IScimResourceTypeDefinition)_ServerConfiguration.GetScimTypeDefinition(schemaType);
             var requiredExtensions = _RequiredResourceExtensionCache.GetOrAdd(resourceTypeDefinition.DefinitionType, resourceType => resourceTypeDefinition.SchemaExtensions.Where(e => e.Required).Select(e => e.Schema));
             if (requiredExtensions.Any())
             {
@@ -84,7 +88,7 @@
                                 string.Format(
                                     "'{0}' is a required extension for this resource type '{1}'. The extension must be specified in the request content.", 
                                     requiredExtension, 
-                                    ScimServerConfiguration.GetSchemaIdentifierForResourceType(schemaType))));
+                                    _ServerConfiguration.GetSchemaIdentifierForResourceType(schemaType))));
                         return;
                     }
                 }

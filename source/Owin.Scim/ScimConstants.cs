@@ -62,6 +62,12 @@
             public const string Users = @"users";
 
             public const string Groups = @"groups";
+
+            public const string ResourceTypes = @"resourcetypes";
+
+            public const string ServiceProviderConfig = @"serviceproviderconfig";
+
+            public const string Schemas = @"schemas";
         }
 
         public static class DataTypes

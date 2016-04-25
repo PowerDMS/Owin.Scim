@@ -21,6 +21,11 @@
 
         public MySubClass ComplexData { get; set; }
 
+        protected override string SchemaIdentifier
+        {
+            get { return Schema; }
+        }
+
         public override int CalculateVersion()
         {
             return new

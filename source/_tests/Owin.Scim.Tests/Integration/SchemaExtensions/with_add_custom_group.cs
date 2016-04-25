@@ -43,13 +43,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PostAsync("groups", new ObjectContent<Group>(GroupDto, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("groups", new ScimObjectContent<Group>(GroupDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
 
             CreatedGroup = Response.StatusCode == HttpStatusCode.Created
-                ? JsonConvert.DeserializeObject<Group>(bodyText)
+                ? Response.Content.ScimReadAsAsync<Group>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

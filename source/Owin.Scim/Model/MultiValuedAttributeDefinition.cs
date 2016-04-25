@@ -4,7 +4,8 @@
 
     public abstract class MultiValuedAttributeDefinition : ScimTypeDefinitionBuilder<MultiValuedAttribute>
     {
-        protected MultiValuedAttributeDefinition()
+        protected MultiValuedAttributeDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(mva => mva.Display)
                 .SetDescription("A human-readable name, primarily used for display purposes.")

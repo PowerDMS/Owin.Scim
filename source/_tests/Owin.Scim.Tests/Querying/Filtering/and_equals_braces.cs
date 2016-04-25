@@ -37,8 +37,7 @@
                 }
             };
 
-            FilterExpression = new ScimFilter(
-                "userType eq \"Employee\" and (emails.type eq \"work\")");
+            FilterExpression = "userType eq \"Employee\" and (emails.type eq \"work\")";
         };
 
         It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("ROMalley");

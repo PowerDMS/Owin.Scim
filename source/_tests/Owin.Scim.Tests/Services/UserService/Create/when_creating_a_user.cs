@@ -2,9 +2,7 @@
 {
     using System;
     using System.Threading.Tasks;
-
-    using Canonicalization;
-
+    
     using Configuration;
 
     using FakeItEasy;
@@ -24,7 +22,7 @@
     {
         Establish context = () =>
         {
-            ServerConfiguration = A.Fake<ScimServerConfiguration>();
+            ServerConfiguration = new ScimServerConfiguration();
             UserRepository = A.Fake<IUserRepository>();
             GroupRepository = A.Fake<IGroupRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
@@ -42,17 +40,16 @@
                 });
 
             var etagProvider = A.Fake<IResourceVersionProvider>();
-            var canonicalizationService = A.Fake<DefaultCanonicalizationService>();
+            var canonicalizationService = A.Fake<DefaultCanonicalizationService>(o => o.CallsBaseMethods());
+
             _UserService = new UserService(
                 ServerConfiguration,
+                etagProvider,
                 canonicalizationService,
-                UserRepository, 
+                new UserValidatorFactory(UserRepository, PasswordManager), 
+                UserRepository,
                 GroupRepository,
-                PasswordManager,
-                new UserValidatorFactory(UserRepository, PasswordManager))
-            {
-                VersionProvider = etagProvider
-            };
+                PasswordManager);
         };
 
         Because of = async () => Result = await _UserService.CreateUser(ClientUserDto).AwaitResponse().AsTask;

@@ -7,8 +7,6 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Model.Users;
 
-    using Scim.Querying;
-
     public class and_present_equals : when_parsing_a_filter_expression<User>
     {
         Establish context = () =>
@@ -20,7 +18,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
                 new User { UserName = "DGioulakis", Title = "Engineer", UserType = "Employee" }
             };
 
-            FilterExpression = new ScimFilter("title pr and userType eq \"employee\"");
+            FilterExpression = "title pr and userType eq \"employee\"";
         };
 
         It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("DGioulakis");

@@ -4,7 +4,8 @@
 
     public class ScimFeatureFilterDefinition : ScimTypeDefinitionBuilder<ScimFeatureFilter>
     {
-        public ScimFeatureFilterDefinition()
+        public ScimFeatureFilterDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(f => f.Supported)
                 .SetDescription(@"A boolean value specifying whether or not the operation is supported.")

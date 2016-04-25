@@ -2,7 +2,8 @@ namespace Owin.Scim.Configuration
 {
     public class ScimSchemaTypeDefinitionBuilder<T> : ScimTypeDefinitionBuilder<T>, IScimSchemaTypeDefinition
     {
-        public ScimSchemaTypeDefinitionBuilder(string schema)
+        public ScimSchemaTypeDefinitionBuilder(ScimServerConfiguration serverConfiguration, string schema) 
+            : base(serverConfiguration)
         {
             Schema = schema;
         }

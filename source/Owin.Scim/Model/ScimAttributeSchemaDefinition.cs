@@ -4,7 +4,8 @@ namespace Owin.Scim.Model
 
     public class ScimAttributeSchemaDefinition : ScimTypeDefinitionBuilder<ScimAttributeSchema>
     {
-        public ScimAttributeSchemaDefinition()
+        public ScimAttributeSchemaDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(a => a.Name)
                 .SetDescription(@"The attribute's name.")

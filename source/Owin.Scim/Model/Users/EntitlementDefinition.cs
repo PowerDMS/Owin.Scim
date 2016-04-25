@@ -2,9 +2,12 @@ namespace Owin.Scim.Model.Users
 {
     using System;
 
+    using Configuration;
+
     public class EntitlementDefinition : MultiValuedAttributeDefinition
     {
-        public EntitlementDefinition()
+        public EntitlementDefinition( ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(e => e.Value)
                 .SetDescription("The value of an entitlement.");

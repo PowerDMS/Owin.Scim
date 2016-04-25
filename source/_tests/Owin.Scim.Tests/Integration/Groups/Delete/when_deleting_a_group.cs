@@ -17,7 +17,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Delete
                 .Result;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
-                ? Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                ? Response.Content.ScimReadAsAsync<Model.ScimError>().Result
                 : null;
         };
 

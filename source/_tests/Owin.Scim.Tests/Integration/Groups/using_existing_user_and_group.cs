@@ -1,7 +1,6 @@
 namespace Owin.Scim.Tests.Integration.Groups
 {
     using System.Net;
-    using System.Net.Http;
 
     using Model.Users;
     using Model.Groups;
@@ -12,10 +11,10 @@ namespace Owin.Scim.Tests.Integration.Groups
         {
             var response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(user, new ScimJsonMediaTypeFormatter())).Result;
+                .PostAsync("users", new ScimObjectContent<User>(user)).Result;
 
             return (response.StatusCode == HttpStatusCode.Created)
-                ? response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                ? response.Content.ScimReadAsAsync<User>().Result
                 : null;
         }
 
@@ -23,10 +22,10 @@ namespace Owin.Scim.Tests.Integration.Groups
         {
             var response = Server
                 .HttpClient
-                .PostAsync("groups", new ObjectContent<Group>(group, new ScimJsonMediaTypeFormatter())).Result;
+                .PostAsync("groups", new ScimObjectContent<Group>(group)).Result;
 
             return response.StatusCode == HttpStatusCode.Created
-                ? response.Content.ReadAsAsync<Group>(ScimJsonMediaTypeFormatter.AsArray()).Result
+                ? response.Content.ScimReadAsAsync<Group>().Result
                 : null;
         }
     }

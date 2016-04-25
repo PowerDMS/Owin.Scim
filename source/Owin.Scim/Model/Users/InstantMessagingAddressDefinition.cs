@@ -2,9 +2,12 @@
 {
     using System;
 
+    using Configuration;
+
     public class InstantMessagingAddressDefinition : MultiValuedAttributeDefinition
     {
-        public InstantMessagingAddressDefinition()
+        public InstantMessagingAddressDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(ima => ima.Value)
                 .SetDescription(@"Instant messaging address for the user.");

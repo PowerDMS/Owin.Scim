@@ -1,5 +1,7 @@
 namespace Owin.Scim.Model
 {
+    using Newtonsoft.Json;
+
     [ScimTypeDefinition(typeof(ScimFeatureDefinition))]
     public class ScimFeature
     {
@@ -8,6 +10,7 @@ namespace Owin.Scim.Model
             Supported = supported;
         }
 
+        [JsonProperty("supported")]
         public bool Supported { get; private set; }
 
         protected internal virtual int GetETagHashCode()

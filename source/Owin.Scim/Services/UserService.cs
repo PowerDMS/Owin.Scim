@@ -3,10 +3,7 @@
     using System;
     using System.Net;
     using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
-
-    using Canonicalization;
 
     using Configuration;
 
@@ -27,7 +24,7 @@
 
     public class UserService : ServiceBase, IUserService
     {
-        private readonly DefaultCanonicalizationService _CanonicalizationService;
+        private readonly ICanonicalizationService _CanonicalizationService;
 
         private readonly IUserRepository _UserRepository;
 
@@ -39,12 +36,13 @@
 
         public UserService(
             ScimServerConfiguration scimServerConfiguration,
-            DefaultCanonicalizationService canonicalizationService,
+            IResourceVersionProvider versionProvider,
+            ICanonicalizationService canonicalizationService,
+            IResourceValidatorFactory resourceValidatorFactory,
             IUserRepository userRepository,
             IGroupRepository groupRepository,
-            IManagePasswords passwordManager,
-            IResourceValidatorFactory resourceValidatorFactory)
-            : base(scimServerConfiguration)
+            IManagePasswords passwordManager)
+            : base(scimServerConfiguration, versionProvider)
         {
             _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
@@ -121,7 +119,7 @@
             // check if we're changing a password
             if (_PasswordManager.PasswordIsDifferent(user.Password, userRecord.Password))
             {
-                if (!ScimServerConfiguration.GetFeature(ScimFeatureType.ChangePassword).Supported)
+                if (!ServerConfiguration.GetFeature(ScimFeatureType.ChangePassword).Supported)
                 {
                     return new ScimErrorResponse<User>(
                         new ScimError(
@@ -164,7 +162,7 @@
 
         protected virtual Task CanonicalizeUser(User user)
         {
-            _CanonicalizationService.Canonicalize(user, ScimServerConfiguration.GetScimTypeDefinition(typeof(User)));
+            _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(typeof(User)));
 
             return Task.FromResult(0);
         }

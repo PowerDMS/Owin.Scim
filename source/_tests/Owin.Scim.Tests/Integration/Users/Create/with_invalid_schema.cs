@@ -26,13 +26,13 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<UserWithSchema>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<UserWithSchema>(UserDto))
                 .Result;
 
             StatusCode = Response.StatusCode;
 
             Error = StatusCode != HttpStatusCode.BadRequest ? null : Response.Content
-                .ReadAsAsync<IEnumerable<ScimError>>(ScimJsonMediaTypeFormatter.AsArray())
+                .ScimReadAsAsync<IEnumerable<ScimError>>()
                 .Result
                 .Single();
         };

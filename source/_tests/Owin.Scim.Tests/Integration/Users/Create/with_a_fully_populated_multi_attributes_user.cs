@@ -1,13 +1,13 @@
 ﻿namespace Owin.Scim.Tests.Integration.Users.Create
 {
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
-
-    using Newtonsoft.Json;
+    using System.Net.Http.Formatting;
 
     using Machine.Specifications;
-    
+
+    using Model;
+
     public class with_a_fully_populated_multi_attributes_user : using_a_scim_server
     {
         Establish context = () =>
@@ -43,24 +43,19 @@
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<MyUser>(UserDto, new ScimJsonMediaTypeFormatter
-                {
-                    SerializerSettings = { NullValueHandling = NullValueHandling.Ignore }
-                }))
+                .PostAsync("users", new ObjectContent<MyUser>(UserDto, new JsonMediaTypeFormatter()))
                 .Result;
 
             StatusCode = Response.StatusCode;
 
             if (StatusCode == HttpStatusCode.Created)
-            {
-                var responseBody = Response.Content.ReadAsStringAsync().Result;
-                CreatedUser = JsonConvert.DeserializeObject<MyUser>(responseBody);
-            }
+                CreatedUser = Response.Content.ReadAsAsync<MyUser>().Result;
 
-            Error = StatusCode != HttpStatusCode.BadRequest ? null : Response.Content
-                .ReadAsAsync<System.Collections.Generic.IEnumerable<Model.ScimError>>(ScimJsonMediaTypeFormatter.AsArray())
-                .Result
-                .Single();
+            Error = StatusCode != HttpStatusCode.BadRequest
+                ? Response.Content
+                    .ScimReadAsAsync<ScimError>()
+                    .Result
+                : null;
         };
 
         It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);
@@ -74,7 +69,7 @@
                 CreatedUser.Emails[i].Value.ShouldEqual(UserDto.Emails[i].Value);
                 CreatedUser.Emails[i].Display.ShouldBeEqualIgnoringCase(UserDto.Emails[i].Value);
                 CreatedUser.Emails[i].Type.ShouldEqual(UserDto.Emails[i].Type);
-                CreatedUser.Emails[i].Primary.ShouldEqual(UserDto.Emails[i].Primary ?? false);
+                CreatedUser.Emails[i].Primary.ShouldEqual(UserDto.Emails[i].Primary);
             }
         };
 
@@ -87,7 +82,7 @@
                 CreatedUser.PhoneNumbers[i].Value.ShouldEqual(UserDto.PhoneNumbers[i].Value);
                 UserDto.PhoneNumbers[i].Value.ToCharArray().ShouldContain(CreatedUser.PhoneNumbers[i].Display.ToCharArray());
                 CreatedUser.PhoneNumbers[i].Type.ShouldEqual(UserDto.PhoneNumbers[i].Type);
-                CreatedUser.PhoneNumbers[i].Primary.ShouldEqual(UserDto.PhoneNumbers[i].Primary ?? false);
+                CreatedUser.PhoneNumbers[i].Primary.ShouldEqual(UserDto.PhoneNumbers[i].Primary);
             }
         };
 
@@ -102,7 +97,7 @@
         protected static Model.ScimError Error;
 
         /// <summary>
-        /// Using my own user class to test interoperativity and not favor our own User class
+        /// Using my own user class to test interoperability and not favor our own User class
         /// </summary>
         public class MyUser
         {
@@ -123,7 +118,7 @@
             public string Value;
             public string Display;
             public string Type;
-            public bool? Primary;
+            public bool Primary;
         }
 
         public class MyMultiAttribute2

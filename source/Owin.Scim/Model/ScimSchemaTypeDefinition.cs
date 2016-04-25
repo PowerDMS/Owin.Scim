@@ -4,7 +4,8 @@
 
     public sealed class ScimSchemaTypeDefinition : ScimSchemaTypeDefinitionBuilder<ScimSchema>
     {
-        public ScimSchemaTypeDefinition() : base(ScimConstants.Schemas.Schema)
+        public ScimSchemaTypeDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration, ScimConstants.Schemas.Schema)
         {
             SetName(ScimConstants.ResourceTypes.Schema);
             SetDescription(@"Specifies the schema that describes a SCIM schema.");

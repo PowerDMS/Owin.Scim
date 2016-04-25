@@ -1,6 +1,5 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
-    using System.Collections.Generic;
     using System.Net;
     using System.Net.Http;
 
@@ -14,16 +13,16 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         {
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<User>(UserDto))
                 .AwaitResponse()
                 .AsTask;
 
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
-                ? await Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).AwaitResponse().AsTask
+                ? await Response.Content.ScimReadAsAsync<User>().AwaitResponse().AsTask
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
-                ? await Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray()).AwaitResponse().AsTask
+                ? await Response.Content.ScimReadAsAsync<Model.ScimError>().AwaitResponse().AsTask
                 : null;
         };
         

@@ -4,7 +4,8 @@ namespace Owin.Scim.Model.Users
 
     public class EnterpriseUserExtensionDefinition : ScimTypeDefinitionBuilder<EnterpriseUserExtension>
     {
-        public EnterpriseUserExtensionDefinition()
+        public EnterpriseUserExtensionDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             SetName("Enterprise user");
             SetDescription("Enterprise user resource extension.");

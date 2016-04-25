@@ -16,6 +16,7 @@
 
     using Model;
 
+    using NContext.Common;
     using NContext.Configuration;
     using NContext.Extensions;
 
@@ -67,11 +68,17 @@
                 // definitions for complex attributes, therefore, no need to re-create the same definition more than once
                 if (serverConfiguration.ContainsTypeDefinition(enumerator.Current)) continue;
 
-                var typeDefinition = (IScimTypeDefinition)Activator.CreateInstance(enumerator.Current);
+                var typeDefinition = (IScimTypeDefinition)enumerator.Current.CreateInstance(serverConfiguration);
                 serverConfiguration.AddTypeDefiniton(typeDefinition);
             }
 
+            var httpConfiguration = serverConfiguration.HttpConfiguration = new HttpConfiguration();
+
+            // Invoke custom configuration action if not null
             _ConfigureScimServerAction?.Invoke(serverConfiguration);
+
+            // Configure SCIM http configuration
+            ConfigureHttpConfiguration(serverConfiguration);
 
             // Set default public origin
             if (serverConfiguration.PublicOrigin == null && _AppBuilder.Properties.ContainsKey("host.Addresses"))
@@ -92,29 +99,28 @@
 
             if (serverConfiguration.RequireSsl)
                 _AppBuilder.Use<RequireSslMiddleware>();
-
-            var httpConfig = CreateHttpConfiguration();
-            _IocContainer.WithWebApi(httpConfig);
-
-            _AppBuilder.UseWebApi(httpConfig);
+            
+            _IocContainer.WithWebApi(httpConfiguration);
+            _AppBuilder.UseWebApi(httpConfiguration);
 
             IsConfigured = true;
         }
 
-        private static HttpConfiguration CreateHttpConfiguration()
+        private static void ConfigureHttpConfiguration(ScimServerConfiguration serverConfiguration)
         {
-            var httpConfiguration = new HttpConfiguration();
+            var httpConfiguration = serverConfiguration.HttpConfiguration;
             httpConfiguration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
             httpConfiguration.MapHttpAttributeRoutes();
 
             var settings = httpConfiguration.Formatters.JsonFormatter.SerializerSettings;
-            settings.Converters.Add(new StringEnumConverter());
-            settings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
-            settings.ContractResolver = new ScimContractResolver
+            settings.ContractResolver = new ScimContractResolver(serverConfiguration)
             {
                 IgnoreSerializableAttribute = true,
                 IgnoreSerializableInterface = true
             };
+            settings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
+            settings.Converters.Add(new StringEnumConverter());
+            settings.Converters.Add(new ResourceJsonConverter(serverConfiguration, JsonSerializer.Create(settings)));
 
             httpConfiguration.ParameterBindingRules.Insert(
                 0,
@@ -122,6 +128,7 @@
                 {
                     if (typeof(Resource).IsAssignableFrom(descriptor.ParameterType))
                         return new ResourceParameterBinding(
+                            serverConfiguration,
                             descriptor,
                             descriptor.Configuration.DependencyResolver.GetService(typeof(ISchemaTypeFactory)) as ISchemaTypeFactory);
 
@@ -135,10 +142,9 @@
                 typeof(IHttpControllerTypeResolver),
                 new DefaultHttpControllerTypeResolver(IsControllerType));
 
-            httpConfiguration.Filters.Add(
-                new ModelBindingResponseAttribute());
+            httpConfiguration.Filters.Add(new ModelBindingResponseAttribute());
 
-            return httpConfiguration;
+            // must be configured last
         }
 
         private static bool IsControllerType(Type t)

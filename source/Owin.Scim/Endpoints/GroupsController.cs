@@ -19,100 +19,107 @@
 
     using Services;
 
+    [RoutePrefix(ScimConstants.Endpoints.Groups)]
     public class GroupsController : ScimControllerBase
     {
+        public const string RetrieveGroupRouteName = @"RetrieveGroup";
+
         private readonly IGroupService _GroupService;
 
         public GroupsController(
-            ScimServerConfiguration scimServerConfiguration,
+            ScimServerConfiguration serverConfiguration,
             IGroupService groupService) 
-            : base(scimServerConfiguration)
+            : base(serverConfiguration)
         {
             _GroupService = groupService;
         }
 
-        [Route("groups", Name = "CreateGroup")]
-        public async Task<HttpResponseMessage> Post(Group group)
+        [Route(Name = "CreateGroup")]
+        public async Task<HttpResponseMessage> Post(Group groupDto)
         {
-            return (await _GroupService.CreateGroup(group))
-                .ToHttpResponseMessage(Request, (groupDto, response) =>
+            return (await _GroupService.CreateGroup(groupDto))
+                .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .ToHttpResponseMessage(Request, (group, response) =>
                 {
                     response.StatusCode = HttpStatusCode.Created;
 
-                    SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
-                    SetETagHeader(response, groupDto);
+                    SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
+                    SetETagHeader(response, group);
                 });
         }
 
-        [Route("groups/{groupId}", Name = "RetrieveGroup")]
+        [Route("{groupId}", Name = RetrieveGroupRouteName)]
         public async Task<HttpResponseMessage> Get(string groupId)
         {
             return (await _GroupService.RetrieveGroup(groupId))
-                .ToHttpResponseMessage(Request, (groupDto, response) =>
+                .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .ToHttpResponseMessage(Request, (group, response) =>
                 {
-                    SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
-                    SetETagHeader(response, groupDto);
+                    SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
+                    SetETagHeader(response, group);
                 });
         }
 
-        [AcceptVerbs("PUT", "OPTIONS")]
-        [Route("groups/{groupId}", Name = "ReplaceGroup")]
-        public async Task<HttpResponseMessage> Put(string groupId, Group group)
-        {
-            group.Id = groupId;
-
-            return (await _GroupService.UpdateGroup(group))
-                .ToHttpResponseMessage(Request, (groupDto, response) =>
-                {
-                    SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
-                    SetETagHeader(response, groupDto);
-                });
-        }
-
-        [Route("groups/{groupId}", Name = "DeleteGroup")]
-        public async Task<HttpResponseMessage> Delete(string groupId)
-        {
-            return (await _GroupService.DeleteGroup(groupId))
-                .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
-        }
-
-        [Route("groups/{groupId}", Name = "UpdateGroup")]
+        [Route("{groupId}", Name = "UpdateGroup")]
         public async Task<HttpResponseMessage> Patch(string groupId, PatchRequest<Group> patchRequest)
         {
             if (patchRequest?.Operations == null ||
                 patchRequest.Operations.Operations.Any(a => a.OperationType == Patching.Operations.OperationType.Invalid))
             {
-                return new ScimErrorResponse<Model.Users.User>(
+                return new ScimErrorResponse<Group>(
                     new ScimError(
                         HttpStatusCode.BadRequest,
                         ScimErrorType.InvalidSyntax,
-                        "The patch request body is unparsable, syntactically incorrect, or violates schema."))
+                        "The patch request body is un-parsable, syntactically incorrect, or violates schema."))
                     .ToHttpResponseMessage(Request);
             }
 
             return (await (await _GroupService.RetrieveGroup(groupId))
-                .Bind<Group, Group>(group =>
+                .Bind(group =>
                 {
                     try
                     {
                         // TODO: (DG) Finish patch support
                         var result = patchRequest.Operations.ApplyTo(
-                            group,
-                            new ScimObjectAdapter<Group>(new CamelCasePropertyNamesContractResolver()));
-
-                        return new ScimDataResponse<Group>(group);
+                            @group, 
+                            new ScimObjectAdapter<Group>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
+                        
+                        return (IScimResponse<Group>)new ScimDataResponse<Group>(@group);
                     }
                     catch (Patching.Exceptions.ScimPatchException ex)
                     {
-                        return new ScimErrorResponse<Group>(ex.ToScimError());
+                        return (IScimResponse<Group>)new ScimErrorResponse<Group>(ex.ToScimError());
                     }
                 })
                 .BindAsync(group => _GroupService.UpdateGroup(group)))
-                .ToHttpResponseMessage(Request, (groupDto, response) =>
+                .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .ToHttpResponseMessage(Request, (group, response) =>
                 {
-                    SetLocationHeader(response, groupDto, "RetrieveGroup", new { groupId = groupDto.Id });
-                    SetETagHeader(response, groupDto);
+                    SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
+                    SetETagHeader(response, group);
                 });
+        }
+
+        [AcceptVerbs("PUT", "OPTIONS")]
+        [Route("{groupId}", Name = "ReplaceGroup")]
+        public async Task<HttpResponseMessage> Put(string groupId, Group groupDto)
+        {
+            groupDto.Id = groupId;
+
+            return (await _GroupService.UpdateGroup(groupDto))
+                .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .ToHttpResponseMessage(Request, (group, response) =>
+                {
+                    SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
+                    SetETagHeader(response, group);
+                });
+        }
+
+        [Route("{groupId}", Name = "DeleteGroup")]
+        public async Task<HttpResponseMessage> Delete(string groupId)
+        {
+            return (await _GroupService.DeleteGroup(groupId))
+                .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
         }
     }
 }

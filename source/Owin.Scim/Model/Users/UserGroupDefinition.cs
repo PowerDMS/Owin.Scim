@@ -6,7 +6,8 @@ namespace Owin.Scim.Model.Users
 
     public class UserGroupDefinition : MultiValuedAttributeDefinition
     {
-        public UserGroupDefinition()
+        public UserGroupDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(g => g.Value)
                 .SetDescription(@"The identifier of the user's group.")

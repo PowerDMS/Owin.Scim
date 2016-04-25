@@ -4,32 +4,19 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.ComponentModel;
-    using System.ComponentModel.Composition.Hosting;
-    using System.IO;
     using System.Linq;
+    using System.Web.Http;
 
     using Model;
-    using Model.Users;
-    using Model.Groups;
 
     using NContext.Common;
-    using NContext.Configuration;
-    using NContext.Extensions;
 
     public class ScimServerConfiguration
     {
-        private static readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache =
+        private readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache =
             new ConcurrentDictionary<Type, IScimTypeDefinition>();
-        
-        private static readonly Lazy<ISet<string>> _ResourceExtensions = 
-            new Lazy<ISet<string>>(
-                () => 
-                new HashSet<string>(_TypeDefinitionCache
-                    .Where(td => td.Value is IScimResourceTypeDefinition)
-                    .SelectMany(rtd => ((IScimResourceTypeDefinition)rtd.Value).SchemaExtensions)
-                    .Select(e => e.Schema)));
 
-        private readonly object _SyncLock = new object();
+        private readonly Lazy<ISet<string>> _ResourceExtensionSchemas;
 
         private readonly IDictionary<ScimFeatureType, ScimFeature> _Features;
 
@@ -37,26 +24,14 @@
 
         private readonly Lazy<IList<SchemaBindingRule>> _SchemaBindingRules;
 
-        private readonly Lazy<IEnumerable<ResourceType>> _ResourceTypes = 
-            new Lazy<IEnumerable<ResourceType>>(() =>
-            {
-                return _TypeDefinitionCache
-                    .Where(td => td.Value is IScimResourceTypeDefinition)
-                    .Select(td =>
-                    {
-                        var rtd = (IScimResourceTypeDefinition) td.Value;
-                        return new ResourceType
-                        {
-                            Description = rtd.Description,
-                            Schema = rtd.Schema,
-                            Name = rtd.Name,
-                            Endpoint = rtd.Endpoint
-                        };
-                    });
-            });
-
         public ScimServerConfiguration()
         {
+            _ResourceExtensionSchemas = new Lazy<ISet<string>>(
+                () =>
+                    new HashSet<string>(_TypeDefinitionCache
+                        .Where(td => td.Value is IScimResourceTypeDefinition)
+                        .SelectMany(rtd => ((IScimResourceTypeDefinition) rtd.Value).SchemaExtensions)
+                        .Select(e => e.Schema)));
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
             _SchemaBindingRules = new Lazy<IList<SchemaBindingRule>>(() => ResourceTypeDefinitions.Select(rtd => new SchemaBindingRule(rtd.SchemaBindingRule, rtd.DefinitionType)).ToList());
             _Features = CreateDefaultFeatures();
@@ -73,7 +48,7 @@
                 scimConfig.GetFeature<ScimFeatureFilter>(ScimFeatureType.Filter),
                 scimConfig.GetFeature(ScimFeatureType.ChangePassword),
                 scimConfig.GetFeature(ScimFeatureType.Sort),
-                scimConfig.GetFeature(ScimFeatureType.ETag),
+                scimConfig.GetFeature<ScimFeatureETag>(ScimFeatureType.ETag),
                 scimConfig.AuthenticationSchemes);
 
             return config;
@@ -83,14 +58,11 @@
 
         public Uri PublicOrigin { get; set; }
 
+        public HttpConfiguration HttpConfiguration { get; internal set; }
+
         public IEnumerable<AuthenticationScheme> AuthenticationSchemes
         {
             get { return _AuthenticationSchemes; }
-        }
-
-        public IEnumerable<ResourceType> ResourceTypes
-        {
-            get { return _ResourceTypes.Value; }
         }
 
         internal IEnumerable<KeyValuePair<ScimFeatureType, ScimFeature>> Features
@@ -116,7 +88,12 @@
             }
         }
 
-        public static IScimTypeDefinition GetScimTypeDefinition(Type type)
+        internal ISet<string> ResourceExtensionSchemas
+        {
+            get { return _ResourceExtensionSchemas.Value; }
+        }
+
+        public IScimTypeDefinition GetScimTypeDefinition(Type type)
         {
             return _TypeDefinitionCache.GetOrAdd(
                 type,
@@ -126,57 +103,40 @@
                     return TypeDescriptor.GetAttributes(t)
                         .OfType<ScimTypeDefinitionAttribute>()
                         .MaybeSingle()
-                        .Bind(a => ((IScimTypeDefinition) Activator.CreateInstance(a.DefinitionType)).ToMaybe())
-                        .FromMaybe((IScimTypeDefinition) Activator.CreateInstance(typeDefinitionType));
+                        .Bind(a => ((IScimTypeDefinition)a.DefinitionType.CreateInstance((ScimServerConfiguration)this)).ToMaybe())
+                        .FromMaybe((IScimTypeDefinition)typeDefinitionType.CreateInstance(this));
                 });
         }
 
-        public static bool ResourceExtensionExists(string extensionSchemaIdentifier)
+        public bool ResourceExtensionExists(string extensionSchemaIdentifier)
         {
-            return _ResourceExtensions.Value.Contains(extensionSchemaIdentifier);
+            return ResourceExtensionSchemas.Contains(extensionSchemaIdentifier);
         }
 
-        public static Type GetResourceExtensionType(Type resourceType, string extensionSchemaIdentifier)
+        public Type GetResourceExtensionType(Type resourceType, string extensionSchemaIdentifier)
         {
-            IScimTypeDefinition rtd;
-            if (!_TypeDefinitionCache.TryGetValue(resourceType, out rtd)) return null;
+            IScimTypeDefinition std;
+            if (!_TypeDefinitionCache.TryGetValue(resourceType, out std)) return null;
 
-            return (rtd as IScimResourceTypeDefinition)?.GetExtension(extensionSchemaIdentifier)?.ExtensionType;
+            return (std as IScimResourceTypeDefinition)?.GetExtension(extensionSchemaIdentifier)?.ExtensionType;
         }
 
-        public static string GetSchemaIdentifierForResourceType(Type resourceType)
+        public string GetSchemaIdentifierForResourceType(Type resourceType)
         {
             IScimTypeDefinition td;
             if (_TypeDefinitionCache.TryGetValue(resourceType, out td))
-            {
                 return ((IScimResourceTypeDefinition) td).Schema;
-            }
 
             throw new InvalidOperationException(
                 string.Format("Type '{0}' is not a valid resource.", resourceType.Name));
-        }
-
-        public static string GetSchemaIdentifierForResourceExtensionType(Type extensionType)
-        {
-            foreach (var rtd in _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>())
-            {
-                var ext = rtd.SchemaExtensions.SingleOrDefault(e => e.ExtensionType == extensionType);
-                if (ext != null)
-                    return ext.Schema;
-            }
-
-            throw new InvalidOperationException(
-                string.Format("Type '{0}' is not a valid resource extension.", extensionType.Name));
         }
 
         public ScimServerConfiguration AddAuthenticationScheme(AuthenticationScheme authenticationScheme)
         {
             // Enforce only one primary
             if (authenticationScheme.Primary)
-            {
                 foreach (var scheme in _AuthenticationSchemes)
                     scheme.Primary = false;
-            }
 
             _AuthenticationSchemes.Add(authenticationScheme);
             return this;

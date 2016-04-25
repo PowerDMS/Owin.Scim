@@ -115,7 +115,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions\HttpContentExtensions.cs" />
     <Compile Include="Extensions\HttpResponseMessageExtensions.cs" />
+    <Compile Include="Extensions\ScimObjectContent.cs" />
     <Compile Include="Extensions\ShouldExtensions.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchema.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchemaValidator.cs" />
@@ -289,7 +291,7 @@
     <Compile Include="Querying\Filtering\equals_with_complex_property.cs" />
     <Compile Include="Querying\Filtering\present_with_enumerable.cs" />
     <Compile Include="Querying\Filtering\equals_with_string.cs" />
-    <Compile Include="ScimJsonMediaTypeFormatter.cs" />
+    <Compile Include="ScimClientJsonMediaTypeFormatter.cs" />
     <Compile Include="Security\when_hashing_passwords.cs" />
     <Compile Include="Security\with_different_passwords.cs" />
     <Compile Include="Security\with_same_passwords.cs" />

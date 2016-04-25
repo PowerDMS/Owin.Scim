@@ -9,22 +9,28 @@
 
     using Model;
 
+    [RoutePrefix(ScimConstants.Endpoints.ServiceProviderConfig)]
     public class ServiceProviderConfigurationController : ScimControllerBase
     {
-        public ServiceProviderConfigurationController(ScimServerConfiguration scimServerConfiguration)
-            : base(scimServerConfiguration)
+        public const string RetrieveServiceProviderConfigurationRouteName = @"GetServiceProviderConfiguration";
+
+        public ServiceProviderConfigurationController(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
         }
 
-        [Route("serviceproviderconfig", Name = "ServiceProviderConfiguration")]
+        [Route(Name = RetrieveServiceProviderConfigurationRouteName)]
         public async Task<HttpResponseMessage> Get()
         {
-            var serviceProviderConfig = (ServiceProviderConfiguration) ScimServerConfiguration;
+            var serviceProviderConfig = (ServiceProviderConfiguration) ServerConfiguration;
+
+            SetMetaLocation(serviceProviderConfig, RetrieveServiceProviderConfigurationRouteName);
+
             var response = Request.CreateResponse(
                 HttpStatusCode.OK, 
                 serviceProviderConfig);
 
-            SetLocationHeader(response, serviceProviderConfig, "ServiceProviderConfiguration");
+            SetContentLocationHeader(response, RetrieveServiceProviderConfigurationRouteName);
 
             return response;
         }

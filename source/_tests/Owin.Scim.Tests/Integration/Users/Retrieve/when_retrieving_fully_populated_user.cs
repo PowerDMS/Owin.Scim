@@ -31,13 +31,13 @@
             // Insert the first user so there's one already in-memory.
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<User>(existingUser))
                 .AwaitResponse()
                 .AsTask;
 
             if (Response.StatusCode == HttpStatusCode.Created)
             {
-                CreatedUser = await Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Await().AsTask;
+                CreatedUser = await Response.Content.ScimReadAsAsync<User>().Await().AsTask;
             }
 
             var client = Server.HttpClient;
@@ -54,7 +54,7 @@
             async () =>
         {
             Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
-            RetrievedUser = await Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).AwaitResponse().AsTask;
+            RetrievedUser = await Response.Content.ScimReadAsAsync<User>().AwaitResponse().AsTask;
 
             RetrievedUser.Meta.Version.ShouldEqual(CreatedUser.Meta.Version);
         };

@@ -10,12 +10,13 @@ namespace Owin.Scim.Model.Groups
 
     public class GroupDefinition : ScimResourceTypeDefinitionBuilder<Group>
     {
-        public GroupDefinition()
+        public GroupDefinition(ScimServerConfiguration serverConfiguration)
             : base(
+                serverConfiguration,
                 ScimConstants.ResourceTypes.Group,
                 ScimConstants.Schemas.Group,
                 ScimConstants.Endpoints.Groups,
-                typeof(GroupValidator),
+                typeof (GroupValidator),
                 schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
         {
             SetName("Group");

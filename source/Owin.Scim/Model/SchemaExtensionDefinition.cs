@@ -4,7 +4,8 @@ namespace Owin.Scim.Model
 
     public class SchemaExtensionDefinition : ScimTypeDefinitionBuilder<SchemaExtension>
     {
-        public SchemaExtensionDefinition()
+        public SchemaExtensionDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(se => se.Required)
                 .SetDescription(@"A boolean value that specifies whether or not the schema extension is required for the resource type.")

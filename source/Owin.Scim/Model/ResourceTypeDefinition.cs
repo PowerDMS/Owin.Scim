@@ -7,8 +7,8 @@
         /// <summary>
         /// Initializes a new instance of the <see cref="ResourceTypeDefinition"/> class.
         /// </summary>
-        public ResourceTypeDefinition()
-            : base(ScimConstants.Schemas.ResourceType)
+        public ResourceTypeDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration, ScimConstants.Schemas.ResourceType)
         {
             SetName(ScimConstants.ResourceTypes.ResourceType);
             SetDescription("Specifies the schema that describes a SCIM resource type.");

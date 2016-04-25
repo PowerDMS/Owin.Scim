@@ -39,13 +39,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<User>(UserDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
-
+            
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
-                ? JsonConvert.DeserializeObject<User>(bodyText)
+                ? Response.Content.ScimReadAsAsync<User>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

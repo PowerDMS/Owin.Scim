@@ -20,43 +20,48 @@
 
     using Services;
 
+    [RoutePrefix(ScimConstants.Endpoints.Users)]
     public class UsersController : ScimControllerBase
     {
+        public const string RetrieveUserRouteName = @"RetrieveUser";
+
         private readonly IUserService _UserService;
 
         public UsersController(
-            ScimServerConfiguration scimServerConfiguration,
+            ScimServerConfiguration serverConfiguration,
             IUserService userService)
-            : base(scimServerConfiguration)
+            : base(serverConfiguration)
         {
             _UserService = userService;
         }
 
-        [Route("users", Name = "CreateUser")]
-        public async Task<HttpResponseMessage> Post(User user)
+        [Route(Name = "CreateUser")]
+        public async Task<HttpResponseMessage> Post(User userDto)
         {
-            return (await _UserService.CreateUser(user))
-                .ToHttpResponseMessage(Request, (userDto, response) =>
+            return (await _UserService.CreateUser(userDto))
+                .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
+                .ToHttpResponseMessage(Request, (user, response) =>
                 {
                     response.StatusCode = HttpStatusCode.Created;
 
-                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
+                    SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
                     SetETagHeader(response, userDto);
                 });
         }
         
-        [Route("users/{userId}", Name = "RetrieveUser")]
+        [Route("{userId}", Name = RetrieveUserRouteName)]
         public async Task<HttpResponseMessage> Get(string userId)
         {
             return (await _UserService.RetrieveUser(userId))
+                .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
                 .ToHttpResponseMessage(Request, (userDto, response) =>
                 {
-                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
+                    SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = userDto.Id });
                     SetETagHeader(response, userDto);
                 });
         }
         
-        [Route("users/{userId}", Name = "UpdateUser")]
+        [Route("{userId}", Name = "UpdateUser")]
         public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<User> patchRequest)
         {
             if (patchRequest?.Operations == null || 
@@ -66,51 +71,52 @@
                     new ScimError(
                         HttpStatusCode.BadRequest,
                         ScimErrorType.InvalidSyntax,
-                        "The patch request body is unparsable, syntactically incorrect, or violates schema."))
+                        "The patch request body is un-parsable, syntactically incorrect, or violates schema."))
                     .ToHttpResponseMessage(Request);
             }
 
             return (await (await _UserService.RetrieveUser(userId))
-                .Bind<User, User>(user =>
+                .Bind(user =>
                 {
                     try
                     {
                         // TODO: (DG) Finish patch support
                         var result = patchRequest.Operations.ApplyTo(
-                            user,
-                            new ScimObjectAdapter<User>(
-                                new CamelCasePropertyNamesContractResolver()));
+                            user, 
+                            new ScimObjectAdapter<User>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
 
-                        return new ScimDataResponse<User>(user);
+                        return (IScimResponse<User>)new ScimDataResponse<User>(user);
                     }
                     catch (ScimPatchException ex)
                     {
-                        return new ScimErrorResponse<User>(ex.ToScimError());
+                        return (IScimResponse<User>)new ScimErrorResponse<User>(ex.ToScimError());
                     }
                 })
                 .BindAsync(user => _UserService.UpdateUser(user)))
-                .ToHttpResponseMessage(Request, (userDto, response) =>
+                .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
+                .ToHttpResponseMessage(Request, (user, response) =>
                 {
-                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
-                    SetETagHeader(response, userDto);
+                    SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
+                    SetETagHeader(response, user);
                 });
         }
 
         [AcceptVerbs("PUT", "OPTIONS")]
-        [Route("users/{userId}", Name = "ReplaceUser")]
-        public async Task<HttpResponseMessage> Put(string userId, User user)
+        [Route("{userId}", Name = "ReplaceUser")]
+        public async Task<HttpResponseMessage> Put(string userId, User userDto)
         {
-            user.Id = userId;
+            userDto.Id = userId;
 
-            return (await _UserService.UpdateUser(user))
-                .ToHttpResponseMessage(Request, (userDto, response) =>
+            return (await _UserService.UpdateUser(userDto))
+                .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
+                .ToHttpResponseMessage(Request, (user, response) =>
                 {
-                    SetLocationHeader(response, userDto, "RetrieveUser", new { userId = userDto.Id });
-                    SetETagHeader(response, userDto);
+                    SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
+                    SetETagHeader(response, user);
                 });
         }
 
-        [Route("users/{userId}", Name = "DeleteUser")]
+        [Route("{userId}", Name = "DeleteUser")]
         public async Task<HttpResponseMessage> Delete(string userId)
         {
             return (await _UserService.DeleteUser(userId))

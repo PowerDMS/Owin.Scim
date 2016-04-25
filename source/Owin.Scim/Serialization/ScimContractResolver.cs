@@ -5,7 +5,6 @@
     using System.Linq;
     using System.Net.Http;
     using System.Reflection;
-    using System.Runtime.Serialization;
     using System.Threading;
 
     using Configuration;
@@ -17,14 +16,17 @@
 
     public class ScimContractResolver : CamelCasePropertyNamesContractResolver
     {
+        private readonly ScimServerConfiguration _ServerConfiguration;
+
         private static readonly HttpMethod _Patch = new HttpMethod("patch");
 
         private static readonly object _TypeContractCacheLock = new object();
 
         private readonly DefaultContractResolverState _InstanceState = new DefaultContractResolverState();
 
-        static ScimContractResolver()
+        public ScimContractResolver(ScimServerConfiguration serverConfiguration)
         {
+            _ServerConfiguration = serverConfiguration;
         }
 
         public override JsonContract ResolveContract(Type type)
@@ -74,7 +76,7 @@
             if (serializableMembers == null)
                 throw new JsonSerializationException("Null collection of seralizable members returned.");
 
-            var typeDefinition = ScimServerConfiguration.GetScimTypeDefinition(type);
+            var typeDefinition = _ServerConfiguration.GetScimTypeDefinition(type);
             var propertyCollection = new JsonPropertyCollection(type);
             foreach (var member in serializableMembers)
             {

@@ -18,7 +18,7 @@
 
             Response = await Server
                 .HttpClient
-                .PutAsync("users/" + UserDto.Id, new ObjectContent<User>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("users/" + UserDto.Id, new ScimObjectContent<User>(UserDto))
                 .AwaitResponse()
                 .AsTask;
 

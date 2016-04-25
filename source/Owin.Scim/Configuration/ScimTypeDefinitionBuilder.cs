@@ -11,10 +11,13 @@ namespace Owin.Scim.Configuration
     
     public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinition
     {
+        private readonly ScimServerConfiguration _ServerConfiguration;
+
         private readonly IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> _AttributeDefinitions;
         
-        public ScimTypeDefinitionBuilder()
+        public ScimTypeDefinitionBuilder(ScimServerConfiguration serverConfiguration)
         {
+            _ServerConfiguration = serverConfiguration;
             _AttributeDefinitions = BuildDefaultTypeDefinitions();
             
             var descriptionAttr = TypeDescriptor
@@ -46,6 +49,11 @@ namespace Owin.Scim.Configuration
         public IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> AttributeDefinitions
         {
             get { return _AttributeDefinitions; }
+        }
+
+        public ScimServerConfiguration ServerConfiguration
+        {
+            get { return _ServerConfiguration; }
         }
 
         public ScimTypeDefinitionBuilder<T> SetDescription(string description)
@@ -188,7 +196,7 @@ namespace Owin.Scim.Configuration
                 // multiValued complex attribute
                 typeDefinition = itemType == typeof (T) // circular reference check
                     ? this
-                    : ScimServerConfiguration.GetScimTypeDefinition(itemType);
+                    : ServerConfiguration.GetScimTypeDefinition(itemType);
                 builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType);
                 instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(
                     builder, 
@@ -202,7 +210,7 @@ namespace Owin.Scim.Configuration
             // complex attribute
             typeDefinition = descriptor.PropertyType == typeof(T) // circular reference check
                 ? this
-                : ScimServerConfiguration.GetScimTypeDefinition(descriptor.PropertyType);
+                : ServerConfiguration.GetScimTypeDefinition(descriptor.PropertyType);
             builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), descriptor.PropertyType);
             instance = (IScimTypeAttributeDefinition)Activator.CreateInstance(
                 builder, 

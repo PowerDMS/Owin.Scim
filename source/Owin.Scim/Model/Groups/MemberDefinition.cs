@@ -6,7 +6,8 @@ namespace Owin.Scim.Model.Groups
 
     public class MemberDefinition : ScimTypeDefinitionBuilder<Member>
     {
-        public MemberDefinition()
+        public MemberDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(p => p.Value)
                 .SetDescription("Identifier of the member of this group.")

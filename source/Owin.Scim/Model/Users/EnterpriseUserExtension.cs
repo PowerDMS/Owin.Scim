@@ -18,6 +18,11 @@ namespace Owin.Scim.Model.Users
 
         public Manager Manager { get; set; }
 
+        protected internal override string SchemaIdentifier
+        {
+            get { return ScimConstants.Schemas.UserEnterprise; }
+        }
+
         public override int CalculateVersion()
         {
             return new

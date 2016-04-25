@@ -1,20 +1,25 @@
 ﻿namespace Owin.Scim.Tests
 {
+    using System.Collections.Generic;
     using System.Net.Http.Formatting;
     using System.Net.Http.Headers;
 
-    using Newtonsoft.Json.Serialization;
+    using Configuration;
+
+    using Newtonsoft.Json;
+
+    using Serialization;
 
     /// <summary>
     /// Must support a media type of "application/scim+json"
     /// See: https://tools.ietf.org/html/rfc7644#section-3.1
     /// </summary>
-    public class ScimJsonMediaTypeFormatter : JsonMediaTypeFormatter
+    public class ScimClientJsonMediaTypeFormatter : JsonMediaTypeFormatter
     {
-        public ScimJsonMediaTypeFormatter()
+        public ScimClientJsonMediaTypeFormatter(ScimServerConfiguration serverConfiguration)
         {
-            SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
             SupportedMediaTypes.Add(new MediaTypeHeaderValue("application/scim+json"));
+            SerializerSettings.Converters.Add(new ResourceJsonConverter(serverConfiguration, JsonSerializer.Create(SerializerSettings)));
         }
 
         public override void SetDefaultContentHeaders(System.Type type, HttpContentHeaders headers, MediaTypeHeaderValue mediaType)
@@ -23,12 +28,9 @@
             headers.ContentType = new MediaTypeHeaderValue("application/scim+json");
         }
 
-        public static ScimJsonMediaTypeFormatter[] AsArray()
+        public IEnumerable<MediaTypeFormatter> AsEnumerable
         {
-            return new[]
-            {
-                new ScimJsonMediaTypeFormatter()
-            };
+            get { return new[] { this }; }
         }
     }
 }

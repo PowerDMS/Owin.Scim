@@ -6,7 +6,8 @@
 
     public class PhoneNumberDefinition : MultiValuedAttributeDefinition
     {
-        public PhoneNumberDefinition()
+        public PhoneNumberDefinition( ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(mva => mva.Display)
                 .SetDescription("A human-readable name, primarily used for display purposes.")

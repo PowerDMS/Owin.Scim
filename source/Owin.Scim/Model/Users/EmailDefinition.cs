@@ -2,9 +2,12 @@ namespace Owin.Scim.Model.Users
 {
     using System;
 
+    using Configuration;
+
     public class EmailDefinition : MultiValuedAttributeDefinition
     {
-        public EmailDefinition()
+        public EmailDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(e => e.Value)
                 .SetDescription("Email address value.");

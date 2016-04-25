@@ -37,8 +37,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
                 }
             };
 
-            FilterExpression = new ScimFilter(
-                "userType ne \"Employee\" and not (emails co \"example.com\" or emails.value co \"example.org\"");
+            FilterExpression = "userType ne \"Employee\" and not (emails co \"example.com\" or emails.value co \"example.org\"";
         };
 
         It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("DGioulakis");

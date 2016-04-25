@@ -6,26 +6,22 @@
 
     public abstract class ServiceBase
     {
-        private readonly ScimServerConfiguration _Configuration;
-
-        protected ServiceBase(ScimServerConfiguration configuration)
+        protected ServiceBase(ScimServerConfiguration serverConfiguration, IResourceVersionProvider versionProvider)
         {
-            _Configuration = configuration;
+            ServerConfiguration = serverConfiguration;
+            VersionProvider = versionProvider;
         }
 
-        public IResourceVersionProvider VersionProvider { get; set; }
+        public IResourceVersionProvider VersionProvider { get; private set; }
 
-        public ScimServerConfiguration ScimServerConfiguration
-        {
-            get { return _Configuration; }
-        }
+        public ScimServerConfiguration ServerConfiguration { get; private set; }
 
         protected virtual TResource SetResourceVersion<TResource>(TResource resource)
             where TResource : Resource
         {
             if (resource == null) return null;
 
-            var etagConfig = _Configuration.GetFeature<ScimFeatureETag>(ScimFeatureType.ETag);
+            var etagConfig = ServerConfiguration.GetFeature<ScimFeatureETag>(ScimFeatureType.ETag);
 
             if (!etagConfig.Supported) return resource;
 

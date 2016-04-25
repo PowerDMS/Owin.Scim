@@ -4,7 +4,8 @@
 
     public class ScimFeatureBulkDefinition : ScimTypeDefinitionBuilder<ScimFeatureBulk>
     {
-        public ScimFeatureBulkDefinition()
+        public ScimFeatureBulkDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(b => b.Supported)
                 .SetDescription(@"A boolean value specifying whether or not the operation is supported.")

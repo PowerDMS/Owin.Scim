@@ -6,8 +6,7 @@
     using System.Threading.Tasks;
 
     using Microsoft.FSharp.Core;
-
-    using Canonicalization;
+    
     using Configuration;
     using Extensions;
     using ErrorHandling;
@@ -18,7 +17,7 @@
 
     public class GroupService : ServiceBase, IGroupService
     {
-        private readonly DefaultCanonicalizationService _CanonicalizationService;
+        private readonly ICanonicalizationService _CanonicalizationService;
 
         private readonly IResourceValidatorFactory _ResourceValidatorFactory;
 
@@ -26,10 +25,11 @@
 
         public GroupService(
             ScimServerConfiguration scimServerConfiguration,
+            IResourceVersionProvider versionProvider,
             IResourceValidatorFactory resourceValidatorFactory,
-            DefaultCanonicalizationService canonicalizationService,
+            ICanonicalizationService canonicalizationService,
             IGroupRepository groupRepository) 
-            : base(scimServerConfiguration)
+            : base(scimServerConfiguration, versionProvider)
         {
             _GroupRepository = groupRepository;
             _ResourceValidatorFactory = resourceValidatorFactory;
@@ -38,7 +38,7 @@
 
         public async Task<IScimResponse<Group>> CreateGroup(Group group)
         {
-            _CanonicalizationService.Canonicalize(group, ScimServerConfiguration.GetScimTypeDefinition(typeof(Group)));
+            _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(typeof(Group)));
 
             var validator = await _ResourceValidatorFactory.CreateValidator(group);
             var validationResult = (await validator.ValidateCreateAsync(group)).ToScimValidationResult();
@@ -89,7 +89,7 @@
                 LastModified = groupRecord.Meta.LastModified
             };
 
-            _CanonicalizationService.Canonicalize(group, ScimServerConfiguration.GetScimTypeDefinition(typeof(Group)));
+            _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(typeof(Group)));
             
             var validator = await _ResourceValidatorFactory.CreateValidator(group);
             var validationResult = (await validator.ValidateUpdateAsync(group, groupRecord)).ToScimValidationResult();

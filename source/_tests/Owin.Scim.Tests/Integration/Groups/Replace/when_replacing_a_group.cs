@@ -6,6 +6,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 
     using Machine.Specifications;
 
+    using Model;
     using Model.Groups;
 
     public class when_replacing_a_group : using_existing_user_and_group
@@ -16,7 +17,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 
             Response = await Server
                 .HttpClient
-                .PutAsync("groups/" + GroupId, new ObjectContent<Group>(GroupDto, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("groups/" + GroupId, new ScimObjectContent<Group>(GroupDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -25,11 +26,11 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
                 : null;
 
             CreatedGroup = bodyText != null
-                ? Newtonsoft.Json.JsonConvert.DeserializeObject<Group>(bodyText)
+                ? Response.Content.ScimReadAsAsync<Group>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
-                ? await Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray())
+                ? await Response.Content.ScimReadAsAsync<ScimError>()
                 : null;
         };
 

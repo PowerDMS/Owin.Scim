@@ -11,6 +11,8 @@
     using System.Text;
     using System.Threading.Tasks;
 
+    using Integration;
+
     internal static class HttpResponseMessageExtensions
     {
         public static async Task DeserializeTo(
@@ -18,7 +20,7 @@
             Expression<Func<IDictionary<string, object>>> jsonDataToSet = null)
         {
             var json = await response.Content.ReadAsByteArrayAsync();
-            var formatter = new ScimJsonMediaTypeFormatter();
+            var formatter = using_a_scim_server.ClientJsonFormatter;
             var serializer = formatter.CreateJsonSerializer();
             var dictReader = formatter.CreateJsonReader(typeof(IDictionary<string, object>), new MemoryStream(json), Encoding.UTF8);
 
@@ -87,12 +89,12 @@
             T instance;
             if (!withJson)
             {
-                instance = await response.Content.ReadAsAsync<T>(new[] { new ScimJsonMediaTypeFormatter() });
+                instance = await response.Content.ScimReadAsAsync<T>();
                 return new ResponseHelper<T>(null, instance);
             }
 
             var json = await response.Content.ReadAsByteArrayAsync();
-            var formatter = new ScimJsonMediaTypeFormatter();
+            var formatter = using_a_scim_server.ClientJsonFormatter;
             var serializer = formatter.CreateJsonSerializer();
             var dictReader = formatter.CreateJsonReader(typeof(IDictionary<string, object>), new MemoryStream(json), Encoding.UTF8);
             var objReader = formatter.CreateJsonReader(typeof(T), new MemoryStream(json), Encoding.UTF8);

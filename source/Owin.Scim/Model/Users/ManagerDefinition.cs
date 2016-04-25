@@ -4,7 +4,8 @@ namespace Owin.Scim.Model.Users
 
     public class ManagerDefinition : ScimTypeDefinitionBuilder<Manager>
     {
-        public ManagerDefinition()
+        public ManagerDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(m => m.Value)
                 .SetDescription(@"The ""id"" of the SCIM resource representing the user's manager.");

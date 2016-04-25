@@ -4,7 +4,8 @@
 
     public class ResourceMetadataDefinition : ScimTypeDefinitionBuilder<ResourceMetadata>
     {
-        public ResourceMetadataDefinition()
+        public ResourceMetadataDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(m => m.ResourceType)
                 .SetDescription(@"The name of the resource type of the resource.")

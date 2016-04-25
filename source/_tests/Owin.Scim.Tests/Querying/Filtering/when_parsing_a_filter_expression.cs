@@ -18,7 +18,9 @@
     {
         Because of = () =>
         {
-            var lexer = new ScimFilterLexer(new AntlrInputStream(FilterExpression));
+            var lexer = new ScimFilterLexer(
+                new AntlrInputStream(
+                    new ScimFilter(ResourceExtensionSchemas, FilterExpression)));
             var parser = new ScimFilterParser(new CommonTokenStream(lexer));
             var filterVisitor = new ScimFilterVisitor<TResource>();
 
@@ -27,8 +29,10 @@
 
         protected static IEnumerable<User> Users;
 
-        protected static ScimFilter FilterExpression;
+        protected static string FilterExpression;
 
         protected static Func<User, bool> Predicate;
+
+        protected static ISet<string> ResourceExtensionSchemas = new HashSet<string>();
     }
 }

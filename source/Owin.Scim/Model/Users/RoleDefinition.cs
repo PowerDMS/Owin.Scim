@@ -2,9 +2,12 @@
 {
     using System;
 
+    using Configuration;
+
     public class RoleDefinition : MultiValuedAttributeDefinition
     {
-        public RoleDefinition()
+        public RoleDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration)
         {
             For(e => e.Value)
                 .SetDescription("The value of a role.");

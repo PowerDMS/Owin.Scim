@@ -2,7 +2,7 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-
+    
     using Machine.Specifications;
 
     using Model.Users;
@@ -37,8 +37,7 @@
                 }
             };
 
-            FilterExpression = new ScimFilter(
-                "userType eq \"Employee\" and (emails co \"example.com\" or emails.value co \"example.org\")");
+            FilterExpression = "userType eq \"Employee\" and (emails co \"example.com\" or emails.value co \"example.org\")";
         };
 
         It should_filter = () => Users.Single(Predicate).UserName.ShouldEqual("ROMalley");

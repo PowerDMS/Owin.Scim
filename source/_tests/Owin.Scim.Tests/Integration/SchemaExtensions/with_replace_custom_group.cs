@@ -24,10 +24,10 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
             Response = Server
                 .HttpClient
-                .PostAsync("groups", new ObjectContent<Group>(existingGroup, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("groups", new ScimObjectContent<Group>(existingGroup))
                 .Result;
 
-            GroupDto = Response.Content.ReadAsAsync<Group>(ScimJsonMediaTypeFormatter.AsArray()).Result;
+            GroupDto = Response.Content.ScimReadAsAsync<Group>().Result;
 
             GroupDto.AddExtension(
                 new MyGroupSchema
@@ -50,13 +50,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PutAsync("groups/" + GroupDto.Id, new ObjectContent<Group>(GroupDto, new ScimJsonMediaTypeFormatter()))
+                .PutAsync("groups/" + GroupDto.Id, new ScimObjectContent<Group>(GroupDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
 
             CreatedGroup = Response.StatusCode == HttpStatusCode.OK
-                ? JsonConvert.DeserializeObject<Group>(bodyText)
+                ? Response.Content.ScimReadAsAsync<Group>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

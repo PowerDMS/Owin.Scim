@@ -26,6 +26,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 .With(x => x.Emails, null)
                 .With(x => x.PhoneNumbers, null)
                 .With(x => x.Photos, null)
+                .With(x => x.X509Certificates, null)
                 .Create();
         };
 

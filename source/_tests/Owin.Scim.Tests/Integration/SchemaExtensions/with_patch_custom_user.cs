@@ -9,8 +9,6 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
     using Model;
     using Model.Users;
 
-    using Newtonsoft.Json;
-
     using Users;
 
     public class with_patch_custom_user : using_a_scim_server
@@ -24,10 +22,10 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(existingUser, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<User>(existingUser))
                 .Result;
 
-            UserDto = Response.Content.ReadAsAsync<User>(ScimJsonMediaTypeFormatter.AsArray()).Result;
+            UserDto = Response.Content.ScimReadAsAsync<User>().Result;
 
            
             PatchContent = new StringContent(
@@ -75,13 +73,9 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                         Content = PatchContent
                     })
                 .Result;
-
-            var body = Response.Content.ReadAsStringAsync().Result;
-
+            
             if (Response.StatusCode == HttpStatusCode.OK)
-            {
-                UpdatedUser = JsonConvert.DeserializeObject<User>(body);
-            }
+                UpdatedUser = Response.Content.ScimReadAsAsync<User>().Result;
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);

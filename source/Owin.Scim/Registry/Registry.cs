@@ -3,8 +3,6 @@
     using System.ComponentModel.Composition;
     using System.Linq;
 
-    using Canonicalization;
-
     using Configuration;
 
     using DryIoc;
@@ -20,7 +18,6 @@
     using Services;
 
     using Validation;
-    using Validation.Users;
 
     public class Registry : IConfigureDryIoc
     {
@@ -46,12 +43,12 @@
         {
             container.RegisterDelegate<IProvideHashing>(r => _CryptograhyManager.HashProvider);
             container.Register<ISchemaTypeFactory, DefaultSchemaTypeFactory>(Reuse.Singleton);
-            container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
             container.Register<IResourceVersionProvider, DefaultResourceVersionProvider>(Reuse.Singleton);
+            container.Register<ICanonicalizationService, DefaultCanonicalizationService>(Reuse.Singleton);
             container.Register<IResourceValidatorFactory, ServiceLocatorResourceValidatorFactory>();
-            container.Register<DefaultCanonicalizationService>(Reuse.Singleton);
+            container.Register<IManagePasswords, DefaultPasswordManager>(Reuse.Singleton);
 
-            // validation
+            // register all resource and resource extension validators
             container.Register<ResourceExtensionValidators>(Reuse.Singleton);
             _ServerConfiguration
                 .ResourceTypeDefinitions
@@ -71,17 +68,10 @@
             container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
 #endif
 
-            container.Register<ISchemaService, SchemaService>(
-                reuse: Reuse.Singleton,
-                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
-
-            container.Register<IUserService, UserService>(
-                reuse: Reuse.Singleton,
-                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
-
-            container.Register<IGroupService, GroupService>(
-                reuse: Reuse.Singleton,
-                made: Made.Of(propertiesAndFields: PropertiesAndFields.Auto));
+            container.Register<IResourceTypeService, ResourceTypeService>(Reuse.Singleton);
+            container.Register<ISchemaService, SchemaService>(Reuse.Singleton);
+            container.Register<IUserService, UserService>(Reuse.Singleton);
+            container.Register<IGroupService, GroupService>(Reuse.Singleton);
         }
     }
 }

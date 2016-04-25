@@ -15,21 +15,18 @@
 
     public class GroupValidator : ResourceValidatorBase<Group>
     {
-        private const string PathSeparator = @"/";
-        private readonly ScimServerConfiguration _scimServerConfiguration;
-        private readonly IUserRepository _userRepository;
-        private readonly IGroupRepository _groupRepository;
+        private readonly IUserRepository _UserRepository;
+
+        private readonly IGroupRepository _GroupRepository;
 
         public GroupValidator(
             ResourceExtensionValidators extensionValidators,
-            ScimServerConfiguration scimServerConfiguration,
-            IUserRepository userRepository, 
+            IUserRepository userRepository,
             IGroupRepository groupRepository)
             : base(extensionValidators)
         {
-            _scimServerConfiguration = scimServerConfiguration;
-            _userRepository = userRepository;
-            _groupRepository = groupRepository;
+            _UserRepository = userRepository;
+            _GroupRepository = groupRepository;
         }
 
         protected override void ConfigureDefaultRuleSet()
@@ -41,45 +38,45 @@
                         HttpStatusCode.BadRequest,
                         ScimErrorType.InvalidValue,
                         ErrorDetail.AttributeRequired("displayName")));
-            
-            // TODO: (CY) because spec does not really specify whether to use value/type or $ref
-            // TODO: I'll rather the implementor decide.
-            When(@group => @group.Members != null && @group.Members.Any(), () =>
+
+            // SCIM specification does not specify whether to use value/type or $ref
+            When(group => group.Members != null && group.Members.Any(),
+                () =>
                 {
-                    RuleFor(@group => @group.Members)
+                    RuleFor(group => group.Members)
                         .SetCollectionValidator(
                             new GenericExpressionValidator<Member>
                             {
                                 {
-                                    g => g.Value,
+                                    member => member.Value,
                                     config => config
                                         .NotEmpty()
-                                        .WithState(u =>
+                                        .WithState(m =>
                                             new ScimError(
                                                 HttpStatusCode.BadRequest,
                                                 ScimErrorType.InvalidValue,
                                                 ErrorDetail.AttributeRequired("member.value")))
                                 },
                                 {
-                                    g => g.Type,
+                                    member => member.Type,
                                     config => config
                                         .NotEmpty()
-                                        .WithState(u =>
+                                        .WithState(m =>
                                             new ScimError(
                                                 HttpStatusCode.BadRequest,
                                                 ScimErrorType.InvalidValue,
                                                 ErrorDetail.AttributeRequired("member.type")))
                                         .Must(IsValidMemberType)
-                                        .WithState(u =>
+                                        .WithState(m =>
                                             new ScimError(
                                                 HttpStatusCode.BadRequest,
                                                 ScimErrorType.InvalidSyntax,
                                                 "The attribute 'member.type' must have a valid value."))
                                 },
                                 {
-                                    g => g.Ref,
+                                    member => member.Ref,
                                     config => config
-                                        .Must(r => r == null || r.IsWellFormedOriginalString())
+                                        .Must(uri => uri == null || uri.IsWellFormedOriginalString()) // TODO: (DG) not valid uri validation
                                         .WithState(u =>
                                             new ScimError(
                                                 HttpStatusCode.BadRequest,
@@ -87,7 +84,7 @@
                                                 "The attribute 'member.$ref' must have a valid url."))
                                 },
                                 {
-                                    g => g,
+                                    member => member,
                                     config => config
                                         .MustAsync(async (member, token) => await IsValidResourceValue(member))
                                         .WithState(u =>
@@ -110,8 +107,8 @@
 
         protected virtual bool IsValidMemberType(string type)
         {
-            return type == null || 
-                type.Equals(ScimConstants.ResourceTypes.User) || 
+            return type == null ||
+                type.Equals(ScimConstants.ResourceTypes.User) ||
                 type.Equals(ScimConstants.ResourceTypes.Group);
         }
 
@@ -119,13 +116,13 @@
         {
             if (member.Type == ScimConstants.ResourceTypes.User)
             {
-                var user = await _userRepository.GetUser(member.Value);
+                var user = await _UserRepository.GetUser(member.Value);
                 return user != null;
             }
 
             if (member.Type == ScimConstants.ResourceTypes.Group)
             {
-                var group = await _groupRepository.GetGroup(member.Value);
+                var group = await _GroupRepository.GetGroup(member.Value);
                 return group != null;
             }
 

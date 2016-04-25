@@ -29,13 +29,14 @@
                 .With(x => x.Ims, null)
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
+                .With(x => x.X509Certificates, null)
                 .Create(seed: new User());
 
 
             // Insert the first user so there's one already in-memory.
             var userRecord = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(MutableUserPayload, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<User>(MutableUserPayload))
                 .Result;
 
             await userRecord.DeserializeTo(() => OriginalUserRecord); // capture original user record

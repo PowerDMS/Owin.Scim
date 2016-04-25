@@ -85,13 +85,13 @@
                     return await Task.FromResult(comparer.Equals(val, compareValue));
                 });
         }
-
+        
         /// <summary>
         /// Associates a validator provider with the current property rule. 
         /// </summary>
         /// <param name="ruleBuilder"></param>
         /// <param name="validatorProvider">The validator provider to use</param>
-        public static IRuleBuilderOptions<T, TProperty> SetValidator2<T, TProperty, TValidator>(
+        public static IRuleBuilderOptions<T, TProperty> SetValidatorNonGeneric<T, TProperty, TValidator>(
             this IRuleBuilderInitial<T, TProperty> ruleBuilder,
             Func<T, TValidator> validatorProvider)
             where TValidator : IValidator

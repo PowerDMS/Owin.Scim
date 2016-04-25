@@ -1,14 +1,16 @@
-﻿namespace Owin.Scim.Canonicalization
+﻿namespace Owin.Scim.Services
 {
     using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
 
+    using Canonicalization;
+
     using Configuration;
 
     using Extensions;
 
-    public class DefaultCanonicalizationService
+    public class DefaultCanonicalizationService : ICanonicalizationService
     {
         public void Canonicalize(object instance, IScimTypeDefinition typeDefinition)
         {

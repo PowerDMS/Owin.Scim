@@ -33,13 +33,13 @@
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<MyUser>(UserDto, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("users", new ScimObjectContent<MyUser>(UserDto))
                 .Result;
 
             StatusCode = Response.StatusCode;
 
             Error = StatusCode != HttpStatusCode.BadRequest ? null : Response.Content
-                .ReadAsAsync<IEnumerable<ScimError>>(ScimJsonMediaTypeFormatter.AsArray())
+                .ScimReadAsAsync<IEnumerable<ScimError>>()
                 .Result
                 .Single();
         };
@@ -57,7 +57,7 @@
         It should_interpret_enterprise_schema = () =>
         {
             var createdUser = Response.Content
-                .ReadAsAsync<MyUser>(ScimJsonMediaTypeFormatter.AsArray())
+                .ScimReadAsAsync<MyUser>()
                 .Result;
 
             createdUser.Id.ShouldNotBeNull();

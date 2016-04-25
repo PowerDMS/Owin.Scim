@@ -1,22 +1,22 @@
 ﻿namespace Owin.Scim.Querying
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
-
-    using Configuration;
 
     using Extensions;
 
     public class ScimFilter
     {
+        private readonly ISet<string> _ResourceExtensionSchemas;
+
         private readonly IList<PathFilterExpression> _Paths;
 
         private string _NormalizedFilterExpression;
 
-        public ScimFilter(string filterExpression)
+        public ScimFilter(ISet<string> resourceExtensionSchemas, string filterExpression)
         {
+            _ResourceExtensionSchemas = resourceExtensionSchemas;
             _Paths = new List<PathFilterExpression>();
             ProcessFilter(filterExpression);
         }
@@ -168,7 +168,7 @@
                     // Therefore, we must constantly check our ScimServerConfiguration to 
                     // determine if we've found a valid extension.
                     var possibleExtensionSchema = expressionBuilder.ToString() + currentChar;
-                    if (ScimServerConfiguration.ResourceExtensionExists(possibleExtensionSchema))
+                    if (_ResourceExtensionSchemas.Contains(possibleExtensionSchema))
                     {
                         _Paths.Add(new PathFilterExpression(possibleExtensionSchema, null));
 

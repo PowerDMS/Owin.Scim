@@ -5,11 +5,8 @@
     using System.Linq;
 
     using Machine.Specifications;
-
-    using Model;
+    
     using Model.Users;
-
-    using Scim.Querying;
 
     public class greaterthanorequal_with_datetime : when_parsing_a_filter_expression<User>
     {
@@ -21,7 +18,7 @@
                 new User { UserName = "ROMalley", Meta = { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
             };
 
-            FilterExpression = new ScimFilter("meta.lastModified ge \"2014-01-01T00:00:00Z\"");
+            FilterExpression = "meta.lastModified ge \"2014-01-01T00:00:00Z\"";
         };
 
         It should_filter = () => Users.Count(Predicate).ShouldEqual(2);

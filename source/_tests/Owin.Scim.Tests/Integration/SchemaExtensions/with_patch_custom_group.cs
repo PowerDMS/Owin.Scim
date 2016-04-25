@@ -25,10 +25,10 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
             Response = Server
                 .HttpClient
-                .PostAsync("groups", new ObjectContent<Group>(existingGroup, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("groups", new ScimObjectContent<Group>(existingGroup))
                 .Result;
 
-            GroupDto = Response.Content.ReadAsAsync<Group>(ScimJsonMediaTypeFormatter.AsArray()).Result;
+            GroupDto = Response.Content.ScimReadAsAsync<Group>().Result;
 
             PatchContent = new StringContent(
                 @"
@@ -71,13 +71,9 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                         Content = PatchContent
                     })
                 .Result;
-
-            var body = Response.Content.ReadAsStringAsync().Result;
-
+            
             if (Response.StatusCode == HttpStatusCode.OK)
-            {
-                UpdatedGroup = JsonConvert.DeserializeObject<Group>(body);
-            }
+                UpdatedGroup = Response.Content.ScimReadAsAsync<Group>().Result;
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);

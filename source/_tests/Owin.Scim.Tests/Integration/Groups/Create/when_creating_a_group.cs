@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
         {
             Response = await Server
                 .HttpClient
-                .PostAsync("groups", new ObjectContent<Group>(GroupDto, new ScimJsonMediaTypeFormatter()))
+                .PostAsync("groups", new ScimObjectContent<Group>(GroupDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -26,7 +26,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
-                ? await Response.Content.ReadAsAsync<Model.ScimError>(ScimJsonMediaTypeFormatter.AsArray())
+                ? await Response.Content.ScimReadAsAsync<Model.ScimError>()
                 : null;
         };
         
