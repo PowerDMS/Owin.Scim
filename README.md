@@ -26,7 +26,7 @@ The list below doesn't necessarily denote priority or order.
     3. [x] Replace  
     4. [x] Remove  
   5. [x] Delete  
-  6. [ ] Query
+  6. [x] Query
 2. [x] Schema extensions
 3. [x] Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
@@ -42,10 +42,10 @@ The list below doesn't necessarily denote priority or order.
   5. [x] Delete  
   6. [ ] Query
 7. [ ] Add support for querying
-  1. [ ] Filtering (parsing into an expression tree is already done)
-  2. [ ] Sorting
-  3. [ ] Ordering
-  4. [ ] Pagination
+  1. [x] Filtering
+  2. [ ] Sorting (in design)
+  3. [ ] Ordering (in design)
+  4. [ ] Pagination (in design)
   5. [ ] Projection (in progress - currently only works with top-level attributes / non-urn qualified references)
 8. [x] Add more extensiblity options
   1. [x] Canonicalization  
