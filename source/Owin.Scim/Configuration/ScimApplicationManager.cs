@@ -23,13 +23,17 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Converters;
 
+    using Querying;
+
     using Serialization;
+
+    using Services;
 
     public class ScimApplicationManager : IApplicationComponent
     {
         private readonly IAppBuilder _AppBuilder;
 
-        private readonly IContainer _IocContainer;
+        private readonly IContainer _Container;
 
         private readonly Action<ScimServerConfiguration> _ConfigureScimServerAction;
 
@@ -37,11 +41,11 @@
 
         public ScimApplicationManager(
             IAppBuilder appBuilder,
-            IContainer iocContainer,
+            IContainer container,
             Action<ScimServerConfiguration> configureScimServerAction)
         {
             _AppBuilder = appBuilder;
-            _IocContainer = iocContainer;
+            _Container = container;
             _ConfigureScimServerAction = configureScimServerAction;
         }
 
@@ -57,8 +61,14 @@
 
             var serverConfiguration = new ScimServerConfiguration();
             applicationConfiguration.CompositionContainer.ComposeExportedValue(serverConfiguration);
-            _IocContainer.RegisterInstance(serverConfiguration, Reuse.Singleton);
+            _Container.RegisterInstance(serverConfiguration, Reuse.Singleton);
             
+            _AppBuilder.Use((context, task) =>
+            {
+                AmbientRequestMessageService.SetRequestInformation(context, serverConfiguration);
+                return task.Invoke();
+            });
+
             // discover and register all type definitions
             var enumerator = applicationConfiguration.CompositionContainer.GetExportTypesThatImplement<IScimTypeDefinition>().GetEnumerator();
             while (enumerator.MoveNext())
@@ -100,7 +110,7 @@
             if (serverConfiguration.RequireSsl)
                 _AppBuilder.Use<RequireSslMiddleware>();
             
-            _IocContainer.WithWebApi(httpConfiguration);
+            _Container.WithWebApi(httpConfiguration);
             _AppBuilder.UseWebApi(httpConfiguration);
 
             IsConfigured = true;
@@ -120,6 +130,7 @@
             };
             settings.DateTimeZoneHandling = DateTimeZoneHandling.Utc;
             settings.Converters.Add(new StringEnumConverter());
+            settings.Converters.Add(new ScimQueryOptionsConverter(serverConfiguration));
             settings.Converters.Add(new ResourceJsonConverter(serverConfiguration, JsonSerializer.Create(settings)));
 
             httpConfiguration.ParameterBindingRules.Insert(
@@ -134,6 +145,15 @@
 
                     return null;
                 });
+            httpConfiguration.ParameterBindingRules.Insert(
+                1,
+                descriptor =>
+                {
+                    if (typeof(ScimQueryOptions).IsAssignableFrom(descriptor.ParameterType))
+                        return new ScimQueryOptionsParameterBinding(descriptor, serverConfiguration);
+
+                    return null;
+                });
 
             // refer to https://tools.ietf.org/html/rfc7644#section-3.1
             httpConfiguration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("application/scim+json"));
@@ -143,8 +163,6 @@
                 new DefaultHttpControllerTypeResolver(IsControllerType));
 
             httpConfiguration.Filters.Add(new ModelBindingResponseAttribute());
-
-            // must be configured last
         }
 
         private static bool IsControllerType(Type t)

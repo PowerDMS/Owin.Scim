@@ -48,7 +48,6 @@
                 canonicalizationService,
                 new UserValidatorFactory(UserRepository, PasswordManager), 
                 UserRepository,
-                GroupRepository,
                 PasswordManager);
         };
 

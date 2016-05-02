@@ -25,9 +25,8 @@
             // Since the priority is lower than Owin.Scim's default registry, this method will execute after all
             // default registrations occur.
 
-            // Unregister any IUserRepository implementation and add our own.
-            container.Unregister<IUserRepository>();
-            container.Register<IUserRepository, CustomInMemoryUserRepository>();
+            // Replace any IUserRepository implementation with our own.
+            container.Register<IUserRepository, CustomInMemoryUserRepository>(ifAlreadyRegistered: IfAlreadyRegistered.Replace);
         }
     }
 }

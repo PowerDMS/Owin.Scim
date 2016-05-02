@@ -2,20 +2,28 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+
+    using Extensions;
 
     using Model.Users;
 
     using NContext.Security.Cryptography;
 
+    using Querying;
+
     public class InMemoryUserRepository : IUserRepository
     {
+        private readonly IGroupRepository _GroupRepository;
+
         private readonly ConcurrentDictionary<string, User> _Users;
 
-        public InMemoryUserRepository()
+        public InMemoryUserRepository(IGroupRepository groupRepository)
         {
+            _GroupRepository = groupRepository;
             _Users = new ConcurrentDictionary<string, User>();
         }
 
@@ -31,11 +39,16 @@
         public async Task<User> GetUser(string userId)
         {
             // return a deep-clone of the user object
-            // since this is in-memory, we don't want patches or other code to actually modify the
+            // since this is in-memory, we don't want any HTTP PATCH or other code to actually modify the
             // simulated database record stored in the list, unless done through create,update,delete
-            return !_Users.ContainsKey(userId) 
+            var user = !_Users.ContainsKey(userId) 
                 ? null 
                 : _Users[userId].Copy();
+
+            if (user != null)
+                user.Groups = await _GroupRepository.GetGroupsUserBelongsTo(userId);
+
+            return user;
         }
 
         public async Task UpdateUser(User user)
@@ -55,6 +68,26 @@
             return userRecord;
         }
 
+        public async Task<IEnumerable<User>> QueryUsers(ScimQueryOptions options)
+        {
+            var users = _Users.Values.AsEnumerable();
+            if (options.Filter != null)
+                users = users.Where(options.Filter.ToPredicate<User>()).ToList();
+            
+            // TODO: (DG) sorting
+            if (options.SortBy != null)
+            {
+            }
+
+            if (options.StartIndex > 1)
+                users = users.Skip(options.StartIndex);
+
+            if (options.Count > 0)
+                users = users.Take(options.Count);
+
+            return users;
+        }
+
         public Task<bool> IsUserNameAvailable(string userName)
         {
             /* Before comparing or evaluating the uniqueness of a "userName" or 
@@ -68,8 +101,8 @@
             
             return Task.FromResult(
                 _Users
-                .Values
-                .All(u => !CryptographyUtility.CompareBytes(Encoding.UTF8.GetBytes(u.UserName), userNameBytes)));
+                    .Values
+                    .All(u => !CryptographyUtility.CompareBytes(Encoding.UTF8.GetBytes(u.UserName), userNameBytes)));
         }
     }
 }

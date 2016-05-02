@@ -1,55 +1,43 @@
-﻿using System.Collections.Generic;
-
-namespace Owin.Scim.Querying
+﻿namespace Owin.Scim.Querying
 {
-    using System;
-    using System.Linq;
+    using System.Collections.Generic;
 
-    [Serializable]
-    public class ScimQueryOptions
+    using Model;
+    
+    using Newtonsoft.Json;
+    
+    public class ScimQueryOptions : SchemaBase
     {
-        private ISet<string> _Attributes;
-
-        private ISet<string> _ExcludedAttributes;
-
-        public ScimQueryOptions(IEnumerable<KeyValuePair<string, string>> queryNameValuePairs)
+        public ScimQueryOptions()
         {
-            if (queryNameValuePairs != null)
-            {
-                foreach (var kvp in queryNameValuePairs)
-                {
-                    if (kvp.Key.Equals("attributes", StringComparison.OrdinalIgnoreCase))
-                        _Attributes = new HashSet<string>(
-                            kvp.Value.Split(new [] { ','}, StringSplitOptions.RemoveEmptyEntries).Distinct(StringComparer.OrdinalIgnoreCase), 
-                            StringComparer.OrdinalIgnoreCase);
-                    else if (kvp.Key.Equals("excludedAttributes", StringComparison.OrdinalIgnoreCase))
-                        _ExcludedAttributes = new HashSet<string>(
-                            kvp.Value.Split(new[] { ',' }, StringSplitOptions.RemoveEmptyEntries).Distinct(StringComparer.OrdinalIgnoreCase), 
-                            StringComparer.OrdinalIgnoreCase);
-                }
-            }
+            Attributes = new HashSet<string>();
+            ExcludedAttributes = new HashSet<string>();
         }
 
-        public ISet<string> Attributes
+        [JsonProperty("attribues")]
+        public ISet<string> Attributes { get; internal set; }
+
+        [JsonProperty("excludedAttributes")]
+        public ISet<string> ExcludedAttributes { get; internal set; }
+
+        [JsonProperty("filter")]
+        public PathFilterExpression Filter { get; internal set; }
+
+        [JsonProperty("sortBy")]
+        public string SortBy { get; internal set; }
+
+        [JsonProperty("sortOrder")]
+        public SortOrder SortOrder { get; internal set; }
+
+        [JsonProperty("startIndex")]
+        public int StartIndex { get; internal set; }
+
+        [JsonProperty("count")]
+        public int Count { get; internal set; }
+
+        public override string SchemaIdentifier
         {
-            get
-            {
-                if (_Attributes == null)
-                    _Attributes = new HashSet<string>();
-
-                return _Attributes;
-            }
-        }
-
-        public ISet<string> ExcludedAttributes
-        {
-            get
-            {
-                if (_ExcludedAttributes == null)
-                    _ExcludedAttributes = new HashSet<string>();
-
-                return _ExcludedAttributes;
-            }
+            get { return ScimConstants.Messages.SearchRequest; }
         }
     }
 }

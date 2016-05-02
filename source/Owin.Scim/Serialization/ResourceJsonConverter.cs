@@ -1,12 +1,15 @@
 ﻿namespace Owin.Scim.Serialization
 {
     using System;
+    using System.Collections.Generic;
 
     using Configuration;
 
     using Extensions;
 
     using Model;
+
+    using NContext.Common;
 
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
@@ -87,18 +90,48 @@
         /// </exception>
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
         {
+            object instance = null;
+            var jsonReader = reader;
             var contract = serializer.ContractResolver.ResolveContract(objectType);
             if (contract.DefaultCreator == null)
+            {
+                // Let's try to dynamically determine the type to instantiate based upon the schemas collection 
+                // of the resource. This adds support for polymorphism if objectType == typeof(Resource), which is abstract.
+                var jObject = JObject.Load(reader);
+                var schemasKey = jObject.FindKeyCaseInsensitive(ScimConstants.Schemas.Key);
+                if (schemasKey != null)
+                {
+                    var schemasValue = jObject[schemasKey];
+                    if (schemasValue != null)
+                    {
+                        var schemaIdentifiers = ((JArray) schemasValue).ToObject<ISet<string>>();
+                        foreach (var schemaBindingRule in _ServerConfiguration.SchemaBindingRules)
+                        {
+                            if (schemaBindingRule.Predicate(schemaIdentifiers))
+                            {
+                                instance = schemaBindingRule.Target.CreateInstance();
+                                jsonReader = jObject.CreateReader(); // create a new reader from the token
+                                break;
+                            }
+                        }
+
+                    }
+                }
+            }
+            else
+            {
+                instance = contract.DefaultCreator();
+            }
+
+            if (instance == null)
                 throw new Exception(
                     @"In order for Owin.Scim to support resource extensions, the serialization 
                       process is uniquely designed. Therefore, your Resource type objects must 
                       contain at mimimum, a default empty constructor (which may be private).".RemoveMultipleSpaces());
 
-            var instance = contract.DefaultCreator();
-
             try
             {
-                serializer.Populate(reader, instance);
+                serializer.Populate(jsonReader, instance);
             }
             catch (FormatException)
             {

@@ -3,6 +3,10 @@
     using System.Net.Http;
     using System.Runtime.Remoting.Messaging;
 
+    using Configuration;
+
+    using Extensions;
+
     using Microsoft.Owin;
 
     using Querying;
@@ -19,12 +23,10 @@
             get { return (ScimQueryOptions) CallContext.LogicalGetData("queryOptions"); }
         }
 
-        internal static void SetRequestInformation(IOwinContext context)
+        internal static void SetRequestInformation(IOwinContext context, ScimServerConfiguration serverConfiguration)
         {
-            // TODO: (DG) Find a better way to get querystring name value pairs that doesn't rely on HttpRequestMessage
-            var req = new HttpRequestMessage(new HttpMethod(context.Request.Method), context.Request.Uri);
             CallContext.LogicalSetData("httpMethod", new HttpMethod(context.Request.Method));
-            CallContext.LogicalSetData("queryOptions", new ScimQueryOptions(req.GetQueryNameValuePairs()));
+            CallContext.LogicalSetData("queryOptions", context.Request.Query.GetScimQueryOptions(serverConfiguration));
         }
     }
 }

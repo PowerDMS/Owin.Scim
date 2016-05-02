@@ -13,10 +13,14 @@
     using Model;
     using Model.Users;
 
+    using NContext.Extensions;
+
     using Newtonsoft.Json.Serialization;
 
     using Patching;
     using Patching.Exceptions;
+
+    using Querying;
 
     using Services;
 
@@ -60,7 +64,37 @@
                     SetETagHeader(response, userDto);
                 });
         }
-        
+
+        [AcceptVerbs("GET")]
+        [Route(Name = "GetQueryUsers")]
+        public Task<HttpResponseMessage> GetQuery(ScimQueryOptions queryOptions)
+        {
+            return Query(queryOptions);
+        }
+
+        [AcceptVerbs("POST")]
+        [Route(".search", Name = "PostQueryUsers")]
+        public Task<HttpResponseMessage> PostQuery(ScimQueryOptions queryOptions)
+        {
+            return Query(queryOptions);
+        }
+
+        [NonAction]
+        private async Task<HttpResponseMessage> Query(ScimQueryOptions options)
+        {
+            return (await _UserService.QueryUsers(options))
+                .Let(users => users.ForEach(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id })))
+                .Bind(
+                    users => 
+                    new ScimDataResponse<ScimListResponse>(
+                        new ScimListResponse(users)
+                        {
+                            StartIndex = options.StartIndex,
+                            ItemsPerPage = options.Count
+                        }))
+                .ToHttpResponseMessage(Request);
+        }
+
         [Route("{userId}", Name = "UpdateUser")]
         public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<User> patchRequest)
         {

@@ -13,7 +13,7 @@
             SetName(ScimConstants.ResourceTypes.ResourceType);
             SetDescription("Specifies the schema that describes a SCIM resource type.");
 
-            For(u => u.Schemas)
+            For(rt => rt.Schemas)
                 .SetReturned(Returned.Always);
 
             For(rt => rt.Id)

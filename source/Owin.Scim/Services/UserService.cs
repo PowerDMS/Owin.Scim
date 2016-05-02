@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Net;
     using System.Linq;
     using System.Threading.Tasks;
@@ -16,6 +17,10 @@
     using Model;
     using Model.Users;
 
+    using NContext.Extensions;
+
+    using Querying;
+
     using Repository;
 
     using Security;
@@ -28,8 +33,6 @@
 
         private readonly IUserRepository _UserRepository;
 
-        private readonly IGroupRepository _GroupRepository;
-
         private readonly IManagePasswords _PasswordManager;
 
         private readonly IResourceValidatorFactory _ResourceValidatorFactory;
@@ -40,13 +43,11 @@
             ICanonicalizationService canonicalizationService,
             IResourceValidatorFactory resourceValidatorFactory,
             IUserRepository userRepository,
-            IGroupRepository groupRepository,
             IManagePasswords passwordManager)
             : base(scimServerConfiguration, versionProvider)
         {
             _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
-            _GroupRepository = groupRepository;
             _PasswordManager = passwordManager;
             _ResourceValidatorFactory = resourceValidatorFactory;
         }
@@ -84,8 +85,6 @@
                         HttpStatusCode.NotFound,
                         detail: ErrorDetail.NotFound(userId)));
 
-            userRecord.Groups = await _GroupRepository.GetGroupsUserBelongsTo(userId);
-
             SetResourceVersion(userRecord);
 
             return new ScimDataResponse<User>(userRecord);
@@ -102,6 +101,7 @@
                         detail: ErrorDetail.NotFound(user.Id)));
             }
 
+            user.Groups = userRecord.Groups; // user.Groups is readOnly and used here only for resource versioning
             user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
             {
                 Created = userRecord.Meta.Created,
@@ -133,8 +133,6 @@
                     user.Password = _PasswordManager.CreateHash(user.Password);
             }
 
-            user.Groups = await _GroupRepository.GetGroupsUserBelongsTo(user.Id);
-
             SetResourceVersion(user);
 
             // if both versions are equal, bypass persistence
@@ -158,6 +156,14 @@
                         detail: ErrorDetail.NotFound(userId)));
 
             return new ScimDataResponse<Unit>(default(Unit));
+        }
+
+        public async Task<IScimResponse<IEnumerable<User>>> QueryUsers(ScimQueryOptions options)
+        {
+            var users = await _UserRepository.QueryUsers(options) ?? new List<User>();
+            users.ForEach(user => SetResourceVersion(user));
+
+            return new ScimDataResponse<IEnumerable<User>>(users);
         }
 
         protected virtual Task CanonicalizeUser(User user)

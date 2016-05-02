@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -9,6 +10,7 @@
     using NContext.Security.Cryptography;
 
     using Owin.Scim.Model.Users;
+    using Owin.Scim.Querying;
     using Owin.Scim.Repository;
 
     public class CustomInMemoryUserRepository : IUserRepository
@@ -53,6 +55,11 @@
             _Users.TryRemove(userId, out userRecord);
 
             return userRecord;
+        }
+
+        public Task<IEnumerable<User>> QueryUsers(ScimQueryOptions options)
+        {
+            throw new NotImplementedException();
         }
 
         public Task<bool> IsUserNameAvailable(string userName)

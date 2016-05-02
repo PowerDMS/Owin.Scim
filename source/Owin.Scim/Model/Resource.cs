@@ -9,7 +9,7 @@
     using Newtonsoft.Json;
     using Newtonsoft.Json.Linq;
     
-    public abstract class Resource
+    public abstract class Resource : SchemaBase
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Resource"/> class.
@@ -23,8 +23,7 @@
         /// Gets the schemas.
         /// </summary>
         /// <value>The schemas.</value>
-        [JsonProperty(Order = -10, PropertyName = "schemas")]
-        public ISet<string> Schemas
+        public override ISet<string> Schemas
         {
             get
             {
@@ -57,14 +56,6 @@
         /// <value>The meta.</value>
         [JsonProperty(Order = 9999, PropertyName = "meta")]
         public ResourceMetadata Meta { get; set; }
-
-        /// <summary>
-        /// Gets the schema identifier for the resource instance.
-        /// </summary>
-        /// <value>The schema identifier.</value>
-        [JsonIgnore]
-        [ScimInternal]
-        public abstract string SchemaIdentifier { get; }
 
         /// <summary>
         /// Gets the extension collection for the resource instance.

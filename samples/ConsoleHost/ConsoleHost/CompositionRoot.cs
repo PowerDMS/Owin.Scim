@@ -13,11 +13,7 @@
         {
             appBuilder.Map("/scim", app =>
             {
-                app.UseScimServer(
-                    new Predicate<FileInfo>[] {
-                        fileInfo => fileInfo.Name.Equals("ConsoleHost.exe", StringComparison.OrdinalIgnoreCase)
-                    },
-                    configuration => { configuration.RequireSsl = false; });
+                app.UseScimServer(configuration => { configuration.RequireSsl = false; });
             });
 
             var address = ((IList<IDictionary<string, object>>)appBuilder.Properties["host.Addresses"])[0];

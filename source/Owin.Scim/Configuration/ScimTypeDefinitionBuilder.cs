@@ -8,12 +8,12 @@ namespace Owin.Scim.Configuration
     using System.Reflection;
 
     using Extensions;
-    
+
     public class ScimTypeDefinitionBuilder<T> : IScimTypeDefinition
     {
         private readonly ScimServerConfiguration _ServerConfiguration;
 
-        private readonly IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> _AttributeDefinitions;
+        private readonly ScimTypeAttributeDefinitions _AttributeDefinitions;
         
         public ScimTypeDefinitionBuilder(ScimServerConfiguration serverConfiguration)
         {
@@ -27,7 +27,7 @@ namespace Owin.Scim.Configuration
 
             if (descriptionAttr != null)
             {
-                Description = descriptionAttr.Description.RemoveMultipleSpaces();
+                SetDescription(descriptionAttr.Description.RemoveMultipleSpaces());
             }
         }
 
@@ -48,7 +48,7 @@ namespace Owin.Scim.Configuration
 
         public IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> AttributeDefinitions
         {
-            get { return _AttributeDefinitions; }
+            get { return _AttributeDefinitions.Definitions; }
         }
 
         public ScimServerConfiguration ServerConfiguration
@@ -79,7 +79,7 @@ namespace Owin.Scim.Configuration
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
             
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
@@ -92,8 +92,8 @@ namespace Owin.Scim.Configuration
             {
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
-
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+            
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
@@ -107,7 +107,7 @@ namespace Owin.Scim.Configuration
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
 
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
         
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
@@ -121,7 +121,7 @@ namespace Owin.Scim.Configuration
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
 
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
@@ -135,33 +135,23 @@ namespace Owin.Scim.Configuration
                 throw new InvalidOperationException("attrExp must be of type MemberExpression.");
             }
             
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[(PropertyInfo)memberExpression.Member];
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 
-        private IReadOnlyDictionary<PropertyInfo, IScimTypeAttributeDefinition> BuildDefaultTypeDefinitions()
+        private ScimTypeAttributeDefinitions BuildDefaultTypeDefinitions()
         {
-            return TypeDescriptor.GetProperties(typeof(T))
-                .Cast<PropertyDescriptor>()
-                .Where(d => !d.Attributes.Contains(new ScimInternalAttribute()))
-                .ToDictionary(
-                    d =>
-                    {
-                        try
-                        {
-                            return d.ComponentType.GetProperty(d.Name, BindingFlags.Instance | BindingFlags.Public);
-                        }
-                        catch (AmbiguousMatchException)
-                        {
-                            return d.ComponentType.GetProperty(d.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
-                        }
-                    },
-                    CreateTypeMemberDefinitionBuilder);
+            return new ScimTypeAttributeDefinitions(
+                TypeDescriptor.GetProperties(typeof(T))
+                    .Cast<PropertyDescriptor>()
+                    .Where(d => !d.Attributes.Contains(new ScimInternalAttribute()))
+                    .ToDictionary(GetPropertyInfo, CreateTypeMemberDefinitionBuilder));
         }
 
         private IScimTypeAttributeDefinition CreateTypeMemberDefinitionBuilder(PropertyDescriptor descriptor)
         {
             Type builder;
             IScimTypeAttributeDefinition instance;
+            IScimTypeDefinition typeDefinition;
 
             // scalar attribute
             if (descriptor.PropertyType.IsTerminalObject())
@@ -175,14 +165,15 @@ namespace Owin.Scim.Configuration
 
                 return instance;
             }
-
-            IScimTypeDefinition typeDefinition;
+            
+            // enumerable attribute
             if (descriptor.PropertyType.IsNonStringEnumerable())
             {
                 var itemType = descriptor.PropertyType.IsArray
                     ? descriptor.PropertyType.GetElementType()
                     : descriptor.PropertyType.GetGenericArguments()[0];
 
+                // enumerable type is a scalar data-type
                 if (itemType.IsTerminalObject())
                 {
                     builder = typeof(Uri).IsAssignableFrom(descriptor.PropertyType)
@@ -193,8 +184,8 @@ namespace Owin.Scim.Configuration
                     return instance;
                 }
 
-                // multiValued complex attribute
-                typeDefinition = itemType == typeof (T) // circular reference check
+                // enumerable type is a complex attribute
+                typeDefinition = itemType == typeof (T) // circular reference check; e.g. ScimAttributeSchema
                     ? this
                     : ServerConfiguration.GetScimTypeDefinition(itemType);
                 builder = typeof(ScimTypeComplexAttributeDefinitionBuilder<,>).MakeGenericType(typeof(T), itemType);
@@ -219,6 +210,30 @@ namespace Owin.Scim.Configuration
                 false);
 
             return instance;
+        }
+
+        private PropertyInfo GetPropertyInfo(MemberExpression expression)
+        {
+            // A MemberExpression from a LambdaExpression.Body gives us the Member.PropertyInfo without taking into account
+            // inheritance. See. http://stackoverflow.com/questions/6658669/lambda-expression-not-returning-expected-memberinfo
+            // For(user => user.Schemas) -> expression.Member gives us a PropertyInfo whose DeclaringType is SchemaBase not Resource
+
+            return GetPropertyInfo(
+                TypeDescriptor.GetProperties(typeof(T))
+                    .Find(expression.Member.Name, false));
+        }
+
+        private PropertyInfo GetPropertyInfo(PropertyDescriptor descriptor)
+        {
+            try
+            {
+                return descriptor.ComponentType.GetProperty(descriptor.Name, BindingFlags.Instance | BindingFlags.Public);
+            }
+            catch (AmbiguousMatchException)
+            {
+                // In some circumstances, we hide base properties using the new operator and we only want the property on the declaring class.
+                return descriptor.ComponentType.GetProperty(descriptor.Name, BindingFlags.Instance | BindingFlags.Public | BindingFlags.DeclaredOnly);
+            }
         }
     }
 }

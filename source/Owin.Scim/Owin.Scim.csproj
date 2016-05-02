@@ -107,7 +107,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLazy.cs" />
+    <Compile Include="Configuration\ScimTypeAttributeDefinitions.cs" />
+    <Compile Include="Extensions\IReadableStringCollectionExtensions.cs" />
+    <Compile Include="Extensions\PathFilterExpressionExtensions.cs" />
+    <Compile Include="Model\SchemaBase.cs" />
+    <Compile Include="Model\SortOrder.cs" />
+    <Compile Include="Querying\ScimListResponse.cs" />
+    <Compile Include="Querying\ScimQueryOptionsParameterBinding.cs" />
     <Compile Include="Serialization\ResourceJsonConverter.cs" />
+    <Compile Include="Serialization\ScimQueryOptionsConverter.cs" />
     <Compile Include="Services\DefaultCanonicalizationService.cs" />
     <Compile Include="Canonicalization\CanonicalizationDelegates.cs" />
     <Compile Include="Configuration\CompositionContainerRegistry.cs" />

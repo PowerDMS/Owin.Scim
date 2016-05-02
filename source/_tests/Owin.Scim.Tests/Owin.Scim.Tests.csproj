@@ -194,6 +194,8 @@
     <Compile Include="Integration\Users\Delete\when_deleting_a_user.cs" />
     <Compile Include="Integration\Users\Delete\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Delete\with_an_invalid_userid.cs" />
+    <Compile Include="Integration\Users\Query\when_querying_users.cs" />
+    <Compile Include="Integration\Users\Query\with_a_filter.cs" />
     <Compile Include="Integration\Users\Replace\when_replacing_a_user.cs" />
     <Compile Include="Integration\Users\Replace\with_unknown_user.cs" />
     <Compile Include="Integration\Users\Replace\with_several_attribute_changes.cs" />
@@ -291,6 +293,9 @@
     <Compile Include="Querying\Filtering\equals_with_complex_property.cs" />
     <Compile Include="Querying\Filtering\present_with_enumerable.cs" />
     <Compile Include="Querying\Filtering\equals_with_string.cs" />
+    <Compile Include="Querying\ScimQueryOptions\when_querying_scim_resources.cs" />
+    <Compile Include="Querying\ScimQueryOptions\with_request_body_parameters.cs" />
+    <Compile Include="Querying\ScimQueryOptions\with_url_query_string_parameters.cs" />
     <Compile Include="ScimClientJsonMediaTypeFormatter.cs" />
     <Compile Include="Security\when_hashing_passwords.cs" />
     <Compile Include="Security\with_different_passwords.cs" />
