@@ -16,42 +16,45 @@ Roadmap
 -------
 The list below doesn't necessarily denote priority or order.
 
-1. [ ] Finish users endpoints
+01. [ ] Finish users endpoints
   1. [x] Create  
   2. [x] Retrieve  
   3. [x] Replace  
-  4. [x] Update (Patch)  
+  4. [ ] Update (Patch) (in progress - cleanup code)
     1. [x] Support for path filters  
     2. [x] Add  
     3. [x] Replace  
     4. [x] Remove  
   5. [x] Delete  
   6. [x] Query
-2. [x] Schema extensions
-3. [x] Add SCIM server configuration endpoints
+02. [x] Schema extensions
+03. [x] Add SCIM server configuration endpoints
   1. [x] /ServiceProviderConfig
   2. [x] /Schemas
   3. [x] /ResourceTypes
-4. [x] Add support for mutability rule-processing.
-5. [ ] Add support for bulk processing
-6. [x] Add groups endpoints
+04. [x] Add support for mutability rule-processing.
+05. [ ] Add support for bulk processing
+06. [x] Add groups endpoints
   1. [x] Create
   2. [x] Retrieve
   3. [x] Replace
-  4. [x] Update (Patch)
+  4. [ ] Update (Patch)  (in progress - cleanup code)
   5. [x] Delete  
   6. [ ] Query
-7. [ ] Add support for querying
+07. [ ] Add support for querying
   1. [x] Filtering
   2. [ ] Sorting (in design)
   3. [ ] Ordering (in design)
   4. [ ] Pagination (in design)
   5. [ ] Projection (in progress - currently only works with top-level attributes / non-urn qualified references)
-8. [x] Add more extensiblity options
+08. [x] Add more extensiblity options
   1. [x] Canonicalization  
   2. [x] Validation  
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
-9. [ ] Add endpoint authorization support
+09. [ ] Add endpoint authorization support
+10. [ ] Outbound Provisioning
+  1. [ ] Event Triggers / Handlers
+  2. [ ] Client Subscription Management
 
 Getting Started
 ===============
