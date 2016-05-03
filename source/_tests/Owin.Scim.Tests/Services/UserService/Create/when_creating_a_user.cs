@@ -5,6 +5,8 @@
     
     using Configuration;
 
+    using Extensions;
+
     using FakeItEasy;
 
     using Machine.Specifications;
@@ -22,7 +24,7 @@
     {
         Establish context = () =>
         {
-            ServerConfiguration = new ScimServerConfiguration();
+            ServerConfiguration = new ScimServerConfiguration().WithTypeDefinitions();
             UserRepository = A.Fake<IUserRepository>();
             GroupRepository = A.Fake<IGroupRepository>();
             PasswordManager = A.Fake<IManagePasswords>();

@@ -21,7 +21,7 @@
 
         public MySubClass ComplexData { get; set; }
 
-        protected override string SchemaIdentifier
+        protected internal override string SchemaIdentifier
         {
             get { return Schema; }
         }
