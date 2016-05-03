@@ -1,10 +1,8 @@
 namespace Owin.Scim.Model.Users
 {
-    using System;
-
     using Configuration;
 
-    public class UserGroupDefinition : MultiValuedAttributeDefinition
+    public class UserGroupDefinition : ScimTypeDefinitionBuilder<UserGroup>
     {
         public UserGroupDefinition(ScimServerConfiguration serverConfiguration)
             : base(serverConfiguration)
@@ -24,15 +22,12 @@ namespace Owin.Scim.Model.Users
                 .SetMutability(Mutability.ReadOnly);
 
             For(g => g.Display)
+                .SetDescription("A human-readable name, primarily used for display purposes.")
                 .SetMutability(Mutability.ReadOnly);
 
             For(g => g.Primary)
+                .SetDescription(@"A boolean value indicating the 'primary' or preferred attribute value for this attribute.")
                 .SetMutability(Mutability.ReadOnly);
-        }
-
-        public override Type DefinitionType
-        {
-            get { return typeof(UserGroup); }
         }
     }
 }

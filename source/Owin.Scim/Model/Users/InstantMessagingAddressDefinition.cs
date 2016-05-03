@@ -1,14 +1,16 @@
 ﻿namespace Owin.Scim.Model.Users
 {
-    using System;
-
     using Configuration;
 
-    public class InstantMessagingAddressDefinition : MultiValuedAttributeDefinition
+    public class InstantMessagingAddressDefinition : ScimTypeDefinitionBuilder<InstantMessagingAddress>
     {
         public InstantMessagingAddressDefinition(ScimServerConfiguration serverConfiguration)
             : base(serverConfiguration)
         {
+            For(mva => mva.Display)
+                .SetDescription("A human-readable name, primarily used for display purposes.")
+                .SetMutability(Mutability.ReadOnly);
+            
             For(ima => ima.Value)
                 .SetDescription(@"Instant messaging address for the user.");
 
@@ -21,11 +23,6 @@
                 .SetDescription(
                     @"A Boolean value indicating the 'primary' or preferred attribute value 
                       for this attribute, e.g., the preferred messenger or primary messenger.");
-        }
-
-        public override Type DefinitionType
-        {
-            get { return typeof (InstantMessagingAddress); }
         }
     }
 }

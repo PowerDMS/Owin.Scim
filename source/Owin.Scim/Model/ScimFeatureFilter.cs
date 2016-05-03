@@ -1,8 +1,7 @@
 ﻿namespace Owin.Scim.Model
 {
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(ScimFeatureFilterDefinition))]
+    
     public class ScimFeatureFilter : ScimFeature
     {
         private ScimFeatureFilter(int maxResults)

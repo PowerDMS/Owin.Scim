@@ -3,7 +3,6 @@ namespace Owin.Scim.Model.Users
     using System.ComponentModel;
 
     [Description("Enterprise user.")]
-    [ScimTypeDefinition(typeof(EnterpriseUserExtensionDefinition))]
     public class EnterpriseUserExtension : ResourceExtension
     {
         public string EmployeeNumber { get; set; }

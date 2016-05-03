@@ -32,12 +32,10 @@ namespace Owin.Scim.Configuration
         }
 
         /// <summary>
-        /// Gets the type of which the definition corresponds to. Typically this will be the type argument <typeparamref name="T"/>, 
-        /// however, you may override this to make use of code reusability with type definition inheritance. 
-        /// See <see cref="Owin.Scim.Model.MultiValuedAttributeDefinition"/> for an example.
+        /// Gets the type of which the definition corresponds to. This returns the type argument <typeparamref name="T"/>.
         /// </summary>
         /// <value>The type of the definition.</value>
-        public virtual Type DefinitionType
+        public Type DefinitionType
         {
             get { return typeof(T); }
         }

@@ -6,6 +6,7 @@
 
     using Extensions;
 
+    // TODO: (DG) Add support for fully-qualified URNs
     public class ScimFilter
     {
         private readonly ISet<string> _ResourceExtensionSchemas;

@@ -1,8 +1,7 @@
 namespace Owin.Scim.Model
 {
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(ScimFeatureDefinition))]
+    
     public class ScimFeature
     {
         public ScimFeature(bool supported)

@@ -3,8 +3,7 @@
     using System.ComponentModel;
 
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(MailingAddressDefinition))]
+    
     public class MailingAddress : MultiValuedAttribute
     {
         [Description(@"The full mailing address, formatted for display or use with a mailing label. This attribute MAY contain newlines.")]

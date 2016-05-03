@@ -1,10 +1,8 @@
 ﻿namespace Owin.Scim.Model.Users
 {
-    using System;
-
     using Configuration;
 
-    public class PhoneNumberDefinition : MultiValuedAttributeDefinition
+    public class PhoneNumberDefinition : ScimTypeDefinitionBuilder<PhoneNumber>
     {
         public PhoneNumberDefinition( ScimServerConfiguration serverConfiguration)
             : base(serverConfiguration)
@@ -25,11 +23,6 @@
                 .SetDescription(
                     @"A boolean value indicating the 'primary' or preferred attribute value for 
                       this attribute, e.g., the preferred phone number or primary phone number.");
-        }
-
-        public override Type DefinitionType
-        {
-            get { return typeof(PhoneNumber); }
         }
     }
 }

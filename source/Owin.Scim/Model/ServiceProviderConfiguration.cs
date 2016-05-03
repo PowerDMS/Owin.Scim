@@ -7,8 +7,7 @@
     using Extensions;
 
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(ServiceProviderConfigurationDefinition))]
+    
     public class ServiceProviderConfiguration : Resource
     {
         public ServiceProviderConfiguration(

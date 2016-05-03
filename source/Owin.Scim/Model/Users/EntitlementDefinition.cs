@@ -1,24 +1,24 @@
 namespace Owin.Scim.Model.Users
 {
-    using System;
-
     using Configuration;
 
-    public class EntitlementDefinition : MultiValuedAttributeDefinition
+    public class EntitlementDefinition : ScimTypeDefinitionBuilder<Entitlement>
     {
         public EntitlementDefinition( ScimServerConfiguration serverConfiguration)
             : base(serverConfiguration)
         {
+            For(mva => mva.Display)
+                .SetDescription("A human-readable name, primarily used for display purposes.")
+                .SetMutability(Mutability.ReadOnly);
+
+            For(mva => mva.Type)
+                .SetDescription("A label indicating the attribute's function, e.g., 'work' or 'home'.");
+
+            For(mva => mva.Primary)
+                .SetDescription(@"A boolean value indicating the 'primary' or preferred attribute value for this attribute.");
+
             For(e => e.Value)
                 .SetDescription("The value of an entitlement.");
-
-            For(e => e.Type)
-                .SetDescription(@"A label indicating the attribute's function, e.g., 'work' or 'home'.");
-        }
-
-        public override Type DefinitionType
-        {
-            get { return typeof(Entitlement); }
         }
     }
 }

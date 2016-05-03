@@ -4,7 +4,6 @@
 
     using Newtonsoft.Json;
     
-    [ScimTypeDefinition(typeof(ResourceMetadataDefinition))]
     public sealed class ResourceMetadata
     {
         public ResourceMetadata(string resourceType)

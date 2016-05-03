@@ -3,8 +3,7 @@
     using System;
 
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(AuthenticationSchemeDefinition))]
+    
     public class AuthenticationScheme : MultiValuedAttribute
     {
         public AuthenticationScheme(

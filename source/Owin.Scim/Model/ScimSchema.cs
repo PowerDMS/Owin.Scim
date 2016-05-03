@@ -9,7 +9,6 @@
     /// The "ResourceType" schema specifies the metadata about a resource type.
     /// </summary>
     /// <seealso cref="Owin.Scim.Model.Resource" />
-    [ScimTypeDefinition(typeof(ScimSchemaTypeDefinition))]
     public class ScimSchema : Resource
     {
         /// <summary>

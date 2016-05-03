@@ -16,6 +16,8 @@
         private readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache =
             new ConcurrentDictionary<Type, IScimTypeDefinition>();
 
+        private readonly IDictionary<Type, Type> _TypeDefinitionRegistry;
+
         private readonly Lazy<ISet<string>> _ResourceExtensionSchemas;
 
         private readonly IDictionary<ScimFeatureType, ScimFeature> _Features;
@@ -26,6 +28,7 @@
 
         public ScimServerConfiguration()
         {
+            _TypeDefinitionRegistry = new Dictionary<Type, Type>();
             _ResourceExtensionSchemas = new Lazy<ISet<string>>(
                 () =>
                     new HashSet<string>(_TypeDefinitionCache
@@ -93,18 +96,23 @@
             get { return _ResourceExtensionSchemas.Value; }
         }
 
+        internal IDictionary<Type, Type> TypeDefinitionRegistry
+        {
+            get { return _TypeDefinitionRegistry; }
+        }
+
         public IScimTypeDefinition GetScimTypeDefinition(Type type)
         {
             return _TypeDefinitionCache.GetOrAdd(
                 type,
                 t =>
                 {
-                    var typeDefinitionType = typeof (ScimTypeDefinitionBuilder<>).MakeGenericType(type);
-                    return TypeDescriptor.GetAttributes(t)
-                        .OfType<ScimTypeDefinitionAttribute>()
-                        .MaybeSingle()
-                        .Bind(a => ((IScimTypeDefinition)a.DefinitionType.CreateInstance((ScimServerConfiguration)this)).ToMaybe())
-                        .FromMaybe((IScimTypeDefinition)typeDefinitionType.CreateInstance(this));
+                    Type typeDefinitionType;
+                    if (TypeDefinitionRegistry.TryGetValue(type, out typeDefinitionType))
+                        return (IScimTypeDefinition)typeDefinitionType.CreateInstance(this);
+
+                    var typeDefinitionBuilder = typeof (ScimTypeDefinitionBuilder<>).MakeGenericType(type);
+                    return (IScimTypeDefinition)typeDefinitionBuilder.CreateInstance(this);
                 });
         }
 

@@ -3,8 +3,7 @@ namespace Owin.Scim.Model.Users
     using System;
 
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(ManagerDefinition))]
+    
     public class Manager
     {
         [JsonProperty("value")]

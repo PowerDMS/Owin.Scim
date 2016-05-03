@@ -205,8 +205,6 @@
     <Compile Include="Model\ScimSchema.cs" />
     <Compile Include="Model\ScimSchemaTypeDefinition.cs" />
     <Compile Include="Model\ServiceProviderConfiguration.cs" />
-    <Compile Include="Model\MultiValuedAttributeDefinition.cs" />
-    <Compile Include="Model\ScimTypeDefinitionAttribute.cs" />
     <Compile Include="Model\ServiceProviderConfigurationDefinition.cs" />
     <Compile Include="Model\Users\EmailDefinition.cs" />
     <Compile Include="Model\Users\EnterpriseUserExtensionDefinition.cs" />

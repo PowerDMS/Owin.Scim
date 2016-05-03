@@ -1,8 +1,7 @@
 ﻿namespace Owin.Scim.Model
 {
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(ScimFeatureBulkDefinition))]
+    
     public class ScimFeatureBulk : ScimFeature
     {
         private ScimFeatureBulk(int maxOperations, int maxPayloadSize)

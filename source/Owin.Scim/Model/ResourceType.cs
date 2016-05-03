@@ -4,8 +4,7 @@
     using System.Linq;
 
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(ResourceTypeDefinition))]
+    
     public sealed class ResourceType : Resource
     {
         public ResourceType()

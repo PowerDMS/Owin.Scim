@@ -5,8 +5,7 @@
     using Extensions;
 
     using Newtonsoft.Json;
-
-    [ScimTypeDefinition(typeof(GroupDefinition))]
+    
     public class Group : Resource
     {
         public Group()

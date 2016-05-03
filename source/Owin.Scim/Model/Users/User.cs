@@ -8,7 +8,6 @@
 
     using Newtonsoft.Json;
     
-    [ScimTypeDefinition(typeof(UserDefinition))]
     public class User : Resource
     {
         public User()
