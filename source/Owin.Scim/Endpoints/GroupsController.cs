@@ -13,9 +13,13 @@
     using Model;
     using Model.Groups;
 
+    using NContext.Extensions;
+
     using Newtonsoft.Json.Serialization;
 
     using Patching;
+
+    using Querying;
 
     using Services;
 
@@ -58,6 +62,37 @@
                     SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
                     SetETagHeader(response, group);
                 });
+        }
+
+
+        [AcceptVerbs("GET")]
+        [Route(Name = "GetQueryGroups")]
+        public Task<HttpResponseMessage> GetQuery(ScimQueryOptions queryOptions)
+        {
+            return Query(queryOptions);
+        }
+
+        [AcceptVerbs("POST")]
+        [Route(".search", Name = "PostQueryGroups")]
+        public Task<HttpResponseMessage> PostQuery(ScimQueryOptions queryOptions)
+        {
+            return Query(queryOptions);
+        }
+
+        [NonAction]
+        private async Task<HttpResponseMessage> Query(ScimQueryOptions options)
+        {
+            return (await _GroupService.QueryGroups(options))
+                .Let(groups => groups.ForEach(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id })))
+                .Bind(
+                    groups =>
+                    new ScimDataResponse<ScimListResponse>(
+                        new ScimListResponse(groups)
+                        {
+                            StartIndex = options.StartIndex,
+                            ItemsPerPage = options.Count
+                        }))
+                .ToHttpResponseMessage(Request);
         }
 
         [Route("{groupId}", Name = "UpdateGroup")]

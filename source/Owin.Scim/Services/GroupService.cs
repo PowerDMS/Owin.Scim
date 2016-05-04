@@ -1,6 +1,7 @@
 ﻿namespace Owin.Scim.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
@@ -12,6 +13,9 @@
     using ErrorHandling;
     using Model;
     using Model.Groups;
+
+    using Querying;
+
     using Repository;
     using Validation;
 
@@ -120,6 +124,11 @@
                         detail: ErrorDetail.NotFound(groupId)));
 
             return new ScimDataResponse<Unit>(default(Unit));
+        }
+
+        public Task<IScimResponse<IEnumerable<Group>>> QueryGroups(ScimQueryOptions options)
+        {
+            throw new NotImplementedException();
         }
     }
 }
