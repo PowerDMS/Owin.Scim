@@ -51,6 +51,7 @@ The list below doesn't necessarily denote priority or order.
   1. [x] Canonicalization  
   2. [x] Validation  
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
+  4. [x] Custom resource types and endpoints
 09. [ ] Add endpoint authorization support
 10. [ ] Outbound Provisioning
   1. [ ] Event Triggers / Handlers
