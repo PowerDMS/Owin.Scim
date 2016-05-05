@@ -40,7 +40,7 @@ The list below doesn't necessarily denote priority or order.
   3. [x] Replace
   4. [ ] Update (Patch)  (in progress - cleanup code)
   5. [x] Delete  
-  6. [ ] Query
+  6. [x] Query
 07. [ ] Add support for querying
   1. [x] Filtering
   2. [ ] Sorting (in design)
@@ -53,7 +53,8 @@ The list below doesn't necessarily denote priority or order.
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
   4. [x] Custom resource types and endpoints
 09. [ ] Add endpoint authorization support
-10. [ ] Outbound Provisioning
+10. [ ] Add endpoint for supporting query-on-root
+11. [ ] Outbound Provisioning
   1. [ ] Event Triggers / Handlers
   2. [ ] Client Subscription Management
 
