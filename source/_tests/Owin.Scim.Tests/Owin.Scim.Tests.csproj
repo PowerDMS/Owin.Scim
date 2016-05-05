@@ -121,6 +121,9 @@
     <Compile Include="Extensions\ScimObjectContent.cs" />
     <Compile Include="Extensions\ScimServerConfigurationExtensions.cs" />
     <Compile Include="Extensions\ShouldExtensions.cs" />
+    <Compile Include="Integration\Groups\GroupNameUtility.cs" />
+    <Compile Include="Integration\Groups\Query\when_querying_groups.cs" />
+    <Compile Include="Integration\Groups\Query\with_a_filter.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchema.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchemaValidator.cs" />
     <Compile Include="Integration\SchemaExtensions\MyUserSchema.cs" />

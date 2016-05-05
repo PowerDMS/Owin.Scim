@@ -5,63 +5,87 @@
     using System.Linq;
     using System.Threading.Tasks;
 
+    using Extensions;
+
     using Model.Groups;
     using Model.Users;
+
+    using Querying;
 
     /// <summary>
     /// This could have been implemented by InMemoryUserRepository
     /// </summary>
     public class InMemoryGroupRepository : IGroupRepository
     {
-        private readonly IDictionary<string, Group> _groups;
+        private readonly IDictionary<string, Group> _Groups;
 
         public InMemoryGroupRepository()
         {
-            _groups = new Dictionary<string, Group>();
+            _Groups = new Dictionary<string, Group>();
         }
 
-        public Task<Group> CreateGroup(Group group)
+        public async Task<Group> CreateGroup(Group group)
         {
             group.Id = Guid.NewGuid().ToString("N");
 
-            _groups.Add(group.Id, group);
+            _Groups.Add(group.Id, group);
 
-            return Task.FromResult(group);
+            return group;
         }
 
-        public Task<Group> GetGroup(string groupId)
+        public async Task<Group> GetGroup(string groupId)
         {
-            if (_groups.ContainsKey(groupId))
+            if (_Groups.ContainsKey(groupId))
+                return _Groups[groupId].Copy();
+
+            return null;
+        }
+
+        public async Task<Group> UpdateGroup(Group group)
+        {
+            if (!_Groups.ContainsKey(group.Id))
+                return null;
+
+            _Groups[group.Id] = group;
+
+            return group;
+        }
+
+        public async Task<Group> DeleteGroup(string groupId)
+        {
+            if (!_Groups.ContainsKey(groupId))
+                return null;
+
+            var groupRecord = _Groups[groupId];
+            _Groups.Remove(groupId);
+
+            return groupRecord;
+        }
+
+        public async Task<IEnumerable<Group>> QueryGroups(ScimQueryOptions options)
+        {
+            var groups = _Groups.Values.AsEnumerable();
+            if (options.Filter != null)
+                groups = groups.Where(options.Filter.ToPredicate<Group>()).ToList();
+
+            // TODO: (DG) sorting
+            if (options.SortBy != null)
             {
-                return Task.FromResult(_groups[groupId].Copy());
             }
 
-            return Task.FromResult<Group>(null);
+            if (options.StartIndex > 1)
+                groups = groups.Skip(options.StartIndex);
+
+            if (options.Count > 0)
+                groups = groups.Take(options.Count);
+
+            return groups;
         }
 
-        public Task<Group> UpdateGroup(Group group)
-        {
-            if (!_groups.ContainsKey(group.Id)) return Task.FromResult<Group>(null);
-
-            _groups[group.Id] = group;
-
-            return Task.FromResult(group);
-        }
-
-        public Task<Group> DeleteGroup(string groupId)
-        {
-            if (!_groups.ContainsKey(groupId)) return Task.FromResult<Group>(null);
-
-            var groupRecord = _groups[groupId];
-            _groups.Remove(groupId);
-
-            return Task.FromResult(groupRecord);
-        }
-
-        public Task<IEnumerable<UserGroup>> GetGroupsUserBelongsTo(string userId)
+        public async Task<IEnumerable<UserGroup>> GetGroupsUserBelongsTo(string userId)
         {
             // TODO: (CY) need to add indirect groups too
-            return Task.FromResult(_groups
+            return _Groups
                 .Values
                 .Where(g => g.Members != null && g.Members.Any(m => m.Value.Equals(userId)))
                 .Select(group => new UserGroup
@@ -70,7 +94,7 @@
                     Ref = new Uri("../Groups/" + group.Id),
                     Display = group.DisplayName,
                     Type = "direct"
-                }));
+                });
         }
     }
 }

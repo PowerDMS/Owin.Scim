@@ -64,7 +64,6 @@
                 });
         }
 
-
         [AcceptVerbs("GET")]
         [Route(Name = "GetQueryGroups")]
         public Task<HttpResponseMessage> GetQuery(ScimQueryOptions queryOptions)

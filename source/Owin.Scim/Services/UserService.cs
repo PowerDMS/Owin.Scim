@@ -38,13 +38,13 @@
         private readonly IResourceValidatorFactory _ResourceValidatorFactory;
 
         public UserService(
-            ScimServerConfiguration scimServerConfiguration,
+            ScimServerConfiguration serverConfiguration,
             IResourceVersionProvider versionProvider,
             ICanonicalizationService canonicalizationService,
             IResourceValidatorFactory resourceValidatorFactory,
             IUserRepository userRepository,
             IManagePasswords passwordManager)
-            : base(scimServerConfiguration, versionProvider)
+            : base(serverConfiguration, versionProvider)
         {
             _CanonicalizationService = canonicalizationService;
             _UserRepository = userRepository;
@@ -54,7 +54,7 @@
 
         public async Task<IScimResponse<User>> CreateUser(User user)
         {
-            await CanonicalizeUser(user);
+            _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(user.GetType()));
 
             var validator = await _ResourceValidatorFactory.CreateValidator(user);
             var validationResult = (await validator.ValidateCreateAsync(user)).ToScimValidationResult();
@@ -108,7 +108,7 @@
                 LastModified = userRecord.Meta.LastModified
             };
 
-            await CanonicalizeUser(user);
+            _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(user.GetType()));
 
             var validator = await _ResourceValidatorFactory.CreateValidator(user);
             var validationResult = (await validator.ValidateUpdateAsync(user, userRecord)).ToScimValidationResult();
@@ -164,13 +164,6 @@
             users.ForEach(user => SetResourceVersion(user));
 
             return new ScimDataResponse<IEnumerable<User>>(users);
-        }
-
-        protected virtual Task CanonicalizeUser(User user)
-        {
-            _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(typeof(User)));
-
-            return Task.FromResult(0);
         }
     }
 }

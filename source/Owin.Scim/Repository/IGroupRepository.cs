@@ -4,6 +4,9 @@
     using System.Threading.Tasks;
 
     using Model.Groups;
+    using Model.Users;
+
+    using Querying;
 
     public interface IGroupRepository
     {
@@ -15,6 +18,8 @@
 
         Task<Group> DeleteGroup(string groupId);
 
-        Task<IEnumerable<Model.Users.UserGroup>> GetGroupsUserBelongsTo(string userId);
+        Task<IEnumerable<Group>> QueryGroups(ScimQueryOptions options);
+
+        Task<IEnumerable<UserGroup>> GetGroupsUserBelongsTo(string userId);
     }
 }

@@ -14,6 +14,8 @@
     using Model;
     using Model.Groups;
 
+    using NContext.Extensions;
+
     using Querying;
 
     using Repository;
@@ -28,12 +30,12 @@
         private readonly IGroupRepository _GroupRepository;
 
         public GroupService(
-            ScimServerConfiguration scimServerConfiguration,
+            ScimServerConfiguration serverConfiguration,
             IResourceVersionProvider versionProvider,
             IResourceValidatorFactory resourceValidatorFactory,
             ICanonicalizationService canonicalizationService,
             IGroupRepository groupRepository) 
-            : base(scimServerConfiguration, versionProvider)
+            : base(serverConfiguration, versionProvider)
         {
             _GroupRepository = groupRepository;
             _ResourceValidatorFactory = resourceValidatorFactory;
@@ -42,7 +44,7 @@
 
         public async Task<IScimResponse<Group>> CreateGroup(Group group)
         {
-            _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(typeof(Group)));
+            _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(group.GetType()));
 
             var validator = await _ResourceValidatorFactory.CreateValidator(group);
             var validationResult = (await validator.ValidateCreateAsync(group)).ToScimValidationResult();
@@ -126,9 +128,12 @@
             return new ScimDataResponse<Unit>(default(Unit));
         }
 
-        public Task<IScimResponse<IEnumerable<Group>>> QueryGroups(ScimQueryOptions options)
+        public async Task<IScimResponse<IEnumerable<Group>>> QueryGroups(ScimQueryOptions options)
         {
-            throw new NotImplementedException();
+            var groups = await _GroupRepository.QueryGroups(options) ?? new List<Group>();
+            groups.ForEach(group => SetResourceVersion(group));
+
+            return new ScimDataResponse<IEnumerable<Group>>(groups);
         }
     }
 }
