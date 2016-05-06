@@ -8,6 +8,8 @@ RFC 7644
 Looking for solid contributers to expedite this effort!  
 email me:  daniel.gioulakis [at] powerdms [dot] com
 
+If you have been evaluating the alpha builds from nuget, we would love to hear feedback from you. Please reach out and share how your experience has been working with Owin.Scim. Any issues and feature requests are welcome. Help us shape Owin.Scim into the best fully-featured and compliant open-source SCIM server!
+
 PROJECT STATUS
 ==============
 This project is in active development with the goal of completing basic protocol implementation by mid-2016.
@@ -34,7 +36,7 @@ The list below doesn't necessarily denote priority or order.
   3. [x] /ResourceTypes
 04. [x] Add support for mutability rule-processing.
 05. [ ] Add support for bulk processing
-06. [x] Add groups endpoints
+06. [ ] Add groups endpoints
   1. [x] Create
   2. [x] Retrieve
   3. [x] Replace
