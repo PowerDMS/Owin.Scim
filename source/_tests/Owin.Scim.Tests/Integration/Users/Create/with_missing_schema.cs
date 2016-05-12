@@ -30,9 +30,8 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             StatusCode = Response.StatusCode;
 
             Error = StatusCode != HttpStatusCode.BadRequest ? null : Response.Content
-                .ScimReadAsAsync<IEnumerable<ScimError>>()
-                .Result
-                .Single();
+                .ScimReadAsAsync<ScimError>()
+                .Result;
         };
 
         It should_return_bad_request = () => StatusCode.ShouldEqual(HttpStatusCode.BadRequest);

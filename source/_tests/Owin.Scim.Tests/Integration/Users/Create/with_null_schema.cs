@@ -8,16 +8,14 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Machine.Specifications;
 
     using Model;
-    using Model.Users;
 
-    public class with_invalid_schema : using_a_scim_server
+    public class with_null_schema : using_a_scim_server
     {
         Establish context = () =>
         {
             UserDto = new UserWithSchema()
             {
-                // older un-supported schema
-                Schemas = new[] { @"urn:ietf:params:scim:schemas:core:1.0:User" },
+                Schemas = null,
                 UserName = "Oops"
             };
         };

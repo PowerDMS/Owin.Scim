@@ -39,9 +39,8 @@
             StatusCode = Response.StatusCode;
 
             Error = StatusCode != HttpStatusCode.BadRequest ? null : Response.Content
-                .ScimReadAsAsync<IEnumerable<ScimError>>()
-                .Result
-                .Single();
+                .ScimReadAsAsync<ScimError>()
+                .Result;
         };
 
         It should_return_created = () => StatusCode.ShouldEqual(HttpStatusCode.Created);

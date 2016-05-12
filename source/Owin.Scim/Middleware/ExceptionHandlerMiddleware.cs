@@ -51,7 +51,7 @@
             {
                 var responseException = ex as ScimException;
 
-                context.Response.Headers.Add("Content-Type", new[] { "application/json+scim; charset=utf-8" });
+                context.Response.Headers.Add("Content-Type", new[] { "application/scim+json; charset=utf-8" });
 
                 if (responseException != null)
                 {
