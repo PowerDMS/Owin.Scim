@@ -1,5 +1,5 @@
 # Owin.Scim
-OWIN SCIM 2.0 implementation  
+OWIN SCIM 2.0 implementation for .NET >= 4.5.1  
 [![Build status](https://ci.appveyor.com/api/projects/status/qgblu9mx4f53tvee/branch/master?svg=true)](https://ci.appveyor.com/project/powerdms/owin-scim/branch/master) [![NuGet Pre Release](https://img.shields.io/nuget/vpre/Owin.Scim.svg?maxAge=1800)](https://www.nuget.org/packages/Owin.Scim/)
 
 RFC 7643  
@@ -23,10 +23,9 @@ The list below doesn't necessarily denote priority or order.
   2. [x] Retrieve  
   3. [x] Replace  
   4. [ ] Update (Patch) (in progress - cleanup code)
-    1. [x] Support for path filters  
-    2. [x] Add  
-    3. [x] Replace  
-    4. [x] Remove  
+    1. [x] Add  
+    2. [x] Replace  
+    3. [x] Remove  
   5. [x] Delete  
   6. [x] Query
 02. [x] Schema extensions
@@ -41,6 +40,9 @@ The list below doesn't necessarily denote priority or order.
   2. [x] Retrieve
   3. [x] Replace
   4. [ ] Update (Patch)  (in progress - cleanup code)
+    1. [x] Add
+    2. [x] Replace
+    3. [x] Remove
   5. [x] Delete  
   6. [x] Query
 07. [ ] Add support for querying
@@ -49,14 +51,15 @@ The list below doesn't necessarily denote priority or order.
   3. [ ] Ordering (in design)
   4. [ ] Pagination (in design)
   5. [ ] Projection (in progress - currently only works with top-level attributes / non-urn qualified references)
-08. [x] Add more extensiblity options
+08. [x] SCIM Extensiblity
   1. [x] Canonicalization  
   2. [x] Validation  
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
   4. [x] Custom resource types and endpoints
 09. [ ] Add endpoint authorization support
 10. [ ] Add endpoint for supporting query-on-root
-11. [ ] Outbound Provisioning
+11. [ ] Add logging functionality
+12. [ ] Outbound Provisioning
   1. [ ] Event Triggers / Handlers
   2. [ ] Client Subscription Management
 
