@@ -16,7 +16,8 @@ namespace Owin.Scim.Model.Groups
             For(p => p.Ref)
                 .SetDescription("The URI corresponding to a SCIM resource that is a member of this group.")
                 .SetMutability(Mutability.Immutable)
-                .SetReferenceTypes(ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group);
+                .SetReferenceTypes(ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group)
+                .AddCanonicalizationRule((uri, definition) => Canonicalization.Canonicalization.EnforceScimUri(uri, definition, ServerConfiguration));
 
             For(p => p.Type)
                 .SetCanonicalValues(new [] { ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group }, StringComparer.OrdinalIgnoreCase)

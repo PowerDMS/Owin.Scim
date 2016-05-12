@@ -150,7 +150,7 @@
                 Base = base.CalculateVersion(),
                 Active,
                 Locale,
-                Name = Name?.CalculateVersion(),
+                Name = Name == null ? 0 : Name.CalculateVersion(),
                 NickName,
                 DisplayName,
                 Password,

@@ -124,11 +124,11 @@
                                     if (attributeDefinition.Mutability == Mutability.WriteOnly || attributeDefinition.Returned == Returned.Never)
                                         return false;
 
-                                    var httpMethod = AmbientRequestMessageService.HttpMethod;
+                                    var httpMethod = AmbientRequestService.HttpMethod;
                                     if (attributeDefinition.Returned == Returned.Default ||
                                         (attributeDefinition.Returned == Returned.Request && (httpMethod == HttpMethod.Post || httpMethod == _Patch || httpMethod == HttpMethod.Put)))
                                     {
-                                        var queryOptions = AmbientRequestMessageService.QueryOptions;
+                                        var queryOptions = AmbientRequestService.QueryOptions;
                                         if (queryOptions.Attributes.Any() && !queryOptions.Attributes.Contains(property.PropertyName))
                                             return false;
 

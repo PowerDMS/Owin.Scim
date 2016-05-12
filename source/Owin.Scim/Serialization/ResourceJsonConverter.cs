@@ -140,7 +140,7 @@
             }
             
             var resource = instance as Resource;
-            if (resource?.ExtensionSerialization != null)
+            if (resource != null && resource.ExtensionSerialization != null)
             {
                 foreach (var kvp in resource.ExtensionSerialization)
                 {

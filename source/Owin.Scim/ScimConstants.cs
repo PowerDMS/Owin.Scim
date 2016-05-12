@@ -5,6 +5,19 @@
 
     public static class ScimConstants
     {
+        public static class Owin
+        {
+            public const string BasePath = @"owin.scim:basePath";
+
+            public const string BaseUri = @"owin.scim:baseUri";
+
+            public const string Host = @"owin.scim:host";
+
+            public const string HttpMethod = @"owin.scim:httpMethod";
+
+            public const string QueryOptions = @"owin.scim:queryOptions";
+        }
+
         public static class Schemas
         {
             public const string Key = @"schemas";
@@ -54,6 +67,8 @@
 
         public static class Defaults
         {
+            public const string URNPrefix = @"urn:";
+
             public const int BulkMaxOperations = 1000;
 
             public const int BulkMaxPayload = 1048576;

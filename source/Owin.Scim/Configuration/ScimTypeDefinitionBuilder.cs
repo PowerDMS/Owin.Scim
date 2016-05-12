@@ -67,72 +67,86 @@ namespace Owin.Scim.Configuration
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
-            Expression<Func<T, TAttribute>> attrExp)
+            Expression<Func<T, TAttribute>> attributeExpression)
         {
-            if (attrExp == null) throw new ArgumentNullException("attrExp");
+            if (attributeExpression == null) throw new ArgumentNullException("attributeExpression");
 
-            var memberExpression = attrExp.Body as MemberExpression;
+            var memberExpression = attributeExpression.Body as MemberExpression;
             if (memberExpression == null)
             {
-                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
+                throw new InvalidOperationException("attributeExpression must be of type MemberExpression.");
             }
             
             return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
-            Expression<Func<T, ISet<TAttribute>>> attrExp)
+            Expression<Func<T, ISet<TAttribute>>> attributeExpression)
         {
-            if (attrExp == null) throw new ArgumentNullException("attrExp");
+            if (attributeExpression == null) throw new ArgumentNullException("attributeExpression");
 
-            var memberExpression = attrExp.Body as MemberExpression;
+            var memberExpression = attributeExpression.Body as MemberExpression;
             if (memberExpression == null)
             {
-                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
+                throw new InvalidOperationException("attributeExpression must be of type MemberExpression.");
             }
             
             return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
-            Expression<Func<T, ICollection<TAttribute>>> attrExp)
+            Expression<Func<T, ICollection<TAttribute>>> attributeExpression)
         {
-            if (attrExp == null) throw new ArgumentNullException("attrExp");
+            if (attributeExpression == null) throw new ArgumentNullException("attributeExpression");
 
-            var memberExpression = attrExp.Body as MemberExpression;
+            var memberExpression = attributeExpression.Body as MemberExpression;
             if (memberExpression == null)
             {
-                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
-            }
-
-            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
-        }
-        
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
-            Expression<Func<T, IList<TAttribute>>> attrExp)
-        {
-            if (attrExp == null) throw new ArgumentNullException("attrExp");
-
-            var memberExpression = attrExp.Body as MemberExpression;
-            if (memberExpression == null)
-            {
-                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
+                throw new InvalidOperationException("attributeExpression must be of type MemberExpression.");
             }
 
             return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
-            Expression<Func<T, IEnumerable<TAttribute>>> attrExp)
+            Expression<Func<T, IList<TAttribute>>> attributeExpression)
         {
-            if (attrExp == null) throw new ArgumentNullException("attrExp");
+            if (attributeExpression == null) throw new ArgumentNullException("attributeExpression");
 
-            var memberExpression = attrExp.Body as MemberExpression;
+            var memberExpression = attributeExpression.Body as MemberExpression;
             if (memberExpression == null)
             {
-                throw new InvalidOperationException("attrExp must be of type MemberExpression.");
+                throw new InvalidOperationException("attributeExpression must be of type MemberExpression.");
+            }
+
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> For<TAttribute>(
+            Expression<Func<T, IEnumerable<TAttribute>>> attributeExpression)
+        {
+            if (attributeExpression == null) throw new ArgumentNullException("attributeExpression");
+
+            var memberExpression = attributeExpression.Body as MemberExpression;
+            if (memberExpression == null)
+            {
+                throw new InvalidOperationException("attributeExpression must be of type MemberExpression.");
             }
             
+            return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
+        }
+
+        public IScimTypeAttributeDefinition GetAttributeDefinition<TAttribute>(Expression<Func<TAttribute>> attributeExpression)
+        {
+            if (attributeExpression == null)
+                throw new ArgumentNullException("attributeExpression");
+
+            var memberExpression = attributeExpression.Body as MemberExpression;
+            if (memberExpression == null)
+            {
+                throw new InvalidOperationException("attributeExpression must be of type MemberExpression.");
+            }
+
             return (ScimTypeAttributeDefinitionBuilder<T, TAttribute>)_AttributeDefinitions[GetPropertyInfo(memberExpression)];
         }
 

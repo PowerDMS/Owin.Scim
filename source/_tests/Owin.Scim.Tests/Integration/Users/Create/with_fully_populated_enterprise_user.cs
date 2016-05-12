@@ -1,14 +1,11 @@
 ﻿namespace Owin.Scim.Tests.Integration.Users.Create
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
 
     using Machine.Specifications;
 
     using Model;
-    using Model.Users;
 
     using Ploeh.AutoFixture;
 
@@ -18,7 +15,7 @@
         {
             var autoFixture = new Fixture();
 
-            UserDto = new MyUser()
+            UserDto = new MyUser
             {
                 Schemas = new[] { @"urn:ietf:params:scim:schemas:core:2.0:User",
                     "urn:ietf:params:scim:schemas:extension:enterprise:2.0:User" },
@@ -39,11 +36,6 @@
                 .Result;
 
             StatusCode = Response.StatusCode;
-
-            Error = StatusCode != HttpStatusCode.BadRequest ? null : Response.Content
-                .ScimReadAsAsync<IEnumerable<ScimError>>()
-                .Result
-                .Single();
         };
 
         It should_return_created = () => StatusCode.ShouldEqual(HttpStatusCode.Created);
@@ -57,8 +49,6 @@
             createdUser.Id.ShouldNotBeNull();
             createdUser.Enterprise.ShouldBeLike(UserDto.Enterprise);
         };
-
-        It should_return_error_schema = () => Error?.Schemas.ShouldContain(ScimConstants.Messages.Error);
 
         protected static MyUser UserDto;
 

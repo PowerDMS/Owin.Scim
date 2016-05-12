@@ -1,6 +1,4 @@
-﻿using System.Linq;
-
-namespace Owin.Scim.Tests.Integration.Groups.Replace
+﻿namespace Owin.Scim.Tests.Integration.Groups.Replace
 {
     using System;
     using System.Net;
@@ -36,7 +34,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
                 DisplayName = "updated group 2",
                 Members = new[]
                 {
-                    new Member { Value = ExistingUser2.Id, Type = "user", Ref = new UriBuilder { Fragment = "\\badthing" }.Uri }
+                    new Member { Ref = new Uri("\\\\badthing") }
                 }
             };
         };

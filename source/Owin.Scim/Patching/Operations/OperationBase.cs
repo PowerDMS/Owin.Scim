@@ -24,7 +24,7 @@ namespace Owin.Scim.Patching.Operations
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             this.OperationType = operationType;

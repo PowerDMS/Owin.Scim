@@ -18,7 +18,7 @@
                 ExternalId = "hello",
                 Members = new []
                 {
-                    new Member { Value = ExistingUser.Id, Type = "user", Ref = new UriBuilder { Fragment = "\\hello" }.Uri }
+                    new Member { Ref = new Uri("\\\\hello") }
                 }
             };
         };

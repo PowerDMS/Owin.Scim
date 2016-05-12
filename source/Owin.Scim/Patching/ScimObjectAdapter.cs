@@ -37,7 +37,7 @@
             _ServerConfiguration = serverConfiguration;
             if (contractResolver == null)
             {
-                throw new ArgumentNullException(nameof(contractResolver));
+                throw new ArgumentNullException("contractResolver");
             }
 
             ContractResolver = contractResolver;
@@ -62,10 +62,10 @@
         public IEnumerable<PatchOperationResult> Add(Operation operation, object objectToApplyTo)
         {
             if (operation == null)
-                throw new ArgumentNullException(nameof(operation));
+                throw new ArgumentNullException("operation");
 
             if (objectToApplyTo == null)
-                throw new ArgumentNullException(nameof(objectToApplyTo));
+                throw new ArgumentNullException("objectToApplyTo");
 
             /*
                 With SCIM 2.0, path is only required for the remove operation:
@@ -99,10 +99,10 @@
             Operation operation)
         {
             if (objectToApplyTo == null)
-                throw new ArgumentNullException(nameof(objectToApplyTo));
+                throw new ArgumentNullException("objectToApplyTo");
 
             if (operation == null)
-                throw new ArgumentNullException(nameof(operation));
+                throw new ArgumentNullException("operation");
 
             // ScimPatchObjectAnalysis.cs will handle resolving the actual 
             // path to object members and parsing any filters.
@@ -254,10 +254,10 @@
         public IEnumerable<PatchOperationResult> Remove(Operation operation, object objectToApplyTo)
         {
             if (operation == null)
-                throw new ArgumentNullException(nameof(operation));
+                throw new ArgumentNullException("operation");
 
             if (objectToApplyTo == null)
-                throw new ArgumentNullException(nameof(objectToApplyTo));
+                throw new ArgumentNullException("objectToApplyTo");
 
             // o  If "path" is unspecified, the operation fails with HTTP status
             //    code 400 and a "scimType" error code of "noTarget".
@@ -365,10 +365,10 @@
         public IEnumerable<PatchOperationResult> Replace(Operation operation, object objectToApplyTo)
         {
             if (operation == null)
-                throw new ArgumentNullException(nameof(operation));
+                throw new ArgumentNullException("operation");
 
             if (objectToApplyTo == null)
-                throw new ArgumentNullException(nameof(objectToApplyTo));
+                throw new ArgumentNullException("objectToApplyTo");
 
             /*
                 With SCIM 2.0, path is only required for the remove operation:

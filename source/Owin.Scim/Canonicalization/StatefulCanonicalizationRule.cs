@@ -4,27 +4,27 @@ namespace Owin.Scim.Canonicalization
 
     using Extensions;
 
-    public class CanonicalizationRule<TAttribute> : ICanonicalizationRule
+    public class StatefulCanonicalizationRule<TAttribute> : ICanonicalizationRule
     {
         private readonly PropertyDescriptor _PropertyDescriptor;
 
-        private readonly CanonicalizationFunc<TAttribute> _CanonicalizationRule;
+        private readonly StatefulCanonicalizationFunc<TAttribute> _CanonicalizationRule;
 
-        public CanonicalizationRule(
+        public StatefulCanonicalizationRule(
             PropertyDescriptor propertyDescriptor,
-            CanonicalizationAction<TAttribute> canonicalizationRule)
+            StatefulCanonicalizationAction<TAttribute> canonicalizationRule)
         {
             _PropertyDescriptor = propertyDescriptor;
-            _CanonicalizationRule = (TAttribute value) =>
+            _CanonicalizationRule = (TAttribute value, ref object state) =>
             {
-                canonicalizationRule.Invoke(value);
+                canonicalizationRule.Invoke(value, ref state);
                 return value;
             };
         }
 
-        public CanonicalizationRule(
+        public StatefulCanonicalizationRule(
             PropertyDescriptor propertyDescriptor,
-            CanonicalizationFunc<TAttribute> canonicalizationRule)
+            StatefulCanonicalizationFunc<TAttribute> canonicalizationRule)
         {
             _PropertyDescriptor = propertyDescriptor;
             _CanonicalizationRule = canonicalizationRule;
@@ -35,11 +35,11 @@ namespace Owin.Scim.Canonicalization
             if (_PropertyDescriptor.PropertyType.IsTerminalObject())
             {
                 var currentValue = (TAttribute)_PropertyDescriptor.GetValue(instance);
-                _PropertyDescriptor.SetValue(instance, _CanonicalizationRule(currentValue));
+                _PropertyDescriptor.SetValue(instance, _CanonicalizationRule(currentValue, ref state));
             }
             else
             {
-                _CanonicalizationRule((TAttribute)instance);
+                _CanonicalizationRule((TAttribute)instance, ref state);
             }
         }
     }

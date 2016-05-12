@@ -96,7 +96,10 @@ namespace Owin.Scim.Configuration
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> SetDescription(string description)
         {
-            Description = description?.RemoveMultipleSpaces();
+            if (description == null)
+                return this;
+
+            Description = description.RemoveMultipleSpaces();
             return this;
         }
 
@@ -126,38 +129,49 @@ namespace Owin.Scim.Configuration
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationAction<TAttribute> rule)
         {
-            var func = new StatefulCanonicalizationFunc<TAttribute>(
-                (TAttribute value, ref object state) =>
-                {
-                    rule.Invoke(value);
-                    return value;
-                });
-
-            return AddCanonicalizationRule(func);
+            _CanonicalizationRules.Add(new CanonicalizationRule<TAttribute>(_PropertyDescriptor, rule));
+            return this;
         }
 
-        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationFunc<TAttribute> rule)
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(AttributeCanonicalizationAction<TAttribute> rule)
         {
-            var func = new StatefulCanonicalizationFunc<TAttribute>((TAttribute value, ref object state) => rule.Invoke(value));
-
-            return AddCanonicalizationRule(func);
+            _CanonicalizationRules.Add(new AttributeCanonicalizationRule<TAttribute>(_PropertyDescriptor, this, rule));
+            return this;
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(StatefulCanonicalizationAction<TAttribute> rule)
         {
-            var func = new StatefulCanonicalizationFunc<TAttribute>(
-                (TAttribute value, ref object state) =>
-                {
-                    rule.Invoke(value, ref state);
-                    return value;
-                });
+            _CanonicalizationRules.Add(new StatefulCanonicalizationRule<TAttribute>(_PropertyDescriptor, rule));
+            return this;
+        }
 
-            return AddCanonicalizationRule(func);
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(StatefulAttributeCanonicalizationAction<TAttribute> rule)
+        {
+            _CanonicalizationRules.Add(new StatefulAttributeCanonicalizationRule<TAttribute>(_PropertyDescriptor, this, rule));
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(CanonicalizationFunc<TAttribute> rule)
+        {
+            _CanonicalizationRules.Add(new CanonicalizationRule<TAttribute>(_PropertyDescriptor, rule));
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(AttributeCanonicalizationFunc<TAttribute> rule)
+        {
+            _CanonicalizationRules.Add(new AttributeCanonicalizationRule<TAttribute>(_PropertyDescriptor, this, rule));
+            return this;
         }
 
         public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(StatefulCanonicalizationFunc<TAttribute> rule)
         {
-            _CanonicalizationRules.Add(new CanonicalizationRule<TAttribute>(_PropertyDescriptor, rule));
+            _CanonicalizationRules.Add(new StatefulCanonicalizationRule<TAttribute>(_PropertyDescriptor, rule));
+            return this;
+        }
+
+        public ScimTypeAttributeDefinitionBuilder<T, TAttribute> AddCanonicalizationRule(StatefulAttributeCanonicalizationFunc<TAttribute> rule)
+        {
+            _CanonicalizationRules.Add(new StatefulAttributeCanonicalizationRule<TAttribute>(_PropertyDescriptor, this, rule));
             return this;
         }
 

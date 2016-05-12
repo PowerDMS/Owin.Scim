@@ -32,12 +32,12 @@ namespace Owin.Scim.Patching.Operations
         {
             if (objectToApplyTo == null)
             {
-                throw new ArgumentNullException(nameof(objectToApplyTo));
+                throw new ArgumentNullException("objectToApplyTo");
             }
 
             if (adapter == null)
             {
-                throw new ArgumentNullException(nameof(adapter));
+                throw new ArgumentNullException("adapter");
             }
 
             switch (OperationType)

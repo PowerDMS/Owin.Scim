@@ -1,6 +1,5 @@
 namespace Owin.Scim.Tests.Integration.Groups.Update.remove
 {
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -46,7 +45,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
 
         It should_return_bad_request = () => PatchResponse.StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_indicate_mutability = () => Error?.ScimType.ShouldEqual(Model.ScimErrorType.Mutability);
+        It should_indicate_mutability = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.Mutability);
 
         private static Group GroupToUpdate;
         private static User ExistingUser;

@@ -59,8 +59,6 @@
 
         public bool RequireSsl { get; set; }
 
-        public Uri PublicOrigin { get; set; }
-
         public HttpConfiguration HttpConfiguration { get; internal set; }
 
         public IEnumerable<AuthenticationScheme> AuthenticationSchemes
@@ -126,7 +124,15 @@
             IScimTypeDefinition std;
             if (!_TypeDefinitionCache.TryGetValue(resourceType, out std)) return null;
 
-            return (std as IScimResourceTypeDefinition)?.GetExtension(extensionSchemaIdentifier)?.ExtensionType;
+            var rtd = std as IScimResourceTypeDefinition;
+            if (rtd == null)
+                return null;
+
+            var extension = rtd.GetExtension(extensionSchemaIdentifier);
+            if (extension == null)
+                return null;
+
+            return extension.ExtensionType;
         }
 
         public string GetSchemaIdentifierForResourceType(Type resourceType)
@@ -235,11 +241,16 @@
 
         public Type GetScimResourceValidatorType(Type resourceType)
         {
-            IScimTypeDefinition td;
+            IScimTypeDefinition std;
 
-            return _TypeDefinitionCache.TryGetValue(resourceType, out td) 
-                ? (td as IScimResourceTypeDefinition)?.ValidatorType 
-                : null;
+            if (!_TypeDefinitionCache.TryGetValue(resourceType, out std))
+                return null;
+
+            var rtd = std as IScimResourceTypeDefinition;
+            if (rtd == null)
+                return null;
+
+            return rtd.ValidatorType;
         }
 
         internal void AddTypeDefiniton(IScimTypeDefinition scimTypeDefinition)

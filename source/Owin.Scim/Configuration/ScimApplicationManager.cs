@@ -67,7 +67,8 @@
             
             _AppBuilder.Use((context, task) =>
             {
-                AmbientRequestMessageService.SetRequestInformation(context, serverConfiguration);
+                AmbientRequestService.SetRequestInformation(context, serverConfiguration);
+
                 return task.Invoke();
             });
 
@@ -107,27 +108,11 @@
             var httpConfiguration = serverConfiguration.HttpConfiguration = new HttpConfiguration();
 
             // Invoke custom configuration action if not null
-            _ConfigureScimServerAction?.Invoke(serverConfiguration);
+            if (_ConfigureScimServerAction != null)
+                _ConfigureScimServerAction.Invoke(serverConfiguration);
 
             // Configure SCIM http configuration
             ConfigureHttpConfiguration(serverConfiguration);
-
-            // Set default public origin
-            if (serverConfiguration.PublicOrigin == null && _AppBuilder.Properties.ContainsKey("host.Addresses"))
-            {
-                var items = ((IList<IDictionary<string, object>>)_AppBuilder.Properties["host.Addresses"])[0];
-                var port = items.ContainsKey("port")
-                    ? int.Parse(items["port"].ToString())
-                    : -1;
-
-                var uriBuilder = new UriBuilder(
-                    items.ContainsKey("scheme") ? items["scheme"].ToString() : null,
-                    items.ContainsKey("host") ? items["host"].ToString() : null,
-                    (port != 80 && port != 443) ? port : -1,
-                    items.ContainsKey("path") ? items["path"].ToString() : null);
-
-                serverConfiguration.PublicOrigin = uriBuilder.Uri;
-            }
 
             if (serverConfiguration.RequireSsl)
                 _AppBuilder.Use<RequireSslMiddleware>();

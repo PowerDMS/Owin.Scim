@@ -39,12 +39,12 @@ namespace Owin.Scim.Patching
         {
             if (operations == null)
             {
-                throw new ArgumentNullException(nameof(operations));
+                throw new ArgumentNullException("operations");
             }
 
             if (contractResolver == null)
             {
-                throw new ArgumentNullException(nameof(contractResolver));
+                throw new ArgumentNullException("contractResolver");
             }
 
             Operations = operations;
@@ -62,7 +62,7 @@ namespace Owin.Scim.Patching
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             Operations.Add(new Operation<TModel>(
@@ -84,7 +84,7 @@ namespace Owin.Scim.Patching
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             Operations.Add(new Operation<TModel>(
@@ -104,7 +104,7 @@ namespace Owin.Scim.Patching
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             Operations.Add(new Operation<TModel>(OperationType.Remove, ExpressionHelpers.GetPath(path).ToLowerInvariant()));
@@ -122,7 +122,7 @@ namespace Owin.Scim.Patching
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             Operations.Add(new Operation<TModel>(
@@ -142,7 +142,7 @@ namespace Owin.Scim.Patching
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             Operations.Add(new Operation<TModel>(
@@ -164,7 +164,7 @@ namespace Owin.Scim.Patching
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             Operations.Add(new Operation<TModel>(
@@ -184,12 +184,12 @@ namespace Owin.Scim.Patching
         {
             if (objectToApplyTo == null)
             {
-                throw new ArgumentNullException(nameof(objectToApplyTo));
+                throw new ArgumentNullException("objectToApplyTo");
             }
 
             if (adapter == null)
             {
-                throw new ArgumentNullException(nameof(adapter));
+                throw new ArgumentNullException("adapter");
             }
 
             var patchResult = new PatchResult();

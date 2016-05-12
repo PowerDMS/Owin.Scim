@@ -6,6 +6,8 @@ namespace Owin.Scim.Validation
     using System.Threading;
     using System.Threading.Tasks;
 
+    using Configuration;
+
     using FluentValidation;
 
     using Extensions;
@@ -16,11 +18,17 @@ namespace Owin.Scim.Validation
     {
         private const string _ResourceInstanceKey = @"ValidationInstance";
 
+        private readonly ScimServerConfiguration _ServerConfiguration;
+
         private readonly ResourceExtensionValidators _ExtensionValidators;
 
-        protected ResourceValidatorBase(ResourceExtensionValidators extensionValidators)
+        protected ResourceValidatorBase(
+            ScimServerConfiguration serverConfiguration,
+            ResourceExtensionValidators extensionValidators)
         {
+            _ServerConfiguration = serverConfiguration;
             _ExtensionValidators = extensionValidators;
+
             CascadeMode = CascadeMode.StopOnFirstFailure;
             
             // Virtual member call from ctor but derived types should not require 
@@ -92,6 +100,11 @@ namespace Owin.Scim.Validation
         public Type TargetType
         {
             get { return typeof (T); }
+        }
+
+        protected ScimServerConfiguration ServerConfiguration
+        {
+            get { return _ServerConfiguration; }
         }
     }
 }

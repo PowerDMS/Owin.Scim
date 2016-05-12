@@ -13,7 +13,7 @@
     {
         static void Main(string[] args)
         {
-            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("http://localhost:8080"))
+            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("http://+:8080"))
             {
                 AsyncContext.Run(TestScimApi);
                 Console.ReadLine();

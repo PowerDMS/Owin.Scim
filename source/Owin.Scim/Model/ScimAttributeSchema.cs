@@ -46,8 +46,8 @@ namespace Owin.Scim.Model
             Mutability = mutability;
             Required = required;
             Returned = returned;
-            ReferenceTypes = referenceTypes?.ToList();
-            SubAttributes = subAttributes?.ToList();
+            ReferenceTypes = referenceTypes == null ? null : referenceTypes.ToList();
+            SubAttributes = subAttributes == null ? null : subAttributes.ToList();
             Uniqueness = uniqueness;
             CaseExact = caseExact;
             CanonicalValues = canonicalValues;

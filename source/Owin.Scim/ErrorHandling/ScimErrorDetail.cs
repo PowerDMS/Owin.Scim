@@ -1,6 +1,6 @@
 ﻿namespace Owin.Scim.ErrorHandling
 {
-    public static class ErrorDetail
+    public static class ScimErrorDetail
     {
         public static string AttributeImmutable(string attribute)
         {

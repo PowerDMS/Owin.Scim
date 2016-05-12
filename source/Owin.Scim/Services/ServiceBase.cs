@@ -33,7 +33,7 @@
                 // Below, we leak service-layer etag logic into the business logic on purpose.
                 // SCIM's Meta.Version property MUST mirror the ETag header.
                 var etagPrefix = etagConfig.IsWeak ? @"W/" : string.Empty;
-                resource.Meta.Version = $"{etagPrefix}\"{VersionProvider.GenerateVersion(resource)}\""; 
+                resource.Meta.Version = string.Format("{0}\"{1}\"", etagPrefix, VersionProvider.GenerateVersion(resource)); 
             }
 
             return resource;

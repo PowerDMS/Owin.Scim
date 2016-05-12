@@ -9,10 +9,11 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Owin.Scim</RootNamespace>
     <AssemblyName>Owin.Scim</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <NuGetPackageImportStamp>
     </NuGetPackageImportStamp>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -23,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\Owin.Scim.xml</DocumentationFile>
+    <LangVersion>5</LangVersion>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -32,6 +34,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\Owin.Scim.xml</DocumentationFile>
+    <LangVersion>5</LangVersion>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Antlr4.Runtime.net45, Version=4.3.0.0, Culture=neutral, PublicKeyToken=eb42632606e9261f, processorArchitecture=MSIL">
@@ -51,11 +54,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NContext.4.0.0-alpha10\lib\net452\NContext.dll</HintPath>
+      <HintPath>..\packages\NContext.4.0.0-alpha11\lib\net451\NContext.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NContext.Common.4.0.0-alpha10\lib\portable-net45+win8+wpa81\NContext.Common.dll</HintPath>
+      <HintPath>..\packages\NContext.Common.4.0.0-alpha11\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -107,10 +110,22 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AsyncLazy.cs" />
+    <Compile Include="Canonicalization\AttributeCanonicalizationRule.cs" />
+    <Compile Include="Canonicalization\CanonicalizationRule.cs" />
+    <Compile Include="Canonicalization\StatefulCanonicalizationRule.cs" />
     <Compile Include="Configuration\ScimTypeAttributeDefinitions.cs" />
+    <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
+    <Compile Include="DryIoc\Container.cs" />
+    <Compile Include="DryIoc\FactoryCompiler.cs" />
+    <Compile Include="DryIoc\ImTools.cs" />
+    <Compile Include="DryIoc\Owin\DryIocOwin.cs" />
+    <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
+    <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />
     <Compile Include="Extensions\IReadableStringCollectionExtensions.cs" />
     <Compile Include="Extensions\PathFilterExpressionExtensions.cs" />
+    <Compile Include="Extensions\UriExtensions.cs" />
     <Compile Include="Model\SchemaBase.cs" />
+    <Compile Include="Model\ScimResourceReference.cs" />
     <Compile Include="Model\SortOrder.cs" />
     <Compile Include="Querying\ScimListResponse.cs" />
     <Compile Include="Querying\ScimQueryOptionsParameterBinding.cs" />
@@ -134,7 +149,7 @@
     <Compile Include="Configuration\ModelBindingResponseAttribute.cs" />
     <Compile Include="Configuration\Mutability.cs" />
     <Compile Include="Configuration\Returned.cs" />
-    <Compile Include="Canonicalization\CanonicalizationRule.cs" />
+    <Compile Include="Canonicalization\StatefulAttributeCanonicalizationRule.cs" />
     <Compile Include="Configuration\ResourceParameterBinding.cs" />
     <Compile Include="Configuration\SchemaBindingRule.cs" />
     <Compile Include="Configuration\ScimApplicationManager.cs" />
@@ -151,20 +166,13 @@
     <Compile Include="Configuration\ScimTypeScalarAttributeDefinitionBuilder.cs" />
     <Compile Include="Configuration\ScimTypeUriAttributeDefinitionBuilder.cs" />
     <Compile Include="Configuration\Uniqueness.cs" />
-    <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
-    <Compile Include="DryIoc\Container.cs" />
-    <Compile Include="DryIoc\FactoryCompiler.cs" />
-    <Compile Include="DryIoc\ImTools.cs" />
-    <Compile Include="DryIoc\Owin\DryIocOwin.cs" />
-    <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
-    <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />
     <Compile Include="Endpoints\ResourceTypesController.cs" />
     <Compile Include="Endpoints\SchemasController.cs" />
     <Compile Include="Endpoints\ServiceProviderConfigurationController.cs" />
     <Compile Include="Endpoints\ScimControllerBase.cs" />
     <Compile Include="Endpoints\GroupsController.cs" />
     <Compile Include="Endpoints\UsersController.cs" />
-    <Compile Include="ErrorHandling\ErrorDetail.cs" />
+    <Compile Include="ErrorHandling\ScimErrorDetail.cs" />
     <Compile Include="ErrorHandling\ScimErrorExtensions.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
     <Compile Include="Extensions\DelegateExtensions.cs" />
@@ -228,7 +236,7 @@
     <Compile Include="Serialization\PropertyNameTable.cs" />
     <Compile Include="Serialization\ResolverContractKey.cs" />
     <Compile Include="Serialization\ScimContractResolver.cs" />
-    <Compile Include="Services\AmbientRequestMessageService.cs" />
+    <Compile Include="Services\AmbientRequestService.cs" />
     <Compile Include="Services\ICanonicalizationService.cs" />
     <Compile Include="Services\IResourceTypeService.cs" />
     <Compile Include="Services\ISchemaService.cs" />

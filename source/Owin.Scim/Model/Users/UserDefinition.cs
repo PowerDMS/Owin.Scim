@@ -41,7 +41,8 @@
                 .AddCanonicalizationRule(locale => !string.IsNullOrWhiteSpace(locale) ? locale.Replace('_', '-') : locale);
 
             For(u => u.ProfileUrl)
-                .SetReferenceTypes(ScimConstants.ReferenceTypes.External);
+                .SetReferenceTypes(ScimConstants.ReferenceTypes.External)
+                .AddCanonicalizationRule((uri, definition) => Canonicalization.EnforceScimUri(uri, definition, ServerConfiguration));
 
             For(u => u.Password)
                 .SetMutability(Mutability.WriteOnly)

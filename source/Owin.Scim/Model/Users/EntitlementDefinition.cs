@@ -7,18 +7,21 @@ namespace Owin.Scim.Model.Users
         public EntitlementDefinition( ScimServerConfiguration serverConfiguration)
             : base(serverConfiguration)
         {
-            For(mva => mva.Display)
+            For(entitlement => entitlement.Display)
                 .SetDescription("A human-readable name, primarily used for display purposes.")
                 .SetMutability(Mutability.ReadOnly);
 
-            For(mva => mva.Type)
+            For(entitlement => entitlement.Type)
                 .SetDescription("A label indicating the attribute's function, e.g., 'work' or 'home'.");
 
-            For(mva => mva.Primary)
+            For(entitlement => entitlement.Primary)
                 .SetDescription(@"A boolean value indicating the 'primary' or preferred attribute value for this attribute.");
 
-            For(e => e.Value)
+            For(entitlement => entitlement.Value)
                 .SetDescription("The value of an entitlement.");
+
+            For(entitlement => entitlement.Ref)
+                .AddCanonicalizationRule((uri, definition) => Canonicalization.Canonicalization.EnforceScimUri(uri, definition, ServerConfiguration));
         }
     }
 }

@@ -17,15 +17,21 @@
         /// <value>
         /// The is left.
         /// </value>
-        public override bool IsLeft => true;
+        public override bool IsLeft
+        {
+            get { return true; }
+        }
 
         /// <summary>
-        /// Gets the error. 
+        /// Gets the error.
         /// </summary>
         /// <value>
         /// The error.
         /// </value>
-        public ScimError Error => _Error;
+        public ScimError Error
+        {
+            get { return _Error; }
+        }
 
         /// <summary>
         /// Gets the left value. 

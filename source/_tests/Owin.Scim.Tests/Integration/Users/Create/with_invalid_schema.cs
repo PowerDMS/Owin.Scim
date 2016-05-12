@@ -39,9 +39,9 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_bad_request = () => StatusCode.ShouldEqual(HttpStatusCode.BadRequest);
 
-        It should_return_invalid_value = () => Error?.ScimType.ShouldEqual(ScimErrorType.InvalidValue);
+        It should_return_invalid_value = () => Error.ScimType.ShouldEqual(ScimErrorType.InvalidValue);
 
-        It should_return_error_schema = () => Error?.Schemas.ShouldContain(ScimConstants.Messages.Error);
+        It should_return_error_schema = () => Error.Schemas.ShouldContain(ScimConstants.Messages.Error);
 
         protected static UserWithSchema UserDto;
 

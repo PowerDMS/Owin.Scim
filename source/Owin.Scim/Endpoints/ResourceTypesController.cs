@@ -25,7 +25,7 @@
         public async Task<HttpResponseMessage> Get(string name = null)
         {
             // TODO: (DG) uncomment when filters are supported.
-//            if (AmbientRequestMessageService.QueryOptions.Filter != null)
+//            if (AmbientRequestService.QueryOptions.Filter != null)
 //                return Task.FromResult(Request.CreateResponse(
 //                    HttpStatusCode.Forbidden,
 //                    new ScimError(HttpStatusCode.Forbidden)));

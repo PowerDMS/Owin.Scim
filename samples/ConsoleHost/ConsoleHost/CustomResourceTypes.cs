@@ -17,6 +17,11 @@
 
     public class Tenant : Resource
     {
+        public Tenant()
+        {
+            Meta = new ResourceMetadata("Tenant");
+        }
+
         public override string SchemaIdentifier
         {
             get { return "urn:custom:schemas:Tenant"; }
@@ -58,7 +63,10 @@
 
     public class TenantValidator : ResourceValidatorBase<Tenant>
     {
-        public TenantValidator(ResourceExtensionValidators extensionValidators) : base(extensionValidators)
+        public TenantValidator(
+            ScimServerConfiguration serverConfiguration,
+            ResourceExtensionValidators extensionValidators) 
+            : base(serverConfiguration, extensionValidators)
         {
         }
 
@@ -70,7 +78,7 @@
                     new ScimError(
                         HttpStatusCode.BadRequest,
                         ScimErrorType.InvalidValue,
-                        ErrorDetail.AttributeRequired("name")));
+                        ScimErrorDetail.AttributeRequired("name")));
         }
 
         protected override void ConfigureCreateRuleSet()
@@ -87,7 +95,7 @@
         public TenantDefinition(ScimServerConfiguration serverConfiguration) 
             : base(
                   serverConfiguration, 
-                  "Tenants", 
+                  "Tenant", 
                   "urn:custom:schemas:Tenant", 
                   "tenants", 
                   typeof(TenantValidator), 

@@ -57,7 +57,7 @@
             {
                 throw new ScimError(System.Net.HttpStatusCode.BadRequest,
                     ScimErrorType.InvalidValue,
-                    ErrorDetail.AttributeRequired(ScimConstants.Schemas.Key))
+                    ScimErrorDetail.AttributeRequired(ScimConstants.Schemas.Key))
                     .ToResponseException();
             }
 
@@ -100,7 +100,7 @@
                 actionContext.Request.Method == _Patch ||
                 actionContext.Request.Method == HttpMethod.Put)
             {
-                var queryOptions = AmbientRequestMessageService.QueryOptions;
+                var queryOptions = AmbientRequestService.QueryOptions;
                 if (!queryOptions.Attributes.Any())
                 {
                     // TODO: (DG) if no attributes have been specified, fill the attributes artificially with jsonData keys for attributes defined as Returned.Request

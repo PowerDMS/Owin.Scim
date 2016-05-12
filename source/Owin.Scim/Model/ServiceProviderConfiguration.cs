@@ -27,15 +27,16 @@
              * "/Groups" will set "resourceType" to "Group".
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.ServiceProviderConfig);
-
-            Id = "blahblahblah";
+            
             Bulk = featureBulk ?? ScimFeatureBulk.CreateUnsupported();
             Filter = featureFilter ?? ScimFeatureFilter.CreateUnsupported();
             Patch = featurePatch;
             ChangePassword = featureChangePassword;
             Sort = featureSort;
             ETag = featureETag;
-            AuthenticationSchemes = authenticationSchemes?.ToList() ?? new List<AuthenticationScheme>();
+            AuthenticationSchemes = authenticationSchemes == null 
+                ? new List<AuthenticationScheme>() 
+                : authenticationSchemes.ToList();
         }
 
         [JsonConstructor]

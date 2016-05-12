@@ -14,7 +14,7 @@
     {
         public ScimListResponse(IEnumerable<Resource> resources)
         {
-            Resources = resources?.ToList() ?? new List<Resource>();
+            Resources = resources == null ? new List<Resource>() : resources.ToList();
         }
 
         [JsonConstructor]
@@ -28,7 +28,7 @@
         [JsonProperty("totalResults", Order = 0)]
         public int TotalResults
         {
-            get { return Resources?.Count() ?? 0; }
+            get { return Resources == null ? 0 : Resources.Count(); }
         }
         
         [JsonProperty("Resources", Order = 1)]

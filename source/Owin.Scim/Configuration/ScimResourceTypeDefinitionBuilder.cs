@@ -28,18 +28,34 @@ namespace Owin.Scim.Configuration
             Predicate<ISet<string>> schemaBindingRule)
             : base(serverConfiguration, schema)
         {
+            if (string.IsNullOrWhiteSpace(name))
+                throw new ArgumentNullException("name");
+
+            if (string.IsNullOrWhiteSpace(schema))
+                throw new ArgumentNullException("schema");
+
+            if (string.IsNullOrWhiteSpace(endpoint))
+                throw new ArgumentNullException("endpoint");
+
+            if (validatorType == null)
+                throw new ArgumentNullException("validatorType");
+
+            if (schemaBindingRule == null)
+                throw new ArgumentNullException("schemaBindingRule");
+
+            if (!schema.StartsWith(ScimConstants.Defaults.URNPrefix, StringComparison.OrdinalIgnoreCase))
+                throw new Exception("Resource types define a schema identifier which starts with \"" + ScimConstants.Defaults.URNPrefix + "\" as per RFC2141.");
+
             _SchemaExtensions = new Dictionary<string, ScimResourceTypeExtension>();
 
-            SetName(name);
-
-            if (endpoint != null && !endpoint.StartsWith("/"))
-            {
+            if (!endpoint.StartsWith("/"))
                 endpoint = endpoint.Insert(0, "/");
-            }
 
             _Endpoint = endpoint;
             _ValidatorType = validatorType;
             _SchemaBindingRule = schemaBindingRule;
+
+            SetName(name);
         }
         
         public string Endpoint

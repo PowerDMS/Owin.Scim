@@ -19,7 +19,8 @@
                 int hash = 19;
                 foreach (var mva in multiValuedAttributes)
                 {
-                    hash = hash * 31 + (mva?.CalculateVersion() ?? 0);
+                    if (mva != null)
+                        hash = hash * 31 + mva.CalculateVersion();
                 }
 
                 return hash;

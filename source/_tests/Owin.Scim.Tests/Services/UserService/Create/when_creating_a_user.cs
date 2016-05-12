@@ -48,7 +48,7 @@
                 ServerConfiguration,
                 etagProvider,
                 canonicalizationService,
-                new UserValidatorFactory(UserRepository, PasswordManager), 
+                new UserValidatorFactory(ServerConfiguration, UserRepository, PasswordManager), 
                 UserRepository,
                 PasswordManager);
         };

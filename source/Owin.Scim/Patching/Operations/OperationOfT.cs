@@ -18,7 +18,7 @@ namespace Owin.Scim.Patching.Operations
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
             this.Value = value;
@@ -29,7 +29,7 @@ namespace Owin.Scim.Patching.Operations
         {
             if (path == null)
             {
-                throw new ArgumentNullException(nameof(path));
+                throw new ArgumentNullException("path");
             }
 
         }
@@ -38,12 +38,12 @@ namespace Owin.Scim.Patching.Operations
         {
             if (objectToApplyTo == null)
             {
-                throw new ArgumentNullException(nameof(objectToApplyTo));
+                throw new ArgumentNullException("objectToApplyTo");
             }
 
             if (adapter == null)
             {
-                throw new ArgumentNullException(nameof(adapter));
+                throw new ArgumentNullException("adapter");
             }
 
             switch (OperationType)

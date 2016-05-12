@@ -40,8 +40,9 @@
                 Description,
                 Endpoint,
                 Schema,
-                SchemaExtensions =
-                    SchemaExtensions?.Aggregate(
+                SchemaExtensions = SchemaExtensions == null
+                    ? 0
+                    : SchemaExtensions.Aggregate(
                         0,
                         (hashSeed, se) =>
                         {

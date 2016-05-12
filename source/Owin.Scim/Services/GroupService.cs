@@ -73,7 +73,7 @@
                 return new ScimErrorResponse<Group>(
                     new ScimError(
                         HttpStatusCode.NotFound,
-                        detail: ErrorDetail.NotFound(groupId)));
+                        detail: ScimErrorDetail.NotFound(groupId)));
 
             return new ScimDataResponse<Group>(userRecord);
         }
@@ -86,7 +86,7 @@
                 return new ScimErrorResponse<Group>(
                     new ScimError(
                         HttpStatusCode.NotFound,
-                        detail: ErrorDetail.NotFound(@group.Id)));
+                        detail: ScimErrorDetail.NotFound(@group.Id)));
             }
 
             @group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group)
@@ -123,7 +123,7 @@
                 return new ScimErrorResponse<Unit>(
                     new ScimError(
                         HttpStatusCode.NotFound,
-                        detail: ErrorDetail.NotFound(groupId)));
+                        detail: ScimErrorDetail.NotFound(groupId)));
 
             return new ScimDataResponse<Unit>(default(Unit));
         }

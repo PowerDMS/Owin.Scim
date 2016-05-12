@@ -97,7 +97,8 @@
         [Route("{groupId}", Name = "UpdateGroup")]
         public async Task<HttpResponseMessage> Patch(string groupId, PatchRequest<Group> patchRequest)
         {
-            if (patchRequest?.Operations == null ||
+            if (patchRequest == null ||
+                patchRequest.Operations == null ||
                 patchRequest.Operations.Operations.Any(a => a.OperationType == Patching.Operations.OperationType.Invalid))
             {
                 return new ScimErrorResponse<Group>(

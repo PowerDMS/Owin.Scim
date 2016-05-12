@@ -2,10 +2,11 @@ namespace Owin.Scim.Validation.Users
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Globalization;
     using System.Linq;
     using System.Net;
+
+    using Configuration;
 
     using ErrorHandling;
 
@@ -27,10 +28,11 @@ namespace Owin.Scim.Validation.Users
         private readonly IManagePasswords _PasswordManager;
         
         public UserValidator(
+            ScimServerConfiguration serverConfiguration,
             ResourceExtensionValidators extensionValidators,
             IUserRepository userRepository,
             IManagePasswords passwordManager)
-            : base(extensionValidators)
+            : base(serverConfiguration, extensionValidators)
         {
             _UserRepository = userRepository;
             _PasswordManager = passwordManager;
@@ -44,7 +46,7 @@ namespace Owin.Scim.Validation.Users
                            new ScimError(
                                HttpStatusCode.BadRequest,
                                ScimErrorType.InvalidValue,
-                               ErrorDetail.AttributeRequired("userName")));
+                               ScimErrorDetail.AttributeRequired("userName")));
 
             When(user => !string.IsNullOrWhiteSpace(user.PreferredLanguage),
                 () =>
@@ -107,7 +109,7 @@ namespace Owin.Scim.Validation.Users
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
-                                                    ErrorDetail.AttributeRequired("email.value")))
+                                                    ScimErrorDetail.AttributeRequired("email.value")))
                                             .EmailAddress()
                                             .WithState(u =>
                                                 new ScimError(
@@ -132,7 +134,7 @@ namespace Owin.Scim.Validation.Users
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
-                                                    ErrorDetail.AttributeRequired("im.value")))
+                                                    ScimErrorDetail.AttributeRequired("im.value")))
                                     }
                             });
                 });
@@ -153,7 +155,7 @@ namespace Owin.Scim.Validation.Users
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
-                                                    ErrorDetail.AttributeRequired("phoneNumber.value")))
+                                                    ScimErrorDetail.AttributeRequired("phoneNumber.value")))
                                             .Must(PhoneNumbers.PhoneNumberUtil.IsViablePhoneNumber)
                                             .WithState(u =>
                                                 new ScimError(
@@ -178,13 +180,13 @@ namespace Owin.Scim.Validation.Users
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
-                                                    ErrorDetail.AttributeRequired("photo.value")))
-                                            .Must(uri => uri.IsAbsoluteUri) // TODO: (DG) validation incorrect
+                                                    ScimErrorDetail.AttributeRequired("photo.value")))
+                                            .Must(uri => uri.IsAbsoluteUri)
                                             .WithState(u =>
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
-                                                    "The attribute 'photo.value' must be a valid URI."))
+                                                    "The attribute 'photo.value' must be a valid absolute URI."))
                                     }
                             });
                 });
@@ -235,7 +237,7 @@ namespace Owin.Scim.Validation.Users
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
-                                                    ErrorDetail.AttributeRequired("entitlement.value")))
+                                                    ScimErrorDetail.AttributeRequired("entitlement.value")))
                                     }
                             });
                 });
@@ -254,7 +256,7 @@ namespace Owin.Scim.Validation.Users
                                                 new ScimError(
                                                     HttpStatusCode.BadRequest,
                                                     ScimErrorType.InvalidValue,
-                                                    ErrorDetail.AttributeRequired("role.value")))
+                                                    ScimErrorDetail.AttributeRequired("role.value")))
                                     }
                             });
                 });
@@ -271,7 +273,7 @@ namespace Owin.Scim.Validation.Users
                             new ScimError(
                                 HttpStatusCode.Conflict,
                                 ScimErrorType.Uniqueness,
-                                ErrorDetail.AttributeUnique("userName")));
+                                ScimErrorDetail.AttributeUnique("userName")));
                 });
 
             When(user => user.Password != null,
@@ -295,7 +297,7 @@ namespace Owin.Scim.Validation.Users
                     new ScimError(
                         HttpStatusCode.BadRequest,
                         ScimErrorType.Mutability,
-                        ErrorDetail.AttributeImmutable("id")));
+                        ScimErrorDetail.AttributeImmutable("id")));
 
             // Updating a username validation
             When(user =>
@@ -309,7 +311,7 @@ namespace Owin.Scim.Validation.Users
                             new ScimError(
                                 HttpStatusCode.Conflict,
                                 ScimErrorType.Uniqueness,
-                                ErrorDetail.AttributeUnique("userName")));
+                                ScimErrorDetail.AttributeUnique("userName")));
                 });
 
             // Updating a user password

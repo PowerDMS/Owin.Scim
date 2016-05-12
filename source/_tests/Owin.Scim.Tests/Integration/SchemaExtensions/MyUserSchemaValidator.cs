@@ -30,6 +30,9 @@
         {
         }
 
-        public override string ExtensionSchema => MyUserSchema.Schema;
+        public override string ExtensionSchema
+        {
+            get { return MyUserSchema.Schema; }
+        }
     }
 }

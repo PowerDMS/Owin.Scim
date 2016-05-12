@@ -83,7 +83,7 @@
                 return new ScimErrorResponse<User>(
                     new ScimError(
                         HttpStatusCode.NotFound,
-                        detail: ErrorDetail.NotFound(userId)));
+                        detail: ScimErrorDetail.NotFound(userId)));
 
             SetResourceVersion(userRecord);
 
@@ -98,7 +98,7 @@
                 return new ScimErrorResponse<User>(
                     new ScimError(
                         HttpStatusCode.NotFound,
-                        detail: ErrorDetail.NotFound(user.Id)));
+                        detail: ScimErrorDetail.NotFound(user.Id)));
             }
 
             user.Groups = userRecord.Groups; // user.Groups is readOnly and used here only for resource versioning
@@ -153,7 +153,7 @@
                 return new ScimErrorResponse<Unit>(
                     new ScimError(
                         HttpStatusCode.NotFound,
-                        detail: ErrorDetail.NotFound(userId)));
+                        detail: ScimErrorDetail.NotFound(userId)));
 
             return new ScimDataResponse<Unit>(default(Unit));
         }

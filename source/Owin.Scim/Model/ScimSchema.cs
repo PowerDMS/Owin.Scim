@@ -23,7 +23,7 @@
             Id = schemaId;
             Name = name;
             Description = description;
-            Attributes = attributes?.ToList();
+            Attributes = attributes == null ? null : attributes.ToList();
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Schema);
         }
 

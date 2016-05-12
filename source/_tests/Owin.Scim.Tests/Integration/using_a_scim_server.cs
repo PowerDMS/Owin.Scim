@@ -36,7 +36,6 @@
                         {
                             ClientJsonFormatter = new ScimClientJsonMediaTypeFormatter(configuration);
                             configuration.RequireSsl = false;
-                            configuration.PublicOrigin = new Uri("https://helloworld.org/scim/v2");
 
                             configuration
                                 .AddAuthenticationScheme(

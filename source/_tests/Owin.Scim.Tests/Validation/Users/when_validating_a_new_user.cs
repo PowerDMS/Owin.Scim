@@ -1,5 +1,7 @@
 ﻿namespace Owin.Scim.Tests.Validation.Users
 {
+    using Configuration;
+
     using FakeItEasy;
 
     using FluentValidation;
@@ -18,10 +20,11 @@
     {
         Establish context = () =>
         {
+            ServerConfiguration = A.Fake<ScimServerConfiguration>();
             UserRepository = A.Fake<IUserRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
 
-            _ValidatorFactory = new UserValidatorFactory(UserRepository, PasswordManager);
+            _ValidatorFactory = new UserValidatorFactory(ServerConfiguration, UserRepository, PasswordManager);
 
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(true);
@@ -32,6 +35,8 @@
             _Validator = await _ValidatorFactory.CreateValidator(User);
             Result = (await _Validator.ValidateCreateAsync(User).AwaitResponse().AsTask).ToScimValidationResult();
         };
+
+        protected static ScimServerConfiguration ServerConfiguration;
 
         protected static IUserRepository UserRepository;
 

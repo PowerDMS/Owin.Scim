@@ -9,9 +9,10 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>ConsoleHost</RootNamespace>
     <AssemblyName>ConsoleHost</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.5.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -58,11 +59,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\source\packages\NContext.4.0.0-alpha10\lib\net452\NContext.dll</HintPath>
+      <HintPath>..\..\..\source\packages\NContext.4.0.0-alpha11\lib\net451\NContext.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\source\packages\NContext.Common.4.0.0-alpha10\lib\portable-net45+win8+wpa81\NContext.Common.dll</HintPath>
+      <HintPath>..\..\..\source\packages\NContext.Common.4.0.0-alpha11\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">

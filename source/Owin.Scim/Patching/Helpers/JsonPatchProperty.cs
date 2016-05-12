@@ -18,14 +18,10 @@ namespace Owin.Scim.Patching.Helpers
         public JsonPatchProperty(JsonProperty property, object parent)
         {
             if (property == null)
-            {
-                throw new ArgumentNullException(nameof(property));
-            }
+                throw new ArgumentNullException("property");
 
             if (parent == null)
-            {
-                throw new ArgumentNullException(nameof(parent));
-            }
+                throw new ArgumentNullException("parent");
 
             Property = property;
             Parent = parent;

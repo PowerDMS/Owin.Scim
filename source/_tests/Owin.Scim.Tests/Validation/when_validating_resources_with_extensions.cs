@@ -2,6 +2,8 @@
 {
     using System.Threading;
 
+    using Configuration;
+
     using FakeItEasy;
 
     using FluentValidation;
@@ -21,6 +23,7 @@
     {
         Establish context = async () =>
         {
+            var serverConfiguration = A.Fake<ScimServerConfiguration>();
             var userRepository = A.Fake<IUserRepository>();
             var passwordManager = A.Fake<IManagePasswords>();
             var validatorFactory = A.Fake<IResourceValidatorFactory>();
@@ -30,6 +33,7 @@
             A.CallTo(() => validatorFactory.CreateValidator(A<User>._))
                 .Returns(
                     new UserValidator(
+                        serverConfiguration,
                         new ResourceExtensionValidators(
                             new []
                             {

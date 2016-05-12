@@ -31,7 +31,7 @@ namespace Owin.Scim.Model.Users
                 Organization,
                 Division,
                 Department,
-                Manager?.Value
+                Manager = Manager == null ? null : Manager.Value
             }.GetHashCode();
         }
     }

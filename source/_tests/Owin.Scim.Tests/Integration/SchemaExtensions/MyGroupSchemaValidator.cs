@@ -18,6 +18,9 @@
         {
         }
 
-        public override string ExtensionSchema => MyGroupSchema.Schema;
+        public override string ExtensionSchema
+        {
+            get { return MyGroupSchema.Schema; }
+        }
     }
 }
