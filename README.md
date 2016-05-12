@@ -58,8 +58,9 @@ The list below doesn't necessarily denote priority or order.
   4. [x] Custom resource types and endpoints
 09. [ ] Add endpoint authorization support
 10. [ ] Add endpoint for supporting query-on-root
-11. [ ] Add logging functionality
-12. [ ] Outbound Provisioning
+11. [ ] Add support for SCIM v1
+12. [ ] Add logging functionality
+13. [ ] Outbound Provisioning
   1. [ ] Event Triggers / Handlers
   2. [ ] Client Subscription Management
 
