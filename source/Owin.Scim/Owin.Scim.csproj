@@ -113,6 +113,7 @@
     <Compile Include="Canonicalization\AttributeCanonicalizationRule.cs" />
     <Compile Include="Canonicalization\CanonicalizationRule.cs" />
     <Compile Include="Canonicalization\StatefulCanonicalizationRule.cs" />
+    <Compile Include="Configuration\PassthroughExceptionHandler.cs" />
     <Compile Include="Configuration\ScimTypeAttributeDefinitions.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />
@@ -121,9 +122,11 @@
     <Compile Include="DryIoc\Owin\DryIocOwin.cs" />
     <Compile Include="DryIoc\WebApi\DryIocWebApi.cs" />
     <Compile Include="DryIoc\WebApi\Owin\DryIocWebApiOwin.cs" />
+    <Compile Include="ErrorHandling\ScimException.cs" />
     <Compile Include="Extensions\IReadableStringCollectionExtensions.cs" />
     <Compile Include="Extensions\PathFilterExpressionExtensions.cs" />
     <Compile Include="Extensions\UriExtensions.cs" />
+    <Compile Include="Middleware\ExceptionHandlerMiddleware.cs" />
     <Compile Include="Model\SchemaBase.cs" />
     <Compile Include="Model\ScimResourceReference.cs" />
     <Compile Include="Model\SortOrder.cs" />
@@ -173,7 +176,6 @@
     <Compile Include="Endpoints\GroupsController.cs" />
     <Compile Include="Endpoints\UsersController.cs" />
     <Compile Include="ErrorHandling\ScimErrorDetail.cs" />
-    <Compile Include="ErrorHandling\ScimErrorExtensions.cs" />
     <Compile Include="Extensions\AppBuilderExtensions.cs" />
     <Compile Include="Extensions\DelegateExtensions.cs" />
     <Compile Include="Extensions\IEnumerableExtensions.cs" />

@@ -7,6 +7,7 @@
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Controllers;
+    using System.Web.Http.ExceptionHandling;
     using System.Web.Http.Dispatcher;
 
     using DryIoc;
@@ -60,6 +61,9 @@
         public void Configure(ApplicationConfigurationBase applicationConfiguration)
         {
             if (IsConfigured) return;
+
+            // my catch all exception handler
+            _AppBuilder.Use<ExceptionHandlerMiddleware>();
 
             var serverConfiguration = new ScimServerConfiguration();
             applicationConfiguration.CompositionContainer.ComposeExportedValue(serverConfiguration);
@@ -190,6 +194,7 @@
                 new DefaultHttpControllerTypeResolver(IsControllerType));
 
             httpConfiguration.Filters.Add(new ModelBindingResponseAttribute());
+            httpConfiguration.Services.Replace(typeof(IExceptionHandler), new PassthroughExceptionHandler());
         }
 
         private static bool IsControllerType(Type t)

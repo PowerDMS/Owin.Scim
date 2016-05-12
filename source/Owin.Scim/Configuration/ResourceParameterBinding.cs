@@ -55,10 +55,9 @@
             var schemasKey = jsonData.FindKeyCaseInsensitive(ScimConstants.Schemas.Key);
             if (schemasKey == null)
             {
-                throw new ScimError(System.Net.HttpStatusCode.BadRequest,
-                    ScimErrorType.InvalidValue,
-                    ScimErrorDetail.AttributeRequired(ScimConstants.Schemas.Key))
-                    .ToResponseException();
+                throw new ScimException(HttpStatusCode.BadRequest,
+                    ScimErrorDetail.AttributeRequired(ScimConstants.Schemas.Key),
+                    ScimErrorType.InvalidValue);
             }
 
             var schemasValue = jsonData[schemasKey];
