@@ -55,16 +55,19 @@
             var schemasKey = jsonData.FindKeyCaseInsensitive(ScimConstants.Schemas.Key);
             if (schemasKey == null)
             {
-                throw new ScimError(System.Net.HttpStatusCode.BadRequest,
-                    ScimErrorType.InvalidValue,
-                    ScimErrorDetail.AttributeRequired(ScimConstants.Schemas.Key))
-                    .ToResponseException();
+                throw new ScimException(HttpStatusCode.BadRequest,
+                    ScimErrorDetail.AttributeRequired(ScimConstants.Schemas.Key),
+                    ScimErrorType.InvalidValue);
             }
 
             var schemasValue = jsonData[schemasKey];
-            if (schemasValue == null)
-                throw new Exception(""); // TODO: (DG) no schemas specified
-            
+            if (schemasValue == null || !schemasValue.HasValues)
+            {
+                throw new ScimException(HttpStatusCode.BadRequest,
+                    ScimErrorDetail.AttributeRequired(ScimConstants.Schemas.Key),
+                    ScimErrorType.InvalidValue);
+            }
+
             var schemaType = _SchemaTypeFactory.GetSchemaType(((JArray)schemasValue).ToObject<ISet<string>>());
             if (!Descriptor.ParameterType.IsAssignableFrom(schemaType))
                 throw new Exception(""); // TODO: (DG) binding rules resolved to a type which is not assignable to the action parameter's type

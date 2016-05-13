@@ -193,6 +193,7 @@
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
     <Compile Include="Integration\Users\Create\with_a_fully_populated_simple_attributes_user.cs" />
     <Compile Include="Integration\Users\Create\with_fully_populated_enterprise_user.cs" />
+    <Compile Include="Integration\Users\Create\with_null_schema.cs" />
     <Compile Include="Integration\Users\Create\with_invalid_schema.cs" />
     <Compile Include="Integration\Users\Create\with_content_type_json.cs" />
     <Compile Include="Integration\Users\Create\with_missing_enterprise_schema.cs" />

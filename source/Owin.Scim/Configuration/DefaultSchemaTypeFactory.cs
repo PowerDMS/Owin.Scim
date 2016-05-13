@@ -23,10 +23,9 @@
                     return schemaBindingRule.Target;
             }
 
-            throw new ScimError(System.Net.HttpStatusCode.BadRequest,
-                ScimErrorType.InvalidValue,
-                "Unsupported schema!")
-                .ToResponseException();
+            throw new ScimException(System.Net.HttpStatusCode.BadRequest, 
+                "Unsupported schema!",
+                ScimErrorType.InvalidValue);
         }
     }
 }
