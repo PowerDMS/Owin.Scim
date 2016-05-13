@@ -4,7 +4,8 @@
     using System.Net;
 
     using Newtonsoft.Json;
-    using Newtonsoft.Json.Converters;
+
+    using Serialization;
 
     public class ScimError
     {
@@ -28,11 +29,14 @@
             set { _Schemas = value; }
         }
 
-        [JsonProperty(ItemConverterType = typeof(StringEnumConverter))]
+        [JsonProperty("status")]
+        [JsonConverter(typeof(IntAsStringEnumConverter))]
         public HttpStatusCode Status { get; private set; }
 
+        [JsonProperty("scimType")]
         public ScimErrorType ScimType { get; set; }
 
+        [JsonProperty("detail")]
         public string Detail { get; set; }
     }
 }

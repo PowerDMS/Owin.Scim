@@ -1,9 +1,7 @@
 ﻿namespace Owin.Scim.Configuration
 {
     using System;
-    using System.Collections.Generic;
     using System.ComponentModel.Composition;
-    using System.Linq;
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -26,6 +24,8 @@
     using Newtonsoft.Json.Converters;
 
     using Querying;
+
+    using Security;
 
     using Serialization;
 
@@ -93,13 +93,16 @@
                 serverConfiguration.TypeDefinitionRegistry[typeDefinitionTarget] = typeDefinition;
             }
 
+            // instantiate an instance of each type definition and add it to configuration
+            // type definitions MAY instantiate new type definitions themselves during attribute definition composition
             var enumerator = serverConfiguration.TypeDefinitionRegistry.Values.GetEnumerator();
             while (enumerator.MoveNext())
             {
                 // creating type definitions may be expensive due to reflection
                 // when a type definition is instantiated, it may implicitly instantiate/register other type 
                 // definitions for complex attributes, therefore, no need to re-create the same definition more than once
-                if (serverConfiguration.ContainsTypeDefinition(enumerator.Current)) continue;
+                if (serverConfiguration.ContainsTypeDefinition(enumerator.Current))
+                    continue;
 
                 var typeDefinition = (IScimTypeDefinition)enumerator.Current.CreateInstance(serverConfiguration);
                 serverConfiguration.AddTypeDefiniton(typeDefinition);
@@ -159,6 +162,8 @@
             settings.Converters.Add(new StringEnumConverter());
             settings.Converters.Add(new ScimQueryOptionsConverter(serverConfiguration));
             settings.Converters.Add(new ResourceJsonConverter(serverConfiguration, JsonSerializer.Create(settings)));
+
+            httpConfiguration.Filters.Add(new ScimAuthorizationAttribute(serverConfiguration));
 
             httpConfiguration.ParameterBindingRules.Insert(
                 0,

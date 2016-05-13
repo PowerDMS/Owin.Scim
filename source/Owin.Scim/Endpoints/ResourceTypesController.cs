@@ -10,6 +10,7 @@
     
     using Services;
 
+    [AllowAnonymous]
     [RoutePrefix(ScimConstants.Endpoints.ResourceTypes)]
     public class ResourceTypesController : ScimControllerBase
     {

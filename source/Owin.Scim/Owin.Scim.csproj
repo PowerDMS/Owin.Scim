@@ -129,6 +129,8 @@
     <Compile Include="Model\SortOrder.cs" />
     <Compile Include="Querying\ScimListResponse.cs" />
     <Compile Include="Querying\ScimQueryOptionsParameterBinding.cs" />
+    <Compile Include="Security\ScimAuthorizationAttribute.cs" />
+    <Compile Include="Serialization\IntAsStringEnumConverter.cs" />
     <Compile Include="Serialization\ResourceJsonConverter.cs" />
     <Compile Include="Serialization\ScimQueryOptionsConverter.cs" />
     <Compile Include="Services\DefaultCanonicalizationService.cs" />

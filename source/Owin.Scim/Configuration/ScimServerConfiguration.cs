@@ -13,8 +13,7 @@
 
     public class ScimServerConfiguration
     {
-        private readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache =
-            new ConcurrentDictionary<Type, IScimTypeDefinition>();
+        private readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache;
 
         private readonly IDictionary<Type, Type> _TypeDefinitionRegistry;
 
@@ -28,6 +27,8 @@
 
         public ScimServerConfiguration()
         {
+            _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
+            _TypeDefinitionCache = new ConcurrentDictionary<Type, IScimTypeDefinition>();
             _TypeDefinitionRegistry = new Dictionary<Type, Type>();
             _ResourceExtensionSchemas = new Lazy<ISet<string>>(
                 () =>
@@ -35,10 +36,12 @@
                         .Where(td => td.Value is IScimResourceTypeDefinition)
                         .SelectMany(rtd => ((IScimResourceTypeDefinition) rtd.Value).SchemaExtensions)
                         .Select(e => e.Schema)));
-            _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
-            _SchemaBindingRules = new Lazy<IList<SchemaBindingRule>>(() => ResourceTypeDefinitions.Select(rtd => new SchemaBindingRule(rtd.SchemaBindingRule, rtd.DefinitionType)).ToList());
+            _SchemaBindingRules = new Lazy<IList<SchemaBindingRule>>(
+                () => 
+                ResourceTypeDefinitions.Select(rtd => new SchemaBindingRule(rtd.SchemaBindingRule, rtd.DefinitionType)).ToList());
             _Features = CreateDefaultFeatures();
 
+            EnableEndpointAuthorization = true;
             RequireSsl = true;
         }
 
@@ -56,6 +59,8 @@
 
             return config;
         }
+
+        public bool EnableEndpointAuthorization { get; set; }
 
         public bool RequireSsl { get; set; }
 

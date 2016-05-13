@@ -14,7 +14,7 @@
     <dependencies>
       <group targetFramework="net451">
         <dependency id="Antlr4.Runtime" version="[4.3.0,)" />
-        <dependency id="NContext" version="[4.0.0-alpha10,5.0.0)" />
+        <dependency id="NContext" version="[4.0.0-alpha11,5.0.0)" />
         <dependency id="Newtonsoft.Json" version="[8.0.0,)" />
         <dependency id="Owin" version="[1.0.0,)" />
         <dependency id="Microsoft.Owin" version="[3.0.1,)" />

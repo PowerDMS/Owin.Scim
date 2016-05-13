@@ -1,51 +1,43 @@
-﻿/*
- * Copyright 2014, 2015 Dominick Baier, Brock Allen
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
-
-namespace Owin.Scim.Middleware
+﻿namespace Owin.Scim.Middleware
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
+    using System.Text;
     using System.Threading.Tasks;
 
     using Microsoft.Owin;
 
+    using Model;
+
+    using Newtonsoft.Json;
+
     internal class RequireSslMiddleware
     {
-        readonly Func<IDictionary<string, object>, Task> _next;
+        private readonly Func<IDictionary<string, object>, Task> _Next;
 
         public RequireSslMiddleware(Func<IDictionary<string, object>, Task> next)
         {
-            _next = next;
+            _Next = next;
         }
 
         public async Task Invoke(IDictionary<string, object> env)
         {
             var context = new OwinContext(env);
 
-            if (context.Request.Uri.Scheme != Uri.UriSchemeHttps)
+            if (!context.Request.Uri.Scheme.Equals(Uri.UriSchemeHttps, StringComparison.OrdinalIgnoreCase))
             {
                 context.Response.StatusCode = 403;
-                context.Response.ReasonPhrase = "SSL is required";
 
-                await context.Response.WriteAsync(context.Response.ReasonPhrase);
+                await context.Response.WriteAsync(
+                    Encoding.UTF8.GetBytes(
+                        JsonConvert.SerializeObject(
+                            new ScimError(HttpStatusCode.Forbidden))));
 
                 return;
             }
 
-            await _next(env);
+            await _Next(env);
         }
     }
 }

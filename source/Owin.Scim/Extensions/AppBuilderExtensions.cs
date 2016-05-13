@@ -15,8 +15,6 @@
     using NContext.EventHandling;
     using NContext.Security.Cryptography;
 
-    using Services;
-
     public static class AppBuilderExtensions
     {
         /// <summary>

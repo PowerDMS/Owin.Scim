@@ -9,6 +9,7 @@
 
     using Model;
 
+    [AllowAnonymous]
     [RoutePrefix(ScimConstants.Endpoints.ServiceProviderConfig)]
     public class ServiceProviderConfigurationController : ScimControllerBase
     {

@@ -23,7 +23,7 @@
     using Querying;
 
     using Services;
-
+    
     [RoutePrefix(ScimConstants.Endpoints.Users)]
     public class UsersController : ScimControllerBase
     {

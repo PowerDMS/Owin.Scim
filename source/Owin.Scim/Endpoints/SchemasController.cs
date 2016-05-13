@@ -10,6 +10,7 @@
 
     using Services;
 
+    [AllowAnonymous]
     [RoutePrefix(ScimConstants.Endpoints.Schemas)]
     public class SchemasController : ScimControllerBase
     {

@@ -36,6 +36,7 @@
                         {
                             ClientJsonFormatter = new ScimClientJsonMediaTypeFormatter(configuration);
                             configuration.RequireSsl = false;
+                            configuration.EnableEndpointAuthorization = false;
 
                             configuration
                                 .AddAuthenticationScheme(

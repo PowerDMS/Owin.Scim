@@ -12,7 +12,11 @@
         {
             appBuilder.Map("/scim", app =>
             {
-                app.UseScimServer(configuration => { configuration.RequireSsl = false; });
+                app.UseScimServer(
+                    configuration => {
+                        configuration.RequireSsl = false;
+                        configuration.EnableEndpointAuthorization = false;
+                });
             });
 
             var address = ((IList<IDictionary<string, object>>)appBuilder.Properties["host.Addresses"])[0];
