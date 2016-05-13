@@ -4,14 +4,11 @@
     using System.Net;
 
     using Model;
-
-    /// <summary>
-    /// Use this to throw exceptions inside Scim processing
-    /// </summary>
+    
     public class ScimException : ApplicationException
     {
         /// <summary>
-        /// Scim Error
+        /// Gets the <see cref="ScimError"/>.
         /// </summary>
         public ScimError ScimError { get; private set; }
 
@@ -21,7 +18,7 @@
         /// <param name="statusCode">HTTP response status code</param>
         /// <param name="detail">body text as raw string</param>
         /// <param name="errorType">Only applicable for status=400</param>
-        public ScimException(HttpStatusCode statusCode, String detail, ScimErrorType errorType = null)
+        public ScimException(HttpStatusCode statusCode, string detail, ScimErrorType errorType = null)
         {
             ScimError = new ScimError(statusCode, errorType, detail);
         }

@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
 
     using Model;
     using ErrorHandling;
@@ -23,8 +24,9 @@
                     return schemaBindingRule.Target;
             }
 
-            throw new ScimException(System.Net.HttpStatusCode.BadRequest, 
-                "Unsupported schema!",
+            throw new ScimException(
+                HttpStatusCode.BadRequest, 
+                "Unsupported schema.",
                 ScimErrorType.InvalidValue);
         }
     }

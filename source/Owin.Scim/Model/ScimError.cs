@@ -34,9 +34,9 @@
         public HttpStatusCode Status { get; private set; }
 
         [JsonProperty("scimType")]
-        public ScimErrorType ScimType { get; set; }
+        public ScimErrorType ScimType { get; private set; }
 
         [JsonProperty("detail")]
-        public string Detail { get; set; }
+        public string Detail { get; private set; }
     }
 }

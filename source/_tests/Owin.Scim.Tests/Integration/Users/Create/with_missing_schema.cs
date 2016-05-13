@@ -1,20 +1,17 @@
 namespace Owin.Scim.Tests.Integration.Users.Create
 {
-    using System.Collections.Generic;
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
 
     using Machine.Specifications;
 
     using Model;
-    using Model.Users;
 
     public class with_missing_schema : using_a_scim_server
     {
         Establish context = () =>
         {
-            UserDto = new UserWithNoSchema()
+            UserDto = new UserWithNoSchema
             {
                 UserName = "Oops"
             };
