@@ -47,7 +47,8 @@
             tenant.Id = Guid.NewGuid().ToString("N");
             _DB.Add(tenant.Id, tenant);
 
-            return Task.FromResult(Request.CreateResponse(HttpStatusCode.Created, tenant));
+            return Task.FromResult(
+                Request.CreateResponse(HttpStatusCode.Created, SetMetaLocation(tenant, "GetTenant", new { tenantId = tenant.Id })));
         }
 
         [Route("{tenantId}", Name = "GetTenant")]
@@ -55,7 +56,10 @@
         {
             Tenant tenant;
             if (_DB.TryGetValue(tenantId, out tenant))
-                return Task.FromResult(Request.CreateResponse(HttpStatusCode.OK, tenant));
+                return Task.FromResult(
+                    Request.CreateResponse(
+                        HttpStatusCode.OK, 
+                        SetMetaLocation(tenant, "GetTenant", new { tenantId = tenant.Id })));
 
             return Task.FromResult(Request.CreateResponse(HttpStatusCode.NotFound));
         }

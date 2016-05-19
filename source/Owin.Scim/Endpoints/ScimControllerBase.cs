@@ -34,7 +34,7 @@ namespace Owin.Scim.Endpoints
         }
 
         [NonAction]
-        protected void SetMetaLocations<T>(IEnumerable<T> items, string routeName, Func<T, object> routeValueFactory = null) 
+        protected IEnumerable<T> SetMetaLocations<T>(IEnumerable<T> items, string routeName, Func<T, object> routeValueFactory = null) 
             where T : Resource
         {
             var urlHelper = Request.GetUrlHelper();
@@ -43,13 +43,16 @@ namespace Owin.Scim.Endpoints
                 var routeValues = routeValueFactory == null ? null : routeValueFactory(item);
                 item.Meta.Location = new Uri(urlHelper.Link(routeName, routeValues));
             }
+
+            return items;
         }
 
         [NonAction]
-        protected void SetMetaLocation<T>(T item, string routeName, object routeValues = null) 
+        protected T SetMetaLocation<T>(T item, string routeName, object routeValues = null) 
             where T : Resource
         {
             item.Meta.Location = new Uri(Request.GetUrlHelper().Link(routeName, routeValues));
+            return item;
         }
     }
 }

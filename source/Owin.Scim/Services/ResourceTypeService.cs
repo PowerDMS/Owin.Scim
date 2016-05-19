@@ -49,13 +49,17 @@
             return ServerConfiguration.ResourceTypeDefinitions
                 .ToDictionary(
                     rtd => rtd.Name,
-                    rtd => new ResourceType
-                    {
-                        Description = rtd.Description,
-                        Schema = rtd.Schema,
-                        Name = rtd.Name,
-                        Endpoint = rtd.Endpoint
-                    },
+                    rtd => SetResourceVersion(
+                        new ResourceType
+                        {
+                            Description = rtd.Description,
+                            Schema = rtd.Schema,
+                            Name = rtd.Name,
+                            Endpoint = rtd.Endpoint,
+                            SchemaExtensions = rtd.SchemaExtensions
+                                .Select(ext => new SchemaExtension(ext.Schema, ext.Required))
+                                .ToList()
+                        }),
                     StringComparer.OrdinalIgnoreCase);
         }
     }

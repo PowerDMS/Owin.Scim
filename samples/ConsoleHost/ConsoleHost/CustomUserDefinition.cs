@@ -5,10 +5,14 @@
 
     public class CustomUserDefinition : UserDefinition
     {
-        public CustomUserDefinition(ScimServerConfiguration serverConfiguration) : base(serverConfiguration)
+        public CustomUserDefinition(ScimServerConfiguration serverConfiguration) 
+            : base(serverConfiguration)
         {
-            For(u => u.Name)
-                .SetRequired(true);
+            For(u => u.NickName)
+                .SetRequired(true)
+                .AddCanonicalizationRule(nickName => nickName.ToUpper());
+
+            SetValidator<CustomUserValidator>();
         }
     }
 }

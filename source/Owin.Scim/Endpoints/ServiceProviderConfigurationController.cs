@@ -1,13 +1,14 @@
 ﻿namespace Owin.Scim.Endpoints
 {
-    using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
     using System.Web.Http;
 
     using Configuration;
 
-    using Model;
+    using Extensions;
+
+    using Services;
 
     [AllowAnonymous]
     [RoutePrefix(ScimConstants.Endpoints.ServiceProviderConfig)]
@@ -15,25 +16,22 @@
     {
         public const string RetrieveServiceProviderConfigurationRouteName = @"GetServiceProviderConfiguration";
 
-        public ServiceProviderConfigurationController(ScimServerConfiguration serverConfiguration)
+        private readonly IServiceProviderConfigurationService _ServiceProviderConfigurationService;
+
+        public ServiceProviderConfigurationController(
+            ScimServerConfiguration serverConfiguration,
+            IServiceProviderConfigurationService serviceProviderConfigurationService)
             : base(serverConfiguration)
         {
+            _ServiceProviderConfigurationService = serviceProviderConfigurationService;
         }
 
         [Route(Name = RetrieveServiceProviderConfigurationRouteName)]
         public async Task<HttpResponseMessage> Get()
         {
-            var serviceProviderConfig = (ServiceProviderConfiguration) ServerConfiguration;
-
-            SetMetaLocation(serviceProviderConfig, RetrieveServiceProviderConfigurationRouteName);
-
-            var response = Request.CreateResponse(
-                HttpStatusCode.OK, 
-                serviceProviderConfig);
-
-            SetContentLocationHeader(response, RetrieveServiceProviderConfigurationRouteName);
-
-            return response;
+            return (await _ServiceProviderConfigurationService.GetServiceProviderConfiguration())
+                .Let(serviceProviderConfig => SetMetaLocation(serviceProviderConfig, RetrieveServiceProviderConfigurationRouteName))
+                .ToHttpResponseMessage(Request, (config, response) => SetContentLocationHeader(response, RetrieveServiceProviderConfigurationRouteName));
         }
     }
 }

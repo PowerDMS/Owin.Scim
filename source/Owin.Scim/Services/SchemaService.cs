@@ -77,7 +77,7 @@ namespace Owin.Scim.Services
                     attributeDefinitions.Add(ad.ToScimAttributeSchema());
                 }
 
-                schemas.Add(std.Schema, new ScimSchema(std.Schema, std.Name, std.Description, attributeDefinitions));
+                schemas.Add(std.Schema, SetResourceVersion(new ScimSchema(std.Schema, std.Name, std.Description, attributeDefinitions)));
 
                 var rtd = std as IScimResourceTypeDefinition;
                 if (rtd != null)
@@ -92,11 +92,12 @@ namespace Owin.Scim.Services
 
                         schemas.Add(
                             extension.Schema,
-                            new ScimSchema(
-                                extension.Schema,
-                                extension.ExtensionDefinition.Name,
-                                extension.ExtensionDefinition.Description,
-                                attributeDefinitions));
+                            SetResourceVersion(
+                                new ScimSchema(
+                                    extension.Schema,
+                                    extension.ExtensionDefinition.Name,
+                                    extension.ExtensionDefinition.Description,
+                                    attributeDefinitions)));
                     }
                 }
             }

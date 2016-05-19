@@ -45,21 +45,6 @@
             RequireSsl = true;
         }
 
-        public static explicit operator ServiceProviderConfiguration(ScimServerConfiguration scimConfig)
-        {
-            // TODO: (DG) move this to a service and set meta version
-            var config = new ServiceProviderConfiguration(
-                scimConfig.GetFeature(ScimFeatureType.Patch),
-                scimConfig.GetFeature<ScimFeatureBulk>(ScimFeatureType.Bulk),
-                scimConfig.GetFeature<ScimFeatureFilter>(ScimFeatureType.Filter),
-                scimConfig.GetFeature(ScimFeatureType.ChangePassword),
-                scimConfig.GetFeature(ScimFeatureType.Sort),
-                scimConfig.GetFeature<ScimFeatureETag>(ScimFeatureType.ETag),
-                scimConfig.AuthenticationSchemes);
-
-            return config;
-        }
-
         public bool EnableEndpointAuthorization { get; set; }
 
         public bool RequireSsl { get; set; }

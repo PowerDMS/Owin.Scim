@@ -68,7 +68,9 @@
             container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
 #endif
 
+            // register all business logic services for built-in endpoints
             container.Register<IResourceTypeService, ResourceTypeService>(Reuse.Singleton);
+            container.Register<IServiceProviderConfigurationService, ServiceProviderConfigurationService>(Reuse.Singleton);
             container.Register<ISchemaService, SchemaService>(Reuse.Singleton);
             container.Register<IUserService, UserService>(Reuse.Singleton);
             container.Register<IGroupService, GroupService>(Reuse.Singleton);

@@ -124,6 +124,7 @@
     <Compile Include="CustomInMemoryUserRepository.cs" />
     <Compile Include="CustomResourceTypes.cs" />
     <Compile Include="CustomUserDefinition.cs" />
+    <Compile Include="CustomUserValidator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registry.cs" />

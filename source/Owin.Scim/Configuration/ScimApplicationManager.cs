@@ -150,7 +150,7 @@
             return baseType.GetGenericArguments()[0];
         }
 
-        private static void ConfigureHttpConfiguration(ScimServerConfiguration serverConfiguration)
+        private void ConfigureHttpConfiguration(ScimServerConfiguration serverConfiguration)
         {
             var httpConfiguration = serverConfiguration.HttpConfiguration;
             httpConfiguration.IncludeErrorDetailPolicy = IncludeErrorDetailPolicy.Always;
@@ -166,7 +166,7 @@
             settings.Converters.Add(new StringEnumConverter());
             settings.Converters.Add(new ScimQueryOptionsConverter(serverConfiguration));
             settings.Converters.Add(new ResourceJsonConverter(serverConfiguration, JsonSerializer.Create(settings)));
-
+            
             httpConfiguration.Filters.Add(new ScimAuthorizationAttribute(serverConfiguration));
 
             httpConfiguration.ParameterBindingRules.Insert(

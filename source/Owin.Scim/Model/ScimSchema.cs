@@ -52,5 +52,57 @@
         /// <value>The attribute's schema definitions.</value>
         [JsonProperty("attributes")]
         public IEnumerable<ScimAttributeSchema> Attributes { get; private set; }
+
+        public override int CalculateVersion()
+        {
+            return new
+            {
+                Name,
+                Description,
+                Attributes = Attributes == null
+                    ? 0
+                    : Attributes.Aggregate(
+                        0,
+                        (hashSeed, attributeSchema) =>
+                        {
+                            if (attributeSchema == null) return 0;
+
+                            return hashSeed * 31 + new
+                            {
+                                ReferenceTypes = attributeSchema.ReferenceTypes,    // TODO: (DG) versioning should iterate collection
+                                CanonicalValues = attributeSchema.CanonicalValues,  // TODO: (DG) versioning should iterate collection
+                                CaseExact = attributeSchema.CaseExact,
+                                Description = attributeSchema.Description,
+                                MultiValued = attributeSchema.MultiValued,
+                                Mutability = attributeSchema.Mutability,
+                                Name = attributeSchema.Name,
+                                Required = attributeSchema.Required,
+                                Returned = attributeSchema.Returned,
+                                SubAttributes = attributeSchema.SubAttributes == null
+                                    ? 0
+                                    : attributeSchema.SubAttributes
+                                        .Aggregate(
+                                            0,
+                                            (subAttributeHashSeed, subAttribute) =>
+                                            {
+                                                if (subAttribute == null) return 0;
+
+                                                return subAttributeHashSeed * 31 + new
+                                                {
+                                                    ReferenceTypes = subAttribute.ReferenceTypes,   // TODO: (DG) versioning should iterate collection
+                                                    CanonicalValues = subAttribute.CanonicalValues, // TODO: (DG) versioning should iterate collection
+                                                    CaseExact = subAttribute.CaseExact,
+                                                    Description = subAttribute.Description,
+                                                    MultiValued = subAttribute.MultiValued,
+                                                    Mutability = subAttribute.Mutability,
+                                                    Name = subAttribute.Name,
+                                                    Required = subAttribute.Required,
+                                                    Returned = subAttribute.Returned
+                                                }.GetHashCode();
+                                            })
+                            }.GetHashCode();
+                        })
+            }.GetHashCode();
+        }
     }
 }
