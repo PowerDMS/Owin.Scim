@@ -23,9 +23,9 @@ namespace Owin.Scim.Tests.Integration.Groups.Delete
 
         protected static string GroupId;
 
-        protected static Group GroupDto;
+        protected static ScimGroup GroupDto;
 
-        protected static Group RetrievedGroup;
+        protected static ScimGroup RetrievedGroup;
 
         protected static HttpResponseMessage Response;
 

@@ -38,6 +38,14 @@
       <HintPath>..\..\..\source\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="Autofac, Version=3.5.0.0, Culture=neutral, PublicKeyToken=17863af14b0044da, processorArchitecture=MSIL">
+      <HintPath>..\..\..\source\packages\Autofac.3.5.2\lib\net40\Autofac.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
+    <Reference Include="AutoMapper, Version=4.2.1.0, Culture=neutral, PublicKeyToken=be96cd2c38ef1005, processorArchitecture=MSIL">
+      <HintPath>..\..\..\source\packages\AutoMapper.4.2.1\lib\net45\AutoMapper.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="FluentValidation, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\..\..\source\packages\FluentValidation.6.2.1.0\lib\Net45\FluentValidation.dll</HintPath>
       <Private>True</Private>
@@ -59,15 +67,15 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\source\packages\NContext.4.0.0-alpha11\lib\net451\NContext.dll</HintPath>
+      <HintPath>..\..\..\source\packages\NContext.4.0.0-alpha12\lib\net451\NContext.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\source\packages\NContext.Common.4.0.0-alpha11\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
+      <HintPath>..\..\..\source\packages\NContext.Common.4.0.0-alpha12\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\..\..\source\packages\Newtonsoft.Json.8.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\..\..\source\packages\Newtonsoft.Json.8.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Nito.AsyncEx, Version=3.0.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -91,6 +99,7 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
     <Reference Include="System.Core" />
     <Reference Include="System.Net.Http.Formatting, Version=5.2.3.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL">
       <HintPath>..\..\..\source\packages\Microsoft.AspNet.WebApi.Client.5.2.3\lib\net45\System.Net.Http.Formatting.dll</HintPath>
@@ -121,10 +130,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CompositionRoot.cs" />
-    <Compile Include="CustomInMemoryUserRepository.cs" />
-    <Compile Include="CustomResourceTypes.cs" />
-    <Compile Include="CustomUserDefinition.cs" />
-    <Compile Include="CustomUserValidator.cs" />
+    <Compile Include="Kernel\KernelUser.cs" />
+    <Compile Include="Kernel\KernelUserRepository.cs" />
+    <Compile Include="Scim\CustomResourceTypes.cs" />
+    <Compile Include="Scim\CustomUserDefinition.cs" />
+    <Compile Include="Kernel\KernelUserManager.cs" />
+    <Compile Include="Scim\CustomUserRepository.cs" />
+    <Compile Include="Scim\CustomUserValidator.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registry.cs" />
@@ -139,6 +151,7 @@
       <Name>Owin.Scim</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

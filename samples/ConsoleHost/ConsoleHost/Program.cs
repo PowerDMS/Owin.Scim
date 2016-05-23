@@ -11,6 +11,8 @@
     using Owin.Scim;
     using Owin.Scim.Model.Users;
 
+    using Scim;
+
     class Program
     {
         static void Main(string[] args)
@@ -29,13 +31,15 @@
                 BaseAddress = new Uri("http://localhost:8080/scim/")
             };
 
+            // Uncomment any of the following method calls to see example Owin.Scim functionality.
+
 //            await ExecuteServiceProviderConfig(client);
 
 //            await ExecuteResourceTypes(client);
 
 //            await ExecuteSchemas(client);
 
-//            await ExecuteUser(client);
+            await ExecuteUser(client);
 
 //            await ExecuteCustomResourceType(client);
         }
@@ -94,11 +98,11 @@
             var response =
                 await
                     client.PostAsync("users",
-                        new ObjectContent<User>(new User { UserName = "daniel", NickName = "danny" }, new JsonMediaTypeFormatter()));
+                        new ObjectContent<ScimUser>(new ScimUser { UserName = "daniel", NickName = "danny" }, new JsonMediaTypeFormatter()));
             Write(await response.Content.ReadAsStringAsync());
             if (response.StatusCode == HttpStatusCode.Created)
             {
-                var user = await response.Content.ReadAsAsync<User>(new[] { new JsonMediaTypeFormatter() });
+                var user = await response.Content.ReadAsAsync<ScimUser>(new[] { new JsonMediaTypeFormatter() });
                 Write("");
                 Write("Getting user " + user.Id);
                 var json = await client.GetStringAsync("users/" + user.Id);

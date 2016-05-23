@@ -13,7 +13,7 @@
         {
             TestStartTime = DateTime.UtcNow;
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 DisplayName = "hello",
                 ExternalId = "hello",

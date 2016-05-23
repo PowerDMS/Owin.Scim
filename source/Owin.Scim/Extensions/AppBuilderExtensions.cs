@@ -59,7 +59,7 @@
                 throw new ArgumentNullException("appBuilder");
             
             IContainer container = new Container(
-                rules => rules.WithoutThrowIfDependencyHasShorterReuseLifespan(), // TODO: (DG) look into this rule
+                rules => rules.WithoutThrowIfDependencyHasShorterReuseLifespan(),
                 new AsyncExecutionFlowScopeContext());
            
             var executionDirectory = Assembly.GetEntryAssembly() == null
@@ -78,7 +78,7 @@
             
             ApplicationConfiguration appConfig = new ApplicationConfigurationBuilder()
                 .ComposeWith(new[] { executionDirectory }, compositionConstraints.ToArray())
-                .RegisterComponent(() => new ScimApplicationManager(appBuilder, container, configureScimServerAction))
+                .RegisterComponent(() => new ScimApplicationManager(container, appBuilder, compositionConstraints.Skip(1).ToList(), configureScimServerAction))
                 .RegisterComponent<IManageCryptography>()
                     .With<CryptographyManagerBuilder>()
                         .SetDefaults<SHA256Cng, HMACSHA256, AesCryptoServiceProvider>()

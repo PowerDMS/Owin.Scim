@@ -11,7 +11,7 @@
         Establish context = () =>
         {
             UserId = "bogus-user-id";
-            UserDto = new User
+            UserDto = new ScimUser
             {
                 Id = UserId,
                 UserName = "bogus-user-name",

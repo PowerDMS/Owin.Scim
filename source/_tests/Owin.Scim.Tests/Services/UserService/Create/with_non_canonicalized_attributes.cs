@@ -12,7 +12,7 @@ namespace Owin.Scim.Tests.Services.UserService.Create
     {
         Establish context = () =>
         {
-            ClientUserDto = new User
+            ClientUserDto = new ScimUser
             {
                 UserName = "daniel",
                 Active = true,

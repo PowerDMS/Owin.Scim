@@ -14,9 +14,9 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.add
     {
         Establish context = () =>
         {
-            var anotherUser = CreateUser(new User {UserName = Users.UserNameUtility.GenerateUserName()});
+            var anotherUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
             GroupToUpdate = CreateGroup(
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "groupToUpdate",
                     Members = new []
@@ -54,6 +54,6 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.add
 
         It should_look_identical = () => UpdatedGroup.ShouldBeLike(GroupToUpdate);
 
-        private static Group GroupToUpdate;
+        private static ScimGroup GroupToUpdate;
     }
 }

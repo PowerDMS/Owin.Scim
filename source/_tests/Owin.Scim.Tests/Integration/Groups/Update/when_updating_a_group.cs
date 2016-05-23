@@ -26,7 +26,7 @@
                 .Await().AsTask;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedGroup = PatchResponse.Content.ReadAsAsync<Group>().Result;
+                UpdatedGroup = PatchResponse.Content.ReadAsAsync<ScimGroup>().Result;
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -41,7 +41,7 @@
 
         protected static HttpResponseMessage PatchResponse;
 
-        protected static Group UpdatedGroup;
+        protected static ScimGroup UpdatedGroup;
 
         protected static Model.ScimError Error;
     }

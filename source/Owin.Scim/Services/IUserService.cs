@@ -11,14 +11,14 @@
 
     public interface IUserService
     {
-        Task<IScimResponse<User>> CreateUser(User user);
+        Task<IScimResponse<ScimUser>> CreateUser(ScimUser user);
 
-        Task<IScimResponse<User>> RetrieveUser(string userId);
+        Task<IScimResponse<ScimUser>> RetrieveUser(string userId);
 
-        Task<IScimResponse<User>> UpdateUser(User user);
+        Task<IScimResponse<ScimUser>> UpdateUser(ScimUser user);
 
         Task<IScimResponse<Unit>> DeleteUser(string userId);
 
-        Task<IScimResponse<IEnumerable<User>>> QueryUsers(ScimQueryOptions options);
+        Task<IScimResponse<IEnumerable<ScimUser>>> QueryUsers(ScimQueryOptions options);
     }
 }

@@ -10,7 +10,7 @@
     {
         Establish ctx = () =>
         {
-            Group = new Group
+            Group = new ScimGroup
             {
                 ExternalId = "some Id",
             };

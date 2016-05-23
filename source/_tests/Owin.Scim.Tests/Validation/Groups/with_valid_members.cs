@@ -14,7 +14,7 @@
     {
         Establish ctx = () =>
         {
-            Group = new Group
+            Group = new ScimGroup
             {
                 DisplayName = "blue man",
                 Members = new []

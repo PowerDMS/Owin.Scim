@@ -17,7 +17,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 
             Response = await Server
                 .HttpClient
-                .PutAsync("groups/" + GroupId, new ScimObjectContent<Group>(GroupDto))
+                .PutAsync("groups/" + GroupId, new ScimObjectContent<ScimGroup>(GroupDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -26,7 +26,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
                 : null;
 
             CreatedGroup = bodyText != null
-                ? Response.Content.ScimReadAsAsync<Group>().Result
+                ? Response.Content.ScimReadAsAsync<ScimGroup>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -36,9 +36,9 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 
         protected static string GroupId;
 
-        protected static Group GroupDto;
+        protected static ScimGroup GroupDto;
 
-        protected static Group CreatedGroup;
+        protected static ScimGroup CreatedGroup;
 
         protected static HttpResponseMessage Response;
 

@@ -11,39 +11,39 @@
     {
         Establish context = async () =>
         {
-            var users = new List<User>
+            var users = new List<ScimUser>
             {
-                new User
+                new ScimUser
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Daniel", FamilyName = "Gioulakis" }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Lev", FamilyName = "Myshkin" }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Nastasya", FamilyName = "Barashkova" }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Parfyón", FamilyName = "Rogózhin" }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Iván", FamilyName = "Yepanchín" }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Agláya", FamilyName = "Ivánovna" }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Daniel", FamilyName = "Smith" }
@@ -54,7 +54,7 @@
             {
                 await Server
                     .HttpClient
-                    .PostAsync("users", new ScimObjectContent<User>(user))
+                    .PostAsync("users", new ScimObjectContent<ScimUser>(user))
                     .AwaitResponse()
                     .AsTask;
             }

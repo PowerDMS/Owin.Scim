@@ -18,17 +18,17 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
     {
         Establish context = () =>
         {
-            var existingGroup = new Group
+            var existingGroup = new ScimGroup
             {
                 DisplayName = UserNameUtility.GenerateUserName()
             };
 
             Response = Server
                 .HttpClient
-                .PostAsync("groups", new ScimObjectContent<Group>(existingGroup))
+                .PostAsync("groups", new ScimObjectContent<ScimGroup>(existingGroup))
                 .Result;
 
-            GroupDto = Response.Content.ScimReadAsAsync<Group>().Result;
+            GroupDto = Response.Content.ScimReadAsAsync<ScimGroup>().Result;
 
             PatchContent = new StringContent(
                 @"
@@ -73,7 +73,7 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .Result;
             
             if (Response.StatusCode == HttpStatusCode.OK)
-                UpdatedGroup = Response.Content.ScimReadAsAsync<Group>().Result;
+                UpdatedGroup = Response.Content.ScimReadAsAsync<ScimGroup>().Result;
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
@@ -106,9 +106,9 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .Value
                 .ShouldEqual("world");
 
-        protected static Group GroupDto;
+        protected static ScimGroup GroupDto;
 
-        protected static Group UpdatedGroup;
+        protected static ScimGroup UpdatedGroup;
 
         protected static HttpResponseMessage Response;
 

@@ -30,7 +30,7 @@
 
             _ExtensionValidator = A.Fake<IResourceExtensionValidator>(b => b.Wrapping(new EnterpriseUserExtensionValidator()));
 
-            A.CallTo(() => validatorFactory.CreateValidator(A<User>._))
+            A.CallTo(() => validatorFactory.CreateValidator(A<ScimUser>._))
                 .Returns(
                     new UserValidator(
                         serverConfiguration,
@@ -45,7 +45,7 @@
 
             _UserValidator = await validatorFactory.CreateValidator(User).AwaitResponse().AsTask;
 
-            User = new User();
+            User = new ScimUser();
             User.Extension<EnterpriseUserExtension>().Department = "sales";
         };
 
@@ -57,7 +57,7 @@
             A.CallTo(() => _ExtensionValidator.ValidateAsync(A<ValidationContext>._, A<CancellationToken>._))
              .MustHaveHappened();
         
-        protected static User User;
+        protected static ScimUser User;
 
         private static IValidator _UserValidator;
 

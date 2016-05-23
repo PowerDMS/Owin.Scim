@@ -17,14 +17,14 @@
     /// </summary>
     public class InMemoryGroupRepository : IGroupRepository
     {
-        private readonly IDictionary<string, Group> _Groups;
+        private readonly IDictionary<string, ScimGroup> _Groups;
 
         public InMemoryGroupRepository()
         {
-            _Groups = new Dictionary<string, Group>();
+            _Groups = new Dictionary<string, ScimGroup>();
         }
 
-        public async Task<Group> CreateGroup(Group group)
+        public async Task<ScimGroup> CreateGroup(ScimGroup group)
         {
             group.Id = Guid.NewGuid().ToString("N");
 
@@ -33,7 +33,7 @@
             return group;
         }
 
-        public async Task<Group> GetGroup(string groupId)
+        public async Task<ScimGroup> GetGroup(string groupId)
         {
             if (_Groups.ContainsKey(groupId))
                 return _Groups[groupId].Copy();
@@ -41,7 +41,7 @@
             return null;
         }
 
-        public async Task<Group> UpdateGroup(Group group)
+        public async Task<ScimGroup> UpdateGroup(ScimGroup group)
         {
             if (!_Groups.ContainsKey(group.Id))
                 return null;
@@ -51,7 +51,7 @@
             return group;
         }
 
-        public async Task<Group> DeleteGroup(string groupId)
+        public async Task<ScimGroup> DeleteGroup(string groupId)
         {
             if (!_Groups.ContainsKey(groupId))
                 return null;
@@ -62,11 +62,11 @@
             return groupRecord;
         }
 
-        public async Task<IEnumerable<Group>> QueryGroups(ScimQueryOptions options)
+        public async Task<IEnumerable<ScimGroup>> QueryGroups(ScimQueryOptions options)
         {
             var groups = _Groups.Values.AsEnumerable();
             if (options.Filter != null)
-                groups = groups.Where(options.Filter.ToPredicate<Group>()).ToList();
+                groups = groups.Where(options.Filter.ToPredicate<ScimGroup>()).ToList();
 
             // TODO: (DG) sorting
             if (options.SortBy != null)

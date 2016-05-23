@@ -40,7 +40,7 @@
         }
 
         [Route(Name = "CreateUser")]
-        public async Task<HttpResponseMessage> Post(User userDto)
+        public async Task<HttpResponseMessage> Post(ScimUser userDto)
         {
             return (await _UserService.CreateUser(userDto))
                 .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
@@ -49,7 +49,7 @@
                     response.StatusCode = HttpStatusCode.Created;
 
                     SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
-                    SetETagHeader(response, userDto);
+                    SetETagHeader(response, user);
                 });
         }
         
@@ -58,10 +58,10 @@
         {
             return (await _UserService.RetrieveUser(userId))
                 .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
-                .ToHttpResponseMessage(Request, (userDto, response) =>
+                .ToHttpResponseMessage(Request, (user, response) =>
                 {
-                    SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = userDto.Id });
-                    SetETagHeader(response, userDto);
+                    SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
+                    SetETagHeader(response, user);
                 });
         }
 
@@ -96,13 +96,13 @@
         }
 
         [Route("{userId}", Name = "UpdateUser")]
-        public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<User> patchRequest)
+        public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<ScimUser> patchRequest)
         {
             if (patchRequest == null ||
                 patchRequest.Operations == null || 
                 patchRequest.Operations.Operations.Any(a => a.OperationType == Patching.Operations.OperationType.Invalid))
             {
-                return new ScimErrorResponse<User>(
+                return new ScimErrorResponse<ScimUser>(
                     new ScimError(
                         HttpStatusCode.BadRequest,
                         ScimErrorType.InvalidSyntax,
@@ -118,13 +118,13 @@
                         // TODO: (DG) Finish patch support
                         var result = patchRequest.Operations.ApplyTo(
                             user, 
-                            new ScimObjectAdapter<User>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
+                            new ScimObjectAdapter<ScimUser>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
 
-                        return (IScimResponse<User>)new ScimDataResponse<User>(user);
+                        return (IScimResponse<ScimUser>)new ScimDataResponse<ScimUser>(user);
                     }
                     catch (ScimPatchException ex)
                     {
-                        return (IScimResponse<User>)new ScimErrorResponse<User>(ex.ToScimError());
+                        return (IScimResponse<ScimUser>)new ScimErrorResponse<ScimUser>(ex.ToScimError());
                     }
                 })
                 .BindAsync(user => _UserService.UpdateUser(user)))
@@ -138,7 +138,7 @@
 
         [AcceptVerbs("PUT", "OPTIONS")]
         [Route("{userId}", Name = "ReplaceUser")]
-        public async Task<HttpResponseMessage> Put(string userId, User userDto)
+        public async Task<HttpResponseMessage> Put(string userId, ScimUser userDto)
         {
             userDto.Id = userId;
 

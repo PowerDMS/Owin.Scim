@@ -10,7 +10,7 @@ namespace Owin.Scim.Tests.Validation.Users
     {
         Establish ctx = () =>
         {
-            ExistingUserRecord = new User
+            ExistingUserRecord = new ScimUser
             {
                 Id = "id",
                 UserName = "daniel",
@@ -23,7 +23,7 @@ namespace Owin.Scim.Tests.Validation.Users
             A.CallTo(() => PasswordManager.VerifyHash(A<string>._, A<string>._))
                 .ReturnsLazily(c => c.Arguments[0].Equals(c.Arguments[1]));
 
-            User = new User
+            User = new ScimUser
             {
                 Id = "id",
                 UserName = "daniel",

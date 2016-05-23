@@ -11,18 +11,18 @@
         /// </summary>
         private Establish context = () =>
         {
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 DisplayName = Users.UserNameUtility.GenerateUserName(),
             };
 
-            ExistingGroup = CreateGroup(new Group {DisplayName = Users.UserNameUtility.GenerateUserName()});
+            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = Users.UserNameUtility.GenerateUserName()});
 
             GroupId = ExistingGroup.Id;
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.NoContent);
 
-        private static Group ExistingGroup;
+        private static ScimGroup ExistingGroup;
     }
 }

@@ -10,11 +10,11 @@
     {
         Establish context = () =>
         {
-            ExistingGroup = CreateGroup(new Group {DisplayName = "existing group"});
+            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = "existing group"});
 
             GroupId = "bogus id";
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 Id = "bogus id",
                 DisplayName = "new group",
@@ -24,6 +24,6 @@
 
         It should_return_method_not_found = () => Response.StatusCode.ShouldEqual(HttpStatusCode.NotFound);
 
-        private static Group ExistingGroup;
+        private static ScimGroup ExistingGroup;
     }
 }

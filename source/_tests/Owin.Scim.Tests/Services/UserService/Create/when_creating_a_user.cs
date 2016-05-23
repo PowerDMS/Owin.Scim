@@ -32,10 +32,10 @@
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(true);
             
-            A.CallTo(() => UserRepository.CreateUser(A<User>._))
+            A.CallTo(() => UserRepository.CreateUser(A<ScimUser>._))
                 .ReturnsLazily(c =>
                 {
-                    var user = (User) c.Arguments[0];
+                    var user = (ScimUser) c.Arguments[0];
                     user.Id = Guid.NewGuid().ToString("N");
 
                     return Task.FromResult(user);
@@ -55,7 +55,7 @@
 
         Because of = async () => Result = await _UserService.CreateUser(ClientUserDto).AwaitResponse().AsTask;
 
-        protected static User ClientUserDto;
+        protected static ScimUser ClientUserDto;
 
         protected static ScimServerConfiguration ServerConfiguration;
 
@@ -65,7 +65,7 @@
 
         protected static IManagePasswords PasswordManager;
 
-        protected static IScimResponse<User> Result;
+        protected static IScimResponse<ScimUser> Result;
 
         private static IUserService _UserService;
     }

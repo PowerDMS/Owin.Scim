@@ -15,17 +15,17 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
     {
         Establish context = () =>
         {
-            var existingUser = new User
+            var existingUser = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
 
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(existingUser))
+                .PostAsync("users", new ScimObjectContent<ScimUser>(existingUser))
                 .Result;
 
-            UserDto = Response.Content.ScimReadAsAsync<User>().Result;
+            UserDto = Response.Content.ScimReadAsAsync<ScimUser>().Result;
 
            
             PatchContent = new StringContent(
@@ -75,7 +75,7 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .Result;
             
             if (Response.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = Response.Content.ScimReadAsAsync<User>().Result;
+                UpdatedUser = Response.Content.ScimReadAsAsync<ScimUser>().Result;
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
@@ -107,9 +107,9 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .Value
                 .ShouldEqual("its complicated");
 
-        protected static User UserDto;
+        protected static ScimUser UserDto;
 
-        protected static User UpdatedUser;
+        protected static ScimUser UpdatedUser;
 
         protected static HttpContent PatchContent;
 

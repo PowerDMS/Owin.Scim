@@ -8,14 +8,14 @@
     
     using Model.Users;
 
-    public class lessthan_with_datetime : when_parsing_a_filter_expression<User>
+    public class lessthan_with_datetime : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen", Meta = { LastModified = new DateTime(2015, 01, 01, 0, 0, 0, DateTimeKind.Utc) } },
-                new User { UserName = "ROMalley", Meta = { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
+                new ScimUser { UserName = "BJensen", Meta = { LastModified = new DateTime(2015, 01, 01, 0, 0, 0, DateTimeKind.Utc) } },
+                new ScimUser { UserName = "ROMalley", Meta = { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
             };
 
             FilterExpression = "meta.lastModified lt \"2014-05-13T04:42:34Z\"";

@@ -7,14 +7,14 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Model.Users;
 
-    public class endswith : when_parsing_a_filter_expression<User>
+    public class endswith : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen", Active = true },
-                new User { UserName = "LSmith", Active = true }
+                new ScimUser { UserName = "BJensen", Active = true },
+                new ScimUser { UserName = "LSmith", Active = true }
             };
 
             FilterExpression = "userName ew \"SEN\"";

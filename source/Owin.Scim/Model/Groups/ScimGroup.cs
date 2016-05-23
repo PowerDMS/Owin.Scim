@@ -6,9 +6,9 @@
 
     using Newtonsoft.Json;
     
-    public class Group : Resource
+    public class ScimGroup : Resource
     {
-        public Group()
+        public ScimGroup()
         {
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute

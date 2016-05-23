@@ -16,7 +16,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         Establish context = async () =>
         {
             var userName = UserNameUtility.GenerateUserName();
-            var initialUser = new User
+            var initialUser = new ScimUser
             {
                 UserName = userName
             };
@@ -24,11 +24,11 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             // Insert the first user so there's one already in-memory.
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(initialUser, new JsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<ScimUser>(initialUser, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
             
-            UserDto = new User
+            UserDto = new ScimUser
             {
                 UserName = userName,
                 PreferredLanguage = "invalidLanguage"

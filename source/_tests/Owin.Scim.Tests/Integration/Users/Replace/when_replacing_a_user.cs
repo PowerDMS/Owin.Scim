@@ -18,7 +18,7 @@
 
             Response = await Server
                 .HttpClient
-                .PutAsync("users/" + UserDto.Id, new ScimObjectContent<User>(UserDto))
+                .PutAsync("users/" + UserDto.Id, new ScimObjectContent<ScimUser>(UserDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -26,10 +26,10 @@
                 await Response.DeserializeTo(() => UpdatedUserRecord); // capture updated user record
         };
 
-        protected static User UserDto;
+        protected static ScimUser UserDto;
 
         protected static HttpResponseMessage Response;
 
-        protected static User UpdatedUserRecord;
+        protected static ScimUser UpdatedUserRecord;
     }
 }

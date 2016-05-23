@@ -4,9 +4,9 @@
 
     using Model.Users;
 
-    public class with_enterprise_users : when_generating_a_User_etags<User>
+    public class with_enterprise_users : when_generating_a_User_etags<ScimUser>
     {
-        Establish ctx = () => User = new User();
+        Establish ctx = () => User = new ScimUser();
 
         Because of = () =>
         {

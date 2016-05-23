@@ -16,11 +16,11 @@
             // Insert the first user so there's one already in-memory.
             var userRecord = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(UserToUpdate, new JsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<ScimUser>(UserToUpdate, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
-            UserToUpdate = await userRecord.Content.ReadAsAsync<User>().AwaitResponse().AsTask;
+            UserToUpdate = await userRecord.Content.ReadAsAsync<ScimUser>().AwaitResponse().AsTask;
 
             Task.Delay(200).Await();
 
@@ -36,7 +36,7 @@
                 .AsTask;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = await PatchResponse.Content.ReadAsAsync<User>();
+                UpdatedUser = await PatchResponse.Content.ReadAsAsync<ScimUser>();
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -44,19 +44,19 @@
                 Error = Newtonsoft.Json.JsonConvert.DeserializeObject<Model.ScimError>(errorText);
 
                 var response = Server.HttpClient.GetAsync("users/" + UserToUpdate.Id).Result;
-                ServerUser = response.Content.ReadAsAsync<User>().Result;
+                ServerUser = response.Content.ReadAsAsync<ScimUser>().Result;
             }
         };
 
-        protected static User UserToUpdate;
+        protected static ScimUser UserToUpdate;
 
-        protected static User ServerUser;
+        protected static ScimUser ServerUser;
 
         protected static HttpContent PatchContent;
 
         protected static HttpResponseMessage PatchResponse;
 
-        protected static User UpdatedUser;
+        protected static ScimUser UpdatedUser;
 
         protected static Model.ScimError Error;
     }

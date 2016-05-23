@@ -17,7 +17,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Retrieve
                 .Result;
             
             RetrievedGroup = Response.StatusCode == HttpStatusCode.OK
-                ? Response.Content.ScimReadAsAsync<Group>().Result
+                ? Response.Content.ScimReadAsAsync<ScimGroup>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -27,9 +27,9 @@ namespace Owin.Scim.Tests.Integration.Groups.Retrieve
 
         protected static string GroupId;
 
-        protected static Group GroupDto;
+        protected static ScimGroup GroupDto;
 
-        protected static Group RetrievedGroup;
+        protected static ScimGroup RetrievedGroup;
 
         protected static HttpResponseMessage Response;
 

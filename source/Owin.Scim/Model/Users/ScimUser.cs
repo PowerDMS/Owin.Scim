@@ -8,9 +8,9 @@
 
     using Newtonsoft.Json;
     
-    public class User : Resource
+    public class ScimUser : Resource
     {
-        public User()
+        public ScimUser()
         {
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute

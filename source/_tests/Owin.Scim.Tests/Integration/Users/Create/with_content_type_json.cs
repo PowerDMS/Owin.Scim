@@ -14,7 +14,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     {
         Establish context = () =>
         {
-            UserDto = new User()
+            UserDto = new ScimUser()
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
@@ -24,7 +24,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(UserDto, new JsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<ScimUser>(UserDto, new JsonMediaTypeFormatter()))
                 .Result;
 
             StatusCode = Response.StatusCode;
@@ -32,7 +32,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
         It should_return_created = () => StatusCode.ShouldEqual(HttpStatusCode.Created);
 
-        protected static User UserDto;
+        protected static ScimUser UserDto;
 
         protected static HttpResponseMessage Response;
 

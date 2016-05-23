@@ -4,7 +4,7 @@
 
     using Scim.Validation;
 
-    public class MyGroupSchemaValidator : ResourceExtensionValidatorBase<Group, MyGroupSchema>
+    public class MyGroupSchemaValidator : ResourceExtensionValidatorBase<ScimGroup, MyGroupSchema>
     {
         protected override void ConfigureDefaultRuleSet()
         {

@@ -19,15 +19,15 @@
     {
         private readonly IGroupRepository _GroupRepository;
 
-        private readonly ConcurrentDictionary<string, User> _Users;
+        private readonly ConcurrentDictionary<string, ScimUser> _Users;
 
         public InMemoryUserRepository(IGroupRepository groupRepository)
         {
             _GroupRepository = groupRepository;
-            _Users = new ConcurrentDictionary<string, User>();
+            _Users = new ConcurrentDictionary<string, ScimUser>();
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<ScimUser> CreateUser(ScimUser user)
         {
             user.Id = Guid.NewGuid().ToString("N");
 
@@ -36,7 +36,7 @@
             return user;
         }
 
-        public async Task<User> GetUser(string userId)
+        public async Task<ScimUser> GetUser(string userId)
         {
             // return a deep-clone of the user object
             // since this is in-memory, we don't want any HTTP PATCH or other code to actually modify the
@@ -51,28 +51,28 @@
             return user;
         }
 
-        public async Task UpdateUser(User user)
+        public async Task UpdateUser(ScimUser user)
         {
             if (!_Users.ContainsKey(user.Id)) return;
 
             _Users[user.Id] = user;
         }
 
-        public async Task<User> DeleteUser(string userId)
+        public async Task<ScimUser> DeleteUser(string userId)
         {
             if (!_Users.ContainsKey(userId)) return null;
 
-            User userRecord;
+            ScimUser userRecord;
             _Users.TryRemove(userId, out userRecord);
 
             return userRecord;
         }
 
-        public async Task<IEnumerable<User>> QueryUsers(ScimQueryOptions options)
+        public async Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
         {
             var users = _Users.Values.AsEnumerable();
             if (options.Filter != null)
-                users = users.Where(options.Filter.ToPredicate<User>()).ToList();
+                users = users.Where(options.Filter.ToPredicate<ScimUser>()).ToList();
             
             // TODO: (DG) sorting
             if (options.SortBy != null)

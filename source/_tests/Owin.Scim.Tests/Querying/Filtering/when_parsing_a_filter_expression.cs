@@ -24,14 +24,14 @@
             var parser = new ScimFilterParser(new CommonTokenStream(lexer));
             var filterVisitor = new ScimFilterVisitor<TResource>();
 
-            Predicate = filterVisitor.Visit(parser.parse()).Compile().AsFunc<User, bool>();
+            Predicate = filterVisitor.Visit(parser.parse()).Compile().AsFunc<ScimUser, bool>();
         };
 
-        protected static IEnumerable<User> Users;
+        protected static IEnumerable<ScimUser> Users;
 
         protected static string FilterExpression;
 
-        protected static Func<User, bool> Predicate;
+        protected static Func<ScimUser, bool> Predicate;
 
         protected static ISet<string> ResourceExtensionSchemas = new HashSet<string>();
     }

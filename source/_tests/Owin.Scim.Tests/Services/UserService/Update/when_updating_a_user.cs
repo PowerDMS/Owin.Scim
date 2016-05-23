@@ -28,8 +28,8 @@
             GroupRepository = A.Fake<IGroupRepository>();
             PasswordManager = A.Fake<IManagePasswords>();
             
-            A.CallTo(() => UserRepository.UpdateUser(A<User>._))
-                .ReturnsLazily(c => Task.FromResult((User)c.Arguments[0]));
+            A.CallTo(() => UserRepository.UpdateUser(A<ScimUser>._))
+                .ReturnsLazily(c => Task.FromResult((ScimUser)c.Arguments[0]));
 
             var etagProvider = A.Fake<IResourceVersionProvider>();
             var canonicalizationService = A.Fake<DefaultCanonicalizationService>(o => o.CallsBaseMethods());
@@ -44,7 +44,7 @@
 
         Because of = async () => Result = await _UserService.UpdateUser(ClientUserDto).AwaitResponse().AsTask;
 
-        protected static User ClientUserDto;
+        protected static ScimUser ClientUserDto;
 
         protected static ScimServerConfiguration ServerConfiguration;
 
@@ -54,7 +54,7 @@
 
         protected static IManagePasswords PasswordManager;
 
-        protected static IScimResponse<User> Result;
+        protected static IScimResponse<ScimUser> Result;
 
         private static IUserService _UserService;
     }

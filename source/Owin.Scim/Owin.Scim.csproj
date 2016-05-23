@@ -54,11 +54,11 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NContext.4.0.0-alpha11\lib\net451\NContext.dll</HintPath>
+      <HintPath>..\packages\NContext.4.0.0-alpha12\lib\net451\NContext.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="NContext.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\NContext.Common.4.0.0-alpha11\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
+      <HintPath>..\packages\NContext.Common.4.0.0-alpha12\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -115,6 +115,8 @@
     <Compile Include="Canonicalization\StatefulCanonicalizationRule.cs" />
     <Compile Include="Configuration\PassthroughExceptionHandler.cs" />
     <Compile Include="Configuration\ScimTypeAttributeDefinitions.cs" />
+    <Compile Include="Dependencies\FuncDependencyResolver.cs" />
+    <Compile Include="Dependencies\IDependencyResolver.cs" />
     <Compile Include="DryIoc\AsyncExecutionFlowScopeContext.cs" />
     <Compile Include="DryIoc\Container.cs" />
     <Compile Include="DryIoc\FactoryCompiler.cs" />
@@ -198,7 +200,7 @@
     <Compile Include="Model\Groups\GroupDefinition.cs" />
     <Compile Include="Model\Groups\MemberDefinition.cs" />
     <Compile Include="Model\ResourceExtensions.cs" />
-    <Compile Include="Model\Groups\Group.cs" />
+    <Compile Include="Model\Groups\ScimGroup.cs" />
     <Compile Include="Model\Groups\Member.cs" />
     <Compile Include="Model\ResourceMetadataDefinition.cs" />
     <Compile Include="Model\ResourceType.cs" />
@@ -276,7 +278,7 @@
     <Compile Include="Model\Users\Photo.cs" />
     <Compile Include="Model\ResourceMetadata.cs" />
     <Compile Include="Model\Resource.cs" />
-    <Compile Include="Model\Users\User.cs" />
+    <Compile Include="Model\Users\ScimUser.cs" />
     <Compile Include="Model\Users\X509Certificate.cs" />
     <Compile Include="Patching\IObjectAdapter.cs" />
     <Compile Include="Patching\Converters\TypedJsonPatchDocumentConverter.cs" />

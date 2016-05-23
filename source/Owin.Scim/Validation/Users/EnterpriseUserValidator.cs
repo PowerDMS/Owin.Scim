@@ -2,7 +2,7 @@ namespace Owin.Scim.Validation.Users
 {
     using Model.Users;
 
-    public class EnterpriseUserExtensionValidator : ResourceExtensionValidatorBase<User, EnterpriseUserExtension>
+    public class EnterpriseUserExtensionValidator : ResourceExtensionValidatorBase<ScimUser, EnterpriseUserExtension>
     {
         public override string ExtensionSchema
         {

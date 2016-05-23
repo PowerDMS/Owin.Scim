@@ -8,7 +8,7 @@ namespace Owin.Scim.Tests.Validation.Users
     {
         Establish ctx = () =>
         {
-            User = new User
+            User = new ScimUser
             {
                 UserName = "daniel",
                 PreferredLanguage = "da, en-gb;q=0.8, en;q=0.7"

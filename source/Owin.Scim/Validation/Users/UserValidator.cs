@@ -21,7 +21,7 @@ namespace Owin.Scim.Validation.Users
 
     using Security;
 
-    public class UserValidator : ResourceValidatorBase<User>
+    public class UserValidator : ResourceValidatorBase<ScimUser>
     {
         private readonly IUserRepository _UserRepository;
 

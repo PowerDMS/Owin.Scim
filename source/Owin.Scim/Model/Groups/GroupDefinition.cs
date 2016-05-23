@@ -8,7 +8,7 @@ namespace Owin.Scim.Model.Groups
 
     using Validation.Groups;
 
-    public class GroupDefinition : ScimResourceTypeDefinitionBuilder<Group>
+    public class GroupDefinition : ScimResourceTypeDefinitionBuilder<ScimGroup>
     {
         public GroupDefinition(ScimServerConfiguration serverConfiguration)
             : base(

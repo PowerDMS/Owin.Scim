@@ -8,7 +8,7 @@
     {
         Establish context = () =>
         {
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 DisplayName = "hello",
                 ExternalId = "hello",

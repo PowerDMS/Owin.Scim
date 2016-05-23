@@ -10,7 +10,7 @@
     {
         Establish ctx = () =>
         {
-            User = new User
+            User = new ScimUser
             {
                 UserName = "daniel",
                 Emails = new List<Email>

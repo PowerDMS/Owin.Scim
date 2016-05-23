@@ -10,14 +10,14 @@ namespace Owin.Scim.Tests.Querying.Filtering
     using Scim.Querying;
 
     [Subject(typeof(ScimFilterVisitor<>))]
-    public class contains_with_multivaluedattribute_value : when_parsing_a_filter_expression<User>
+    public class contains_with_multivaluedattribute_value : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen", UserType = "employee"},
-                new User
+                new ScimUser { UserName = "BJensen", UserType = "employee"},
+                new ScimUser
                 {
                     UserName = "ROMalley",
                     UserType = "manager",
@@ -26,7 +26,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
                         new Email { Value = "user@example.com", Type = "work" }
                     }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = "DGioulakis",
                     UserType = "architect",

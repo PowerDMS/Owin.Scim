@@ -19,7 +19,7 @@
 
     using Services;
 
-    public class GroupValidator : ResourceValidatorBase<Group>
+    public class GroupValidator : ResourceValidatorBase<ScimGroup>
     {
         private readonly IUserRepository _UserRepository;
 

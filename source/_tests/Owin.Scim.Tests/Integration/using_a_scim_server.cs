@@ -47,8 +47,8 @@
                                         specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
                                         isPrimary: true))
                                 .ConfigureETag(supported: true, isWeak: true)
-                                .ModifyResourceType<User>(ModifyUserResourceType)
-                                .ModifyResourceType<Group>(ModifyGroupResourceType);
+                                .ModifyResourceType<ScimUser>(ModifyUserResourceType)
+                                .ModifyResourceType<ScimGroup>(ModifyGroupResourceType);
                         });
                 });
             }
@@ -63,13 +63,13 @@
         {
         }
 
-        private static void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<User> builder)
+        private static void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<ScimUser> builder)
         {
             // this adds custom schemas, need play with custom validation next
             builder.AddSchemaExtension<MyUserSchema, MyUserSchemaValidator>(MyUserSchema.Schema);
         }
 
-        private static void ModifyGroupResourceType(ScimResourceTypeDefinitionBuilder<Group> builder)
+        private static void ModifyGroupResourceType(ScimResourceTypeDefinitionBuilder<ScimGroup> builder)
         {
             // this adds custom schemas, need play with custom validation next
             builder.AddSchemaExtension<MyGroupSchema, MyGroupSchemaValidator>(MyGroupSchema.Schema);

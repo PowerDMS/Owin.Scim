@@ -13,10 +13,10 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
     {
         Establish context = () =>
         {
-            ExistingUser = CreateUser(new User {UserName = Users.UserNameUtility.GenerateUserName()});
-            var anotherUser = CreateUser(new User {UserName = Users.UserNameUtility.GenerateUserName()});
+            ExistingUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
+            var anotherUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
             GroupToUpdate = CreateGroup(
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "groupToUpdate",
                     Members = new []
@@ -47,7 +47,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
 
         It should_indicate_mutability = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.Mutability);
 
-        private static Group GroupToUpdate;
-        private static User ExistingUser;
+        private static ScimGroup GroupToUpdate;
+        private static ScimUser ExistingUser;
     }
 }

@@ -15,10 +15,10 @@
         {
             TestStartTime = DateTime.UtcNow;
 
-            ExistingUser = CreateUser(new User { UserName = Users.UserNameUtility.GenerateUserName() });
-            ExistingGroup = CreateGroup(new Group {DisplayName = Users.UserNameUtility.GenerateUserName()});
+            ExistingUser = CreateUser(new ScimUser { UserName = Users.UserNameUtility.GenerateUserName() });
+            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = Users.UserNameUtility.GenerateUserName()});
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 DisplayName = "hello",
                 ExternalId = "hello",
@@ -49,8 +49,8 @@
 
         It should_canonize_member_type = () => CreatedGroup.Members.First().Type.ShouldEqual("User");
 
-        private static User ExistingUser;
-        private static Group ExistingGroup;
+        private static ScimUser ExistingUser;
+        private static ScimGroup ExistingGroup;
         private static DateTime TestStartTime;
     }
 }

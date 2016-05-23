@@ -13,9 +13,9 @@
         /// </summary>
         private Establish context = () =>
         {
-            ExistingUser = CreateUser(new User {UserName = Users.UserNameUtility.GenerateUserName()});
+            ExistingUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 DisplayName = Users.UserNameUtility.GenerateUserName(),
                 Members = new[] {new Member {Value = ExistingUser.Id, Type = "user"},}
@@ -40,7 +40,7 @@
             RetrievedGroup.Meta.Version.ShouldEqual(Response.Headers.ETag.ToString());
         };
 
-        private static User ExistingUser;
-        private static Group ExistingGroup;
+        private static ScimUser ExistingUser;
+        private static ScimGroup ExistingGroup;
     }
 }

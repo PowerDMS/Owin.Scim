@@ -16,7 +16,7 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
     {
         Establish context = () =>
         {
-            UserDto = new User
+            UserDto = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
@@ -39,13 +39,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(UserDto))
+                .PostAsync("users", new ScimObjectContent<ScimUser>(UserDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
             
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
-                ? Response.Content.ScimReadAsAsync<User>().Result
+                ? Response.Content.ScimReadAsAsync<ScimUser>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -67,9 +67,9 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .Extension<MyUserSchema>()
                 .ShouldBeLike(UserDto.Extension<MyUserSchema>());
 
-        protected static User UserDto;
+        protected static ScimUser UserDto;
 
-        protected static User CreatedUser;
+        protected static ScimUser CreatedUser;
 
         protected static HttpResponseMessage Response;
 

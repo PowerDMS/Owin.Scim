@@ -7,25 +7,25 @@ namespace Owin.Scim.Tests.Integration.Groups
 
     public class using_existing_user_and_group : using_a_scim_server
     {
-        protected static User CreateUser(User user)
+        protected static ScimUser CreateUser(ScimUser user)
         {
             var response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(user)).Result;
+                .PostAsync("users", new ScimObjectContent<ScimUser>(user)).Result;
 
             return (response.StatusCode == HttpStatusCode.Created)
-                ? response.Content.ScimReadAsAsync<User>().Result
+                ? response.Content.ScimReadAsAsync<ScimUser>().Result
                 : null;
         }
 
-        protected static Group CreateGroup(Group group)
+        protected static ScimGroup CreateGroup(ScimGroup group)
         {
             var response = Server
                 .HttpClient
-                .PostAsync("groups", new ScimObjectContent<Group>(group)).Result;
+                .PostAsync("groups", new ScimObjectContent<ScimGroup>(group)).Result;
 
             return response.StatusCode == HttpStatusCode.Created
-                ? response.Content.ScimReadAsAsync<Group>().Result
+                ? response.Content.ScimReadAsAsync<ScimGroup>().Result
                 : null;
         }
     }

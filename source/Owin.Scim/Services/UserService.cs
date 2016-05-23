@@ -52,7 +52,7 @@
             _ResourceValidatorFactory = resourceValidatorFactory;
         }
 
-        public async Task<IScimResponse<User>> CreateUser(User user)
+        public async Task<IScimResponse<ScimUser>> CreateUser(ScimUser user)
         {
             _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(user.GetType()));
 
@@ -60,7 +60,7 @@
             var validationResult = (await validator.ValidateCreateAsync(user)).ToScimValidationResult();
 
             if (!validationResult)
-                return new ScimErrorResponse<User>(validationResult.Errors.First());
+                return new ScimErrorResponse<ScimUser>(validationResult.Errors.First());
             
             var createdDate = DateTime.UtcNow;
             user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
@@ -70,32 +70,36 @@
             };
 
             var userRecord = await _UserRepository.CreateUser(user);
+            if (userRecord == null)
+                return new ScimErrorResponse<ScimUser>(
+                    new ScimError(
+                        HttpStatusCode.BadRequest));
 
-            SetResourceVersion(user);
+            SetResourceVersion(userRecord);
 
-            return new ScimDataResponse<User>(userRecord);
+            return new ScimDataResponse<ScimUser>(userRecord);
         }
 
-        public async Task<IScimResponse<User>> RetrieveUser(string userId)
+        public async Task<IScimResponse<ScimUser>> RetrieveUser(string userId)
         {
             var userRecord = await _UserRepository.GetUser(userId);
             if (userRecord == null)
-                return new ScimErrorResponse<User>(
+                return new ScimErrorResponse<ScimUser>(
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ScimErrorDetail.NotFound(userId)));
 
             SetResourceVersion(userRecord);
 
-            return new ScimDataResponse<User>(userRecord);
+            return new ScimDataResponse<ScimUser>(userRecord);
         }
 
-        public async Task<IScimResponse<User>> UpdateUser(User user)
+        public async Task<IScimResponse<ScimUser>> UpdateUser(ScimUser user)
         {
             var userRecord = await _UserRepository.GetUser(user.Id);
             if (userRecord == null)
             {
-                return new ScimErrorResponse<User>(
+                return new ScimErrorResponse<ScimUser>(
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ScimErrorDetail.NotFound(user.Id)));
@@ -114,14 +118,14 @@
             var validationResult = (await validator.ValidateUpdateAsync(user, userRecord)).ToScimValidationResult();
 
             if (!validationResult)
-                return new ScimErrorResponse<User>(validationResult.Errors.First());
+                return new ScimErrorResponse<ScimUser>(validationResult.Errors.First());
             
             // check if we're changing a password
             if (_PasswordManager.PasswordIsDifferent(user.Password, userRecord.Password))
             {
                 if (!ServerConfiguration.GetFeature(ScimFeatureType.ChangePassword).Supported)
                 {
-                    return new ScimErrorResponse<User>(
+                    return new ScimErrorResponse<ScimUser>(
                         new ScimError(
                             HttpStatusCode.BadRequest,
                             ScimErrorType.InvalidValue,
@@ -137,13 +141,13 @@
 
             // if both versions are equal, bypass persistence
             if (user.Meta.Version.Equals(userRecord.Meta.Version))
-                return new ScimDataResponse<User>(user);
+                return new ScimDataResponse<ScimUser>(user);
 
             user.Meta.LastModified = DateTime.UtcNow;
 
             await _UserRepository.UpdateUser(user);
 
-            return new ScimDataResponse<User>(user);
+            return new ScimDataResponse<ScimUser>(user);
         }
 
         public async Task<IScimResponse<Unit>> DeleteUser(string userId)
@@ -158,12 +162,12 @@
             return new ScimDataResponse<Unit>(default(Unit));
         }
 
-        public async Task<IScimResponse<IEnumerable<User>>> QueryUsers(ScimQueryOptions options)
+        public async Task<IScimResponse<IEnumerable<ScimUser>>> QueryUsers(ScimQueryOptions options)
         {
-            var users = await _UserRepository.QueryUsers(options) ?? new List<User>();
+            var users = await _UserRepository.QueryUsers(options) ?? new List<ScimUser>();
             users.ForEach(user => SetResourceVersion(user));
 
-            return new ScimDataResponse<IEnumerable<User>>(users);
+            return new ScimDataResponse<IEnumerable<ScimUser>>(users);
         }
     }
 }

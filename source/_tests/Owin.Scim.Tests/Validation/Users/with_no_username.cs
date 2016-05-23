@@ -8,7 +8,7 @@ namespace Owin.Scim.Tests.Validation.Users
     {
         Establish ctx = () =>
         {
-            User = new User
+            User = new ScimUser
             {
             };
         };

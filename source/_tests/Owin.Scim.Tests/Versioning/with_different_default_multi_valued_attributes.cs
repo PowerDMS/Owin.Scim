@@ -6,11 +6,11 @@
 
     using Model.Users;
 
-    public class with_different_default_multi_valued_attributes : when_generating_a_User_etags<User>
+    public class with_different_default_multi_valued_attributes : when_generating_a_User_etags<ScimUser>
     {
         Establish ctx = () =>
         {
-            User = new User { Emails = _Emails };
+            User = new ScimUser { Emails = _Emails };
         };
 
         Because of = () =>

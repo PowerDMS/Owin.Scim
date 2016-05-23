@@ -37,7 +37,7 @@ namespace Owin.Scim.Tests.Validation.Users
                 .ToScimValidationResult();
         };
 
-        protected static User ExistingUserRecord;
+        protected static ScimUser ExistingUserRecord;
 
         protected static ScimServerConfiguration ServerConfiguration;
 
@@ -45,7 +45,7 @@ namespace Owin.Scim.Tests.Validation.Users
         
         protected static IManagePasswords PasswordManager;
 
-        protected static User User;
+        protected static ScimUser User;
 
         protected static ValidationResult Result;
 

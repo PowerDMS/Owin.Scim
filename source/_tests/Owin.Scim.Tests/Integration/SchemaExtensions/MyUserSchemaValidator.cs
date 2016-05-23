@@ -10,7 +10,7 @@
 
     using Scim.Validation;
 
-    public class MyUserSchemaValidator : ResourceExtensionValidatorBase<User, MyUserSchema>
+    public class MyUserSchemaValidator : ResourceExtensionValidatorBase<ScimUser, MyUserSchema>
     {
         protected override void ConfigureDefaultRuleSet()
         {

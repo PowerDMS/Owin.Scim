@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
         {
             Response = await Server
                 .HttpClient
-                .PostAsync("groups", new ScimObjectContent<Group>(GroupDto))
+                .PostAsync("groups", new ScimObjectContent<ScimGroup>(GroupDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -22,7 +22,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
                 : null;
 
             CreatedGroup = bodyText != null
-                ? Newtonsoft.Json.JsonConvert.DeserializeObject<Group>(bodyText)
+                ? Newtonsoft.Json.JsonConvert.DeserializeObject<ScimGroup>(bodyText)
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -30,9 +30,9 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
                 : null;
         };
         
-        protected static Group GroupDto;
+        protected static ScimGroup GroupDto;
 
-        protected static Group CreatedGroup;
+        protected static ScimGroup CreatedGroup;
 
         protected static HttpResponseMessage Response;
 

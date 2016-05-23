@@ -42,7 +42,7 @@
 
         protected static IManagePasswords PasswordManager;
 
-        protected static User User;
+        protected static ScimUser User;
 
         protected static ValidationResult Result;
 

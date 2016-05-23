@@ -12,7 +12,7 @@
     {
         Establish context = async () =>
         {
-            var existingUser = new User
+            var existingUser = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
@@ -20,11 +20,11 @@
             // Insert the first user so there's one already in-memory.
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(existingUser, new JsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<ScimUser>(existingUser, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
-            UserId = (await Response.Content.ReadAsAsync<User>()).Id;
+            UserId = (await Response.Content.ReadAsAsync<ScimUser>()).Id;
         };
 
         It should_return_no_content = () => Response.StatusCode.ShouldEqual(HttpStatusCode.NoContent);

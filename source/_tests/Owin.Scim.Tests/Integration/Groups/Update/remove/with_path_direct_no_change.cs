@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
         Establish context = () =>
         {
             GroupToUpdate = CreateGroup(
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "groupToUpdate",
                 });
@@ -48,6 +48,6 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
 
         It should_look_identical = () => UpdatedGroup.ShouldBeLike(GroupToUpdate);
 
-        private static Group GroupToUpdate;
+        private static ScimGroup GroupToUpdate;
     }
 }

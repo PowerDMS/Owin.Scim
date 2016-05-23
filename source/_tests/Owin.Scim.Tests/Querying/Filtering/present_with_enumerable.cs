@@ -7,15 +7,15 @@
     
     using Model.Users;
 
-    public class present_with_enumerable : when_parsing_a_filter_expression<User>
+    public class present_with_enumerable : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen" },
-                new User { UserName = "LSmith", Emails = new List<Email>() },
-                new User { UserName = "DGioulakis", Emails = new List<Email> { new Email { Value = "my@email.com", Primary = true, Type = "work" } } }
+                new ScimUser { UserName = "BJensen" },
+                new ScimUser { UserName = "LSmith", Emails = new List<Email>() },
+                new ScimUser { UserName = "DGioulakis", Emails = new List<Email> { new Email { Value = "my@email.com", Primary = true, Type = "work" } } }
             };
 
             FilterExpression = "emails pr";

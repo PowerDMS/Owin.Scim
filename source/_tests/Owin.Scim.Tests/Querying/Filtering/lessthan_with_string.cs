@@ -7,14 +7,14 @@
 
     using Model.Users;
 
-    public class lessthan_with_string : when_parsing_a_filter_expression<User>
+    public class lessthan_with_string : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "abcdef" },
-                new User { UserName = "acdefg" }
+                new ScimUser { UserName = "abcdef" },
+                new ScimUser { UserName = "acdefg" }
             };
 
             FilterExpression = "userName lt \"acbdef\"";

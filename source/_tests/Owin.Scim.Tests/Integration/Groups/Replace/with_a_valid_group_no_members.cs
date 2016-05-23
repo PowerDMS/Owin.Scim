@@ -10,11 +10,11 @@
     {
         Establish context = () =>
         {
-            ExistingGroup = CreateGroup(new Group {DisplayName = "existing group"});
+            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = "existing group"});
 
             GroupId = ExistingGroup.Id;
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 Id = GroupId,
                 DisplayName = "new group",
@@ -41,6 +41,6 @@
             CreatedGroup.Meta.Version.ShouldNotEqual(ExistingGroup.Meta.Version);
         };
 
-        private static Group ExistingGroup;
+        private static ScimGroup ExistingGroup;
     }
 }

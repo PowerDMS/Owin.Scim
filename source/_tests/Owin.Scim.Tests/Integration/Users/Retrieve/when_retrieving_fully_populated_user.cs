@@ -15,7 +15,7 @@
         {
             var autoFixture = new Fixture();
 
-            var existingUser = autoFixture.Build<User>()
+            var existingUser = autoFixture.Build<ScimUser>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -27,18 +27,18 @@
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
                 .With(x => x.X509Certificates, null)
-                .Create(seed: new User());
+                .Create(seed: new ScimUser());
 
             // Insert the first user so there's one already in-memory.
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(existingUser))
+                .PostAsync("users", new ScimObjectContent<ScimUser>(existingUser))
                 .AwaitResponse()
                 .AsTask;
 
             if (Response.StatusCode == HttpStatusCode.Created)
             {
-                CreatedUser = await Response.Content.ScimReadAsAsync<User>().Await().AsTask;
+                CreatedUser = await Response.Content.ScimReadAsAsync<ScimUser>().Await().AsTask;
             }
 
             var client = Server.HttpClient;
@@ -55,15 +55,15 @@
             async () =>
         {
             Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
-            RetrievedUser = await Response.Content.ScimReadAsAsync<User>().AwaitResponse().AsTask;
+            RetrievedUser = await Response.Content.ScimReadAsAsync<ScimUser>().AwaitResponse().AsTask;
 
             RetrievedUser.Meta.Version.ShouldEqual(CreatedUser.Meta.Version);
         };
 
         protected static HttpResponseMessage Response;
 
-        protected static User CreatedUser;
+        protected static ScimUser CreatedUser;
         
-        protected static User RetrievedUser;
+        protected static ScimUser RetrievedUser;
     }
 }

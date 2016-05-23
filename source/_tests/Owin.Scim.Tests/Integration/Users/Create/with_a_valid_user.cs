@@ -14,7 +14,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         Establish context = () =>
         {
             CurrentUtcDateTime = DateTime.UtcNow;
-            UserDto = new User
+            UserDto = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName()
             };

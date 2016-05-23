@@ -10,9 +10,9 @@
     {
         Establish context = () =>
         {
-            ExistingUser = CreateUser(new User { UserName = Users.UserNameUtility.GenerateUserName() });
+            ExistingUser = CreateUser(new ScimUser { UserName = Users.UserNameUtility.GenerateUserName() });
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 DisplayName = "hello",
                 ExternalId = "hello",
@@ -29,6 +29,6 @@
 
         It should_return_indicate_invalid_attribute = () => Error.Detail.ShouldContain("member.$ref");
 
-        private static User ExistingUser;
+        private static ScimUser ExistingUser;
     }
 }

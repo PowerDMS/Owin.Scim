@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Validation.Users
             A.CallTo(() => UserRepository.IsUserNameAvailable(A<string>._))
                 .Returns(false);
 
-            User = new User
+            User = new ScimUser
             {
                 UserName = "daniel"
             };

@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
     {
         Establish context = () =>
         {
-            UserToUpdate = new User
+            UserToUpdate = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Emails = null

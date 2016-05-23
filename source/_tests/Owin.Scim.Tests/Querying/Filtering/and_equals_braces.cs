@@ -10,14 +10,14 @@
     using Scim.Querying;
 
     [Subject(typeof(ScimFilterVisitor<>))]
-    public class and_equals_braces : when_parsing_a_filter_expression<User>
+    public class and_equals_braces : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen", UserType = "employee"},
-                new User
+                new ScimUser { UserName = "BJensen", UserType = "employee"},
+                new ScimUser
                 {
                     UserName = "ROMalley",
                     UserType = "employee",
@@ -26,7 +26,7 @@
                         new Email { Value = "user@example.com", Type = "work" }
                     }
                 },
-                new User
+                new ScimUser
                 {
                     UserName = "DGioulakis",
                     Emails = new List<Email>

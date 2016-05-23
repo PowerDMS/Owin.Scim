@@ -16,11 +16,11 @@
             // Insert the first user so there's one already in-memory.
             var userRecord = await Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(UserToUpdate))
+                .PostAsync("users", new ScimObjectContent<ScimUser>(UserToUpdate))
                 .AwaitResponse()
                 .AsTask;
 
-            UserToUpdate = await userRecord.Content.ScimReadAsAsync<User>().AwaitResponse().AsTask;
+            UserToUpdate = await userRecord.Content.ScimReadAsAsync<ScimUser>().AwaitResponse().AsTask;
 
             Task.Delay(100).Await();
 
@@ -36,7 +36,7 @@
                 .AsTask;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = await PatchResponse.Content.ScimReadAsAsync<User>();
+                UpdatedUser = await PatchResponse.Content.ScimReadAsAsync<ScimUser>();
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -45,13 +45,13 @@
             }
         };
 
-        protected static User UserToUpdate;
+        protected static ScimUser UserToUpdate;
 
         protected static HttpContent PatchContent;
 
         protected static HttpResponseMessage PatchResponse;
 
-        protected static User UpdatedUser;
+        protected static ScimUser UpdatedUser;
 
         protected static Model.ScimError Error;
     }

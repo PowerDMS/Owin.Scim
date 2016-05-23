@@ -17,17 +17,17 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
     {
         private Establish context = () =>
         {
-            var existingUser = new User
+            var existingUser = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
 
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(existingUser))
+                .PostAsync("users", new ScimObjectContent<ScimUser>(existingUser))
                 .Result;
 
-            UserDto = Response.Content.ScimReadAsAsync<User>().Result;
+            UserDto = Response.Content.ScimReadAsAsync<ScimUser>().Result;
 
             UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
             UserDto.AddExtension(
@@ -48,13 +48,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PutAsync("users/" + UserDto.Id, new ScimObjectContent<User>(UserDto))
+                .PutAsync("users/" + UserDto.Id, new ScimObjectContent<ScimUser>(UserDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
 
             CreatedUser = Response.StatusCode == HttpStatusCode.OK
-                ? Response.Content.ScimReadAsAsync<User>().Result
+                ? Response.Content.ScimReadAsAsync<ScimUser>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -76,9 +76,9 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .Extension<MyUserSchema>()
                 .ShouldBeLike(UserDto.Extension<MyUserSchema>());
 
-        protected static User UserDto;
+        protected static ScimUser UserDto;
 
-        protected static User CreatedUser;
+        protected static ScimUser CreatedUser;
 
         protected static HttpResponseMessage Response;
 

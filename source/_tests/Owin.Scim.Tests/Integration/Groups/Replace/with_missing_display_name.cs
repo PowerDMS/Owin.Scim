@@ -10,11 +10,11 @@
     {
         Establish context = () =>
         {
-            ExistingGroup = CreateGroup(new Group {DisplayName = "existing group"});
+            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = "existing group"});
 
             GroupId = ExistingGroup.Id;
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 Id = GroupId,
                 ExternalId = "hello",
@@ -27,6 +27,6 @@
 
         It should_return_indicate_missing_attribute = () => Error.Detail.ShouldContain("displayName");
 
-        private static Group ExistingGroup;
+        private static ScimGroup ExistingGroup;
     }
 }

@@ -1,4 +1,4 @@
-﻿namespace ConsoleHost
+﻿namespace ConsoleHost.Scim
 {
     using System.Net;
 

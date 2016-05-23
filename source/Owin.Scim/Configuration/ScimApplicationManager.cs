@@ -1,7 +1,11 @@
 ﻿namespace Owin.Scim.Configuration
 {
     using System;
+    using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.IO;
+    using System.Linq;
     using System.Reflection;
     using System.Web.Http;
     using System.Web.Http.Controllers;
@@ -34,22 +38,29 @@
 
     public class ScimApplicationManager : IApplicationComponent
     {
+        private IContainer _Container;
+
         private readonly IAppBuilder _AppBuilder;
 
-        private readonly IContainer _Container;
+        private readonly IList<Predicate<FileInfo>> _CompositionConstraints;
+
+        private readonly ConcurrentDictionary<Type, bool> _TypeResolverCache;
 
         private readonly Action<ScimServerConfiguration> _ConfigureScimServerAction;
 
         private bool _IsConfigured;
 
         public ScimApplicationManager(
-            IAppBuilder appBuilder,
-            IContainer container,
+            IContainer container, 
+            IAppBuilder appBuilder, 
+            IList<Predicate<FileInfo>> compositionConstraints, 
             Action<ScimServerConfiguration> configureScimServerAction)
         {
             _AppBuilder = appBuilder;
             _Container = container;
+            _CompositionConstraints = compositionConstraints;
             _ConfigureScimServerAction = configureScimServerAction;
+            _TypeResolverCache = new ConcurrentDictionary<Type, bool>();
         }
 
         public bool IsConfigured
@@ -60,9 +71,10 @@
 
         public void Configure(ApplicationConfigurationBase applicationConfiguration)
         {
-            if (IsConfigured) return;
+            if (IsConfigured)
+                return;
 
-            // my catch all exception handler
+            // global exception handler for returning SCIM-formatted messages
             _AppBuilder.Use<ExceptionHandlerMiddleware>();
 
             var serverConfiguration = new ScimServerConfiguration();
@@ -117,6 +129,31 @@
             // Invoke custom configuration action if not null
             if (_ConfigureScimServerAction != null)
                 _ConfigureScimServerAction.Invoke(serverConfiguration);
+            
+            // Register a fallback dependency resolver if one has been specified
+            if (serverConfiguration.DependencyResolver != null)
+            {
+                typeof(Rules).GetProperty("UnknownServiceResolvers", BindingFlags.Instance | BindingFlags.Public)
+                    .SetValue(_Container.Rules, new Rules.UnknownServiceResolver[]
+                    {
+                        request =>
+                        {
+                            var shouldResolve = _TypeResolverCache.GetOrAdd(
+                                request.ServiceType,
+                                type =>
+                                    _CompositionConstraints.Any(
+                                        constraint =>
+                                            constraint(new FileInfo(type.Assembly.Location))));
+
+                            if (!shouldResolve)
+                                return null;
+                            
+                            return new DelegateFactory(
+                                resolver =>
+                                    serverConfiguration.DependencyResolver.Resolve(request.ServiceType));
+                        }
+                    });
+            }
 
             // Configure SCIM http configuration
             ConfigureHttpConfiguration(serverConfiguration);

@@ -14,7 +14,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.multiOperation
     {
         Establish context = () =>
         {
-            UserToUpdate = new User
+            UserToUpdate = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 DisplayName = "Danny",

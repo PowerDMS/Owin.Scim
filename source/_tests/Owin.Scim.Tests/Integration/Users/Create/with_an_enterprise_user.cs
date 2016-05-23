@@ -10,7 +10,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     {
         Establish context = () =>
         {
-            UserDto = new User
+            UserDto = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName()
             };

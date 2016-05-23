@@ -9,7 +9,7 @@
 
     using Newtonsoft.Json;
 
-    [KnownType(typeof(User))]
+    [KnownType(typeof(ScimUser))]
     public class ScimListResponse : SchemaBase
     {
         public ScimListResponse(IEnumerable<Resource> resources)

@@ -7,14 +7,14 @@
 
     using Model.Users;
 
-    public class contains_with_string : when_parsing_a_filter_expression<User>
+    public class contains_with_string : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen" },
-                new User { UserName = "ROMalley", Name = new Name { FamilyName = "O'Malley", GivenName = "Ryan" } }
+                new ScimUser { UserName = "BJensen" },
+                new ScimUser { UserName = "ROMalley", Name = new Name { FamilyName = "O'Malley", GivenName = "Ryan" } }
             };
 
             FilterExpression = "name.familyName co \"malley\"";

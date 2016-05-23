@@ -1,4 +1,4 @@
-﻿namespace ConsoleHost
+﻿namespace ConsoleHost.Scim
 {
     using Owin.Scim.Configuration;
     using Owin.Scim.Model.Users;

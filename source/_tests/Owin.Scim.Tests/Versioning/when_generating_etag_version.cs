@@ -2,7 +2,7 @@
 {
     using Model.Users;
 
-    public class when_generating_a_User_etags<TUser> where TUser : User
+    public class when_generating_a_User_etags<TUser> where TUser : ScimUser
     {
         protected static int User1ETag;
         

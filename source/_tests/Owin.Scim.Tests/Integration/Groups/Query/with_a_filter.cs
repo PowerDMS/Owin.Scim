@@ -14,33 +14,33 @@
     {
         Establish context = async () =>
         {
-            var groups = new List<Group>
+            var groups = new List<ScimGroup>
             {
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "dev1"
                 },
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "dev2"
                 },
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "dev3"
                 },
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "sales1"
                 },
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "sales2"
                 },
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "hr"
                 },
-                new Group
+                new ScimGroup
                 {
                     DisplayName = "exec"
                 }
@@ -50,7 +50,7 @@
             {
                 await Server
                     .HttpClient
-                    .PostAsync("groups", new ScimObjectContent<Group>(group))
+                    .PostAsync("groups", new ScimObjectContent<ScimGroup>(group))
                     .AwaitResponse()
                     .AsTask;
             }

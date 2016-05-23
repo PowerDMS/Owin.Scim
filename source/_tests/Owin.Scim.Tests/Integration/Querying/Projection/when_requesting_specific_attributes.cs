@@ -19,7 +19,7 @@
         {
             var autoFixture = new Fixture();
 
-            var existingUser = autoFixture.Build<User>()
+            var existingUser = autoFixture.Build<ScimUser>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -31,7 +31,7 @@
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
                 .With(x => x.X509Certificates, null)
-                .Create(seed: new User());
+                .Create(seed: new ScimUser());
 
             // Insert the first user so there's one already in-memory.
             await (await Server
@@ -41,7 +41,7 @@
                         new Uri("http://localhost/users"))
                     {
                         Query = "attributes=" + string.Join(",", Attributes ?? new List<string>())
-                    }.ToString(), new ScimObjectContent<User>(existingUser))
+                    }.ToString(), new ScimObjectContent<ScimUser>(existingUser))
                 .AwaitResponse()
                 .AsTask).DeserializeTo(() => JsonResponse);
         };

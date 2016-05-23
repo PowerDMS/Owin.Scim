@@ -17,7 +17,7 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
     {
         Establish context = () =>
         {
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 DisplayName = UserNameUtility.GenerateUserName()
             };
@@ -43,13 +43,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PostAsync("groups", new ScimObjectContent<Group>(GroupDto))
+                .PostAsync("groups", new ScimObjectContent<ScimGroup>(GroupDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
 
             CreatedGroup = Response.StatusCode == HttpStatusCode.Created
-                ? Response.Content.ScimReadAsAsync<Group>().Result
+                ? Response.Content.ScimReadAsAsync<ScimGroup>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -66,9 +66,9 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .Extension<MyGroupSchema>()
                 .ShouldBeLike(GroupDto.Extension<MyGroupSchema>());
 
-        protected static Group GroupDto;
+        protected static ScimGroup GroupDto;
 
-        protected static Group CreatedGroup;
+        protected static ScimGroup CreatedGroup;
 
         protected static HttpResponseMessage Response;
 

@@ -13,12 +13,12 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         {
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(UserDto))
+                .PostAsync("users", new ScimObjectContent<ScimUser>(UserDto))
                 .AwaitResponse()
                 .AsTask;
 
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
-                ? await Response.Content.ScimReadAsAsync<User>().AwaitResponse().AsTask
+                ? await Response.Content.ScimReadAsAsync<ScimUser>().AwaitResponse().AsTask
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -26,9 +26,9 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 : null;
         };
         
-        protected static User UserDto;
+        protected static ScimUser UserDto;
 
-        protected static User CreatedUser;
+        protected static ScimUser CreatedUser;
 
         protected static HttpResponseMessage Response;
 

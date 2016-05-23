@@ -13,7 +13,7 @@
         Establish context = async () =>
         {
             var userName = UserNameUtility.GenerateUserName();
-            var existingUser = new User
+            var existingUser = new ScimUser
             {
                 UserName = userName
             };
@@ -21,13 +21,13 @@
             // Insert the first user so there's one already in-memory.
             var userRecord = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<User>(existingUser, new JsonMediaTypeFormatter()))
+                .PostAsync("users", new ObjectContent<ScimUser>(existingUser, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
-            var userId = (await userRecord.Content.ReadAsAsync<User>()).Id;
+            var userId = (await userRecord.Content.ReadAsAsync<ScimUser>()).Id;
 
-            UserDto = new User
+            UserDto = new ScimUser
             {
                 Id = userId,
                 UserName = userName,

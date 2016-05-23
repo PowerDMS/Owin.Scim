@@ -24,7 +24,7 @@ namespace Owin.Scim.Tests.Services.UserService.Update
             A.CallTo(() => UserRepository.GetUser(A<string>._))
                 .ReturnsLazily(GetUserRecord);
 
-            ClientUserDto = new User
+            ClientUserDto = new ScimUser
             {
                 Id = "id",
                 UserName = "name",
@@ -34,10 +34,10 @@ namespace Owin.Scim.Tests.Services.UserService.Update
 
         It should_hash_the_new_password = () => A.CallTo(() => PasswordManager.CreateHash(A<string>._)).MustHaveHappened();
 
-        private static Task<User> GetUserRecord()
+        private static Task<ScimUser> GetUserRecord()
         {
             return Task.FromResult(
-                new User
+                new ScimUser
                 {
                     Id = "id",
                     UserName = "name",

@@ -23,7 +23,7 @@ namespace Owin.Scim.Endpoints
         protected void SetETagHeader<T>(HttpResponseMessage response, T resource) 
             where T : Resource
         {
-            if (ServerConfiguration.IsFeatureSupported(ScimFeatureType.ETag))
+            if (!string.IsNullOrWhiteSpace(resource.Meta.Version) && ServerConfiguration.IsFeatureSupported(ScimFeatureType.ETag))
                 response.Headers.ETag = EntityTagHeaderValue.Parse(resource.Meta.Version);
         }
 

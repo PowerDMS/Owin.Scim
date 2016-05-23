@@ -39,7 +39,7 @@
         }
 
         [Route(Name = "CreateGroup")]
-        public async Task<HttpResponseMessage> Post(Group groupDto)
+        public async Task<HttpResponseMessage> Post(ScimGroup groupDto)
         {
             return (await _GroupService.CreateGroup(groupDto))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
@@ -95,13 +95,13 @@
         }
 
         [Route("{groupId}", Name = "UpdateGroup")]
-        public async Task<HttpResponseMessage> Patch(string groupId, PatchRequest<Group> patchRequest)
+        public async Task<HttpResponseMessage> Patch(string groupId, PatchRequest<ScimGroup> patchRequest)
         {
             if (patchRequest == null ||
                 patchRequest.Operations == null ||
                 patchRequest.Operations.Operations.Any(a => a.OperationType == Patching.Operations.OperationType.Invalid))
             {
-                return new ScimErrorResponse<Group>(
+                return new ScimErrorResponse<ScimGroup>(
                     new ScimError(
                         HttpStatusCode.BadRequest,
                         ScimErrorType.InvalidSyntax,
@@ -117,13 +117,13 @@
                         // TODO: (DG) Finish patch support
                         var result = patchRequest.Operations.ApplyTo(
                             @group, 
-                            new ScimObjectAdapter<Group>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
+                            new ScimObjectAdapter<ScimGroup>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
                         
-                        return (IScimResponse<Group>)new ScimDataResponse<Group>(@group);
+                        return (IScimResponse<ScimGroup>)new ScimDataResponse<ScimGroup>(@group);
                     }
                     catch (Patching.Exceptions.ScimPatchException ex)
                     {
-                        return (IScimResponse<Group>)new ScimErrorResponse<Group>(ex.ToScimError());
+                        return (IScimResponse<ScimGroup>)new ScimErrorResponse<ScimGroup>(ex.ToScimError());
                     }
                 })
                 .BindAsync(group => _GroupService.UpdateGroup(group)))
@@ -137,7 +137,7 @@
 
         [AcceptVerbs("PUT", "OPTIONS")]
         [Route("{groupId}", Name = "ReplaceGroup")]
-        public async Task<HttpResponseMessage> Put(string groupId, Group groupDto)
+        public async Task<HttpResponseMessage> Put(string groupId, ScimGroup groupDto)
         {
             groupDto.Id = groupId;
 

@@ -8,7 +8,7 @@
 
     using Validation.Users;
 
-    public class UserDefinition : ScimResourceTypeDefinitionBuilder<User>
+    public class UserDefinition : ScimResourceTypeDefinitionBuilder<ScimUser>
     {
         public UserDefinition(ScimServerConfiguration serverConfiguration)
             : base(

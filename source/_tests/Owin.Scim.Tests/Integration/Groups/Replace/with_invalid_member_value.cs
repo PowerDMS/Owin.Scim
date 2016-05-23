@@ -13,10 +13,10 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
     {
         Establish context = () =>
         {
-            ExistingUser1 = CreateUser(new User {UserName = Users.UserNameUtility.GenerateUserName()});
-            ExistingUser2 = CreateUser(new User { UserName = Users.UserNameUtility.GenerateUserName() });
-            ExistingGroup1 = CreateGroup(new Group { DisplayName = "existing group 1" });
-            ExistingGroup2 = CreateGroup(new Group
+            ExistingUser1 = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
+            ExistingUser2 = CreateUser(new ScimUser { UserName = Users.UserNameUtility.GenerateUserName() });
+            ExistingGroup1 = CreateGroup(new ScimGroup { DisplayName = "existing group 1" });
+            ExistingGroup2 = CreateGroup(new ScimGroup
             {
                 DisplayName = "existing group 2",
                 ExternalId = "hello",
@@ -29,7 +29,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 
             GroupId = ExistingGroup2.Id;
 
-            GroupDto = new Group
+            GroupDto = new ScimGroup
             {
                 Id = GroupId,
                 DisplayName = "updated group 2",
@@ -44,9 +44,9 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 
         It should_return_invalid_syntax = () => Error.ScimType.ShouldEqual(Model.ScimErrorType.InvalidSyntax);
 
-        private static User ExistingUser1;
-        private static User ExistingUser2;
-        private static Group ExistingGroup1;
-        private static Group ExistingGroup2;
+        private static ScimUser ExistingUser1;
+        private static ScimUser ExistingUser2;
+        private static ScimGroup ExistingGroup1;
+        private static ScimGroup ExistingGroup2;
     }
 }

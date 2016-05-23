@@ -15,7 +15,7 @@
     {
         Establish context = () =>
         {
-            UserToUpdate = new User
+            UserToUpdate = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Emails = new List<Email>

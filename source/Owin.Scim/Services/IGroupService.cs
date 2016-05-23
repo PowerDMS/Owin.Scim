@@ -11,14 +11,14 @@
 
     public interface IGroupService
     {
-        Task<IScimResponse<Group>> CreateGroup(Group group);
+        Task<IScimResponse<ScimGroup>> CreateGroup(ScimGroup group);
 
-        Task<IScimResponse<Group>> RetrieveGroup(string groupId);
+        Task<IScimResponse<ScimGroup>> RetrieveGroup(string groupId);
 
-        Task<IScimResponse<Group>> UpdateGroup(Group group);
+        Task<IScimResponse<ScimGroup>> UpdateGroup(ScimGroup group);
 
         Task<IScimResponse<Unit>> DeleteGroup(string groupId);
 
-        Task<IScimResponse<IEnumerable<Group>>> QueryGroups(ScimQueryOptions options);
+        Task<IScimResponse<IEnumerable<ScimGroup>>> QueryGroups(ScimQueryOptions options);
     }
 }

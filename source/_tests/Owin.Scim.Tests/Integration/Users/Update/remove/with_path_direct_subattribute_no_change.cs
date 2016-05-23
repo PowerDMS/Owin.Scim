@@ -12,7 +12,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
     {
         Establish context = () =>
         {
-            UserToUpdate = new User
+            UserToUpdate = new ScimUser
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Name = new Name

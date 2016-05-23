@@ -7,15 +7,15 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Model.Users;
 
-    public class or_present_equals : when_parsing_a_filter_expression<User>
+    public class or_present_equals : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen"},
-                new User { UserName = "LSmith", Title = "Engineer", UserType = "Manager" },
-                new User { UserName = "DGioulakis", UserType = "Employee" }
+                new ScimUser { UserName = "BJensen"},
+                new ScimUser { UserName = "LSmith", Title = "Engineer", UserType = "Manager" },
+                new ScimUser { UserName = "DGioulakis", UserType = "Employee" }
             };
 
             FilterExpression = "title pr or userType eq \"employee\"";

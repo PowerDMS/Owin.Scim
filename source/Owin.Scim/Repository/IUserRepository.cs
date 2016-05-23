@@ -14,21 +14,21 @@
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        Task<User> CreateUser(User user);
+        Task<ScimUser> CreateUser(ScimUser user);
 
         /// <summary>
-        /// Gets the <see cref="User"/> resource associated with the specified <paramref name="userId"/>.
+        /// Gets the <see cref="ScimUser"/> resource associated with the specified <paramref name="userId"/>.
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<User> GetUser(string userId);
+        Task<ScimUser> GetUser(string userId);
 
         /// <summary>
         /// Updates the specified <paramref name="user"/> record.
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        Task UpdateUser(User user);
+        Task UpdateUser(ScimUser user);
 
         /// <summary>
         /// Clients request resource removal via DELETE.  Service providers MAY
@@ -44,14 +44,14 @@
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<User> DeleteUser(string userId);
+        Task<ScimUser> DeleteUser(string userId);
 
         /// <summary>
         /// Searches for users whose metadata satisfy the specified <paramref name="options"/>.
         /// </summary>
         /// <param name="options"></param>
         /// <returns></returns>
-        Task<IEnumerable<User>> QueryUsers(ScimQueryOptions options);
+        Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options);
 
         /// <summary>
         /// Returns whether the specified <paramref name="userName"/> is available or already in use.

@@ -1,28 +1,23 @@
-﻿namespace ConsoleHost
+﻿namespace ConsoleHost.Kernel
 {
     using System;
     using System.Collections.Concurrent;
-    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
 
     using NContext.Security.Cryptography;
 
-    using Owin.Scim.Model.Users;
-    using Owin.Scim.Querying;
-    using Owin.Scim.Repository;
-
-    public class CustomInMemoryUserRepository : IUserRepository
+    public class KernelUserRepository
     {
-        private readonly ConcurrentDictionary<string, User> _Users;
+        private readonly ConcurrentDictionary<string, KernelUser> _Users;
 
-        public CustomInMemoryUserRepository()
+        public KernelUserRepository()
         {
-            _Users = new ConcurrentDictionary<string, User>();
+            _Users = new ConcurrentDictionary<string, KernelUser>();
         }
 
-        public async Task<User> CreateUser(User user)
+        public async Task<KernelUser> CreateUser(KernelUser user)
         {
             user.Id = Guid.NewGuid().ToString("N");
 
@@ -31,7 +26,7 @@
             return user;
         }
 
-        public async Task<User> GetUser(string userId)
+        public async Task<KernelUser> GetUser(string userId)
         {
             // this should really return a deep-clone of the db record so it accurate represents in-memory
             // and domain code can't mutate the in-memory db record 
@@ -40,26 +35,21 @@
                 : _Users[userId];
         }
 
-        public async Task UpdateUser(User user)
+        public async Task UpdateUser(KernelUser user)
         {
             if (!_Users.ContainsKey(user.Id)) return;
 
             _Users[user.Id] = user;
         }
 
-        public async Task<User> DeleteUser(string userId)
+        public async Task<KernelUser> DeleteUser(string userId)
         {
             if (!_Users.ContainsKey(userId)) return null;
 
-            User userRecord;
+            KernelUser userRecord;
             _Users.TryRemove(userId, out userRecord);
 
             return userRecord;
-        }
-
-        public Task<IEnumerable<User>> QueryUsers(ScimQueryOptions options)
-        {
-            throw new NotImplementedException();
         }
 
         public Task<bool> IsUserNameAvailable(string userName)

@@ -10,15 +10,15 @@
 
     public interface IGroupRepository
     {
-        Task<Group> CreateGroup(Group group);
+        Task<ScimGroup> CreateGroup(ScimGroup group);
 
-        Task<Group> GetGroup(string groupId);
+        Task<ScimGroup> GetGroup(string groupId);
 
-        Task<Group> UpdateGroup(Group group);
+        Task<ScimGroup> UpdateGroup(ScimGroup group);
 
-        Task<Group> DeleteGroup(string groupId);
+        Task<ScimGroup> DeleteGroup(string groupId);
 
-        Task<IEnumerable<Group>> QueryGroups(ScimQueryOptions options);
+        Task<IEnumerable<ScimGroup>> QueryGroups(ScimQueryOptions options);
 
         Task<IEnumerable<UserGroup>> GetGroupsUserBelongsTo(string userId);
     }

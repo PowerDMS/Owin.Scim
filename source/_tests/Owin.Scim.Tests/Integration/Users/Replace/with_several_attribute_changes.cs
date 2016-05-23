@@ -18,7 +18,7 @@
         {
             var autoFixture = new Fixture();
 
-            MutableUserPayload = autoFixture.Build<User>()
+            MutableUserPayload = autoFixture.Build<ScimUser>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -30,13 +30,13 @@
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
                 .With(x => x.X509Certificates, null)
-                .Create(seed: new User());
+                .Create(seed: new ScimUser());
 
 
             // Insert the first user so there's one already in-memory.
             var userRecord = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<User>(MutableUserPayload))
+                .PostAsync("users", new ScimObjectContent<ScimUser>(MutableUserPayload))
                 .Result;
 
             await userRecord.DeserializeTo(() => OriginalUserRecord); // capture original user record
@@ -75,8 +75,8 @@
             UpdatedUserRecord.Meta.LastModified.ShouldBeGreaterThan(OriginalUserRecord.Meta.LastModified);
         };
 
-        protected static User OriginalUserRecord;
+        protected static ScimUser OriginalUserRecord;
 
-        protected static User MutableUserPayload;
+        protected static ScimUser MutableUserPayload;
     }
 }

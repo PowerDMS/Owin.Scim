@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Validation.Users
             A.CallTo(() => PasswordManager.MeetsRequirements(A<string>._))
                 .Returns(true);
 
-            User = new User
+            User = new ScimUser
             {
                 UserName = "daniel",
                 Password = "secret"

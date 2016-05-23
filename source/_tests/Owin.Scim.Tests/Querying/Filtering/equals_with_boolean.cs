@@ -7,14 +7,14 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Model.Users;
     
-    public class equals_with_boolean : when_parsing_a_filter_expression<User>
+    public class equals_with_boolean : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
-            Users = new List<User>
+            Users = new List<ScimUser>
             {
-                new User { UserName = "BJensen", Active = false },
-                new User { UserName = "LSmith", Active = true }
+                new ScimUser { UserName = "BJensen", Active = false },
+                new ScimUser { UserName = "LSmith", Active = true }
             };
 
             FilterExpression = "active eq \"true\"";
