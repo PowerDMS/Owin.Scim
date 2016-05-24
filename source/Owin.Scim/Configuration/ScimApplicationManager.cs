@@ -38,8 +38,6 @@
 
     public class ScimApplicationManager : IApplicationComponent
     {
-        private IContainer _Container;
-
         private readonly IAppBuilder _AppBuilder;
 
         private readonly IList<Predicate<FileInfo>> _CompositionConstraints;
@@ -47,21 +45,21 @@
         private readonly ConcurrentDictionary<Type, bool> _TypeResolverCache;
 
         private readonly Action<ScimServerConfiguration> _ConfigureScimServerAction;
-
+        
         private bool _IsConfigured;
 
         public ScimApplicationManager(
-            IContainer container, 
             IAppBuilder appBuilder, 
             IList<Predicate<FileInfo>> compositionConstraints, 
             Action<ScimServerConfiguration> configureScimServerAction)
         {
             _AppBuilder = appBuilder;
-            _Container = container;
             _CompositionConstraints = compositionConstraints;
             _ConfigureScimServerAction = configureScimServerAction;
             _TypeResolverCache = new ConcurrentDictionary<Type, bool>();
         }
+
+        public IContainer Container { get; private set; }
 
         public bool IsConfigured
         {
@@ -69,19 +67,22 @@
             private set { _IsConfigured = value; }
         }
 
+        public IAppBuilder AppBuilder
+        {
+            get { return _AppBuilder; }
+        }
+
         public void Configure(ApplicationConfigurationBase applicationConfiguration)
         {
             if (IsConfigured)
                 return;
 
-            // global exception handler for returning SCIM-formatted messages
-            _AppBuilder.Use<ExceptionHandlerMiddleware>();
-
             var serverConfiguration = new ScimServerConfiguration();
             applicationConfiguration.CompositionContainer.ComposeExportedValue(serverConfiguration);
-            _Container.RegisterInstance(serverConfiguration, Reuse.Singleton);
             
-            _AppBuilder.Use((context, task) =>
+            // configure appBuilder middleware
+            AppBuilder.Use<ExceptionHandlerMiddleware>(); // global exception handler for returning SCIM-formatted messages
+            AppBuilder.Use((context, task) =>
             {
                 AmbientRequestService.SetRequestInformation(context, serverConfiguration);
 
@@ -124,45 +125,56 @@
                 serverConfiguration.AddTypeDefiniton(typeDefinition);
             }
 
+            // define a new HttpConfiguration
             var httpConfiguration = serverConfiguration.HttpConfiguration = new HttpConfiguration();
 
-            // Invoke custom configuration action if not null
+            // invoke custom configuration action if not null
             if (_ConfigureScimServerAction != null)
                 _ConfigureScimServerAction.Invoke(serverConfiguration);
-            
-            // Register a fallback dependency resolver if one has been specified
+
+            // register any optional middleware
+            if (serverConfiguration.RequireSsl)
+                AppBuilder.Use<RequireSslMiddleware>();
+
+            // create a DryIoC container with an optional fallback dependency resolver if one has been specified
             if (serverConfiguration.DependencyResolver != null)
             {
-                typeof(Rules).GetProperty("UnknownServiceResolvers", BindingFlags.Instance | BindingFlags.Public)
-                    .SetValue(_Container.Rules, new Rules.UnknownServiceResolver[]
-                    {
-                        request =>
-                        {
-                            var shouldResolve = _TypeResolverCache.GetOrAdd(
-                                request.ServiceType,
-                                type =>
-                                    _CompositionConstraints.Any(
-                                        constraint =>
-                                            constraint(new FileInfo(type.Assembly.Location))));
+                Container = new Container(
+                    rules =>
+                        rules.WithoutThrowIfDependencyHasShorterReuseLifespan()
+                            .WithUnknownServiceResolvers(request =>
+                            {
+                                var shouldResolve = _TypeResolverCache.GetOrAdd(
+                                    request.ServiceType,
+                                    type =>
+                                        _CompositionConstraints.Any(
+                                            constraint =>
+                                                constraint(new FileInfo(type.Assembly.Location))));
 
-                            if (!shouldResolve)
-                                return null;
-                            
-                            return new DelegateFactory(
-                                resolver =>
-                                    serverConfiguration.DependencyResolver.Resolve(request.ServiceType));
-                        }
-                    });
+                                if (!shouldResolve)
+                                    return null;
+
+                                return new DelegateFactory(
+                                    resolver =>
+                                        serverConfiguration.DependencyResolver.Resolve(request.ServiceType));
+                            }),
+                    new AsyncExecutionFlowScopeContext());
+            }
+            else
+            {
+                Container = new Container(
+                    rules => rules.WithoutThrowIfDependencyHasShorterReuseLifespan(),
+                    new AsyncExecutionFlowScopeContext());
             }
 
-            // Configure SCIM http configuration
-            ConfigureHttpConfiguration(serverConfiguration);
+            // Register our ScimServerConfiguration as a singleton
+            Container.RegisterInstance(serverConfiguration, Reuse.Singleton);
 
-            if (serverConfiguration.RequireSsl)
-                _AppBuilder.Use<RequireSslMiddleware>();
+            // Configure http configuration for SCIM
+            ConfigureHttpConfiguration(serverConfiguration);
             
-            _Container.WithWebApi(httpConfiguration);
-            _AppBuilder.UseWebApi(httpConfiguration);
+            Container.WithWebApi(httpConfiguration);
+            AppBuilder.UseWebApi(httpConfiguration);
 
             IsConfigured = true;
         }

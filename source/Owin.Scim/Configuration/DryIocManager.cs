@@ -73,7 +73,7 @@
                 return;
             }
 
-            _Container = _Configuration.CreateContainer();
+            _Container = _Configuration.CreateContainer(applicationConfiguration);
 
             applicationConfiguration.CompositionContainer.ComposeExportedValue<IContainer>(_Container);
             applicationConfiguration.CompositionContainer.ComposeExportedValue<DryIocManager>(this);

@@ -9,8 +9,6 @@
 
     using Configuration;
 
-    using DryIoc;
-
     using NContext.Configuration;
     using NContext.EventHandling;
     using NContext.Security.Cryptography;
@@ -58,10 +56,6 @@
             if (appBuilder == null)
                 throw new ArgumentNullException("appBuilder");
             
-            IContainer container = new Container(
-                rules => rules.WithoutThrowIfDependencyHasShorterReuseLifespan(),
-                new AsyncExecutionFlowScopeContext());
-           
             var executionDirectory = Assembly.GetEntryAssembly() == null
                 ? AppDomain.CurrentDomain.BaseDirectory
                 : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
@@ -78,16 +72,14 @@
             
             ApplicationConfiguration appConfig = new ApplicationConfigurationBuilder()
                 .ComposeWith(new[] { executionDirectory }, compositionConstraints.ToArray())
-                .RegisterComponent(() => new ScimApplicationManager(container, appBuilder, compositionConstraints.Skip(1).ToList(), configureScimServerAction))
+                .RegisterComponent(() => new ScimApplicationManager(appBuilder, compositionConstraints.Skip(1).ToList(), configureScimServerAction))
                 .RegisterComponent<IManageCryptography>()
                     .With<CryptographyManagerBuilder>()
                         .SetDefaults<SHA256Cng, HMACSHA256, AesCryptoServiceProvider>()
                 .RegisterComponent<DryIocManager>()
                     .With<DryIocManagerBuilder>()
-                        .SetContainer(() => container)
                 .RegisterComponent<IManageEvents>()
-                    .With<EventManagerBuilder>()
-                        .SetActivationProvider(() => new DryIocActivationProvider(container));
+                    .With<ScimEventManagerBuilder>();
 
             Configure.Using(appConfig);
 

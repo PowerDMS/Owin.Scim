@@ -113,7 +113,9 @@
     <Compile Include="Canonicalization\AttributeCanonicalizationRule.cs" />
     <Compile Include="Canonicalization\CanonicalizationRule.cs" />
     <Compile Include="Canonicalization\StatefulCanonicalizationRule.cs" />
+    <Compile Include="Configuration\DryIocConfiguration.cs" />
     <Compile Include="Configuration\PassthroughExceptionHandler.cs" />
+    <Compile Include="Configuration\ScimEventManagerBuilder.cs" />
     <Compile Include="Configuration\ScimTypeAttributeDefinitions.cs" />
     <Compile Include="Dependencies\FuncDependencyResolver.cs" />
     <Compile Include="Dependencies\IDependencyResolver.cs" />

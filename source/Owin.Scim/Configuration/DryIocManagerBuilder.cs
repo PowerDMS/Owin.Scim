@@ -8,7 +8,7 @@
 
     public class DryIocManagerBuilder : ApplicationComponentConfigurationBuilderBase
     {
-        private Func<IContainer> _ContainerFactory;
+        private Func<ApplicationConfigurationBase, IContainer> _ContainerFactory;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationComponentConfigurationBuilderBase"/> class.
@@ -18,7 +18,7 @@
         public DryIocManagerBuilder(ApplicationConfigurationBuilder applicationConfigurationBuilder)
             : base(applicationConfigurationBuilder)
         {
-            _ContainerFactory = () => new Container();
+            _ContainerFactory = appConfig => appConfig.GetComponent<ScimApplicationManager>().Container;
         }
 
         /// <summary>
@@ -27,7 +27,7 @@
         /// <param name="containerFactory">The <see cref="IContainer"/> factory.</param>
         /// <returns>This <see cref="DryIocManagerBuilder"/> instance.</returns>
         /// <remarks></remarks>
-        public DryIocManagerBuilder SetContainer(Func<IContainer> containerFactory)
+        public DryIocManagerBuilder SetContainer(Func<ApplicationConfigurationBase, IContainer> containerFactory)
         {
             _ContainerFactory = containerFactory;
 
@@ -45,28 +45,6 @@
                    () =>
                        new DryIocManager(
                            new DryIocConfiguration(_ContainerFactory)));
-        }
-    }
-
-    public class DryIocConfiguration
-    {
-        private readonly Func<IContainer> _ContainerFactory;
-
-        public DryIocConfiguration(Func<IContainer> containerFactory)
-        {
-            _ContainerFactory = containerFactory;
-        }
-
-        /// <summary>
-        /// Creates the <see cref="IContainer"/> instance.
-        /// </summary>
-        /// <returns>Instance of <see cref="IContainer"/>.</returns>
-        /// <remarks></remarks>
-        public virtual IContainer CreateContainer()
-        {
-            return _ContainerFactory == null
-                ? new Container()
-                : _ContainerFactory.Invoke();
         }
     }
 }
