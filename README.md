@@ -57,11 +57,10 @@ The list below doesn't necessarily denote priority or order.
   3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
   4. [x] Custom resource types and endpoints
 09. [x] Add endpoint authorization support
-10. [ ] Add resource authorization support
-11. [ ] Add endpoint for supporting query-on-root
-12. [ ] Add support for SCIM v1
-13. [ ] Add logging functionality
-14. [ ] Outbound Provisioning
+10. [ ] Add endpoint for supporting query-on-root
+11. [ ] Add support for SCIM v1.1
+12. [ ] Add logging functionality
+13. [ ] Outbound Provisioning (SCIM Event Notification)
   1. [ ] Event Triggers / Handlers
   2. [ ] Client Subscription Management
 
