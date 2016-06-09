@@ -2,7 +2,6 @@
 {
     using System.Net;
     using System.Net.Http;
-    using System.Net.Http.Formatting;
     using System.Threading.Tasks;
 
     using Machine.Specifications;
@@ -22,7 +21,7 @@
 
             UserToUpdate = await userRecord.Content.ScimReadAsAsync<ScimUser>().AwaitResponse().AsTask;
 
-            Task.Delay(100).Await();
+            await Task.Delay(150).Await().AsTask;
 
             PatchResponse = await Server
                 .HttpClient
