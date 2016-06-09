@@ -5,6 +5,8 @@
     using System.Net.Http;
 
     using Newtonsoft.Json;
+
+    using Serialization;
     /*
     public class BulkRequest : SchemaBase
     {
@@ -41,6 +43,7 @@
         public HttpContent Response { get; set; }
 
         [JsonProperty("status")]
+        [JsonConverter(typeof(IntAsStringEnumConverter))]
         public HttpStatusCode Status { get; set; }
     }
 

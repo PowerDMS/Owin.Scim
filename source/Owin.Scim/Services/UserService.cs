@@ -61,6 +61,9 @@
 
             if (!validationResult)
                 return new ScimErrorResponse<ScimUser>(validationResult.Errors.First());
+
+            if (user.Password != null)
+                user.Password = _PasswordManager.CreateHash(user.Password);
             
             var createdDate = DateTime.UtcNow;
             user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
@@ -75,6 +78,8 @@
                     new ScimError(
                         HttpStatusCode.BadRequest));
 
+            // version may require the User.Id which is often generated using database unique constraints
+            // therefore, we will set the version after persistence
             SetResourceVersion(userRecord);
 
             return new ScimDataResponse<ScimUser>(userRecord);

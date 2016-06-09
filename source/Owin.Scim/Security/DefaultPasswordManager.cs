@@ -14,10 +14,11 @@
     /// </summary>
     public class DefaultPasswordManager : IManagePasswords
     {
+        /// <summary>
+        /// Default password complexity requires a minimum of: 8 characters; 1 uppercase, 1 lowercase, 1 number, and 1 special character.
+        /// </summary>
         private readonly Regex _DefaultComplexityRule =
-            new Regex(
-                @"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}",
-                RegexOptions.Compiled | RegexOptions.Singleline);
+            new Regex(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[$@$!%*?&])[A-Za-z\d$@$!%*?&]{8,}", RegexOptions.Compiled | RegexOptions.Singleline);
 
         /// <summary>
         /// Gets the length of the password salt. Defaults to 32 bytes.
@@ -40,6 +41,12 @@
             return CreateHashBytes(new UTF8Encoding(false).GetBytes(plainTextPassword)).ToHexadecimal();
         }
 
+        /// <summary>
+        /// Creates the hash bytes.
+        /// </summary>
+        /// <param name="plainTextPassword">The plain text password.</param>
+        /// <param name="salt">The salt.</param>
+        /// <returns>System.Byte[].</returns>
         protected virtual byte[] CreateHashBytes(byte[] plainTextPassword, byte[] salt = null)
         {
             if (salt == null)
@@ -57,6 +64,17 @@
             return CryptographyUtility.CombineBytes(salt, hash);
         }
 
+        /// <summary>
+        /// Verifies the hash of the <paramref name="plainTextPassword" /> matches the specified <paramref name="passwordHash" />.
+        /// </summary>
+        /// <param name="plainTextPassword">The password to verify.</param>
+        /// <param name="passwordHash">The password hash.</param>
+        /// <returns>Whether or not the password is the same.</returns>
+        /// <exception cref="System.ArgumentNullException">
+        /// plainTextPassword
+        /// or
+        /// passwordHash
+        /// </exception>
         public bool VerifyHash(string plainTextPassword, string passwordHash)
         {
             if (string.IsNullOrWhiteSpace(plainTextPassword))
@@ -73,7 +91,7 @@
         }
 
         /// <summary>
-        /// Default passowrd complexity must the following requirements: minimum 8 characters, at least 1 uppercase, at least 1 lowercase, 1 number, and 1 special character.
+        /// Default password complexity requires a minimum of: 8 characters; 1 uppercase, 1 lowercase, 1 number, and 1 special character.
         /// </summary>
         /// <param name="plainTextPassword"></param>
         /// <returns></returns>
@@ -84,6 +102,12 @@
             return Task.FromResult(_DefaultComplexityRule.IsMatch(plainTextPassword));
         }
 
+        /// <summary>
+        /// Checks to see whether <paramref name="plainTextPassword" /> is different than the <paramref name="existingPasswordHash" /> including checks for null.
+        /// </summary>
+        /// <param name="plainTextPassword">The plain text password.</param>
+        /// <param name="existingPasswordHash">The existing password hash.</param>
+        /// <returns><c>true</c> if XXXX, <c>false</c> otherwise.</returns>
         public bool PasswordIsDifferent(string plainTextPassword, string existingPasswordHash)
         {
             if (plainTextPassword == null && existingPasswordHash == null) return false;
