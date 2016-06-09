@@ -61,7 +61,10 @@
 
             if (!validationResult)
                 return new ScimErrorResponse<ScimUser>(validationResult.Errors.First());
-            
+
+            if (user.Password != null)
+                user.Password = _PasswordManager.CreateHash(user.Password);
+
             var createdDate = DateTime.UtcNow;
             user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
             {

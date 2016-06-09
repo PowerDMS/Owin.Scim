@@ -16,7 +16,8 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             CurrentUtcDateTime = DateTime.UtcNow;
             UserDto = new ScimUser
             {
-                UserName = UserNameUtility.GenerateUserName()
+                UserName = UserNameUtility.GenerateUserName(),
+                Password = "Hiworld!1"
             };
         };
 

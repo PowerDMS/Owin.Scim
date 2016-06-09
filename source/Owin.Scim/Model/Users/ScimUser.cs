@@ -98,7 +98,6 @@
         The User's cleartext password. This attribute is intended to be used as a means 
         to specify an initial password when creating a new User or to reset an existing 
         User's password.")]
-        [JsonIgnore]
         public string Password { get; set; }
 
         [Description(@"

@@ -18,7 +18,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
             UserDto = autoFixture.Build<ScimUser>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
-                .With(x => x.Password, "somePass")
+                .With(x => x.Password, "somePass!2")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
                 .With(x => x.Locale, "en-US")
                 .With(x => x.Timezone, @"US/Eastern")
