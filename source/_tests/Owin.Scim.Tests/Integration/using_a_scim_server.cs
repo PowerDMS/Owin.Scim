@@ -34,19 +34,15 @@
                         null,
                         configuration =>
                         {
+                            // only required for using Owin.Scim types as a client for serialization
+                            // unfortunately, Owin.Scim models are not pure POCOs in order to support
+                            // resource extensions
                             ClientJsonFormatter = new ScimClientJsonMediaTypeFormatter(configuration);
+
                             configuration.RequireSsl = false;
                             configuration.EnableEndpointAuthorization = false;
 
                             configuration
-                                .AddAuthenticationScheme(
-                                    new AuthenticationScheme(
-                                        "oauthbearertoken",
-                                        "OAuth Bearer Token",
-                                        "Authentication scheme using the OAuth Bearer Token standard.",
-                                        specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
-                                        isPrimary: true))
-                                .ConfigureETag(supported: true, isWeak: true)
                                 .ModifyResourceType<ScimUser>(ModifyUserResourceType)
                                 .ModifyResourceType<ScimGroup>(ModifyGroupResourceType);
                         });
