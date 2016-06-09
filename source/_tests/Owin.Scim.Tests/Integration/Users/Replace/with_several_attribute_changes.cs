@@ -20,7 +20,7 @@
 
             MutableUserPayload = autoFixture.Build<ScimUser>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
-                .With(x => x.Password, "somePass")
+                .With(x => x.Password, "somePass!2")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
                 .With(x => x.Locale, "en-US")
                 .With(x => x.Timezone, @"US/Eastern")
@@ -44,7 +44,7 @@
             // Common use case for replace is for client to send the full object back
             MutableUserPayload.Id = OriginalUserRecord.Id; // set server-assigned ID
             MutableUserPayload.UserName = UserNameUtility.GenerateUserName(); // new userName
-            MutableUserPayload.Password = "someOtherPass"; // newPassword
+            MutableUserPayload.Password = "someOtherPass!3"; // newPassword
             MutableUserPayload.Extension<EnterpriseUserExtension>().EmployeeNumber = "007";
 
             UserDto = MutableUserPayload;

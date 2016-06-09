@@ -64,7 +64,7 @@
 
             if (user.Password != null)
                 user.Password = _PasswordManager.CreateHash(user.Password);
-            
+
             var createdDate = DateTime.UtcNow;
             user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
             {

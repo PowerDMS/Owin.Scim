@@ -37,8 +37,8 @@
       <HintPath>..\..\packages\Antlr4.Runtime.4.3.0\lib\net45\Antlr4.Runtime.net45.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="FakeItEasy, Version=1.25.3.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\FakeItEasy.1.25.3\lib\net40\FakeItEasy.dll</HintPath>
+    <Reference Include="FakeItEasy, Version=2.0.0.0, Culture=neutral, PublicKeyToken=eff28e2146d5fd2c, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\FakeItEasy.2.0.0\lib\net40\FakeItEasy.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="FluentValidation, Version=6.2.1.0, Culture=neutral, processorArchitecture=MSIL">
@@ -73,12 +73,12 @@
       <HintPath>..\..\packages\Microsoft.Owin.Testing.3.0.1\lib\net45\Microsoft.Owin.Testing.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NContext, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NContext.4.0.0-alpha12\lib\net451\NContext.dll</HintPath>
+    <Reference Include="NContext, Version=4.0.0.15, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NContext.4.0.0.15\lib\net451\NContext.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NContext.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\NContext.Common.4.0.0-alpha12\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
+    <Reference Include="NContext.Common, Version=4.0.0.15, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\NContext.Common.4.0.0.15\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -92,8 +92,8 @@
     <Reference Include="Owin.Scim.Antlr">
       <HintPath>..\..\lib\Owin.Scim.Antlr.dll</HintPath>
     </Reference>
-    <Reference Include="Ploeh.AutoFixture, Version=3.46.0.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
-      <HintPath>..\..\packages\AutoFixture.3.46.0\lib\net40\Ploeh.AutoFixture.dll</HintPath>
+    <Reference Include="Ploeh.AutoFixture, Version=3.47.4.0, Culture=neutral, PublicKeyToken=b24654c590009d4f, processorArchitecture=MSIL">
+      <HintPath>..\..\packages\AutoFixture.3.47.4\lib\net40\Ploeh.AutoFixture.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />
@@ -192,6 +192,7 @@
     <Compile Include="Integration\Users\Create\with_a_fully_populated_multi_attributes_user.cs" />
     <Compile Include="Integration\Users\Create\with_a_username_conflict.cs" />
     <Compile Include="Integration\Users\Create\with_a_fully_populated_simple_attributes_user.cs" />
+    <Compile Include="Integration\Users\Create\with_invalid_password_requirement.cs" />
     <Compile Include="Integration\Users\Create\with_fully_populated_enterprise_user.cs" />
     <Compile Include="Integration\Users\Create\with_null_schema.cs" />
     <Compile Include="Integration\Users\Create\with_invalid_schema.cs" />

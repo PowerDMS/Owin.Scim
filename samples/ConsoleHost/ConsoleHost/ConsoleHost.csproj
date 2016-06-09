@@ -66,12 +66,12 @@
       <HintPath>..\..\..\source\packages\Microsoft.Owin.Hosting.3.0.1\lib\net45\Microsoft.Owin.Hosting.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NContext, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\source\packages\NContext.4.0.0-alpha12\lib\net451\NContext.dll</HintPath>
+    <Reference Include="NContext, Version=4.0.0.15, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\source\packages\NContext.4.0.0.15\lib\net451\NContext.dll</HintPath>
       <Private>True</Private>
     </Reference>
-    <Reference Include="NContext.Common, Version=4.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\..\..\source\packages\NContext.Common.4.0.0-alpha12\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
+    <Reference Include="NContext.Common, Version=4.0.0.15, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\..\..\source\packages\NContext.Common.4.0.0.15\lib\portable45-net45+win8+wpa81\NContext.Common.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Newtonsoft.Json, Version=8.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
