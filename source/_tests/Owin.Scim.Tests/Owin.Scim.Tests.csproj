@@ -124,6 +124,14 @@
     <Compile Include="Extensions\ScimObjectContent.cs" />
     <Compile Include="Extensions\ScimServerConfigurationExtensions.cs" />
     <Compile Include="Extensions\ShouldExtensions.cs" />
+    <Compile Include="Integration\CustomResourceTypes\CustomSchemas.cs" />
+    <Compile Include="Integration\CustomResourceTypes\SalesForceExtension.cs" />
+    <Compile Include="Integration\CustomResourceTypes\SalesForceExtensionValidator.cs" />
+    <Compile Include="Integration\CustomResourceTypes\Tenant.cs" />
+    <Compile Include="Integration\CustomResourceTypes\TenantDefinition.cs" />
+    <Compile Include="Integration\CustomResourceTypes\TenantsController.cs" />
+    <Compile Include="Integration\CustomResourceTypes\TenantValidator.cs" />
+    <Compile Include="Integration\CustomResourceTypes\when_creating_a_resource_with_a_required_schema_extension.cs" />
     <Compile Include="Integration\Groups\GroupNameUtility.cs" />
     <Compile Include="Integration\Groups\Query\when_querying_groups.cs" />
     <Compile Include="Integration\Groups\Query\with_a_filter.cs" />
@@ -364,9 +372,7 @@
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Integration\CustomResourceTypes\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

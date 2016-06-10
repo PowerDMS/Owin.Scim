@@ -18,7 +18,7 @@ namespace Owin.Scim.Model
         {
             _Extensions = new ConcurrentDictionary<string, ResourceExtension>();
         }
-
+        
         public ISet<string> Schemas
         {
             get
@@ -42,8 +42,17 @@ namespace Owin.Scim.Model
                 type => (ResourceExtension)typeof(T).CreateInstance()) as T;
         }
 
+        public void Remove(Type extensionType)
+        {
+            ResourceExtension ext;
+            _Extensions.TryRemove(extensionType.FullName, out ext);
+        }
+
         internal void Add(ResourceExtension extensionInstance)
         {
+            if (extensionInstance == null)
+                throw new ArgumentNullException("extensionInstance");
+
             _Extensions.TryAdd(extensionInstance.GetType().FullName, extensionInstance);
         }
 
@@ -55,16 +64,6 @@ namespace Owin.Scim.Model
             return _Extensions.GetOrAdd(
                 extensionType.FullName,
                 type => (ResourceExtension)extensionType.CreateInstance());
-        }
-
-        public IDictionary<string, JToken> ToJsonDictionary()
-        {
-            return _Extensions
-                .ToDictionary(
-                    kvp => kvp.Value.SchemaIdentifier,
-                    kvp => kvp.Value == null
-                        ? (JToken)null
-                        : (JToken)JObject.FromObject(kvp.Value));
         }
 
         public int CalculateVersion()
@@ -86,6 +85,16 @@ namespace Owin.Scim.Model
         IEnumerator IEnumerable.GetEnumerator()
         {
             return GetEnumerator();
+        }
+
+        internal IDictionary<string, JToken> ToJsonDictionary()
+        {
+            return _Extensions
+                .ToDictionary(
+                    kvp => kvp.Value.SchemaIdentifier,
+                    kvp => kvp.Value == null
+                        ? (JToken)null
+                        : (JToken)JObject.FromObject(kvp.Value));
         }
     }
 }

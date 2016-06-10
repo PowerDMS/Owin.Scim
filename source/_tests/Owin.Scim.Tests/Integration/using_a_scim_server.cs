@@ -43,6 +43,13 @@
                             configuration.EnableEndpointAuthorization = false;
 
                             configuration
+                                .AddAuthenticationScheme(
+                                    new AuthenticationScheme(
+                                        "oauthbearertoken",
+                                        "OAuth Bearer Token",
+                                        "Authentication scheme using the OAuth Bearer Token standard.",
+                                        specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
+                                        isPrimary: true))
                                 .ModifyResourceType<ScimUser>(ModifyUserResourceType)
                                 .ModifyResourceType<ScimGroup>(ModifyGroupResourceType);
                         });
