@@ -10,6 +10,14 @@ email me:  daniel.gioulakis [at] powerdms [dot] com
 
 If you have been evaluating the alpha builds from nuget, we would love to hear feedback from you. Please reach out and share how your experience has been working with Owin.Scim. Any issues and feature requests are welcome. Help us shape Owin.Scim into the best fully-featured and compliant open-source SCIM server!
 
+Latest News!
+============
+We're excited to announce that Owin.Scim is now actively deployed to Azure AppServices as part of our way to showcase the capabilities of Owin.Scim. You can access all live SCIM endpoints at: http://owin-scim.azurewebsites.net/ (e.g. `http://owin-scim.azurewebsites.net/scim/<endpoint>`)  
+
+Additionally, thanks to Okta's SCIM 2.0 efforts with creating a set of acceptence tests that may be run using RunScope's services, we can now use these scripts to offer the community confidence that Owin.Scim is a compliant server implementation.  
+
+https://www.runscope.com/radar/lxv41thxd6q1/b0c8fbb1-b8e7-4d3d-82b7-6f06c87d6799/history/e6b49f14-b055-4400-ad8d-bc7ca56e241d
+
 PROJECT STATUS
 ==============
 This project is in active development with the goal of completing basic protocol implementation by mid-2016.
