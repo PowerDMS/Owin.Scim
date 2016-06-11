@@ -23,6 +23,7 @@
             Detail = detail;
         }
         
+        [JsonProperty("schemas")]
         public IEnumerable<string> Schemas
         {
             get { return _Schemas; }

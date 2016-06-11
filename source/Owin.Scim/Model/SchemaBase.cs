@@ -12,7 +12,7 @@
         /// Gets the schemas.
         /// </summary>
         /// <value>The schemas.</value>
-        [JsonProperty(Order = -10, PropertyName = "schemas")]
+        [JsonProperty("schemas", Order = -10)]
         public virtual ISet<string> Schemas
         {
             get
