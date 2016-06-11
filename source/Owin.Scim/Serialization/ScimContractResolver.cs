@@ -14,7 +14,7 @@
 
     using Services;
 
-    public class ScimContractResolver : CamelCasePropertyNamesContractResolver
+    public class ScimContractResolver : DefaultContractResolver
     {
         private readonly ScimServerConfiguration _ServerConfiguration;
 

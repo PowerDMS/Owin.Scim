@@ -62,11 +62,9 @@
 
                     container.Register(rtd.ValidatorType, reuse: Reuse.Singleton);
                 });
-
-#if DEBUG
-            container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton, ifAlreadyRegistered:IfAlreadyRegistered.Keep);
+            
+            container.Register<IUserRepository, InMemoryUserRepository>(Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
             container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
-#endif
 
             // register all business logic services for built-in endpoints
             container.Register<IResourceTypeService, ResourceTypeService>(Reuse.Singleton);
