@@ -167,12 +167,12 @@
                     new AsyncExecutionFlowScopeContext());
             }
 
+            // Configure http configuration for SCIM
+            ConfigureHttpConfiguration(serverConfiguration);
+
             // Register our ScimServerConfiguration as a singleton
             Container.RegisterInstance(serverConfiguration, Reuse.Singleton);
 
-            // Configure http configuration for SCIM
-            ConfigureHttpConfiguration(serverConfiguration);
-            
             Container.WithWebApi(httpConfiguration);
             AppBuilder.UseWebApi(httpConfiguration);
 

@@ -28,11 +28,13 @@
             this IAppBuilder appBuilder,
             Action<ScimServerConfiguration> configureScimServerAction = null)
         {
-            var callingAssemblyLocation = Assembly.GetCallingAssembly().Location;
+            var composableExtensions = new[] { ".dll", ".exe" };
+            var callingAssemblyFileName = new FileInfo(Assembly.GetCallingAssembly().Location).Name;
             return appBuilder.UseScimServer(
                 new Predicate<FileInfo>[]
                 {
-                    fileInfo => fileInfo.FullName.Equals(callingAssemblyLocation, StringComparison.Ordinal)
+                    fileInfo => composableExtensions.Contains(fileInfo.Extension, StringComparer.OrdinalIgnoreCase) &&
+                                fileInfo.Name.Equals(callingAssemblyFileName, StringComparison.Ordinal)
                 },
                 configureScimServerAction);
         }
@@ -55,16 +57,19 @@
         {
             if (appBuilder == null)
                 throw new ArgumentNullException("appBuilder");
-            
-            var executionDirectory = Assembly.GetEntryAssembly() == null
-                ? AppDomain.CurrentDomain.BaseDirectory
-                : Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
+
+            var httpRuntimeBin = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "bin");
+            var executionDirectory = Assembly.GetEntryAssembly() != null
+                ? Path.GetDirectoryName(Assembly.GetEntryAssembly().Location)
+                : Directory.Exists(httpRuntimeBin)
+                    ? httpRuntimeBin
+                    : AppDomain.CurrentDomain.BaseDirectory;
 
             var compositionConstraints = new List<Predicate<FileInfo>>
             {
                 fileInfo =>
                     fileInfo.Name.StartsWith("Owin.Scim", StringComparison.OrdinalIgnoreCase) &&
-                    new[] { ".dll" }.Contains(fileInfo.Extension.ToLower())
+                    fileInfo.Extension.Equals(".dll", StringComparison.OrdinalIgnoreCase)
             };
 
             if (fileCompositionConstraints != null)
