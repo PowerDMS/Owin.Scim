@@ -15,9 +15,9 @@
 
         private string _NormalizedFilterExpression;
 
-        public ScimFilter(ISet<string> resourceExtensionSchemas, string filterExpression)
+        public ScimFilter(IEnumerable<string> resourceExtensionSchemas, string filterExpression)
         {
-            _ResourceExtensionSchemas = resourceExtensionSchemas;
+            _ResourceExtensionSchemas = new HashSet<string>(resourceExtensionSchemas);
             _Paths = new List<PathFilterExpression>();
             ProcessFilter(filterExpression);
         }

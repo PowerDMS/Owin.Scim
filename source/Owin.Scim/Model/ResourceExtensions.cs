@@ -12,21 +12,18 @@ namespace Owin.Scim.Model
 
     public class ResourceExtensions : IEnumerable<KeyValuePair<string, ResourceExtension>>
     {
-        private readonly ConcurrentDictionary<string, ResourceExtension> _Extensions;
+        private readonly ConcurrentDictionary<string, KeyValuePair<string, ResourceExtension>> _Extensions;
 
         public ResourceExtensions()
         {
-            _Extensions = new ConcurrentDictionary<string, ResourceExtension>();
+            _Extensions = new ConcurrentDictionary<string, KeyValuePair<string, ResourceExtension>>();
         }
         
         public ISet<string> Schemas
         {
             get
             {
-                return new HashSet<string>(
-                    _Extensions.Values
-                        .Where(ext => ext != null)
-                        .Select(ext => ext.SchemaIdentifier));
+                return new HashSet<string>(_Extensions.Values.Select(kvp => kvp.Key));
             }
         }
 
@@ -38,22 +35,37 @@ namespace Owin.Scim.Model
         public T GetOrCreate<T>() where T : ResourceExtension, new()
         {
             return _Extensions.GetOrAdd(
-                typeof (T).FullName,
-                type => (ResourceExtension)typeof(T).CreateInstance()) as T;
+                typeof(T).FullName,
+                type =>
+                {
+                    var instance = (ResourceExtension) typeof(T).CreateInstance();
+                    return new KeyValuePair<string, ResourceExtension>(instance.SchemaIdentifier, instance);
+                }).Value as T;
         }
 
         public void Remove(Type extensionType)
         {
-            ResourceExtension ext;
+            KeyValuePair<string, ResourceExtension> ext;
             _Extensions.TryRemove(extensionType.FullName, out ext);
         }
 
         internal void Add(ResourceExtension extensionInstance)
         {
             if (extensionInstance == null)
-                throw new ArgumentNullException("extensionInstance");
+                throw new ArgumentNullException(@"You cannot pass in a null value to this method. See the additional Add() overloads for adding null extensions.");
 
-            _Extensions.TryAdd(extensionInstance.GetType().FullName, extensionInstance);
+            _Extensions.AddOrUpdate(
+                extensionInstance.GetType().FullName, 
+                new KeyValuePair<string, ResourceExtension>(extensionInstance.SchemaIdentifier, extensionInstance), 
+                (key, existing) => new KeyValuePair<string, ResourceExtension>(extensionInstance.SchemaIdentifier, extensionInstance));
+        }
+
+        internal void Add(Type extensionType, string extensionSchema, object value)
+        {
+            _Extensions.AddOrUpdate(
+                extensionType.FullName,
+                new KeyValuePair<string, ResourceExtension>(extensionSchema, null),
+                (key, existing) => new KeyValuePair<string, ResourceExtension>(extensionSchema, null));
         }
 
         internal object GetOrCreate(Type extensionType)
@@ -63,15 +75,19 @@ namespace Owin.Scim.Model
 
             return _Extensions.GetOrAdd(
                 extensionType.FullName,
-                type => (ResourceExtension)extensionType.CreateInstance());
+                type =>
+                {
+                    var instance = (ResourceExtension) extensionType.CreateInstance();
+                    return new KeyValuePair<string, ResourceExtension>(instance.SchemaIdentifier, instance);
+                }).Value;
         }
 
         public int CalculateVersion()
         {
             var hash = 0;
-            foreach (var extension in _Extensions.Values.Where(ext => ext != null))
+            foreach (var extension in _Extensions.Values.Where(ext => ext.Value != null))
             {
-                hash = hash * 31 + extension.CalculateVersion();
+                hash = hash * 31 + extension.Value.CalculateVersion();
             }
 
             return hash;
@@ -79,7 +95,7 @@ namespace Owin.Scim.Model
 
         public IEnumerator<KeyValuePair<string, ResourceExtension>> GetEnumerator()
         {
-            return _Extensions.GetEnumerator();
+            return _Extensions.Values.GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator()
@@ -90,8 +106,9 @@ namespace Owin.Scim.Model
         internal IDictionary<string, JToken> ToJsonDictionary()
         {
             return _Extensions
+                .Values
                 .ToDictionary(
-                    kvp => kvp.Value.SchemaIdentifier,
+                    kvp => kvp.Key,
                     kvp => kvp.Value == null
                         ? (JToken)null
                         : (JToken)JObject.FromObject(kvp.Value));

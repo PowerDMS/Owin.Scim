@@ -132,6 +132,9 @@
     <Compile Include="Integration\CustomResourceTypes\TenantsController.cs" />
     <Compile Include="Integration\CustomResourceTypes\TenantValidator.cs" />
     <Compile Include="Integration\CustomResourceTypes\when_creating_a_resource_with_a_required_schema_extension.cs" />
+    <Compile Include="Integration\CustomResourceTypes\with_a_null_extension_value.cs" />
+    <Compile Include="Integration\CustomResourceTypes\with_a_valid_extension_value.cs" />
+    <Compile Include="Integration\CustomResourceTypes\with_no_extension.cs" />
     <Compile Include="Integration\Groups\GroupNameUtility.cs" />
     <Compile Include="Integration\Groups\Query\when_querying_groups.cs" />
     <Compile Include="Integration\Groups\Query\with_a_filter.cs" />

@@ -2,6 +2,7 @@ namespace Owin.Scim.Endpoints
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net.Http;
     using System.Net.Http.Headers;
     using System.Web.Http;
@@ -38,7 +39,7 @@ namespace Owin.Scim.Endpoints
             where T : Resource
         {
             var urlHelper = Request.GetUrlHelper();
-            foreach (var item in items)
+            foreach (var item in items.Where(item => item.Meta != null))
             {
                 var routeValues = routeValueFactory == null ? null : routeValueFactory(item);
                 item.Meta.Location = new Uri(urlHelper.Link(routeName, routeValues));
@@ -51,7 +52,9 @@ namespace Owin.Scim.Endpoints
         protected T SetMetaLocation<T>(T item, string routeName, object routeValues = null) 
             where T : Resource
         {
-            item.Meta.Location = new Uri(Request.GetUrlHelper().Link(routeName, routeValues));
+            if (item.Meta != null)
+                item.Meta.Location = new Uri(Request.GetUrlHelper().Link(routeName, routeValues));
+
             return item;
         }
     }

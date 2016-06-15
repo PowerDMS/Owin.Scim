@@ -61,7 +61,7 @@
                 Once normalized, associate each resource member with its filter (if present).
                 This is represented as a PathMember, which is essentially a tuple of <memberName, memberFilter?>
             */
-            var pathTree = new ScimFilter(_ServerConfiguration.ResourceExtensionSchemas, filter).Paths.ToList();
+            var pathTree = new ScimFilter(_ServerConfiguration.ResourceExtensionSchemas.Keys, filter).Paths.ToList();
             var lastPosition = 0;
             var nodes = GetAffectedMembers(pathTree, ref lastPosition, new Node(objectToSearch, null));
             

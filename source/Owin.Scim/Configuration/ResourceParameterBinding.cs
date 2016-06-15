@@ -70,7 +70,16 @@
 
             var schemaType = _SchemaTypeFactory.GetSchemaType(((JArray)schemasValue).ToObject<ISet<string>>());
             if (!Descriptor.ParameterType.IsAssignableFrom(schemaType))
-                throw new Exception(""); // TODO: (DG) binding rules resolved to a type which is not assignable to the action parameter's type
+                throw new ScimException(
+                    HttpStatusCode.InternalServerError,
+                    string.Format(
+                        @"The SCIM server's parameter binding rules resulted in a type 
+                          which is un-assignable to the controller action's parameter type. 
+                          The action's parameter type is '{0}' but the parameter binding rules 
+                          resulted in type '{1}'.",
+                        Descriptor.ParameterType,
+                        schemaType)
+                        .RemoveMultipleSpaces());
 
             // Enforce the request contains all required extensions for the resource.
             var resourceTypeDefinition = (IScimResourceTypeDefinition)_ServerConfiguration.GetScimTypeDefinition(schemaType);
@@ -79,7 +88,8 @@
             {
                 foreach (var requiredExtension in requiredExtensions)
                 {
-                    if (jsonData[requiredExtension] == null)
+                    // you cannot set a required schema extension to null, e.g. !HasValues
+                    if (jsonData[requiredExtension] == null || !jsonData[requiredExtension].HasValues)
                     {
                         // the request will be cut short by ModelBindingResponseAttribute and the response below will be returned
                         SetValue(actionContext, null);

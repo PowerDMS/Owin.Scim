@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
     using System.Web.Http;
@@ -23,13 +24,13 @@
 
         private readonly IDictionary<Type, Type> _TypeDefinitionRegistry;
 
-        private readonly Lazy<ISet<string>> _ResourceExtensionSchemas;
-
         private readonly IDictionary<ScimFeatureType, ScimFeature> _Features;
 
         private readonly ISet<AuthenticationScheme> _AuthenticationSchemes;
 
-        private readonly Lazy<IList<SchemaBindingRule>> _SchemaBindingRules;
+        private Lazy<IList<SchemaBindingRule>> _SchemaBindingRules;
+
+        private Lazy<Dictionary<string, Type>> _ResourceExtensionCache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ScimServerConfiguration"/> class.
@@ -39,16 +40,9 @@
             _AuthenticationSchemes = new HashSet<AuthenticationScheme>();
             _TypeDefinitionCache = new ConcurrentDictionary<Type, IScimTypeDefinition>();
             _TypeDefinitionRegistry = new Dictionary<Type, Type>();
-            _ResourceExtensionSchemas = new Lazy<ISet<string>>(
-                () =>
-                    new HashSet<string>(_TypeDefinitionCache
-                        .Where(td => td.Value is IScimResourceTypeDefinition)
-                        .SelectMany(rtd => ((IScimResourceTypeDefinition) rtd.Value).SchemaExtensions)
-                        .Select(e => e.Schema)));
-            _SchemaBindingRules = new Lazy<IList<SchemaBindingRule>>(
-                () => 
-                ResourceTypeDefinitions.Select(rtd => new SchemaBindingRule(rtd.SchemaBindingRule, rtd.DefinitionType)).ToList());
             _Features = CreateDefaultFeatures();
+            InitializeResourceExtensionCache();
+            InitializeSchemaBindingRules();
 
             EnableEndpointAuthorization = true;
             RequireSsl = true;
@@ -113,9 +107,9 @@
             }
         }
 
-        internal ISet<string> ResourceExtensionSchemas
+        internal IReadOnlyDictionary<string, Type> ResourceExtensionSchemas
         {
-            get { return _ResourceExtensionSchemas.Value; }
+            get { return _ResourceExtensionCache.Value; }
         }
 
         internal IDictionary<Type, Type> TypeDefinitionRegistry
@@ -291,6 +285,11 @@
                 throw new Exception(string.Format("There is no resource type defined for type '{0}'.", typeof(T).FullName));
 
             builder((ScimResourceTypeDefinitionBuilder<T>)td);
+            if (_ResourceExtensionCache.IsValueCreated)
+            {
+                // re-initialize since we may have modified extensions for the resource
+                InitializeResourceExtensionCache();
+            }
 
             return this;
         }
@@ -303,7 +302,12 @@
         public ScimServerConfiguration RemoveResourceType<T>() where T : Resource
         {
             IScimTypeDefinition td;
-            _TypeDefinitionCache.TryRemove(typeof (T), out td);
+            if (_TypeDefinitionCache.TryRemove(typeof(T), out td) && _ResourceExtensionCache.IsValueCreated)
+            {
+                // re-initialize since we've modified our resource type cache
+                InitializeResourceExtensionCache();
+                InitializeSchemaBindingRules();
+            }
 
             return this;
         }
@@ -390,7 +394,25 @@
         /// <returns><c>true</c> if [extensionSchemaIdentifier is registered], <c>false</c> otherwise.</returns>
         internal bool ResourceExtensionExists(string extensionSchemaIdentifier)
         {
-            return ResourceExtensionSchemas.Contains(extensionSchemaIdentifier);
+            return ResourceExtensionSchemas.ContainsKey(extensionSchemaIdentifier);
+        }
+
+        private void InitializeResourceExtensionCache()
+        {
+            _ResourceExtensionCache = new Lazy<Dictionary<string, Type>>(
+                () => _TypeDefinitionCache
+                        .Where(td => td.Value is IScimResourceTypeDefinition)
+                        .SelectMany(rtd => ((IScimResourceTypeDefinition)rtd.Value).SchemaExtensions)
+                        .ToDictionary(e => e.Schema, e => e.ExtensionType));
+        }
+        
+        private void InitializeSchemaBindingRules()
+        {
+            _SchemaBindingRules = new Lazy<IList<SchemaBindingRule>>(
+                () =>
+                    ResourceTypeDefinitions.Select(
+                        rtd =>
+                            new SchemaBindingRule(rtd.SchemaBindingRule, rtd.DefinitionType)).ToList());
         }
 
         private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()

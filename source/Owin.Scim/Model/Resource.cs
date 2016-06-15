@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.Model
 {
+    using System;
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
@@ -92,6 +93,11 @@
         public void AddExtension<T>(T extension) where T : ResourceExtension
         {
             Extensions.Add(extension);
+        }
+
+        internal void AddNullExtension(Type extensionType, string extensionSchema)
+        {
+            Extensions.Add(extensionType, extensionSchema, null);
         }
 
         public virtual int CalculateVersion()

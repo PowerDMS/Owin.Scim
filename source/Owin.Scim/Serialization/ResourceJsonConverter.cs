@@ -2,9 +2,10 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Net;
 
     using Configuration;
-
+    using ErrorHandling;
     using Extensions;
 
     using Model;
@@ -124,7 +125,8 @@
             }
 
             if (instance == null)
-                throw new Exception(
+                throw new ScimException(
+                    HttpStatusCode.InternalServerError, 
                     @"In order for Owin.Scim to support resource extensions, the serialization 
                       process is uniquely designed. Therefore, your Resource type objects must 
                       contain at mimimum, a default empty constructor (which may be private).".RemoveMultipleSpaces());
@@ -133,10 +135,14 @@
             {
                 serializer.Populate(jsonReader, instance);
             }
-            catch (FormatException)
+            catch (FormatException e)
             {
-                // TODO: (DG) implement exception handling
-                throw new Exception("Invalid json. Could not deserialize to objectType...");
+                throw new ScimException(
+                    HttpStatusCode.InternalServerError, 
+                    string.Format(
+                        "Owin.Scim was unable to deserialize the json. Exception detail: {0}{1}",
+                        Environment.NewLine,
+                        e.Message));
             }
             
             var resource = instance as Resource;
@@ -148,7 +154,11 @@
                     if (extensionType == null)
                         continue; // This is either a readOnly attribute or an unknown/unsupported extension
 
-                    resource.AddExtension((ResourceExtension)kvp.Value.ToObject(extensionType));
+                    // extension value may be null
+                    if (kvp.Value.HasValues)
+                        resource.AddExtension((ResourceExtension)kvp.Value.ToObject(extensionType));
+                    else
+                        resource.AddNullExtension(extensionType, kvp.Key);
                 }
             }
 
