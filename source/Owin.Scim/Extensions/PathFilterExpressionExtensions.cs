@@ -3,14 +3,14 @@
     using System;
     using System.Linq.Expressions;
     using System.Reflection;
-
-    using Antlr;
-
+    
     using Antlr4.Runtime;
 
     using NContext.Common;
 
     using Querying;
+
+    using Owin.Scim.Antlr;
 
     public static class PathFilterExpressionExtensions
     {
@@ -32,7 +32,7 @@
             // if enumerable, get generic argument
             if (declaryingType.IsNonStringEnumerable())
                 declaryingType = declaryingType.GetGenericArguments()[0];
-
+            
             var lexer = new ScimFilterLexer(new AntlrInputStream(filterExpression.Filter));
             var parser = new ScimFilterParser(new CommonTokenStream(lexer));
 
@@ -44,7 +44,7 @@
             if (filterExpression.Path == null)
                 return filterDelegateExpression.Compile().AsFunc<T, bool>();
 
-            //Func<Product, object>
+            // TODO: (DG) add more comments
             var resourceArg = Expression.Parameter(typeof(T));
             var resourceComplexAttr = Expression.Property(resourceArg, filterExpression.Path);
             var invokeFilterExpression = Expression.Invoke(filterDelegateExpression, resourceComplexAttr);

@@ -250,8 +250,8 @@
                         ErrorType = ScimErrorType.NoTarget;
                         break;
                     }
-
-                    Delegate predicate;
+                    
+                    dynamic predicate;
                     try
                     {
                         // parse our filter into an expression tree
@@ -280,7 +280,8 @@
                     while (enumerator.MoveNext())
                     {
                         originalHasElements = true;
-                        if ((bool) predicate.DynamicInvoke(enumerator.Current)) // TODO: (DG) Find a way to refactor away from DynamicInvoke.
+                        dynamic currentElement = enumerator.Current;
+                        if ((bool) predicate(currentElement))
                         {
                             filteredNodes.AddRange(
                                 GetAffectedMembers(
