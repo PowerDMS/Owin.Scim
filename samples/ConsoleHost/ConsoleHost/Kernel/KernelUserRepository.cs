@@ -35,21 +35,23 @@
                 : _Users[userId];
         }
 
-        public async Task UpdateUser(KernelUser user)
+        public async Task<KernelUser> UpdateUser(KernelUser user)
         {
-            if (!_Users.ContainsKey(user.Id)) return;
+            if (!_Users.ContainsKey(user.Id))
+                return null;
 
             _Users[user.Id] = user;
+
+            return user;
         }
 
-        public async Task<KernelUser> DeleteUser(string userId)
+        public async Task DeleteUser(string userId)
         {
-            if (!_Users.ContainsKey(userId)) return null;
+            if (!_Users.ContainsKey(userId))
+                return;
 
             KernelUser userRecord;
             _Users.TryRemove(userId, out userRecord);
-
-            return userRecord;
         }
 
         public Task<bool> IsUserNameAvailable(string userName)

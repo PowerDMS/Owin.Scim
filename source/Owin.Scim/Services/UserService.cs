@@ -101,68 +101,65 @@
 
         public async Task<IScimResponse<ScimUser>> UpdateUser(ScimUser user)
         {
-            var userRecord = await _UserRepository.GetUser(user.Id);
-            if (userRecord == null)
-            {
-                return new ScimErrorResponse<ScimUser>(
-                    new ScimError(
-                        HttpStatusCode.NotFound,
-                        detail: ScimErrorDetail.NotFound(user.Id)));
-            }
-
-            user.Groups = userRecord.Groups; // user.Groups is readOnly and used here only for resource versioning
-            user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
-            {
-                Created = userRecord.Meta.Created,
-                LastModified = userRecord.Meta.LastModified
-            };
-
-            _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(user.GetType()));
-
-            var validator = await _ResourceValidatorFactory.CreateValidator(user);
-            var validationResult = (await validator.ValidateUpdateAsync(user, userRecord)).ToScimValidationResult();
-
-            if (!validationResult)
-                return new ScimErrorResponse<ScimUser>(validationResult.Errors.First());
-            
-            // check if we're changing a password
-            if (_PasswordManager.PasswordIsDifferent(user.Password, userRecord.Password))
-            {
-                if (!ServerConfiguration.GetFeature(ScimFeatureType.ChangePassword).Supported)
+            return await (await RetrieveUser(user.Id))
+                .BindAsync<ScimUser, ScimUser>(async userRecord =>
                 {
-                    return new ScimErrorResponse<ScimUser>(
-                        new ScimError(
-                            HttpStatusCode.BadRequest,
-                            ScimErrorType.InvalidValue,
-                            "Password change is not supported."));
-                }
+                    user.Groups = userRecord.Groups; // user.Groups is readOnly and used here only for resource versioning
+                    user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
+                    {
+                        Created = userRecord.Meta.Created,
+                        LastModified = userRecord.Meta.LastModified
+                    };
 
-                // if we're not setting password to null, then hash the plainText
-                if (user.Password != null)
-                    user.Password = _PasswordManager.CreateHash(user.Password);
-            }
+                    _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(user.GetType()));
 
-            SetResourceVersion(user);
+                    var validator = await _ResourceValidatorFactory.CreateValidator(user);
+                    var validationResult = (await validator.ValidateUpdateAsync(user, userRecord)).ToScimValidationResult();
 
-            // if both versions are equal, bypass persistence
-            if (user.Meta.Version.Equals(userRecord.Meta.Version))
-                return new ScimDataResponse<ScimUser>(user);
+                    if (!validationResult)
+                        return new ScimErrorResponse<ScimUser>(validationResult.Errors.First());
 
-            user.Meta.LastModified = DateTime.UtcNow;
+                    // check if we're changing a password
+                    if (_PasswordManager.PasswordIsDifferent(user.Password, userRecord.Password))
+                    {
+                        if (!ServerConfiguration.GetFeature(ScimFeatureType.ChangePassword).Supported)
+                        {
+                            return new ScimErrorResponse<ScimUser>(
+                                new ScimError(
+                                    HttpStatusCode.BadRequest,
+                                    ScimErrorType.InvalidValue,
+                                    "Password change is not supported."));
+                        }
 
-            await _UserRepository.UpdateUser(user);
+                        // if we're not setting password to null, then hash the plainText
+                        if (user.Password != null)
+                            user.Password = _PasswordManager.CreateHash(user.Password);
+                    }
 
-            return new ScimDataResponse<ScimUser>(user);
+                    SetResourceVersion(user);
+
+                    // if both versions are equal, bypass persistence
+                    if (user.Meta.Version.Equals(userRecord.Meta.Version))
+                        return new ScimDataResponse<ScimUser>(user);
+
+                    user.Meta.LastModified = DateTime.UtcNow;
+
+                    var updatedUser = await _UserRepository.UpdateUser(user);
+
+                    return new ScimDataResponse<ScimUser>(updatedUser);
+                });
         }
 
         public async Task<IScimResponse<Unit>> DeleteUser(string userId)
         {
-            var result = await _UserRepository.DeleteUser(userId);
-            if (result == null)
+            var exists = await _UserRepository.UserExists(userId);
+            if (!exists)
                 return new ScimErrorResponse<Unit>(
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ScimErrorDetail.NotFound(userId)));
+
+            await _UserRepository.DeleteUser(userId);
 
             return new ScimDataResponse<Unit>(default(Unit));
         }

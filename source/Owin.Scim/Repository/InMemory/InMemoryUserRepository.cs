@@ -51,21 +51,22 @@
             return user;
         }
 
-        public async Task UpdateUser(ScimUser user)
+        public async Task<ScimUser> UpdateUser(ScimUser user)
         {
-            if (!_Users.ContainsKey(user.Id)) return;
+            if (!_Users.ContainsKey(user.Id))
+                return user;
 
             _Users[user.Id] = user;
+
+            return user;
         }
 
-        public async Task<ScimUser> DeleteUser(string userId)
+        public async Task DeleteUser(string userId)
         {
-            if (!_Users.ContainsKey(userId)) return null;
+            if (!_Users.ContainsKey(userId)) return;
 
             ScimUser userRecord;
             _Users.TryRemove(userId, out userRecord);
-
-            return userRecord;
         }
 
         public async Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
@@ -103,6 +104,11 @@
                 _Users
                     .Values
                     .All(u => !CryptographyUtility.CompareBytes(Encoding.UTF8.GetBytes(u.UserName), userNameBytes)));
+        }
+
+        public Task<bool> UserExists(string userId)
+        {
+            return Task.FromResult(_Users.ContainsKey(userId));
         }
     }
 }

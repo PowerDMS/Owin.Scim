@@ -78,52 +78,49 @@
             return new ScimDataResponse<ScimGroup>(userRecord);
         }
 
-        public async Task<IScimResponse<ScimGroup>> UpdateGroup(ScimGroup @group)
+        public async Task<IScimResponse<ScimGroup>> UpdateGroup(ScimGroup group)
         {
-            var groupRecord = await _GroupRepository.GetGroup(@group.Id);
-            if (groupRecord == null)
-            {
-                return new ScimErrorResponse<ScimGroup>(
-                    new ScimError(
-                        HttpStatusCode.NotFound,
-                        detail: ScimErrorDetail.NotFound(@group.Id)));
-            }
+            return await (await RetrieveGroup(group.Id))
+                .BindAsync<ScimGroup, ScimGroup>(async groupRecord =>
+                {
+                    group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group)
+                    {
+                        Created = groupRecord.Meta.Created,
+                        LastModified = groupRecord.Meta.LastModified
+                    };
 
-            @group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group)
-            {
-                Created = groupRecord.Meta.Created,
-                LastModified = groupRecord.Meta.LastModified
-            };
+                    _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(typeof(ScimGroup)));
 
-            _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(typeof(ScimGroup)));
-            
-            var validator = await _ResourceValidatorFactory.CreateValidator(group);
-            var validationResult = (await validator.ValidateUpdateAsync(group, groupRecord)).ToScimValidationResult();
+                    var validator = await _ResourceValidatorFactory.CreateValidator(group);
+                    var validationResult = (await validator.ValidateUpdateAsync(group, groupRecord)).ToScimValidationResult();
 
-            if (!validationResult)
-                return new ScimErrorResponse<ScimGroup>(validationResult.Errors.First());
-            
-            SetResourceVersion(@group);
+                    if (!validationResult)
+                        return new ScimErrorResponse<ScimGroup>(validationResult.Errors.First());
 
-            // if both versions are equal, bypass persistence
-            if (@group.Meta.Version.Equals(groupRecord.Meta.Version))
-                return new ScimDataResponse<ScimGroup>(groupRecord);
+                    SetResourceVersion(group);
 
-            @group.Meta.LastModified = DateTime.UtcNow;
+                    // if both versions are equal, bypass persistence
+                    if (group.Meta.Version.Equals(groupRecord.Meta.Version))
+                        return new ScimDataResponse<ScimGroup>(groupRecord);
 
-            await _GroupRepository.UpdateGroup(@group);
+                    group.Meta.LastModified = DateTime.UtcNow;
 
-            return new ScimDataResponse<ScimGroup>(@group);
+                    var updatedGroup = await _GroupRepository.UpdateGroup(group);
+
+                    return new ScimDataResponse<ScimGroup>(updatedGroup);
+                });
         }
 
         public async Task<IScimResponse<Unit>> DeleteGroup(string groupId)
         {
-            var result = await _GroupRepository.DeleteGroup(groupId);
-            if (result == null)
+            var groupExists = await _GroupRepository.GroupExists(groupId);
+            if (!groupExists)
                 return new ScimErrorResponse<Unit>(
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ScimErrorDetail.NotFound(groupId)));
+
+            await _GroupRepository.DeleteGroup(groupId);
 
             return new ScimDataResponse<Unit>(default(Unit));
         }

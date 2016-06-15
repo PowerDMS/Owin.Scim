@@ -51,15 +51,13 @@
             return group;
         }
 
-        public async Task<ScimGroup> DeleteGroup(string groupId)
+        public async Task DeleteGroup(string groupId)
         {
             if (!_Groups.ContainsKey(groupId))
-                return null;
+                return;
 
             var groupRecord = _Groups[groupId];
             _Groups.Remove(groupId);
-
-            return groupRecord;
         }
 
         public async Task<IEnumerable<ScimGroup>> QueryGroups(ScimQueryOptions options)
@@ -91,10 +89,14 @@
                 .Select(group => new UserGroup
                 {
                     Value = group.Id,
-                    Ref = new Uri("../Groups/" + group.Id),
                     Display = group.DisplayName,
                     Type = "direct"
                 });
+        }
+
+        public Task<bool> GroupExists(string groupId)
+        {
+            return Task.FromResult(_Groups.ContainsKey(groupId));
         }
     }
 }

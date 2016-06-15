@@ -28,9 +28,10 @@
         /// </summary>
         /// <param name="user"></param>
         /// <returns></returns>
-        Task UpdateUser(ScimUser user);
+        Task<ScimUser> UpdateUser(ScimUser user);
 
         /// <summary>
+        /// Deletes the <see cref="ScimUser"/> resource associated with the specified <paramref name="userId"/>.
         /// Clients request resource removal via DELETE.  Service providers MAY
         /// choose not to permanently delete the resource but MUST return a 404
         /// (Not Found) error code for all operations associated with the
@@ -44,7 +45,7 @@
         /// </summary>
         /// <param name="userId"></param>
         /// <returns></returns>
-        Task<ScimUser> DeleteUser(string userId);
+        Task DeleteUser(string userId);
 
         /// <summary>
         /// Searches for users whose metadata satisfy the specified <paramref name="options"/>.
@@ -59,5 +60,12 @@
         /// <param name="userName"></param>
         /// <returns></returns>
         Task<bool> IsUserNameAvailable(string userName);
+        
+        /// <summary>
+        /// Determines whether a user with the specified <paramref name="userId"/> exists.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <returns>Task&lt;System.Boolean&gt;.</returns>
+        Task<bool> UserExists(string userId);
     }
 }

@@ -19,8 +19,8 @@
                 DisplayName = "blue man",
                 Members = new []
                 {
-                    new Member {Value = ValidUserId, Type = "User" },
-                    new Member {Value = ValidGroupId, Type = "Group" }
+                    new Member { Value = ValidUserId, Type = "User" },
+                    new Member { Value = ValidGroupId, Type = "Group" }
                 }
             };
         };

@@ -180,17 +180,16 @@
 
         protected virtual async Task<bool> IsValidResourceValue(Member member)
         {
-            // TODO: (DG) Should we add repository methods for User.Exists(userId) and Group.Exists(groupId)?
             if (member.Type == ScimConstants.ResourceTypes.User)
             {
-                var user = await _UserRepository.GetUser(member.Value);
-                return user != null;
+                var userExists = await _UserRepository.UserExists(member.Value);
+                return userExists;
             }
 
             if (member.Type == ScimConstants.ResourceTypes.Group)
             {
-                var group = await _GroupRepository.GetGroup(member.Value);
-                return group != null;
+                var groupExists = await _GroupRepository.GroupExists(member.Value);
+                return groupExists;
             }
 
             return false;

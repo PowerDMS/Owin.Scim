@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.Endpoints
 {
+    using System;
     using System.Linq;
     using System.Net;
     using System.Net.Http;
@@ -62,6 +63,17 @@
                 {
                     SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
                     SetETagHeader(response, user);
+
+                    if (user.Groups != null)
+                    {
+                        foreach (var userGroup in user.Groups)
+                        {
+                            userGroup.Ref = new Uri(
+                                Request
+                                    .GetUrlHelper()
+                                    .Link(GroupsController.RetrieveGroupRouteName, new { groupId = userGroup.Value }));
+                        }
+                    }
                 });
         }
 

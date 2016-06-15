@@ -4,7 +4,7 @@
 
     using NContext.Common;
 
-    public interface IScimResponse<T> : IEither<ScimError, T>
+    public interface IScimResponse<out T> : IEither<ScimError, T>
     {
     }
 }

@@ -23,8 +23,14 @@
             var groupRepository = A.Fake<IGroupRepository>();
             var scimServerConfiguration = A.Fake<ScimServerConfiguration>();
             
-            A.CallTo(() => userRepository.GetUser(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidUserId ? new ScimUser() : null);
-            A.CallTo(() => groupRepository.GetGroup(A<string>.Ignored)).ReturnsLazily((string id) => id == ValidGroupId ? new ScimGroup() : null);
+            A.CallTo(() => userRepository.GetUser(A<string>.Ignored))
+                .ReturnsLazily((string id) => id == ValidUserId ? new ScimUser() : null);
+            A.CallTo(() => userRepository.UserExists(A<string>.Ignored))
+                .ReturnsLazily((string id) => id == ValidUserId);
+            A.CallTo(() => groupRepository.GetGroup(A<string>.Ignored))
+                .ReturnsLazily((string id) => id == ValidGroupId ? new ScimGroup() : null);
+            A.CallTo(() => groupRepository.GroupExists(A<string>.Ignored))
+                .ReturnsLazily((string id) => id == ValidGroupId);
 
             Validator = new GroupValidator(
                 scimServerConfiguration, 

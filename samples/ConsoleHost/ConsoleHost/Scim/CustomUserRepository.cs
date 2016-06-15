@@ -51,19 +51,20 @@
             if (userRecord == null)
                 return null;
 
+            // In real-life, don't forget to get the user's groups! i.e. ScimUser.Groups
+
             return _Mapper.Map<ScimUser>(userRecord);
         }
 
-        public async Task UpdateUser(ScimUser user)
+        public async Task<ScimUser> UpdateUser(ScimUser user)
         {
             var kernelUser = _Mapper.Map<KernelUser>(user);
-            await _UserManager.UpdateUser(kernelUser);
+            return _Mapper.Map<ScimUser>(await _UserManager.UpdateUser(kernelUser));
         }
 
-        public async Task<ScimUser> DeleteUser(string userId)
+        public async Task DeleteUser(string userId)
         {
-            var userRecord = await _UserManager.DeleteUser(userId);
-            return _Mapper.Map<ScimUser>(userRecord);
+            await _UserManager.DeleteUser(userId);
         }
 
         public Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
@@ -74,6 +75,11 @@
         public Task<bool> IsUserNameAvailable(string userName)
         {
             return Task.FromResult(true);
+        }
+
+        public async Task<bool> UserExists(string userId)
+        {
+            return await _UserManager.GetUser(userId) != null;
         }
     }
 }
