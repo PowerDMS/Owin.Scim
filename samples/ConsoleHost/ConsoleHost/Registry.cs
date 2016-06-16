@@ -9,6 +9,7 @@
     using Owin.Scim.Configuration;
     using Owin.Scim.Model.Users;
     using Owin.Scim.Repository;
+    using Owin.Scim.v2.Model;
 
     using Scim;
 
@@ -33,7 +34,14 @@
             // default registrations occur.
 
             // Configure AutoMapper to translate ScimUser and your application's user.
-            var mapperConfiguration = new MapperConfiguration(config => config.CreateMap<ScimUser, KernelUser>().ReverseMap());
+            var mapperConfiguration = new MapperConfiguration(
+                config =>
+                {
+                    config.CreateMap<KernelUser, ScimUser2>();
+                    config.CreateMap<ScimUser, KernelUser>()
+                        .ReverseMap()
+                        .Include<KernelUser, ScimUser2>();
+                });
             container.RegisterDelegate<IMapper>(resolver => mapperConfiguration.CreateMapper());
 
             // Replace any IUserRepository implementation with our own.

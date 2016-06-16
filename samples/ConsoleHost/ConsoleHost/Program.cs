@@ -35,13 +35,13 @@
 
             // Uncomment any of the following method calls to see example Owin.Scim functionality.
 
-//            await ExecuteServiceProviderConfig(client);
+            await ExecuteServiceProviderConfig(client);
 
 //            await ExecuteResourceTypes(client);
 
 //            await ExecuteSchemas(client);
 
-            await ExecuteUser(client);
+//            await ExecuteUser(client);
 
 //            await ExecuteCustomResourceType(client);
         }
@@ -50,7 +50,7 @@
         {
             Write("");
             Write("Getting schemas ...");
-            var response = await client.GetAsync("schemas/" + ScimConstantsV2.Schemas.User);
+            var response = await client.GetAsync("v2/schemas/" + ScimConstantsV2.Schemas.User);
             Write(await response.Content.ReadAsStringAsync());
             Write("");
         }
@@ -59,7 +59,7 @@
         {
             Write("");
             Write("Getting resource types ...");
-            var response = await client.GetAsync("resourcetypes");
+            var response = await client.GetAsync("v2/resourcetypes");
             Write(await response.Content.ReadAsStringAsync());
             Write("");
         }
@@ -68,7 +68,7 @@
         {
             Write("");
             Write("Getting service provider configuration ...");
-            var response = await client.GetAsync("serviceproviderconfig");
+            var response = await client.GetAsync("v2/serviceproviderconfig");
             Write(await response.Content.ReadAsStringAsync());
             Write("");
         }
@@ -99,15 +99,15 @@
             Write("Creating user ...");
             var response =
                 await
-                    client.PostAsync("users",
+                    client.PostAsync("v2/users",
                         new ObjectContent<ScimUser>(new ScimUser2 { UserName = "daniel", NickName = "danny" }, new JsonMediaTypeFormatter()));
             Write(await response.Content.ReadAsStringAsync());
             if (response.StatusCode == HttpStatusCode.Created)
             {
-                var user = await response.Content.ReadAsAsync<ScimUser>(new[] { new JsonMediaTypeFormatter() });
+                var user = await response.Content.ReadAsAsync<ScimUser2>(new[] { new JsonMediaTypeFormatter() });
                 Write("");
                 Write("Getting user " + user.Id);
-                var json = await client.GetStringAsync("users/" + user.Id);
+                var json = await client.GetStringAsync("v2/users/" + user.Id);
                 Write(json);
             }
 
