@@ -10,6 +10,8 @@ namespace Owin.Scim.Tests.Services.UserService.Update
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_client_supplied_groups : when_updating_a_user
     {
         Establish context = () =>
@@ -20,7 +22,7 @@ namespace Owin.Scim.Tests.Services.UserService.Update
             A.CallTo(() => GroupRepository.GetGroupsUserBelongsTo(A<string>._))
                 .ReturnsLazily(() => _UserRecordGroups);
 
-            ClientUserDto = new ScimUser
+            ClientUserDto = new ScimUser2
             {
                 Id = "id",
                 UserName = "name",
@@ -46,8 +48,8 @@ namespace Owin.Scim.Tests.Services.UserService.Update
 
         private static Task<ScimUser> GetUserRecord()
         {
-            return Task.FromResult(
-                new ScimUser
+            return Task.FromResult<ScimUser>(
+                new ScimUser2
                 {
                     Id = "id",
                     UserName = "name",

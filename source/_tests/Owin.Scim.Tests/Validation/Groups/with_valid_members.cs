@@ -7,6 +7,8 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     /// <summary>
     /// members must provide $ref or a value/type combo
     /// </summary>
@@ -14,7 +16,7 @@
     {
         Establish ctx = () =>
         {
-            Group = new ScimGroup
+            Group = new ScimGroup2
             {
                 DisplayName = "blue man",
                 Members = new []

@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Endpoints
+﻿namespace Owin.Scim.v2.Endpoints
 {
     using System.Linq;
     using System.Net;
@@ -11,7 +11,6 @@
     using Extensions;
 
     using Model;
-    using Model.Groups;
 
     using NContext.Extensions;
 
@@ -21,9 +20,12 @@
 
     using Querying;
 
-    using Services;
-
-    [RoutePrefix(ScimConstants.Endpoints.Groups)]
+    using Scim.Endpoints;
+    using Scim.Model;
+    using Scim.Model.Groups;
+    using Scim.Services;
+    
+    [RoutePrefix(ScimConstantsV2.Endpoints.Groups)]
     public class GroupsController : ScimControllerBase
     {
         public const string RetrieveGroupRouteName = @"RetrieveGroup";
@@ -39,7 +41,7 @@
         }
 
         [Route(Name = "CreateGroup")]
-        public async Task<HttpResponseMessage> Post(ScimGroup groupDto)
+        public async Task<HttpResponseMessage> Post(ScimGroup2 groupDto)
         {
             return (await _GroupService.CreateGroup(groupDto))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))

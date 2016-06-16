@@ -6,11 +6,13 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_no_display_name : when_creating_a_group
     {
         Establish ctx = () =>
         {
-            Group = new ScimGroup
+            Group = new ScimGroup2
             {
                 ExternalId = "some Id",
             };

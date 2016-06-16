@@ -6,15 +6,17 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_missing_display_name : when_replacing_a_group
     {
         Establish context = () =>
         {
-            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = "existing group"});
+            ExistingGroup = CreateGroup(new ScimGroup2 {DisplayName = "existing group"});
 
             GroupId = ExistingGroup.Id;
 
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 Id = GroupId,
                 ExternalId = "hello",

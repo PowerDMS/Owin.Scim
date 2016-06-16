@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Services
+﻿namespace Owin.Scim.v2.Services
 {
     using System;
     using System.Collections.Generic;
@@ -9,6 +9,9 @@
     using Configuration;
 
     using Model;
+
+    using Scim.Model;
+    using Scim.Services;
 
     public class ResourceTypeService : ServiceBase, IResourceTypeService
     {

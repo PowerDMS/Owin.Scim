@@ -13,7 +13,9 @@
     using Repository;
     using Scim.Extensions;
     using Scim.Validation;
-    using Scim.Validation.Groups;
+
+    using v2.Model;
+    using v2.Validation.Groups;
 
     public class when_creating_a_group
     {
@@ -24,15 +26,15 @@
             var scimServerConfiguration = A.Fake<ScimServerConfiguration>();
             
             A.CallTo(() => userRepository.GetUser(A<string>.Ignored))
-                .ReturnsLazily((string id) => id == ValidUserId ? new ScimUser() : null);
+                .ReturnsLazily((string id) => id == ValidUserId ? new ScimUser2() : null);
             A.CallTo(() => userRepository.UserExists(A<string>.Ignored))
                 .ReturnsLazily((string id) => id == ValidUserId);
             A.CallTo(() => groupRepository.GetGroup(A<string>.Ignored))
-                .ReturnsLazily((string id) => id == ValidGroupId ? new ScimGroup() : null);
+                .ReturnsLazily((string id) => id == ValidGroupId ? new ScimGroup2() : null);
             A.CallTo(() => groupRepository.GroupExists(A<string>.Ignored))
                 .ReturnsLazily((string id) => id == ValidGroupId);
 
-            Validator = new GroupValidator(
+            Validator = new ScimGroup2Validator(
                 scimServerConfiguration, 
                 new ResourceExtensionValidators(null), userRepository, groupRepository);
         };

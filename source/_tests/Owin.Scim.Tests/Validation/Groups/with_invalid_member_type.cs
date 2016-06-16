@@ -6,6 +6,8 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     /// <summary>
     /// valid values for member.type are User/Group
     /// </summary>
@@ -13,7 +15,7 @@
     {
         Establish ctx = () =>
         {
-            Group = new ScimGroup
+            Group = new ScimGroup2
             {
                 DisplayName = "blue man",
                 Members = new []{new Member {Value="some value", Type = "NotUser"} }

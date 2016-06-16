@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Endpoints
+﻿namespace Owin.Scim.v2.Endpoints
 {
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -7,11 +7,13 @@
     using Configuration;
 
     using Extensions;
-    
+
+    using Scim.Endpoints;
+
     using Services;
 
     [AllowAnonymous]
-    [RoutePrefix(ScimConstants.Endpoints.ResourceTypes)]
+    [RoutePrefix(ScimConstantsV2.Endpoints.ResourceTypes)]
     public class ResourceTypesController : ScimControllerBase
     {
         private readonly IResourceTypeService _ResourceTypeService;

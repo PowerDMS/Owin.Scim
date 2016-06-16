@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Validation.Groups
+﻿namespace Owin.Scim.v2.Validation.Groups
 {
     using System;
     using System.Linq;
@@ -6,26 +6,29 @@
     using System.Threading;
     using System.Threading.Tasks;
 
-    using FluentValidation;
-
     using Configuration;
+
     using ErrorHandling;
 
     using Extensions;
 
+    using FluentValidation;
+
     using Model;
-    using Model.Groups;
+
     using Repository;
 
-    using Services;
+    using Scim.Model;
+    using Scim.Model.Groups;
+    using Scim.Validation;
 
-    public class GroupValidator : ResourceValidatorBase<ScimGroup>
+    public class ScimGroup2Validator : ResourceValidatorBase<ScimGroup2>
     {
         private readonly IUserRepository _UserRepository;
 
         private readonly IGroupRepository _GroupRepository;
 
-        public GroupValidator(
+        public ScimGroup2Validator(
             ScimServerConfiguration serverConfiguration,
             ResourceExtensionValidators extensionValidators,
             IUserRepository userRepository,

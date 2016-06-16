@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Endpoints
+﻿namespace Owin.Scim.v2.Endpoints
 {
     using System;
     using System.Linq;
@@ -12,7 +12,6 @@
     using Extensions;
 
     using Model;
-    using Model.Users;
 
     using NContext.Extensions;
 
@@ -23,9 +22,14 @@
 
     using Querying;
 
+    using Scim.Endpoints;
+    using Scim.Model;
+    using Scim.Model.Users;
+    using Scim.Services;
+
     using Services;
-    
-    [RoutePrefix(ScimConstants.Endpoints.Users)]
+
+    [RoutePrefix(ScimConstantsV2.Endpoints.Users)]
     public class UsersController : ScimControllerBase
     {
         public const string RetrieveUserRouteName = @"RetrieveUser";
@@ -41,7 +45,7 @@
         }
 
         [Route(Name = "CreateUser")]
-        public async Task<HttpResponseMessage> Post(ScimUser userDto)
+        public async Task<HttpResponseMessage> Post(ScimUser2 userDto)
         {
             return (await _UserService.CreateUser(userDto))
                 .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
@@ -130,7 +134,7 @@
                         // TODO: (DG) Finish patch support
                         var result = patchRequest.Operations.ApplyTo(
                             user, 
-                            new ScimObjectAdapter<ScimUser>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
+                            new ScimObjectAdapter<ScimUser2>(ServerConfiguration, new CamelCasePropertyNamesContractResolver()));
 
                         return (IScimResponse<ScimUser>)new ScimDataResponse<ScimUser>(user);
                     }

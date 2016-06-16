@@ -6,15 +6,17 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_no_id_in_url : when_replacing_a_group
     {
         Establish context = () =>
         {
-            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = "existing group"});
+            ExistingGroup = CreateGroup(new ScimGroup2 {DisplayName = "existing group"});
 
             GroupId = string.Empty;
 
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 Id = ExistingGroup.Id,
                 DisplayName = "new group",

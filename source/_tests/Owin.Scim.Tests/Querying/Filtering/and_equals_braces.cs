@@ -9,6 +9,8 @@
 
     using Scim.Querying;
 
+    using v2.Model;
+
     [Subject(typeof(ScimFilterVisitor<>))]
     public class and_equals_braces : when_parsing_a_filter_expression<ScimUser>
     {
@@ -16,8 +18,8 @@
         {
             Users = new List<ScimUser>
             {
-                new ScimUser { UserName = "BJensen", UserType = "employee"},
-                new ScimUser
+                new ScimUser2 { UserName = "BJensen", UserType = "employee"},
+                new ScimUser2
                 {
                     UserName = "ROMalley",
                     UserType = "employee",
@@ -26,7 +28,7 @@
                         new Email { Value = "user@example.com", Type = "work" }
                     }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = "DGioulakis",
                     Emails = new List<Email>

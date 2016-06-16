@@ -26,7 +26,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<UserWithSchema>(UserDto))
+                .PostAsync("v2/users", new ScimObjectContent<UserWithSchema>(UserDto))
                 .Result;
 
             StatusCode = Response.StatusCode;

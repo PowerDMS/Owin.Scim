@@ -2,10 +2,13 @@
 {
     using Configuration;
 
-    public sealed class ScimSchemaTypeDefinition : ScimSchemaTypeDefinitionBuilder<ScimSchema>
+    using v2;
+    using v2.Model;
+
+    public sealed class ScimSchema2TypeDefinition : ScimSchemaTypeDefinitionBuilder<ScimSchema2>
     {
-        public ScimSchemaTypeDefinition(ScimServerConfiguration serverConfiguration)
-            : base(serverConfiguration, ScimConstants.Schemas.Schema)
+        public ScimSchema2TypeDefinition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration, ScimConstantsV2.Schemas.Schema)
         {
             SetName(ScimConstants.ResourceTypes.Schema);
             SetDescription(@"Specifies the schema that describes a SCIM schema.");

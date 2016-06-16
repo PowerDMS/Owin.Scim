@@ -84,6 +84,19 @@
             get { return _AuthenticationSchemes; }
         }
 
+        public IEnumerable<IScimSchemaTypeDefinition> SchemaTypeDefinitions
+        {
+            get
+            {
+                return _TypeDefinitionCache.Values.OfType<IScimSchemaTypeDefinition>();
+            }
+        }
+
+        public IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
+        {
+            get { return _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>(); }
+        }
+
         internal IEnumerable<KeyValuePair<ScimFeatureType, ScimFeature>> Features
         {
             get { return _Features; }
@@ -93,20 +106,7 @@
         {
             get { return _SchemaBindingRules.Value; }
         }
-
-        internal IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
-        {
-            get { return _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>(); }
-        }
-
-        internal IEnumerable<IScimSchemaTypeDefinition> SchemaTypeDefinitions
-        {
-            get
-            {
-                return _TypeDefinitionCache.Values.OfType<IScimSchemaTypeDefinition>();
-            }
-        }
-
+        
         internal IReadOnlyDictionary<string, Type> ResourceExtensionSchemas
         {
             get { return _ResourceExtensionCache.Value; }
@@ -278,7 +278,8 @@
         /// <param name="builder">The builder.</param>
         /// <returns>ScimServerConfiguration.</returns>
         /// <exception cref="System.Exception"></exception>
-        public ScimServerConfiguration ModifyResourceType<T>(Action<ScimResourceTypeDefinitionBuilder<T>> builder) where T : Resource
+        public ScimServerConfiguration ModifyResourceType<T>(Action<ScimResourceTypeDefinitionBuilder<T>> builder)
+            where T : Resource, new()
         {
             IScimTypeDefinition td;
             if (!_TypeDefinitionCache.TryGetValue(typeof(T), out td))
@@ -299,7 +300,7 @@
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns>ScimServerConfiguration.</returns>
-        public ScimServerConfiguration RemoveResourceType<T>() where T : Resource
+        public ScimServerConfiguration RemoveResourceType<T>() where T : Resource, new()
         {
             IScimTypeDefinition td;
             if (_TypeDefinitionCache.TryRemove(typeof(T), out td) && _ResourceExtensionCache.IsValueCreated)

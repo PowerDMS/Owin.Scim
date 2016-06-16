@@ -7,11 +7,13 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_missing_display_name : when_creating_a_group
     {
         Establish context = () =>
         {
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 ExternalId = "hello",
             };

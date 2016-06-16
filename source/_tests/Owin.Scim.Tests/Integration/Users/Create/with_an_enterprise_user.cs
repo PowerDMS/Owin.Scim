@@ -3,19 +3,19 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using System.Net;
 
     using Machine.Specifications;
-
-    using Model.Users;
+    
+    using v2.Model;
 
     public class with_an_enterprise_user : when_creating_a_user
     {
         Establish context = () =>
         {
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
             
-            UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
+            UserDto.Extension<EnterpriseUser2Extension>().Department = "Sales";
         };
 
         It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);

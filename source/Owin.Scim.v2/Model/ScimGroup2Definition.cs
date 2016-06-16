@@ -1,4 +1,4 @@
-namespace Owin.Scim.Model.Groups
+namespace Owin.Scim.v2.Model
 {
     using Canonicalization;
 
@@ -8,16 +8,16 @@ namespace Owin.Scim.Model.Groups
 
     using Validation.Groups;
 
-    public class GroupDefinition : ScimResourceTypeDefinitionBuilder<ScimGroup>
+    public class ScimGroup2Definition : ScimResourceTypeDefinitionBuilder<ScimGroup2>
     {
-        public GroupDefinition(ScimServerConfiguration serverConfiguration)
+        public ScimGroup2Definition(ScimServerConfiguration serverConfiguration)
             : base(
                 serverConfiguration,
                 ScimConstants.ResourceTypes.Group,
-                ScimConstants.Schemas.Group,
-                ScimConstants.Endpoints.Groups,
-                typeof (GroupValidator),
-                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.Group))
+                ScimConstantsV2.Schemas.Group,
+                ScimConstantsV2.Endpoints.Groups,
+                typeof (ScimGroup2Validator),
+                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstantsV2.Schemas.Group))
         {
             SetName("Group");
             SetDescription("Group resource.");

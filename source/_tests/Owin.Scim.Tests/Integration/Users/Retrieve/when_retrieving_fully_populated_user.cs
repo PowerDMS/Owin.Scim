@@ -9,13 +9,15 @@
 
     using Ploeh.AutoFixture;
 
+    using v2.Model;
+
     public class when_retrieving_fully_populated_user : using_a_scim_server
     {
         Because of = async () =>
         {
             var autoFixture = new Fixture();
 
-            var existingUser = autoFixture.Build<ScimUser>()
+            var existingUser = autoFixture.Build<ScimUser2>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass!1")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -27,18 +29,18 @@
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
                 .With(x => x.X509Certificates, null)
-                .Create(seed: new ScimUser());
+                .Create(seed: new ScimUser2());
 
             // Insert the first user so there's one already in-memory.
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<ScimUser>(existingUser))
+                .PostAsync("v2/users", new ScimObjectContent<ScimUser>(existingUser))
                 .AwaitResponse()
                 .AsTask;
 
             if (Response.StatusCode == HttpStatusCode.Created)
             {
-                CreatedUser = await Response.Content.ScimReadAsAsync<ScimUser>().Await().AsTask;
+                CreatedUser = await Response.Content.ScimReadAsAsync<ScimUser2>().Await().AsTask;
             }
 
             var client = Server.HttpClient;
@@ -46,7 +48,7 @@
 
             Response = await Server
                 .HttpClient
-                .GetAsync("users/" + CreatedUser.Id)
+                .GetAsync("v2/users/" + CreatedUser.Id)
                 .AwaitResponse()
                 .AsTask;
         };
@@ -55,7 +57,7 @@
             async () =>
         {
             Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
-            RetrievedUser = await Response.Content.ScimReadAsAsync<ScimUser>().AwaitResponse().AsTask;
+            RetrievedUser = await Response.Content.ScimReadAsAsync<ScimUser2>().AwaitResponse().AsTask;
 
             RetrievedUser.Meta.Version.ShouldEqual(CreatedUser.Meta.Version);
         };

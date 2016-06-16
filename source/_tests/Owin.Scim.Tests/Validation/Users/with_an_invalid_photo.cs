@@ -7,11 +7,13 @@ namespace Owin.Scim.Tests.Validation.Users
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_an_invalid_photo : when_validating_a_user
     {
         Establish ctx = () =>
         {
-            User = new ScimUser
+            User = new ScimUser2
             {
                 UserName = "daniel",
                 Photos = new List<Photo>

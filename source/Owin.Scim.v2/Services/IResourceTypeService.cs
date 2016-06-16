@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Services
+﻿namespace Owin.Scim.v2.Services
 {
     using System.Collections.Generic;
     using System.Threading.Tasks;

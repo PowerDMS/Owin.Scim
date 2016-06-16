@@ -7,11 +7,13 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Model;
     using Model.Users;
 
+    using v2.Model;
+
     public class with_invalid_password_requrement : when_creating_a_user
     {
         Establish context = () =>
         {
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Password = "short"

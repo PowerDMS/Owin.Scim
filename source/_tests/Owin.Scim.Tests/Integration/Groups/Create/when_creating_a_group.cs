@@ -7,13 +7,15 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class when_creating_a_group : using_existing_user_and_group
     {
         Because of = async () =>
         {
             Response = await Server
                 .HttpClient
-                .PostAsync("groups", new ScimObjectContent<ScimGroup>(GroupDto))
+                .PostAsync("v2/groups", new ScimObjectContent<ScimGroup>(GroupDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -22,7 +24,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Create
                 : null;
 
             CreatedGroup = bodyText != null
-                ? Newtonsoft.Json.JsonConvert.DeserializeObject<ScimGroup>(bodyText)
+                ? Newtonsoft.Json.JsonConvert.DeserializeObject<ScimGroup2>(bodyText)
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

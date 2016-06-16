@@ -9,6 +9,8 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
     using Model;
     using Model.Groups;
 
+    using v2.Model;
+
     public class when_replacing_a_group : using_existing_user_and_group
     {
         Because of = async () =>
@@ -17,7 +19,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
 
             Response = await Server
                 .HttpClient
-                .PutAsync("groups/" + GroupId, new ScimObjectContent<ScimGroup>(GroupDto))
+                .PutAsync("v2/groups/" + GroupId, new ScimObjectContent<ScimGroup>(GroupDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -26,7 +28,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Replace
                 : null;
 
             CreatedGroup = bodyText != null
-                ? Response.Content.ScimReadAsAsync<ScimGroup>().Result
+                ? Response.Content.ScimReadAsAsync<ScimGroup2>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

@@ -12,13 +12,15 @@
 
     using Ploeh.AutoFixture;
 
+    using v2.Model;
+
     public class with_several_attribute_changes : when_replacing_a_user
     {
         Establish context = async () =>
         {
             var autoFixture = new Fixture();
 
-            MutableUserPayload = autoFixture.Build<ScimUser>()
+            MutableUserPayload = autoFixture.Build<ScimUser2>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass!2")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -30,13 +32,13 @@
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
                 .With(x => x.X509Certificates, null)
-                .Create(seed: new ScimUser());
+                .Create(seed: new ScimUser2());
 
 
             // Insert the first user so there's one already in-memory.
             var userRecord = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<ScimUser>(MutableUserPayload))
+                .PostAsync("v2/users", new ScimObjectContent<ScimUser>(MutableUserPayload))
                 .Result;
 
             await userRecord.DeserializeTo(() => OriginalUserRecord); // capture original user record
@@ -45,7 +47,7 @@
             MutableUserPayload.Id = OriginalUserRecord.Id; // set server-assigned ID
             MutableUserPayload.UserName = UserNameUtility.GenerateUserName(); // new userName
             MutableUserPayload.Password = "someOtherPass!3"; // newPassword
-            MutableUserPayload.Extension<EnterpriseUserExtension>().EmployeeNumber = "007";
+            MutableUserPayload.Extension<EnterpriseUser2Extension>().EmployeeNumber = "007";
 
             UserDto = MutableUserPayload;
         };
@@ -56,9 +58,9 @@
         {
             UpdatedUserRecord.UserName.ShouldNotEqual(OriginalUserRecord.UserName);
             UpdatedUserRecord
-                .Extension<EnterpriseUserExtension>()
+                .Extension<EnterpriseUser2Extension>()
                 .EmployeeNumber
-                .ShouldNotEqual(OriginalUserRecord.Extension<EnterpriseUserExtension>().EmployeeNumber);
+                .ShouldNotEqual(OriginalUserRecord.Extension<EnterpriseUser2Extension>().EmployeeNumber);
         };
 
         It should_not_return_password = () => UpdatedUserRecord.Password.ShouldBeNull();
@@ -75,8 +77,8 @@
             UpdatedUserRecord.Meta.LastModified.ShouldBeGreaterThan(OriginalUserRecord.Meta.LastModified);
         };
 
-        protected static ScimUser OriginalUserRecord;
+        protected static ScimUser2 OriginalUserRecord;
 
-        protected static ScimUser MutableUserPayload;
+        protected static ScimUser2 MutableUserPayload;
     }
 }

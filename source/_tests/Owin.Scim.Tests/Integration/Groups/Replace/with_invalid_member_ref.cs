@@ -8,14 +8,16 @@
     using Model.Groups;
     using Model.Users;
 
+    using v2.Model;
+
     public class with_invalid_member_ref : when_replacing_a_group
     {
         Establish context = () =>
         {
-            ExistingUser1 = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
-            ExistingUser2 = CreateUser(new ScimUser { UserName = Users.UserNameUtility.GenerateUserName() });
-            ExistingGroup1 = CreateGroup(new ScimGroup { DisplayName = "existing group 1" });
-            ExistingGroup2 = CreateGroup(new ScimGroup
+            ExistingUser1 = CreateUser(new ScimUser2 {UserName = Users.UserNameUtility.GenerateUserName()});
+            ExistingUser2 = CreateUser(new ScimUser2 { UserName = Users.UserNameUtility.GenerateUserName() });
+            ExistingGroup1 = CreateGroup(new ScimGroup2 { DisplayName = "existing group 1" });
+            ExistingGroup2 = CreateGroup(new ScimGroup2
             {
                 DisplayName = "existing group 2",
                 ExternalId = "hello",
@@ -28,7 +30,7 @@
 
             GroupId = ExistingGroup2.Id;
 
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 Id = GroupId,
                 DisplayName = "updated group 2",

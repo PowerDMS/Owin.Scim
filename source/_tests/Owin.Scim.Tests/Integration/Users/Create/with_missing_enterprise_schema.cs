@@ -33,7 +33,7 @@
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<MyUser>(UserDto))
+                .PostAsync("v2/users", new ScimObjectContent<MyUser>(UserDto))
                 .Result;
 
             StatusCode = Response.StatusCode;

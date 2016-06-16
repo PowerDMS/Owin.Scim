@@ -8,6 +8,8 @@
 
     using Model.Users;
 
+    using v2.Model;
+
     public class when_updating_a_user : using_a_scim_server
     {
         Because of = async () =>
@@ -15,11 +17,11 @@
             // Insert the first user so there's one already in-memory.
             var userRecord = await Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<ScimUser>(UserToUpdate))
+                .PostAsync("v2/users", new ScimObjectContent<ScimUser>(UserToUpdate))
                 .AwaitResponse()
                 .AsTask;
 
-            UserToUpdate = await userRecord.Content.ScimReadAsAsync<ScimUser>().AwaitResponse().AsTask;
+            UserToUpdate = await userRecord.Content.ScimReadAsAsync<ScimUser2>().AwaitResponse().AsTask;
 
             await Task.Delay(150).Await().AsTask;
 
@@ -27,7 +29,7 @@
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
-                        new HttpMethod("PATCH"), "users/" + UserToUpdate.Id)
+                        new HttpMethod("PATCH"), "v2/users/" + UserToUpdate.Id)
                     {
                         Content = PatchContent
                     })
@@ -35,7 +37,7 @@
                 .AsTask;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = await PatchResponse.Content.ScimReadAsAsync<ScimUser>();
+                UpdatedUser = await PatchResponse.Content.ScimReadAsAsync<ScimUser2>();
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {

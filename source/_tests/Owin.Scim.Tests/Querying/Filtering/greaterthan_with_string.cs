@@ -7,15 +7,17 @@
 
     using Model.Users;
 
+    using v2.Model;
+
     public class greaterthan_with_string : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
             Users = new List<ScimUser>
             {
-                new ScimUser {UserName = "DGioulakis" },
-                new ScimUser { UserName = "BJensen", Addresses = new List<MailingAddress> { new MailingAddress { PostalCode = "10010" } } },
-                new ScimUser { UserName = "ROMalley", Addresses = new List<MailingAddress> { new MailingAddress { PostalCode = "20005" } } }
+                new ScimUser2 {UserName = "DGioulakis" },
+                new ScimUser2 { UserName = "BJensen", Addresses = new List<MailingAddress> { new MailingAddress { PostalCode = "10010" } } },
+                new ScimUser2 { UserName = "ROMalley", Addresses = new List<MailingAddress> { new MailingAddress { PostalCode = "20005" } } }
             };
 
             FilterExpression = "addresses.postalCode gt \"20000\"";

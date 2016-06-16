@@ -9,13 +9,15 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.replace
     using Model.Users;
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_no_path_no_changes : when_updating_a_group
     {
         Establish context = () =>
         {
-            var anotherUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
+            var anotherUser = CreateUser(new ScimUser2 {UserName = Users.UserNameUtility.GenerateUserName()});
             GroupToUpdate = CreateGroup(
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "groupToUpdate",
                     Members = new []

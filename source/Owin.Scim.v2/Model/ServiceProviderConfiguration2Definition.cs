@@ -1,11 +1,11 @@
-﻿namespace Owin.Scim.Model
+﻿namespace Owin.Scim.v2.Model
 {
     using Configuration;
-
-    public class ServiceProviderConfigurationDefinition : ScimSchemaTypeDefinitionBuilder<ServiceProviderConfiguration>
+    
+    public class ServiceProviderConfiguration2Definition : ScimSchemaTypeDefinitionBuilder<ServiceProviderConfiguration2>
     {
-        public ServiceProviderConfigurationDefinition(ScimServerConfiguration serverConfiguration)
-            : base(serverConfiguration, ScimConstants.Schemas.ServiceProviderConfig)
+        public ServiceProviderConfiguration2Definition(ScimServerConfiguration serverConfiguration)
+            : base(serverConfiguration, ScimConstantsV2.Schemas.ServiceProviderConfig)
         {
             SetName("Service Provider Configuration");
             SetDescription("Schema for representing the service provider's configuration");

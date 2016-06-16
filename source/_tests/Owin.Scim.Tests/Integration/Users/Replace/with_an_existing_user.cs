@@ -8,12 +8,14 @@
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_an_existing_user : when_replacing_a_user
     {
         Establish context = async () =>
         {
             var userName = UserNameUtility.GenerateUserName();
-            var existingUser = new ScimUser
+            var existingUser = new ScimUser2
             {
                 UserName = userName
             };
@@ -21,13 +23,13 @@
             // Insert the first user so there's one already in-memory.
             var userRecord = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<ScimUser>(existingUser, new JsonMediaTypeFormatter()))
+                .PostAsync("v2/users", new ObjectContent<ScimUser>(existingUser, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
 
-            var userId = (await userRecord.Content.ReadAsAsync<ScimUser>()).Id;
+            var userId = (await userRecord.Content.ReadAsAsync<ScimUser2>()).Id;
 
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 Id = userId,
                 UserName = userName,

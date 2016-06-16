@@ -1,10 +1,12 @@
-﻿namespace Owin.Scim.Model
+﻿namespace Owin.Scim.v2.Model
 {
     using System.Collections.Generic;
     using System.Linq;
 
     using Newtonsoft.Json;
-    
+
+    using Scim.Model;
+
     public sealed class ResourceType : Resource
     {
         public ResourceType()
@@ -29,7 +31,7 @@
 
         public override string SchemaIdentifier
         {
-            get { return ScimConstants.Schemas.ResourceType; }
+            get { return ScimConstantsV2.Schemas.ResourceType; }
         }
 
         public override int CalculateVersion()

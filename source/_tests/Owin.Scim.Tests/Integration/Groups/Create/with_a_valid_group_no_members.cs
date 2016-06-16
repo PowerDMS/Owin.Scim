@@ -7,13 +7,15 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_a_valid_group_no_members : when_creating_a_group
     {
         Establish context = () =>
         {
             TestStartTime = DateTime.UtcNow;
 
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 DisplayName = "hello",
                 ExternalId = "hello",

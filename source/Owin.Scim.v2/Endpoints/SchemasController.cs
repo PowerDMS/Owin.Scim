@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Endpoints
+﻿namespace Owin.Scim.v2.Endpoints
 {
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -8,10 +8,11 @@
 
     using Extensions;
 
-    using Services;
+    using Scim.Endpoints;
+    using Scim.Services;
 
     [AllowAnonymous]
-    [RoutePrefix(ScimConstants.Endpoints.Schemas)]
+    [RoutePrefix(ScimConstantsV2.Endpoints.Schemas)]
     public class SchemasController : ScimControllerBase
     {
         private readonly ISchemaService _SchemaService;

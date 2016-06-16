@@ -57,7 +57,12 @@
                     if (rtd.SchemaExtensions.Any())
                     {
                         rtd.SchemaExtensions
-                           .ForEach(ext => container.Register(typeof(IResourceExtensionValidator), ext.ExtensionValidatorType, reuse: Reuse.Singleton));
+                            .ForEach(
+                                ext =>
+                                    container.Register(
+                                        typeof(IResourceExtensionValidator),
+                                        ext.ExtensionValidatorType,
+                                        reuse: Reuse.Singleton));
                     }
 
                     container.Register(rtd.ValidatorType, reuse: Reuse.Singleton);
@@ -67,9 +72,8 @@
             container.Register<IGroupRepository, InMemoryGroupRepository>(Reuse.Singleton, ifAlreadyRegistered: IfAlreadyRegistered.Keep);
 
             // register all business logic services for built-in endpoints
-            container.Register<IResourceTypeService, ResourceTypeService>(Reuse.Singleton);
-            container.Register<IServiceProviderConfigurationService, ServiceProviderConfigurationService>(Reuse.Singleton);
-            container.Register<ISchemaService, SchemaService>(Reuse.Singleton);
+            container.RegisterDelegate(r => r.Resolve<IServiceProviderConfigurationService>(AmbientRequestService.ProtocolVersion));
+            container.RegisterDelegate(r => r.Resolve<ISchemaService>(AmbientRequestService.ProtocolVersion));
             container.Register<IUserService, UserService>(Reuse.Singleton);
             container.Register<IGroupService, GroupService>(Reuse.Singleton);
         }

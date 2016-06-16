@@ -6,6 +6,8 @@ namespace Owin.Scim.Tests.Validation.Users
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_an_invalid_password : when_validating_a_new_user
     {
         Establish ctx = () =>
@@ -13,7 +15,7 @@ namespace Owin.Scim.Tests.Validation.Users
             A.CallTo(() => PasswordManager.MeetsRequirements(A<string>._))
                 .Returns(false);
 
-            User = new ScimUser
+            User = new ScimUser2
             {
                 UserName = "daniel",
                 Password = "invalid"

@@ -27,6 +27,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "owin-scim-host", "..\deploy
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Scim.Antlr", "Owin.Scim.Antlr\Owin.Scim.Antlr.csproj", "{F551E5EB-5E0C-495E-8137-3C8C62BEB86E}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Owin.Scim.v2", "Owin.Scim.v2\Owin.Scim.v2.csproj", "{4B87A51B-70D0-48AD-8DBF-C7256E1CBF44}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,6 +55,10 @@ Global
 		{F551E5EB-5E0C-495E-8137-3C8C62BEB86E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F551E5EB-5E0C-495E-8137-3C8C62BEB86E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F551E5EB-5E0C-495E-8137-3C8C62BEB86E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B87A51B-70D0-48AD-8DBF-C7256E1CBF44}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B87A51B-70D0-48AD-8DBF-C7256E1CBF44}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B87A51B-70D0-48AD-8DBF-C7256E1CBF44}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B87A51B-70D0-48AD-8DBF-C7256E1CBF44}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

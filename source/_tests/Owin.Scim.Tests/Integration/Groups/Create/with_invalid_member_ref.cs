@@ -6,13 +6,15 @@
     using Model.Users;
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_invalid_member_ref : when_creating_a_group
     {
         Establish context = () =>
         {
-            ExistingUser = CreateUser(new ScimUser { UserName = Users.UserNameUtility.GenerateUserName() });
+            ExistingUser = CreateUser(new ScimUser2 { UserName = Users.UserNameUtility.GenerateUserName() });
 
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 DisplayName = "hello",
                 ExternalId = "hello",

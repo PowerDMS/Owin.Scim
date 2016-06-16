@@ -9,6 +9,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
     using Model.Users;
 
+    using v2.Model;
+
     /// <summary>
     /// Try assigning subattribute to a null complex attribute
     /// </summary>
@@ -16,7 +18,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 DisplayName = "Danny",

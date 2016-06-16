@@ -2,14 +2,12 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.Serialization;
 
     using Model;
-    using Model.Users;
 
     using Newtonsoft.Json;
-
-    [KnownType(typeof(ScimUser))]
+    
+    //[JsonConverter(typeof(ScimListResponseConverter))]
     public class ScimListResponse : SchemaBase
     {
         public ScimListResponse(IEnumerable<Resource> resources)

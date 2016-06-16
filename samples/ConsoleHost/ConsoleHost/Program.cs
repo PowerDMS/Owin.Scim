@@ -10,6 +10,8 @@
 
     using Owin.Scim;
     using Owin.Scim.Model.Users;
+    using Owin.Scim.v2;
+    using Owin.Scim.v2.Model;
 
     using Scim;
 
@@ -48,7 +50,7 @@
         {
             Write("");
             Write("Getting schemas ...");
-            var response = await client.GetAsync("schemas/" + ScimConstants.Schemas.User);
+            var response = await client.GetAsync("schemas/" + ScimConstantsV2.Schemas.User);
             Write(await response.Content.ReadAsStringAsync());
             Write("");
         }
@@ -98,7 +100,7 @@
             var response =
                 await
                     client.PostAsync("users",
-                        new ObjectContent<ScimUser>(new ScimUser { UserName = "daniel", NickName = "danny" }, new JsonMediaTypeFormatter()));
+                        new ObjectContent<ScimUser>(new ScimUser2 { UserName = "daniel", NickName = "danny" }, new JsonMediaTypeFormatter()));
             Write(await response.Content.ReadAsStringAsync());
             if (response.StatusCode == HttpStatusCode.Created)
             {

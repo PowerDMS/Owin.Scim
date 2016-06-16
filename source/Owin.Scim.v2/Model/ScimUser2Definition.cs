@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Model.Users
+﻿namespace Owin.Scim.v2.Model
 {
     using Canonicalization;
 
@@ -6,23 +6,27 @@
 
     using PhoneNumbers;
 
+    using Scim.Model.Users;
+
     using Validation.Users;
 
-    public class UserDefinition : ScimResourceTypeDefinitionBuilder<ScimUser>
+    using PhoneNumber = Scim.Model.Users.PhoneNumber;
+
+    public class ScimUser2Definition : ScimResourceTypeDefinitionBuilder<ScimUser2>
     {
-        public UserDefinition(ScimServerConfiguration serverConfiguration)
+        public ScimUser2Definition(ScimServerConfiguration serverConfiguration)
             : base(
                 serverConfiguration,
                 ScimConstants.ResourceTypes.User,
-                ScimConstants.Schemas.User,
-                ScimConstants.Endpoints.Users,
-                typeof(UserValidator),
-                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstants.Schemas.User))
+                ScimConstantsV2.Schemas.User,
+                ScimConstantsV2.Endpoints.Users,
+                typeof(ScimUser2Validator),
+                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstantsV2.Schemas.User))
         {
             SetName(ScimConstants.ResourceTypes.User);
             SetDescription("User resource.");
 
-            AddSchemaExtension<EnterpriseUserExtension, EnterpriseUserExtensionValidator>(ScimConstants.Schemas.UserEnterprise, false);
+            AddSchemaExtension<EnterpriseUser2Extension, EnterpriseUser2ExtensionValidator>(ScimConstantsV2.Schemas.UserEnterprise, false);
 
             For(u => u.Active)
                 .SetDescription(@"A Boolean value indicating the User's administrative status.");

@@ -10,7 +10,7 @@
         {
             Response = await Server
                 .HttpClient
-                .DeleteAsync("users/" + UserId)
+                .DeleteAsync("v2/users/" + UserId)
                 .AwaitResponse()
                 .AsTask;
         };

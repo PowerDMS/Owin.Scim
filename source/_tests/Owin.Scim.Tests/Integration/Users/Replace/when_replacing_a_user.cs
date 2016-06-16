@@ -10,6 +10,8 @@
 
     using Model.Users;
 
+    using v2.Model;
+
     public class when_replacing_a_user : using_a_scim_server
     {
         Because of = async () =>
@@ -18,7 +20,7 @@
 
             Response = await Server
                 .HttpClient
-                .PutAsync("users/" + UserDto.Id, new ScimObjectContent<ScimUser>(UserDto))
+                .PutAsync("v2/users/" + UserDto.Id, new ScimObjectContent<ScimUser>(UserDto))
                 .AwaitResponse()
                 .AsTask;
 
@@ -26,10 +28,10 @@
                 await Response.DeserializeTo(() => UpdatedUserRecord); // capture updated user record
         };
 
-        protected static ScimUser UserDto;
+        protected static ScimUser2 UserDto;
 
         protected static HttpResponseMessage Response;
 
-        protected static ScimUser UpdatedUserRecord;
+        protected static ScimUser2 UpdatedUserRecord;
     }
 }

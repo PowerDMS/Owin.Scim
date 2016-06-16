@@ -6,8 +6,8 @@
     using Extensions;
 
     using Machine.Specifications;
-
-    using Model;
+    
+    using v2.Model;
 
     public class when_retrieving_service_provider_configuration : using_a_scim_server
     {
@@ -15,7 +15,7 @@
         {
             Response = await Server
                 .HttpClient
-                .GetAsync("serviceproviderconfig")
+                .GetAsync("v2/serviceproviderconfig")
                 .AwaitResponse()
                 .AsTask;
 
@@ -30,7 +30,7 @@
         
         protected static HttpResponseMessage Response;
 
-        protected static ServiceProviderConfiguration Configuration;
+        protected static ServiceProviderConfiguration2 Configuration;
 
         protected static IDictionary<string, object> JsonData;
     }

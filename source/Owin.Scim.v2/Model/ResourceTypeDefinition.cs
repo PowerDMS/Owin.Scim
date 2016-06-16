@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.Model
+﻿namespace Owin.Scim.v2.Model
 {
     using Configuration;
 
@@ -8,7 +8,7 @@
         /// Initializes a new instance of the <see cref="ResourceTypeDefinition"/> class.
         /// </summary>
         public ResourceTypeDefinition(ScimServerConfiguration serverConfiguration)
-            : base(serverConfiguration, ScimConstants.Schemas.ResourceType)
+            : base(serverConfiguration, ScimConstantsV2.Schemas.ResourceType)
         {
             SetName(ScimConstants.ResourceTypes.ResourceType);
             SetDescription("Specifies the schema that describes a SCIM resource type.");

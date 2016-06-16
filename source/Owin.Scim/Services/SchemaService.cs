@@ -7,11 +7,9 @@ namespace Owin.Scim.Services
 
     using Configuration;
 
-    using Extensions;
-
     using Model;
     
-    public class SchemaService : ServiceBase, ISchemaService
+    public abstract class SchemaService : ServiceBase, ISchemaService
     {
         private readonly Lazy<IReadOnlyDictionary<string, ScimSchema>> _Schemas;
 
@@ -20,7 +18,7 @@ namespace Owin.Scim.Services
         /// </summary>
         /// <param name="serverConfiguration">The configuration.</param>
         /// <param name="versionProvider">The version provider.</param>
-        public SchemaService(ScimServerConfiguration serverConfiguration, IResourceVersionProvider versionProvider) 
+        protected SchemaService(ScimServerConfiguration serverConfiguration, IResourceVersionProvider versionProvider) 
             : base(serverConfiguration, versionProvider)
         {
             _Schemas = new Lazy<IReadOnlyDictionary<string, ScimSchema>>(CreateSchemas);
@@ -66,43 +64,6 @@ namespace Owin.Scim.Services
         /// Creates the schemas dictionary.
         /// </summary>
         /// <returns>IReadOnlyDictionary&lt;System.String, ScimSchema&gt;.</returns>
-        protected virtual IReadOnlyDictionary<string, ScimSchema> CreateSchemas()
-        {
-            var schemas = new Dictionary<string, ScimSchema>();
-            foreach (var std in ServerConfiguration.SchemaTypeDefinitions)
-            {
-                var attributeDefinitions = new List<ScimAttributeSchema>();
-                foreach (var ad in std.AttributeDefinitions.Values)
-                {
-                    attributeDefinitions.Add(ad.ToScimAttributeSchema());
-                }
-
-                schemas.Add(std.Schema, SetResourceVersion(new ScimSchema(std.Schema, std.Name, std.Description, attributeDefinitions)));
-
-                var rtd = std as IScimResourceTypeDefinition;
-                if (rtd != null)
-                {
-                    foreach (var extension in rtd.SchemaExtensions)
-                    {
-                        attributeDefinitions = new List<ScimAttributeSchema>();
-                        foreach (var ad in extension.ExtensionDefinition.AttributeDefinitions.Values)
-                        {
-                            attributeDefinitions.Add(ad.ToScimAttributeSchema());
-                        }
-
-                        schemas.Add(
-                            extension.Schema,
-                            SetResourceVersion(
-                                new ScimSchema(
-                                    extension.Schema,
-                                    extension.ExtensionDefinition.Name,
-                                    extension.ExtensionDefinition.Description,
-                                    attributeDefinitions)));
-                    }
-                }
-            }
-
-            return schemas;
-        }
+        protected abstract IReadOnlyDictionary<string, ScimSchema> CreateSchemas();
     }
 }

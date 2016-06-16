@@ -9,6 +9,8 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Scim.Querying;
 
+    using v2.Model;
+
     [Subject(typeof(ScimFilterVisitor<>))]
     public class contains_with_multivaluedattribute_value : when_parsing_a_filter_expression<ScimUser>
     {
@@ -16,8 +18,8 @@ namespace Owin.Scim.Tests.Querying.Filtering
         {
             Users = new List<ScimUser>
             {
-                new ScimUser { UserName = "BJensen", UserType = "employee"},
-                new ScimUser
+                new ScimUser2 { UserName = "BJensen", UserType = "employee"},
+                new ScimUser2
                 {
                     UserName = "ROMalley",
                     UserType = "manager",
@@ -26,7 +28,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
                         new Email { Value = "user@example.com", Type = "work" }
                     }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = "DGioulakis",
                     UserType = "architect",

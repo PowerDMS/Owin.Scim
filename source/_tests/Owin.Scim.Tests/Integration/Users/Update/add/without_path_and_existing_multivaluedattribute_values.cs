@@ -9,12 +9,14 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
     using Machine.Specifications;
 
     using Model.Users;
-    
+
+    using v2.Model;
+
     public class without_path_and_existing_multivaluedattribute_values : when_updating_a_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Emails = new List<Email>

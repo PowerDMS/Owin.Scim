@@ -10,11 +10,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_path_and_existing_multivaluedattribute_values : when_updating_a_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Emails = new List<Email>

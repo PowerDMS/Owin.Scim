@@ -6,41 +6,41 @@
     using Machine.Specifications;
 
     using Model.Groups;
-    using Model.Users;
 
-    using Users;
+    using v2.Model;
 
+    [Ignore("ListResponse needs a jsonconverter")]
     public class with_a_filter : when_querying_groups
     {
         Establish context = async () =>
         {
             var groups = new List<ScimGroup>
             {
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "dev1"
                 },
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "dev2"
                 },
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "dev3"
                 },
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "sales1"
                 },
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "sales2"
                 },
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "hr"
                 },
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "exec"
                 }
@@ -50,7 +50,7 @@
             {
                 await Server
                     .HttpClient
-                    .PostAsync("groups", new ScimObjectContent<ScimGroup>(group))
+                    .PostAsync("v2/groups", new ScimObjectContent<ScimGroup>(group))
                     .AwaitResponse()
                     .AsTask;
             }
