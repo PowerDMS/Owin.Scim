@@ -9,7 +9,7 @@ namespace Owin.Scim.Configuration
 
         Type ValidatorType { get; }
 
-        Predicate<ISet<string>> SchemaBindingRule { get; }
+        SchemaBindingPredicate SchemaBindingPredicate { get; }
 
         IEnumerable<ScimResourceTypeExtension> SchemaExtensions { get; }
 

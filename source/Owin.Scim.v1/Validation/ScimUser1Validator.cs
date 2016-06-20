@@ -1,4 +1,4 @@
-namespace Owin.Scim.v2.Validation.Users
+namespace Owin.Scim.v1.Validation
 {
     using System;
     using System.Collections.Generic;
@@ -24,13 +24,13 @@ namespace Owin.Scim.v2.Validation.Users
 
     using Security;
 
-    public class ScimUser2Validator : ResourceValidatorBase<ScimUser2>
+    public class ScimUser1Validator : ResourceValidatorBase<ScimUser1>
     {
         private readonly IUserRepository _UserRepository;
 
         private readonly IManagePasswords _PasswordManager;
         
-        public ScimUser2Validator(
+        public ScimUser1Validator(
             ScimServerConfiguration serverConfiguration,
             ResourceExtensionValidators extensionValidators,
             IUserRepository userRepository,

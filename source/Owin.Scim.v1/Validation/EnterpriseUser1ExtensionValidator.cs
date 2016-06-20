@@ -1,15 +1,15 @@
-namespace Owin.Scim.v2.Validation.Users
+namespace Owin.Scim.v1.Validation
 {
     using Model;
 
     using Scim.Model.Users;
     using Scim.Validation;
 
-    public class EnterpriseUser2ExtensionValidator : ResourceExtensionValidatorBase<ScimUser, EnterpriseUser2Extension>
+    public class EnterpriseUser1ExtensionValidator : ResourceExtensionValidatorBase<ScimUser, EnterpriseUser1Extension>
     {
         public override string ExtensionSchema
         {
-            get { return ScimConstantsV2.Schemas.UserEnterprise; }
+            get { return ScimConstantsV1.Schemas.UserEnterprise; }
         }
 
         protected override void ConfigureDefaultRuleSet()

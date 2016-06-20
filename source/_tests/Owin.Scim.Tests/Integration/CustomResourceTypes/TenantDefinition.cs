@@ -11,7 +11,7 @@
                   CustomSchemas.Tenant,
                   "tenants",
                   typeof(TenantValidator),
-                  schemaIdentifiers => schemaIdentifiers.Contains(CustomSchemas.Tenant))
+                  (schemaIdentifiers, parameterType) => schemaIdentifiers.Contains(CustomSchemas.Tenant))
         {
             AddSchemaExtension<SalesForceExtension, SalesForceExtensionValidator>(CustomSchemas.SalesForceExtension, true);
 

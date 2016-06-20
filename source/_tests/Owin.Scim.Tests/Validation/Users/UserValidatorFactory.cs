@@ -13,7 +13,7 @@
     using Scim.Security;
     using Scim.Validation;
 
-    using v2.Validation.Users;
+    using v2.Validation;
 
     public class UserValidatorFactory : IResourceValidatorFactory
     {

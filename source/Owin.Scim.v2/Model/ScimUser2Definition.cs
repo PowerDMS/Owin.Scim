@@ -8,7 +8,7 @@
 
     using Scim.Model.Users;
 
-    using Validation.Users;
+    using Validation;
 
     using PhoneNumber = Scim.Model.Users.PhoneNumber;
 
@@ -21,7 +21,7 @@
                 ScimConstantsV2.Schemas.User,
                 ScimConstantsV2.Endpoints.Users,
                 typeof(ScimUser2Validator),
-                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstantsV2.Schemas.User))
+                (schemaIdentifiers, parameterType) => schemaIdentifiers.Contains(ScimConstantsV2.Schemas.User))
         {
             SetName(ScimConstants.ResourceTypes.User);
             SetDescription("User resource.");

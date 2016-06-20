@@ -18,10 +18,9 @@
 
         public void ConfigureContainer(IContainer container)
         {
-            var protocolVersion = new ScimVersion("v2");
             container.Register<IResourceTypeService, ResourceTypeService>(Reuse.Singleton);
-            container.Register<IServiceProviderConfigurationService, ServiceProviderConfiguration2Service>(Reuse.Singleton, serviceKey: protocolVersion);
-            container.Register<ISchemaService, ScimSchema2Service>(Reuse.Singleton, serviceKey: protocolVersion);
+            container.Register<IServiceProviderConfigurationService, ServiceProviderConfiguration2Service>(Reuse.Singleton, serviceKey: ScimVersion.Two);
+            container.Register<ISchemaService, ScimSchema2Service>(Reuse.Singleton, serviceKey: ScimVersion.Two);
         }
     }
 }

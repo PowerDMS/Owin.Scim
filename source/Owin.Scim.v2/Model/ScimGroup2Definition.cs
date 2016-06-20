@@ -6,7 +6,7 @@ namespace Owin.Scim.v2.Model
 
     using Extensions;
 
-    using Validation.Groups;
+    using Validation;
 
     public class ScimGroup2Definition : ScimResourceTypeDefinitionBuilder<ScimGroup2>
     {
@@ -17,7 +17,7 @@ namespace Owin.Scim.v2.Model
                 ScimConstantsV2.Schemas.Group,
                 ScimConstantsV2.Endpoints.Groups,
                 typeof (ScimGroup2Validator),
-                schemaIdentifiers => schemaIdentifiers.Contains(ScimConstantsV2.Schemas.Group))
+                (schemaIdentifiers, parameterType) => schemaIdentifiers.Contains(ScimConstantsV2.Schemas.Group))
         {
             SetName("Group");
             SetDescription("Group resource.");

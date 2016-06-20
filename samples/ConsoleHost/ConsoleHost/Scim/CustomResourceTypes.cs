@@ -103,7 +103,7 @@
                   "urn:custom:schemas:Tenant", 
                   "tenants", 
                   typeof(TenantValidator), 
-                  schemaIdentifiers => schemaIdentifiers.Contains("urn:custom:schemas:Tenant"))
+                  (schemaIdentifiers, parameterType) => schemaIdentifiers.Contains("urn:custom:schemas:Tenant"))
         {
             For(tenant => tenant.Name)
                 .SetRequired(true)

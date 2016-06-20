@@ -42,7 +42,6 @@
         public void ConfigureContainer(IContainer container)
         {
             container.RegisterDelegate<IProvideHashing>(r => _CryptograhyManager.HashProvider);
-            container.Register<ISchemaTypeFactory, DefaultSchemaTypeFactory>(Reuse.Singleton);
             container.Register<IResourceVersionProvider, DefaultResourceVersionProvider>(Reuse.Singleton);
             container.Register<ICanonicalizationService, DefaultCanonicalizationService>(Reuse.Singleton);
             container.Register<IResourceValidatorFactory, ServiceLocatorResourceValidatorFactory>();

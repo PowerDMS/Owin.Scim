@@ -19,7 +19,7 @@
     using Scim.Validation;
 
     using v2.Model;
-    using v2.Validation.Users;
+    using v2.Validation;
 
     public class when_validating_resources_with_extensions
     {

@@ -27,12 +27,10 @@
     using Scim.Model.Users;
     using Scim.Services;
 
-    using Services;
-
     [RoutePrefix(ScimConstantsV2.Endpoints.Users)]
     public class UsersController : ScimControllerBase
     {
-        public const string RetrieveUserRouteName = @"RetrieveUser";
+        public const string RetrieveUserRouteName = @"RetrieveUser2";
 
         private readonly IUserService _UserService;
 
@@ -44,8 +42,8 @@
             _UserService = userService;
         }
 
-        [Route(Name = "CreateUser")]
-        public async Task<HttpResponseMessage> Post(ScimUser2 userDto)
+        [Route]
+        public async Task<HttpResponseMessage> Post(ScimUser userDto)
         {
             return (await _UserService.CreateUser(userDto))
                 .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
@@ -82,14 +80,14 @@
         }
 
         [AcceptVerbs("GET")]
-        [Route(Name = "GetQueryUsers")]
+        [Route]
         public Task<HttpResponseMessage> GetQuery(ScimQueryOptions queryOptions)
         {
             return Query(queryOptions);
         }
 
         [AcceptVerbs("POST")]
-        [Route(".search", Name = "PostQueryUsers")]
+        [Route(".search")]
         public Task<HttpResponseMessage> PostQuery(ScimQueryOptions queryOptions)
         {
             return Query(queryOptions);
@@ -103,7 +101,7 @@
                 .Bind(
                     users => 
                     new ScimDataResponse<ScimListResponse>(
-                        new ScimListResponse(users)
+                        new ScimListResponse2(users)
                         {
                             StartIndex = options.StartIndex,
                             ItemsPerPage = options.Count
@@ -111,7 +109,7 @@
                 .ToHttpResponseMessage(Request);
         }
 
-        [Route("{userId}", Name = "UpdateUser")]
+        [Route("{userId}")]
         public async Task<HttpResponseMessage> Patch(string userId, PatchRequest<ScimUser> patchRequest)
         {
             if (patchRequest == null ||
@@ -153,7 +151,7 @@
         }
 
         [AcceptVerbs("PUT", "OPTIONS")]
-        [Route("{userId}", Name = "ReplaceUser")]
+        [Route("{userId}")]
         public async Task<HttpResponseMessage> Put(string userId, ScimUser userDto)
         {
             userDto.Id = userId;
@@ -167,7 +165,7 @@
                 });
         }
 
-        [Route("{userId}", Name = "DeleteUser")]
+        [Route("{userId}")]
         public async Task<HttpResponseMessage> Delete(string userId)
         {
             return (await _UserService.DeleteUser(userId))

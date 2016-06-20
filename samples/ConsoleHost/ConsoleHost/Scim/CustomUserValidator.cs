@@ -9,7 +9,7 @@
     using Owin.Scim.Model;
     using Owin.Scim.Repository;
     using Owin.Scim.Security;
-    using Owin.Scim.v2.Validation.Users;
+    using Owin.Scim.v2.Validation;
     using Owin.Scim.Validation;
 
     public class CustomUserValidator : ScimUser2Validator

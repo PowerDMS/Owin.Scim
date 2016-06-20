@@ -1,4 +1,4 @@
-﻿namespace Owin.Scim.v2.Validation.Groups
+﻿namespace Owin.Scim.v2.Validation
 {
     using System;
     using System.Linq;

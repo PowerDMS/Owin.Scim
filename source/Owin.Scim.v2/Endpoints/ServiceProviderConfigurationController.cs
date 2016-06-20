@@ -15,7 +15,7 @@
     [RoutePrefix(ScimConstantsV2.Endpoints.ServiceProviderConfig)]
     public class ServiceProviderConfigurationController : ScimControllerBase
     {
-        public const string RetrieveServiceProviderConfigurationRouteName = @"GetServiceProviderConfiguration";
+        public const string GetServiceProviderConfigurationRouteName = @"GetServiceProviderConfiguration2";
 
         private readonly IServiceProviderConfigurationService _ServiceProviderConfigurationService;
 
@@ -27,12 +27,12 @@
             _ServiceProviderConfigurationService = serviceProviderConfigurationService;
         }
 
-        [Route(Name = RetrieveServiceProviderConfigurationRouteName)]
+        [Route(Name = GetServiceProviderConfigurationRouteName)]
         public async Task<HttpResponseMessage> Get()
         {
             return (await _ServiceProviderConfigurationService.GetServiceProviderConfiguration())
-                .Let(serviceProviderConfig => SetMetaLocation(serviceProviderConfig, RetrieveServiceProviderConfigurationRouteName))
-                .ToHttpResponseMessage(Request, (config, response) => SetContentLocationHeader(response, RetrieveServiceProviderConfigurationRouteName));
+                .Let(serviceProviderConfig => SetMetaLocation(serviceProviderConfig, GetServiceProviderConfigurationRouteName))
+                .ToHttpResponseMessage(Request, (config, response) => SetContentLocationHeader(response, GetServiceProviderConfigurationRouteName));
         }
     }
 }

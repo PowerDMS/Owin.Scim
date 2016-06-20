@@ -413,7 +413,7 @@
                 () =>
                     ResourceTypeDefinitions.Select(
                         rtd =>
-                            new SchemaBindingRule(rtd.SchemaBindingRule, rtd.DefinitionType)).ToList());
+                            new SchemaBindingRule(rtd.SchemaBindingPredicate, rtd.DefinitionType)).ToList());
         }
 
         private IDictionary<ScimFeatureType, ScimFeature> CreateDefaultFeatures()

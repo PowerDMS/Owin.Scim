@@ -305,6 +305,7 @@
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_grouped_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_no_filter.cs" />
+    <Compile Include="Querying\Filtering\not_precedence.cs" />
     <Compile Include="Querying\Filtering\or_brackets_equals_and_contains.cs" />
     <Compile Include="Querying\Filtering\or_present_equals.cs" />
     <Compile Include="Querying\Filtering\startswith.cs" />

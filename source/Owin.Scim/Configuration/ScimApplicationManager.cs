@@ -4,13 +4,17 @@
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.ComponentModel.Composition;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
+    using System.Net.Http;
     using System.Reflection;
+    using System.Text.RegularExpressions;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.ExceptionHandling;
     using System.Web.Http.Dispatcher;
+    using System.Web.Http.Routing;
 
     using DryIoc;
     using DryIoc.WebApi;
@@ -223,10 +227,7 @@
                 descriptor =>
                 {
                     if (typeof(Resource).IsAssignableFrom(descriptor.ParameterType))
-                        return new ResourceParameterBinding(
-                            serverConfiguration,
-                            descriptor,
-                            descriptor.Configuration.DependencyResolver.GetService(typeof(ISchemaTypeFactory)) as ISchemaTypeFactory);
+                        return new ResourceParameterBinding(serverConfiguration, descriptor);
 
                     return null;
                 });
@@ -243,12 +244,11 @@
             // refer to https://tools.ietf.org/html/rfc7644#section-3.1
             httpConfiguration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("application/scim+json"));
 
-            httpConfiguration.Services.Replace(
-                typeof(IHttpControllerTypeResolver),
-                new DefaultHttpControllerTypeResolver(IsControllerType));
+            httpConfiguration.Services.Replace(typeof(IExceptionHandler), new PassthroughExceptionHandler());
+            httpConfiguration.Services.Replace(typeof(IHttpControllerTypeResolver), new DefaultHttpControllerTypeResolver(IsControllerType));
+            httpConfiguration.Services.Replace(typeof(IHttpControllerSelector), new ScimHttpControllerSelector(httpConfiguration));
 
             httpConfiguration.Filters.Add(new ModelBindingResponseAttribute());
-            httpConfiguration.Services.Replace(typeof(IExceptionHandler), new PassthroughExceptionHandler());
         }
 
         private static bool IsControllerType(Type t)
@@ -268,6 +268,57 @@
             string controllerSuffix = DefaultHttpControllerSelector.ControllerSuffix;
             return controllerType.Name.Length > controllerSuffix.Length &&
                 controllerType.Name.EndsWith(controllerSuffix, StringComparison.OrdinalIgnoreCase);
+        }
+    }
+
+    internal class ScimHttpControllerSelector : DefaultHttpControllerSelector
+    {
+        private static readonly Regex _VersionRegex =
+            new Regex("(?:\\.)(v[0-9]+)(?:\\.)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
+        private readonly HttpConfiguration _Configuration;
+
+        public ScimHttpControllerSelector(HttpConfiguration configuration) 
+            : base(configuration)
+        {
+            _Configuration = configuration;
+        }
+
+        public override HttpControllerDescriptor SelectController(HttpRequestMessage request)
+        {
+            return base.SelectController(request);
+        }
+
+        public override string GetControllerName(HttpRequestMessage request)
+        {
+            var name = base.GetControllerName(request);
+
+            return name;
+        }
+
+        public override IDictionary<string, HttpControllerDescriptor> GetControllerMapping()
+        {
+            var dictionary = new Dictionary<string, HttpControllerDescriptor>(StringComparer.OrdinalIgnoreCase);
+            var assembliesResolver = _Configuration.Services.GetAssembliesResolver();
+            var controllerResolver = _Configuration.Services.GetHttpControllerTypeResolver();
+            var controllerTypes = controllerResolver.GetControllerTypes(assembliesResolver);
+
+            foreach (var controllerType in controllerTypes)
+            {
+                string version = string.Empty;
+                var result = _VersionRegex.Match(controllerType.Namespace);
+                if (result.Success)
+                    version = result.Groups[1].Value; // e.g. groups[] -> /v0/, v0
+                
+                var controllerName = controllerType.Name;//.Remove(controllerType.Name.Length - ControllerSuffix.Length);
+                var controllerKey = string.Format(CultureInfo.InvariantCulture, "{0}{1}", version, controllerName);
+                if (!dictionary.Keys.Contains(controllerKey))
+                {
+                    dictionary[controllerKey] = new HttpControllerDescriptor(_Configuration, controllerType.Name, controllerType);
+                }
+            }
+
+            return dictionary;
         }
     }
 }

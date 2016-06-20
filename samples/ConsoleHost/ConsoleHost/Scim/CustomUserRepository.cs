@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
 
@@ -10,6 +11,7 @@
     using Kernel;
 
     using Owin.Scim.ErrorHandling;
+    using Owin.Scim.Extensions;
     using Owin.Scim.Model.Users;
     using Owin.Scim.Querying;
     using Owin.Scim.Repository;
@@ -68,9 +70,12 @@
             await _UserManager.DeleteUser(userId);
         }
 
-        public Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
+        public async Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
         {
-            throw new NotImplementedException();
+            var users = _Mapper.Map<IEnumerable<ScimUser2>>(await _UserManager.GetUsers());
+            var filtered = users.Where(options.Filter.ToPredicate<ScimUser2>()).ToList();
+
+            return filtered;
         }
 
         public Task<bool> IsUserNameAvailable(string userName)

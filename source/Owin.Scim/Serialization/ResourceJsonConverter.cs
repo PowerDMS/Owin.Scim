@@ -108,7 +108,7 @@
                         var schemaIdentifiers = ((JArray) schemasValue).ToObject<ISet<string>>();
                         foreach (var schemaBindingRule in _ServerConfiguration.SchemaBindingRules)
                         {
-                            if (schemaBindingRule.Predicate(schemaIdentifiers))
+                            if (schemaBindingRule.Predicate(schemaIdentifiers, objectType))
                             {
                                 instance = schemaBindingRule.Target.CreateInstance();
                                 jsonReader = jObject.CreateReader(); // create a new reader from the token

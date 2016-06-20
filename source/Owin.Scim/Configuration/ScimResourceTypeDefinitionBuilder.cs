@@ -15,7 +15,7 @@ namespace Owin.Scim.Configuration
 
         private readonly string _Endpoint;
 
-        private readonly Predicate<ISet<string>> _SchemaBindingRule;
+        private readonly SchemaBindingPredicate _SchemaBindingPredicate;
 
         private Type _ValidatorType;
 
@@ -25,7 +25,7 @@ namespace Owin.Scim.Configuration
             string schema, 
             string endpoint,
             Type validatorType,
-            Predicate<ISet<string>> schemaBindingRule)
+            SchemaBindingPredicate schemaBindingPredicate)
             : base(serverConfiguration, schema)
         {
             if (string.IsNullOrWhiteSpace(name))
@@ -40,8 +40,8 @@ namespace Owin.Scim.Configuration
             if (validatorType == null)
                 throw new ArgumentNullException("validatorType");
 
-            if (schemaBindingRule == null)
-                throw new ArgumentNullException("schemaBindingRule");
+            if (schemaBindingPredicate == null)
+                throw new ArgumentNullException("schemaBindingPredicate");
 
             if (!schema.StartsWith(ScimConstants.Defaults.URNPrefix, StringComparison.OrdinalIgnoreCase))
                 throw new Exception("Resource types define a schema identifier which starts with \"" + ScimConstants.Defaults.URNPrefix + "\" as per RFC2141.");
@@ -53,7 +53,7 @@ namespace Owin.Scim.Configuration
 
             _Endpoint = endpoint;
             _ValidatorType = validatorType;
-            _SchemaBindingRule = schemaBindingRule;
+            _SchemaBindingPredicate = schemaBindingPredicate;
 
             SetName(name);
         }
@@ -73,9 +73,9 @@ namespace Owin.Scim.Configuration
             get { return _SchemaExtensions.Values; }
         }
 
-        public Predicate<ISet<string>> SchemaBindingRule
+        public SchemaBindingPredicate SchemaBindingPredicate
         {
-            get { return _SchemaBindingRule; }
+            get { return _SchemaBindingPredicate; }
         }
 
         public ScimTypeDefinitionBuilder<T> AddSchemaExtension<TExtension, TValidator>(

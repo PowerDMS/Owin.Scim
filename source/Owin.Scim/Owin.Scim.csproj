@@ -116,6 +116,7 @@
     <Compile Include="Canonicalization\StatefulCanonicalizationRule.cs" />
     <Compile Include="Configuration\DryIocConfiguration.cs" />
     <Compile Include="Configuration\PassthroughExceptionHandler.cs" />
+    <Compile Include="Configuration\SchemaBindingPredicate.cs" />
     <Compile Include="Configuration\ScimEventManagerBuilder.cs" />
     <Compile Include="Configuration\ScimTypeAttributeDefinitions.cs" />
     <Compile Include="Dependencies\FuncDependencyResolver.cs" />
@@ -146,13 +147,11 @@
     <Compile Include="Canonicalization\CanonicalizationDelegates.cs" />
     <Compile Include="Configuration\CompositionContainerRegistry.cs" />
     <Compile Include="Configuration\CompositionContainerRegistryBuilder.cs" />
-    <Compile Include="Configuration\DefaultSchemaTypeFactory.cs" />
     <Compile Include="Configuration\DryIocActivationProvider.cs" />
     <Compile Include="Configuration\DryIocManager.cs" />
     <Compile Include="Configuration\DryIocManagerBuilder.cs" />
     <Compile Include="Canonicalization\ICanonicalizationRule.cs" />
     <Compile Include="Configuration\IConfigureDryIoc.cs" />
-    <Compile Include="Configuration\ISchemaTypeFactory.cs" />
     <Compile Include="Configuration\IScimResourceTypeDefinition.cs" />
     <Compile Include="Configuration\IScimSchemaTypeDefinition.cs" />
     <Compile Include="Configuration\IScimTypeDefinition.cs" />

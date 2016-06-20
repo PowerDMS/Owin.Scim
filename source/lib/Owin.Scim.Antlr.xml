@@ -7,64 +7,94 @@
         <!-- Badly formed XML comment ignored for member "T:Owin.Scim.Antlr.IScimFilterListener" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterAndExp(Owin.Scim.Antlr.ScimFilterParser.AndExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitAndExp(Owin.Scim.Antlr.ScimFilterParser.AndExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterBracketExp(Owin.Scim.Antlr.ScimFilterParser.BracketExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitBracketExp(Owin.Scim.Antlr.ScimFilterParser.BracketExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterValPathExp(Owin.Scim.Antlr.ScimFilterParser.ValPathExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitValPathExp(Owin.Scim.Antlr.ScimFilterParser.ValPathExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterPresentExp(Owin.Scim.Antlr.ScimFilterParser.PresentExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitPresentExp(Owin.Scim.Antlr.ScimFilterParser.PresentExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterOperatorExp(Owin.Scim.Antlr.ScimFilterParser.OperatorExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitOperatorExp(Owin.Scim.Antlr.ScimFilterParser.OperatorExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterBraceExp(Owin.Scim.Antlr.ScimFilterParser.BraceExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitBraceExp(Owin.Scim.Antlr.ScimFilterParser.BraceExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterNotExp(Owin.Scim.Antlr.ScimFilterParser.NotExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitNotExp(Owin.Scim.Antlr.ScimFilterParser.NotExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterValPathOperatorExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOperatorExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitValPathOperatorExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOperatorExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterValPathPresentExp(Owin.Scim.Antlr.ScimFilterParser.ValPathPresentExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitValPathPresentExp(Owin.Scim.Antlr.ScimFilterParser.ValPathPresentExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterValPathAndExp(Owin.Scim.Antlr.ScimFilterParser.ValPathAndExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitValPathAndExp(Owin.Scim.Antlr.ScimFilterParser.ValPathAndExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterValPathOrExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitValPathOrExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterValPathBraceExp(Owin.Scim.Antlr.ScimFilterParser.ValPathBraceExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitValPathBraceExp(Owin.Scim.Antlr.ScimFilterParser.ValPathBraceExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterParse(Owin.Scim.Antlr.ScimFilterParser.ParseContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitParse(Owin.Scim.Antlr.ScimFilterParser.ParseContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterExpression(Owin.Scim.Antlr.ScimFilterParser.ExpressionContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitExpression(Owin.Scim.Antlr.ScimFilterParser.ExpressionContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterFilter(Owin.Scim.Antlr.ScimFilterParser.FilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitFilter(Owin.Scim.Antlr.ScimFilterParser.FilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.EnterValPathFilter(Owin.Scim.Antlr.ScimFilterParser.ValPathFilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterListener.ExitValPathFilter(Owin.Scim.Antlr.ScimFilterParser.ValPathFilterContext)" -->
         <!-- Badly formed XML comment ignored for member "T:Owin.Scim.Antlr.ScimFilterBaseListener" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterAndExp(Owin.Scim.Antlr.ScimFilterParser.AndExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitAndExp(Owin.Scim.Antlr.ScimFilterParser.AndExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterBracketExp(Owin.Scim.Antlr.ScimFilterParser.BracketExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitBracketExp(Owin.Scim.Antlr.ScimFilterParser.BracketExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterValPathExp(Owin.Scim.Antlr.ScimFilterParser.ValPathExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitValPathExp(Owin.Scim.Antlr.ScimFilterParser.ValPathExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterPresentExp(Owin.Scim.Antlr.ScimFilterParser.PresentExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitPresentExp(Owin.Scim.Antlr.ScimFilterParser.PresentExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterOperatorExp(Owin.Scim.Antlr.ScimFilterParser.OperatorExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitOperatorExp(Owin.Scim.Antlr.ScimFilterParser.OperatorExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterBraceExp(Owin.Scim.Antlr.ScimFilterParser.BraceExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitBraceExp(Owin.Scim.Antlr.ScimFilterParser.BraceExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterNotExp(Owin.Scim.Antlr.ScimFilterParser.NotExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitNotExp(Owin.Scim.Antlr.ScimFilterParser.NotExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterValPathOperatorExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOperatorExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitValPathOperatorExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOperatorExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterValPathPresentExp(Owin.Scim.Antlr.ScimFilterParser.ValPathPresentExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitValPathPresentExp(Owin.Scim.Antlr.ScimFilterParser.ValPathPresentExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterValPathAndExp(Owin.Scim.Antlr.ScimFilterParser.ValPathAndExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitValPathAndExp(Owin.Scim.Antlr.ScimFilterParser.ValPathAndExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterValPathOrExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitValPathOrExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterValPathBraceExp(Owin.Scim.Antlr.ScimFilterParser.ValPathBraceExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitValPathBraceExp(Owin.Scim.Antlr.ScimFilterParser.ValPathBraceExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterParse(Owin.Scim.Antlr.ScimFilterParser.ParseContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitParse(Owin.Scim.Antlr.ScimFilterParser.ParseContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterExpression(Owin.Scim.Antlr.ScimFilterParser.ExpressionContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitExpression(Owin.Scim.Antlr.ScimFilterParser.ExpressionContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterFilter(Owin.Scim.Antlr.ScimFilterParser.FilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitFilter(Owin.Scim.Antlr.ScimFilterParser.FilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterValPathFilter(Owin.Scim.Antlr.ScimFilterParser.ValPathFilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitValPathFilter(Owin.Scim.Antlr.ScimFilterParser.ValPathFilterContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.EnterEveryRule(Antlr4.Runtime.ParserRuleContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.ExitEveryRule(Antlr4.Runtime.ParserRuleContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.VisitTerminal(Antlr4.Runtime.Tree.ITerminalNode)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseListener.VisitErrorNode(Antlr4.Runtime.Tree.IErrorNode)" -->
         <!-- Badly formed XML comment ignored for member "T:Owin.Scim.Antlr.IScimFilterVisitor`1" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitAndExp(Owin.Scim.Antlr.ScimFilterParser.AndExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitBracketExp(Owin.Scim.Antlr.ScimFilterParser.BracketExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitValPathExp(Owin.Scim.Antlr.ScimFilterParser.ValPathExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitPresentExp(Owin.Scim.Antlr.ScimFilterParser.PresentExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitOperatorExp(Owin.Scim.Antlr.ScimFilterParser.OperatorExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitBraceExp(Owin.Scim.Antlr.ScimFilterParser.BraceExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitNotExp(Owin.Scim.Antlr.ScimFilterParser.NotExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitValPathOperatorExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOperatorExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitValPathPresentExp(Owin.Scim.Antlr.ScimFilterParser.ValPathPresentExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitValPathAndExp(Owin.Scim.Antlr.ScimFilterParser.ValPathAndExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitValPathOrExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitValPathBraceExp(Owin.Scim.Antlr.ScimFilterParser.ValPathBraceExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitParse(Owin.Scim.Antlr.ScimFilterParser.ParseContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitExpression(Owin.Scim.Antlr.ScimFilterParser.ExpressionContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitFilter(Owin.Scim.Antlr.ScimFilterParser.FilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.IScimFilterVisitor`1.VisitValPathFilter(Owin.Scim.Antlr.ScimFilterParser.ValPathFilterContext)" -->
         <!-- Badly formed XML comment ignored for member "T:Owin.Scim.Antlr.ScimFilterBaseVisitor`1" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitAndExp(Owin.Scim.Antlr.ScimFilterParser.AndExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitBracketExp(Owin.Scim.Antlr.ScimFilterParser.BracketExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitValPathExp(Owin.Scim.Antlr.ScimFilterParser.ValPathExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitPresentExp(Owin.Scim.Antlr.ScimFilterParser.PresentExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitOperatorExp(Owin.Scim.Antlr.ScimFilterParser.OperatorExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitBraceExp(Owin.Scim.Antlr.ScimFilterParser.BraceExpContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitNotExp(Owin.Scim.Antlr.ScimFilterParser.NotExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitOrExp(Owin.Scim.Antlr.ScimFilterParser.OrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitValPathOperatorExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOperatorExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitValPathPresentExp(Owin.Scim.Antlr.ScimFilterParser.ValPathPresentExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitValPathAndExp(Owin.Scim.Antlr.ScimFilterParser.ValPathAndExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitValPathOrExp(Owin.Scim.Antlr.ScimFilterParser.ValPathOrExpContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitValPathBraceExp(Owin.Scim.Antlr.ScimFilterParser.ValPathBraceExpContext)" -->
         <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitParse(Owin.Scim.Antlr.ScimFilterParser.ParseContext)" -->
-        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitExpression(Owin.Scim.Antlr.ScimFilterParser.ExpressionContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitFilter(Owin.Scim.Antlr.ScimFilterParser.FilterContext)" -->
+        <!-- Badly formed XML comment ignored for member "M:Owin.Scim.Antlr.ScimFilterBaseVisitor`1.VisitValPathFilter(Owin.Scim.Antlr.ScimFilterParser.ValPathFilterContext)" -->
     </members>
 </doc>

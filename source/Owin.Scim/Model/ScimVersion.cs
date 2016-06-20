@@ -7,12 +7,31 @@
 
     public class ScimVersion : IEquatable<ScimVersion>
     {
-        public ScimVersion(string version)
+        private static readonly ScimVersion _One = new ScimVersion("v1");
+
+        private static readonly ScimVersion _Two = new ScimVersion("v2");
+
+        protected internal ScimVersion(string version)
         {
             if (string.IsNullOrWhiteSpace(version))
                 throw new ScimException(HttpStatusCode.InternalServerError, "ScimVersion cannot be null.");
 
             Version = version.ToLower();
+        }
+
+        public static implicit operator string(ScimVersion version)
+        {
+            return version.ToString();
+        }
+
+        public static ScimVersion One
+        {
+            get { return _One; }
+        }
+
+        public static ScimVersion Two
+        {
+            get { return _Two; }
         }
 
         public string Version { get; private set; }
@@ -45,6 +64,11 @@
         public override int GetHashCode()
         {
             return Version.GetHashCode();
+        }
+
+        public override string ToString()
+        {
+            return Version;
         }
     }
 }

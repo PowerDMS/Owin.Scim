@@ -15,6 +15,8 @@
     [RoutePrefix(ScimConstantsV2.Endpoints.Schemas)]
     public class SchemasController : ScimControllerBase
     {
+        public const string GetSchemasRouteName = @"GetSchemas2";
+
         private readonly ISchemaService _SchemaService;
 
         public SchemasController(
@@ -25,17 +27,17 @@
             _SchemaService = schemaService;
         }
 
-        [Route("{schemaId?}", Name = "GetSchemas")]
+        [Route("{schemaId?}", Name = GetSchemasRouteName)]
         public async Task<HttpResponseMessage> GetSchemas(string schemaId = null)
         {
             if (string.IsNullOrWhiteSpace(schemaId))
                 return (await _SchemaService.GetSchemas())
-                    .Let(schemata => SetMetaLocations(schemata, "GetSchemas", schema => new { schemaId = schema.Id }))
+                    .Let(schemata => SetMetaLocations(schemata, GetSchemasRouteName, schema => new { schemaId = schema.Id }))
                     .ToHttpResponseMessage(Request);
 
             return (await _SchemaService.GetSchema(schemaId))
-                .Let(schema => SetMetaLocation(schema, "GetSchemas", new { schemaId = schema.Id }))
-                .ToHttpResponseMessage(Request, (schema, response) => SetContentLocationHeader(response, "GetSchemas", new { schemaId = schema.Id }));
+                .Let(schema => SetMetaLocation(schema, GetSchemasRouteName, new { schemaId = schema.Id }))
+                .ToHttpResponseMessage(Request, (schema, response) => SetContentLocationHeader(response, GetSchemasRouteName, new { schemaId = schema.Id }));
         }
     }
 }

@@ -38,7 +38,7 @@ namespace Owin.Scim.Services
         /// </summary>
         /// <param name="schemaId">The schema identifier.</param>
         /// <returns>IScimResponse&lt;ScimSchema&gt;.</returns>
-        public Task<IScimResponse<ScimSchema>> GetSchema(string schemaId)
+        public virtual Task<IScimResponse<ScimSchema>> GetSchema(string schemaId)
         {
             ScimSchema schema;
             if (!Schemas.TryGetValue(schemaId, out schema))
@@ -54,7 +54,7 @@ namespace Owin.Scim.Services
         /// Gets all defined <see cref="ScimSchema" />s.
         /// </summary>
         /// <returns>IScimResponse&lt;IEnumerable&lt;ScimSchema&gt;&gt;.</returns>
-        public Task<IScimResponse<IEnumerable<ScimSchema>>> GetSchemas()
+        public virtual Task<IScimResponse<IEnumerable<ScimSchema>>> GetSchemas()
         {
             return Task.FromResult<IScimResponse<IEnumerable<ScimSchema>>>(
                 new ScimDataResponse<IEnumerable<ScimSchema>>(Schemas.Values));

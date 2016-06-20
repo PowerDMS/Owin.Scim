@@ -15,7 +15,7 @@
     using Scim.Validation;
 
     using v2.Model;
-    using v2.Validation.Groups;
+    using v2.Validation;
 
     public class when_creating_a_group
     {

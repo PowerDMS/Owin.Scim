@@ -1,5 +1,6 @@
 ﻿namespace ConsoleHost.Kernel
 {
+    using System.Collections.Generic;
     using System.Threading.Tasks;
 
     public class KernelUserManager
@@ -37,6 +38,13 @@
             // Typically more business logic. e.g. does the authenticated user have access to the userId resource?
 
             return _UserRepository.DeleteUser(userId);
+        }
+
+        public Task<IEnumerable<KernelUser>> GetUsers()
+        {
+            // Typically more business logic. e.g. does the authenticated user have access to the userId resource?
+
+            return _UserRepository.GetUsers();
         }
     }
 }

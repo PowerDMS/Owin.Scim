@@ -26,17 +26,9 @@
 
         public static class Messages
         {
-            public const string UriPrefix = @"urn:ietf:params:scim:api:";
-
-            public const string BulkRequest = @"urn:ietf:params:scim:api:messages:2.0:BulkRequest";
-
-            public const string BulkResponse = @"urn:ietf:params:scim:api:messages:2.0:BulkResponse";
-
             public const string Error = @"urn:ietf:params:scim:api:messages:2.0:Error";
 
             public const string PatchOp = @"urn:ietf:params:scim:api:messages:2.0:PatchOp";
-
-            public const string ListResponse = @"urn:ietf:params:scim:api:messages:2.0:ListResponse";
 
             public const string SearchRequest = @"urn:ietf:params:scim:api:messages:2.0:SearchRequest";
         }

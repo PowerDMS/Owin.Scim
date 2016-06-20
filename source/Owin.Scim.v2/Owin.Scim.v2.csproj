@@ -93,6 +93,7 @@
     <Compile Include="Model\ResourceTypeDefinition.cs" />
     <Compile Include="Model\ScimGroup2Definition.cs" />
     <Compile Include="Model\ScimGroup2.cs" />
+    <Compile Include="Model\ScimListResponse2.cs" />
     <Compile Include="Model\ScimSchema2.cs" />
     <Compile Include="Model\ScimSchema2TypeDefinition.cs" />
     <Compile Include="Model\ScimUser2.cs" />
@@ -106,9 +107,9 @@
     <Compile Include="Services\ResourceTypeService.cs" />
     <Compile Include="Services\ScimSchema2Service.cs" />
     <Compile Include="Services\ServiceProviderConfiguration2Service.cs" />
-    <Compile Include="Validation\Groups\ScimGroup2Validator.cs" />
-    <Compile Include="Validation\Users\EnterpriseUserValidator.cs" />
-    <Compile Include="Validation\Users\ScimUser2Validator.cs" />
+    <Compile Include="Validation\ScimGroup2Validator.cs" />
+    <Compile Include="Validation\EnterpriseUser2ExtensionValidator.cs" />
+    <Compile Include="Validation\ScimUser2Validator.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Owin.Scim\Owin.Scim.csproj">

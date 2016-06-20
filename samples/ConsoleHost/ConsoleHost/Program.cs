@@ -19,7 +19,7 @@
     {
         static void Main(string[] args)
         {
-            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("http://+:8080"))
+            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("https://gioulakisscim.powerdms.com"))
             {
                 AsyncContext.Run(TestScimApi);
                 Console.ReadLine();
@@ -35,7 +35,7 @@
 
             // Uncomment any of the following method calls to see example Owin.Scim functionality.
 
-            await ExecuteServiceProviderConfig(client);
+//            await ExecuteServiceProviderConfig(client);
 
 //            await ExecuteResourceTypes(client);
 

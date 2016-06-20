@@ -28,7 +28,7 @@
     [RoutePrefix(ScimConstantsV2.Endpoints.Groups)]
     public class GroupsController : ScimControllerBase
     {
-        public const string RetrieveGroupRouteName = @"RetrieveGroup";
+        public const string RetrieveGroupRouteName = @"RetrieveGroup2";
 
         private readonly IGroupService _GroupService;
 
@@ -40,8 +40,8 @@
             _GroupService = groupService;
         }
 
-        [Route(Name = "CreateGroup")]
-        public async Task<HttpResponseMessage> Post(ScimGroup2 groupDto)
+        [Route]
+        public async Task<HttpResponseMessage> Post(ScimGroup groupDto)
         {
             return (await _GroupService.CreateGroup(groupDto))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
@@ -67,14 +67,14 @@
         }
 
         [AcceptVerbs("GET")]
-        [Route(Name = "GetQueryGroups")]
+        [Route]
         public Task<HttpResponseMessage> GetQuery(ScimQueryOptions queryOptions)
         {
             return Query(queryOptions);
         }
 
         [AcceptVerbs("POST")]
-        [Route(".search", Name = "PostQueryGroups")]
+        [Route(".search")]
         public Task<HttpResponseMessage> PostQuery(ScimQueryOptions queryOptions)
         {
             return Query(queryOptions);
@@ -88,7 +88,7 @@
                 .Bind(
                     groups =>
                     new ScimDataResponse<ScimListResponse>(
-                        new ScimListResponse(groups)
+                        new ScimListResponse2(groups)
                         {
                             StartIndex = options.StartIndex,
                             ItemsPerPage = options.Count
@@ -96,7 +96,7 @@
                 .ToHttpResponseMessage(Request);
         }
 
-        [Route("{groupId}", Name = "UpdateGroup")]
+        [Route("{groupId}")]
         public async Task<HttpResponseMessage> Patch(string groupId, PatchRequest<ScimGroup> patchRequest)
         {
             if (patchRequest == null ||
@@ -138,7 +138,7 @@
         }
 
         [AcceptVerbs("PUT", "OPTIONS")]
-        [Route("{groupId}", Name = "ReplaceGroup")]
+        [Route("{groupId}")]
         public async Task<HttpResponseMessage> Put(string groupId, ScimGroup groupDto)
         {
             groupDto.Id = groupId;
@@ -152,7 +152,7 @@
                 });
         }
 
-        [Route("{groupId}", Name = "DeleteGroup")]
+        [Route("{groupId}")]
         public async Task<HttpResponseMessage> Delete(string groupId)
         {
             return (await _GroupService.DeleteGroup(groupId))

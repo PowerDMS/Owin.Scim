@@ -15,10 +15,6 @@
             public const string ResourceType = @"urn:ietf:params:scim:schemas:core:2.0:ResourceType";
 
             public const string Schema = @"urn:ietf:params:scim:schemas:core:2.0:Schema";
-
-            public const string BulkRequest = @"urn:ietf:params:scim:api:messages:2.0:BulkRequest";
-
-            public const string BulkResponse = @"urn:ietf:params:scim:api:messages:2.0:BulkResponse";
         }
 
         public static class Messages
