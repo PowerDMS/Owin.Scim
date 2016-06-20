@@ -20,7 +20,7 @@
     {
         static void Main(string[] args)
         {
-            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("https://gioulakisscim.powerdms.com"))
+            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("http://localhost:8080"))
             {
                 AsyncContext.Run(TestScimApi);
                 Console.ReadLine();
