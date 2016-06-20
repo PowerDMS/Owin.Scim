@@ -20,7 +20,7 @@
         protected override IReadOnlyDictionary<string, ScimSchema> CreateSchemas()
         {
             var schemas = new Dictionary<string, ScimSchema>();
-            foreach (var std in ServerConfiguration.SchemaTypeDefinitions)
+            foreach (var std in ServerConfiguration.GetSchemaTypeDefinitions(ScimVersion.Two))
             {
                 var attributeDefinitions = new List<ScimAttributeSchema>();
                 foreach (var ad in std.AttributeDefinitions.Values)

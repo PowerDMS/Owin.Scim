@@ -49,7 +49,7 @@
 
         private IReadOnlyDictionary<string, ResourceType> CreateResourceTypes()
         {
-            return ServerConfiguration.ResourceTypeDefinitions
+            return ServerConfiguration.GetResourceTypeDefinitions(ScimVersion.Two)
                 .ToDictionary(
                     rtd => rtd.Name,
                     rtd => SetResourceVersion(

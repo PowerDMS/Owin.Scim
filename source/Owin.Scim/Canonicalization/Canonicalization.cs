@@ -141,7 +141,7 @@
 
                         // uri MUST be a valid SCIM resource
                         resourceDefinition = serverConfiguration
-                            .ResourceTypeDefinitions
+                            .GetResourceTypeDefinitions(AmbientRequestService.ProtocolVersion)
                             .SingleOrDefault(rtd => uri.AbsolutePath.IndexOf(rtd.Endpoint, StringComparison.OrdinalIgnoreCase) >= 0);
 
                         if (resourceDefinition != null)
@@ -152,7 +152,7 @@
 
                     // uri MUST be a valid SCIM resource that's within the allowed referenceTypes
                     resourceDefinition = serverConfiguration
-                        .ResourceTypeDefinitions
+                        .GetResourceTypeDefinitions(AmbientRequestService.ProtocolVersion)
                         .SingleOrDefault(
                             rtd => 
                             rtd.Name.Equals(referenceType, StringComparison.OrdinalIgnoreCase) && 

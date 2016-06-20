@@ -6,9 +6,12 @@
     using System.Collections.ObjectModel;
     using System.ComponentModel;
     using System.Linq;
+    using System.Net;
     using System.Web.Http;
 
     using Dependencies;
+
+    using ErrorHandling;
 
     using Model;
 
@@ -20,8 +23,10 @@
     /// </summary>
     public class ScimServerConfiguration
     {
+        // cache of Resource Type -> IScimTypeDefinition
         private readonly ConcurrentDictionary<Type, IScimTypeDefinition> _TypeDefinitionCache;
 
+        // cache of Resource Type -> Resource Definition Type
         private readonly IDictionary<Type, Type> _TypeDefinitionRegistry;
 
         private readonly IDictionary<ScimFeatureType, ScimFeature> _Features;
@@ -84,15 +89,11 @@
             get { return _AuthenticationSchemes; }
         }
 
-        public IEnumerable<IScimSchemaTypeDefinition> SchemaTypeDefinitions
-        {
-            get
-            {
-                return _TypeDefinitionCache.Values.OfType<IScimSchemaTypeDefinition>();
-            }
-        }
-
-        public IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
+        /// <summary>
+        /// Gets all resource type definitions regardless of <see cref="ScimVersion"/>.
+        /// </summary>
+        /// <value>The resource type definitions.</value>
+        internal IEnumerable<IScimResourceTypeDefinition> ResourceTypeDefinitions
         {
             get { return _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>(); }
         }
@@ -112,9 +113,34 @@
             get { return _ResourceExtensionCache.Value; }
         }
 
+        /// <summary>
+        /// Gets the type definition registry which is a map of <see cref="Resource"/> 
+        /// to its associated <see cref="IScimResourceTypeDefinition"/> type.
+        /// </summary>
+        /// <value>The type definition registry.</value>
         internal IDictionary<Type, Type> TypeDefinitionRegistry
         {
             get { return _TypeDefinitionRegistry; }
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IScimSchemaTypeDefinition"/>s for the specified <paramref name="version"/>.
+        /// </summary>
+        /// <param name="version">The version.</param>
+        /// <returns>IEnumerable&lt;IScimSchemaTypeDefinition&gt;.</returns>
+        public IEnumerable<IScimSchemaTypeDefinition> GetSchemaTypeDefinitions(ScimVersion version)
+        {
+            return _TypeDefinitionCache.Values.OfType<IScimSchemaTypeDefinition>(); // TODO: (DG) add versioning
+        }
+
+        /// <summary>
+        /// Gets the <see cref="IScimResourceTypeDefinition"/>s for the specified <paramref name="version"/>.
+        /// </summary>
+        /// <param name="version">The version.</param>
+        /// <returns>IEnumerable&lt;IScimResourceTypeDefinition&gt;.</returns>
+        public IEnumerable<IScimResourceTypeDefinition> GetResourceTypeDefinitions(ScimVersion version)
+        {
+            return _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>(); // TODO: (DG) add versioning
         }
 
         /// <summary>
@@ -130,9 +156,16 @@
                 t =>
                 {
                     Type typeDefinitionType;
-                    if (TypeDefinitionRegistry.TryGetValue(type, out typeDefinitionType))
+                    if (TypeDefinitionRegistry.TryGetValue(type, out typeDefinitionType)) // SHOULD always return true
                         return (IScimTypeDefinition)typeDefinitionType.CreateInstance(this);
 
+                    // This is safe because a Resource MUST NOT contain attributes which are Resources as well.
+                    // SHOULD NEVER get here because Owin.Scim registers all type definitions into the 
+                    // TypeDefinitionRegistry prior to instantiating any definition builder.
+
+                    // If this code does execute, it means that ScimApplicationManager could not discover the
+                    // type definition builder. This is okay, but ideally all complex attributes are defined and
+                    // don't use the defaults provided by Owin.Scim / SCIM specification.
                     var typeDefinitionBuilder = typeof (ScimTypeDefinitionBuilder<>).MakeGenericType(type);
                     return (IScimTypeDefinition)typeDefinitionBuilder.CreateInstance(this);
                 });
@@ -327,12 +360,18 @@
 
             var rtd = std as IScimResourceTypeDefinition;
             if (rtd == null)
-                return null;
+                throw new ScimException(
+                    HttpStatusCode.InternalServerError,
+                    string.Format(
+                        "The type {0}'s type definition '{1}' does not implement '{2}'.", 
+                        resourceType.Name, 
+                        std.GetType().Name,
+                        typeof(IScimResourceTypeDefinition).Name));
 
             return rtd.ValidatorType;
         }
 
-        internal void AddTypeDefiniton(IScimTypeDefinition scimTypeDefinition)
+        internal void AddTypeDefiniton(ScimVersion version, IScimTypeDefinition scimTypeDefinition)
         {
             if (_TypeDefinitionCache.ContainsKey(scimTypeDefinition.DefinitionType)) return;
 

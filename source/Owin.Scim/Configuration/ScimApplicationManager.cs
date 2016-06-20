@@ -188,14 +188,15 @@
             Type genericTypeDefinition;
             var baseType = typeDefinition.BaseType;
             if (baseType == null)
-                throw new Exception("Invalid type defintion. Must inherit from either ScimResourceTypeDefinitionBuilder or ScimTypeDefinitionBuilder.");
+                throw new Exception("Invalid type definition. Must inherit from either ScimResourceTypeDefinitionBuilder or ScimTypeDefinitionBuilder.");
 
             while (!baseType.IsGenericType ||
                 (((genericTypeDefinition = baseType.GetGenericTypeDefinition()) != typeof(ScimResourceTypeDefinitionBuilder<>)) && 
+                 genericTypeDefinition != typeof(ScimSchemaTypeDefinitionBuilder<>) &&
                  genericTypeDefinition != typeof(ScimTypeDefinitionBuilder<>)))
             {
                 if (baseType.BaseType == null)
-                    throw new Exception("Invalid type defintion. Must inherit from either ScimResourceTypeDefinitionBuilder or ScimTypeDefinitionBuilder.");
+                    throw new Exception("Invalid type definition. Must inherit from either ScimResourceTypeDefinitionBuilder or ScimTypeDefinitionBuilder.");
 
                 baseType = baseType.BaseType;
             }
