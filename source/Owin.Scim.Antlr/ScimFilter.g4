@@ -16,7 +16,7 @@ filter
 valPathFilter
 	: FIELD SP PR							#valPathPresentExp
 	| FIELD SP COMPAREOPERATOR SP VALUE		#valPathOperatorExp
-	| not=NOT '(' valPathFilter ')'			#valPathBraceExp
+	| NOT '(' valPathFilter ')'				#valPathBraceExp
 	| valPathFilter SP AND SP valPathFilter	#valPathAndExp
 	| valPathFilter SP OR SP valPathFilter	#valPathOrExp
 	;
