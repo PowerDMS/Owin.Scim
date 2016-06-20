@@ -9,6 +9,8 @@
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class when_updating_a_group : using_existing_user_and_group
     {
         Because of = async () =>
@@ -19,14 +21,14 @@
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
-                        new HttpMethod("PATCH"), "groups/" + PatchGroupId)
+                        new HttpMethod("PATCH"), "v2/groups/" + PatchGroupId)
                     {
                         Content = PatchContent
                     })
                 .Await().AsTask;
 
             if (PatchResponse.StatusCode == HttpStatusCode.OK)
-                UpdatedGroup = PatchResponse.Content.ReadAsAsync<ScimGroup>().Result;
+                UpdatedGroup = PatchResponse.Content.ReadAsAsync<ScimGroup2>().Result;
 
             if (PatchResponse.StatusCode == HttpStatusCode.BadRequest)
             {
@@ -41,7 +43,7 @@
 
         protected static HttpResponseMessage PatchResponse;
 
-        protected static ScimGroup UpdatedGroup;
+        protected static ScimGroup2 UpdatedGroup;
 
         protected static Model.ScimError Error;
     }

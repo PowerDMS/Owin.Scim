@@ -8,11 +8,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.multiOperation
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_failed_second_operation : when_updating_a_user_with_server_state
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 DisplayName = "Danny",

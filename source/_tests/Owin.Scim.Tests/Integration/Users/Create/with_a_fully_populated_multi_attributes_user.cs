@@ -43,7 +43,7 @@
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<MyUser>(UserDto, new JsonMediaTypeFormatter()))
+                .PostAsync("v2/users", new ObjectContent<MyUser>(UserDto, new JsonMediaTypeFormatter()))
                 .Result;
 
             StatusCode = Response.StatusCode;

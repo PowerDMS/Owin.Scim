@@ -9,11 +9,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update
     using Model;
     using Model.Users;
 
+    using v2.Model;
+
     public class with_an_invalid_operation : when_updating_a_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName()
             };

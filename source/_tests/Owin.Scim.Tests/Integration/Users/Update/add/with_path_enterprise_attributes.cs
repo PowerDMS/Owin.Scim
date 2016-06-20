@@ -8,11 +8,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_path_enterprise_attributes : when_updating_a_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Name = new Name
@@ -22,7 +24,7 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
                 }
             };
 
-            UserToUpdate.Extension<EnterpriseUserExtension>().Department = "Hello";
+            UserToUpdate.Extension<EnterpriseUser2Extension>().Department = "Hello";
 
             PatchContent = new StringContent(
                 @"
@@ -50,8 +52,8 @@ namespace Owin.Scim.Tests.Integration.Users.Update.add
 
         It should_update_last_modified = () => UpdatedUser.Meta.LastModified.ShouldBeGreaterThan(UserToUpdate.Meta.LastModified);
 
-        It should_add_department = () => UpdatedUser.Extension<EnterpriseUserExtension>().Department.ShouldEqual("1234");
+        It should_add_department = () => UpdatedUser.Extension<EnterpriseUser2Extension>().Department.ShouldEqual("1234");
 
-        It should_add_manager_value = () => UpdatedUser.Extension<EnterpriseUserExtension>().Manager.Value.ShouldEqual("42");
+        It should_add_manager_value = () => UpdatedUser.Extension<EnterpriseUser2Extension>().Manager.Value.ShouldEqual("42");
     }
 }

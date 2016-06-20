@@ -44,7 +44,7 @@
             var resourceId = uriPaths[1];
             
             var resourceDefinition = serverConfiguration
-                .ResourceTypeDefinitions
+                .GetResourceTypeDefinitions(AmbientRequestService.ProtocolVersion)
                 .SingleOrDefault(rtd => rtd.Endpoint.IndexOf(resourceEndpoint, StringComparison.OrdinalIgnoreCase) >= 0);
 
             if (resourceDefinition == null)

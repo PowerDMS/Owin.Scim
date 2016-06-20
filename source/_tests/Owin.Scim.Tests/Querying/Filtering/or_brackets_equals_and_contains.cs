@@ -9,6 +9,8 @@ namespace Owin.Scim.Tests.Querying.Filtering
 
     using Scim.Querying;
 
+    using v2.Model;
+
     [Subject(typeof(ScimFilterVisitor<>))]
     public class or_brackets_equals_and_contains : when_parsing_a_filter_expression<ScimUser>
     {
@@ -16,8 +18,8 @@ namespace Owin.Scim.Tests.Querying.Filtering
         {
             Users = new List<ScimUser>
             {
-                new ScimUser { UserName = "BJensen", UserType = "employee"},
-                new ScimUser
+                new ScimUser2 { UserName = "BJensen", UserType = "employee"},
+                new ScimUser2
                 {
                     UserName = "ROMalley",
                     UserType = "employee",
@@ -30,7 +32,7 @@ namespace Owin.Scim.Tests.Querying.Filtering
                         new InstantMessagingAddress { Value = "romalley@foo.com", Type = "xmpp" }
                     }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = "DGioulakis",
                     Emails = new List<Email>

@@ -2,8 +2,13 @@
 {
     using System.Text.RegularExpressions;
 
+    using Model;
+
     public static class StringExtensions
     {
+        private static readonly Regex _NamespaceScimVersionRegex =
+            new Regex("(?:\\.)(v[0-9]+)(?:\\.)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
+
         public static string RemoveMultipleSpaces(this string value)
         {
             return Regex.Replace(value.Trim(), @"\s+", " ");
@@ -38,6 +43,15 @@
             }
 
             return -1;
+        }
+
+        public static ScimVersion GetScimVersion(this string @namespace)
+        {
+            var result = _NamespaceScimVersionRegex.Match(@namespace);
+            if (result.Success)
+                return new ScimVersion(result.Groups[1].Value); // e.g. groups[] -> /v0/, v0
+
+            return null;
         }
     }
 }

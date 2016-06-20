@@ -9,13 +9,15 @@
 
     using Model;
 
+    using v2.Model;
+
     public class when_retrieving_resource_types : using_a_scim_server
     {
         Because of = async () =>
         {
             Response = await Server
                 .HttpClient
-                .GetAsync("resourcetypes/" + ResourceTypeName ?? string.Empty)
+                .GetAsync("v2/resourcetypes/" + ResourceTypeName ?? string.Empty)
                 .AwaitResponse()
                 .AsTask;
 

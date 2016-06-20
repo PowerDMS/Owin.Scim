@@ -1,6 +1,5 @@
 namespace Owin.Scim.Tests.Integration.Groups.Update.add
 {
-    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Text;
@@ -10,14 +9,16 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.add
     using Model.Users;
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_path_direct_no_change : when_updating_a_group
     {
         Establish context = () =>
         {
-            ExistingUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
-            var anotherUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
+            ExistingUser = CreateUser(new ScimUser2 {UserName = Users.UserNameUtility.GenerateUserName()});
+            var anotherUser = CreateUser(new ScimUser2 {UserName = Users.UserNameUtility.GenerateUserName()});
             GroupToUpdate = CreateGroup(
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "groupToUpdate",
                     Members = new []

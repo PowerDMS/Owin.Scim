@@ -1,9 +1,9 @@
 ﻿namespace ConsoleHost.Scim
 {
     using Owin.Scim.Configuration;
-    using Owin.Scim.Model.Users;
+    using Owin.Scim.v2.Model;
 
-    public class CustomUserDefinition : UserDefinition
+    public class CustomUserDefinition : ScimUser2Definition
     {
         public CustomUserDefinition(ScimServerConfiguration serverConfiguration) 
             : base(serverConfiguration)

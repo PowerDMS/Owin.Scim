@@ -8,12 +8,14 @@ namespace Owin.Scim.Tests.Integration.Groups.Update.remove
 
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_path_direct_no_change : when_updating_a_group
     {
         Establish context = () =>
         {
             GroupToUpdate = CreateGroup(
-                new ScimGroup
+                new ScimGroup2
                 {
                     DisplayName = "groupToUpdate",
                 });

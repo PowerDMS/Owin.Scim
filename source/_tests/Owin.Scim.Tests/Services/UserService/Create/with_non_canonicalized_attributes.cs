@@ -8,11 +8,13 @@ namespace Owin.Scim.Tests.Services.UserService.Create
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_non_canonicalized_attributes : when_creating_a_user
     {
         Establish context = () =>
         {
-            ClientUserDto = new ScimUser
+            ClientUserDto = new ScimUser2
             {
                 UserName = "daniel",
                 Active = true,

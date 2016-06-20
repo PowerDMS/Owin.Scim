@@ -246,6 +246,14 @@
     <Content Include="Scripts\jquery-2.2.3.min.map" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\source\Owin.Scim.v1\Owin.Scim.v1.csproj">
+      <Project>{d2b18dc8-a244-4133-86d3-e5b3710250b1}</Project>
+      <Name>Owin.Scim.v1</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\source\Owin.Scim.v2\Owin.Scim.v2.csproj">
+      <Project>{4b87a51b-70d0-48ad-8dbf-c7256e1cbf44}</Project>
+      <Name>Owin.Scim.v2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\source\Owin.Scim\Owin.Scim.csproj">
       <Project>{5ddb5f75-55ca-47ed-8132-03b757148275}</Project>
       <Name>Owin.Scim</Name>

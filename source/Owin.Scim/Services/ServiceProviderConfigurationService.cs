@@ -7,11 +7,11 @@
 
     using Model;
 
-    public class ServiceProviderConfigurationService : ServiceBase, IServiceProviderConfigurationService
+    public abstract class ServiceProviderConfigurationServiceBase : ServiceBase, IServiceProviderConfigurationService
     {
         private readonly Lazy<ServiceProviderConfiguration> _ServiceProviderConfigurationFactory;
 
-        public ServiceProviderConfigurationService(
+        protected ServiceProviderConfigurationServiceBase(
             ScimServerConfiguration serverConfiguration, 
             IResourceVersionProvider versionProvider) 
             : base(serverConfiguration, versionProvider)
@@ -19,14 +19,7 @@
             _ServiceProviderConfigurationFactory = new Lazy<ServiceProviderConfiguration>(
                 () =>
                 {
-                    var config = new ServiceProviderConfiguration(
-                        ServerConfiguration.GetFeature(ScimFeatureType.Patch),
-                        ServerConfiguration.GetFeature<ScimFeatureBulk>(ScimFeatureType.Bulk),
-                        ServerConfiguration.GetFeature<ScimFeatureFilter>(ScimFeatureType.Filter),
-                        ServerConfiguration.GetFeature(ScimFeatureType.ChangePassword),
-                        ServerConfiguration.GetFeature(ScimFeatureType.Sort),
-                        ServerConfiguration.GetFeature<ScimFeatureETag>(ScimFeatureType.ETag),
-                        ServerConfiguration.AuthenticationSchemes);
+                    var config = CreateServiceProviderConfiguration();
 
                     SetResourceVersion(config);
 
@@ -40,5 +33,7 @@
                 new ScimDataResponse<ServiceProviderConfiguration>(
                     _ServiceProviderConfigurationFactory.Value));
         }
+
+        protected abstract ServiceProviderConfiguration CreateServiceProviderConfiguration();
     }
 }

@@ -13,11 +13,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
     using Users;
 
+    using v2.Model;
+
     public class with_add_custom_group : using_a_scim_server
     {
         Establish context = () =>
         {
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 DisplayName = UserNameUtility.GenerateUserName()
             };
@@ -43,13 +45,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PostAsync("groups", new ScimObjectContent<ScimGroup>(GroupDto))
+                .PostAsync("v2/groups", new ScimObjectContent<ScimGroup>(GroupDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
 
             CreatedGroup = Response.StatusCode == HttpStatusCode.Created
-                ? Response.Content.ScimReadAsAsync<ScimGroup>().Result
+                ? Response.Content.ScimReadAsAsync<ScimGroup2>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

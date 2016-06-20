@@ -9,14 +9,16 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Model.Users;
 
     using Ploeh.AutoFixture;
-    
+
+    using v2.Model;
+
     public class with_a_fully_populated_simple_attributes_user : when_creating_a_user
     {
         Establish context = () =>
         {
             var autoFixture = new Fixture();
 
-            UserDto = autoFixture.Build<ScimUser>()
+            UserDto = autoFixture.Build<ScimUser2>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass!2")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -27,7 +29,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
                 .With(x => x.PhoneNumbers, null)
                 .With(x => x.Photos, null)
                 .With(x => x.X509Certificates, null)
-                .Create();
+                .Create(new ScimUser2());
         };
 
         It should_return_created = () => Response.StatusCode.ShouldEqual(HttpStatusCode.Created);

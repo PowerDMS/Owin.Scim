@@ -13,13 +13,15 @@
 
     using Users;
 
+    using v2.Model;
+
     public class when_requesting_specific_attributes : using_a_scim_server
     {
         Because of = async () =>
         {
             var autoFixture = new Fixture();
 
-            var existingUser = autoFixture.Build<ScimUser>()
+            var existingUser = autoFixture.Build<ScimUser2>()
                 .With(x => x.UserName, UserNameUtility.GenerateUserName())
                 .With(x => x.Password, "somePass!2")
                 .With(x => x.PreferredLanguage, "en-US,en,es")
@@ -31,14 +33,13 @@
                 .With(x => x.Photos, null)
                 .With(x => x.Addresses, null)
                 .With(x => x.X509Certificates, null)
-                .Create(seed: new ScimUser());
+                .Create(seed: new ScimUser2());
 
             // Insert the first user so there's one already in-memory.
             await (await Server
                 .HttpClient
                 .PostAsync(
-                    new UriBuilder(
-                        new Uri("http://localhost/users"))
+                    new UriBuilder(new Uri("http://localhost/v2/users"))
                     {
                         Query = "attributes=" + string.Join(",", Attributes ?? new List<string>())
                     }.ToString(), new ScimObjectContent<ScimUser>(existingUser))

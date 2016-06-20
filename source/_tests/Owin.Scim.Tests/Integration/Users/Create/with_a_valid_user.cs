@@ -9,12 +9,14 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_a_valid_user : when_creating_a_user
     {
         Establish context = () =>
         {
             CurrentUtcDateTime = DateTime.UtcNow;
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 Password = "Hiworld!1"

@@ -8,11 +8,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.replace
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_no_path_no_change : when_updating_a_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 DisplayName = "Babs",

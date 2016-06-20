@@ -22,7 +22,8 @@ namespace Owin.Scim.Model.Groups
             For(p => p.Type)
                 .SetCanonicalValues(new [] { ScimConstants.ResourceTypes.User, ScimConstants.ResourceTypes.Group }, StringComparer.OrdinalIgnoreCase)
                 .SetDescription("A label indicating the type of resource, e.g., 'User' or 'Group'.")
-                .SetMutability(Mutability.Immutable);
+                .SetMutability(Mutability.Immutable)
+                .AddCanonicalizationRule(type => char.ToUpper(type[0]) + type.Substring(1));
         }
     }
 }

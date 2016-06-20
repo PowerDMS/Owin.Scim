@@ -2,22 +2,14 @@
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
 
     using Extensions;
 
     using Newtonsoft.Json;
     
-    public class ServiceProviderConfiguration : Resource
+    public abstract class ServiceProviderConfiguration : Resource
     {
-        public ServiceProviderConfiguration(
-            ScimFeature featurePatch,
-            ScimFeatureBulk featureBulk,
-            ScimFeatureFilter featureFilter,
-            ScimFeature featureChangePassword,
-            ScimFeature featureSort,
-            ScimFeatureETag featureETag,
-            IEnumerable<AuthenticationScheme> authenticationSchemes = null)
+        protected ServiceProviderConfiguration()
         {
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute
@@ -27,50 +19,32 @@
              * "/Groups" will set "resourceType" to "Group".
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.ServiceProviderConfig);
-            
-            Bulk = featureBulk ?? ScimFeatureBulk.CreateUnsupported();
-            Filter = featureFilter ?? ScimFeatureFilter.CreateUnsupported();
-            Patch = featurePatch;
-            ChangePassword = featureChangePassword;
-            Sort = featureSort;
-            ETag = featureETag;
-            AuthenticationSchemes = authenticationSchemes == null 
-                ? new List<AuthenticationScheme>() 
-                : authenticationSchemes.ToList();
         }
-
-        [JsonConstructor]
-        private ServiceProviderConfiguration() { }
 
         [JsonProperty("documentationUri")]
-        public Uri DocumentationUri { get; private set; }
+        public Uri DocumentationUri { get; protected set; }
 
         [JsonProperty("patch")]
-        public ScimFeature Patch { get; private set; }
+        public ScimFeature Patch { get; protected set; }
 
         [JsonProperty("bulk")]
-        public ScimFeatureBulk Bulk { get; private set; }
+        public ScimFeatureBulk Bulk { get; protected set; }
 
         [JsonProperty("filter")]
-        public ScimFeatureFilter Filter { get; private set; }
+        public ScimFeatureFilter Filter { get; protected set; }
 
         [JsonProperty("changePassword")]
-        public ScimFeature ChangePassword { get; private set; }
+        public ScimFeature ChangePassword { get; protected set; }
 
         [JsonProperty("sort")]
-        public ScimFeature Sort { get; private set; }
+        public ScimFeature Sort { get; protected set; }
 
         [JsonProperty("etag")]
-        public ScimFeatureETag ETag { get; private set; }
+        public ScimFeatureETag ETag { get; protected set; }
 
         [JsonProperty("authenticationSchemes")]
-        public IEnumerable<AuthenticationScheme> AuthenticationSchemes { get; private set; }
+        public IEnumerable<AuthenticationScheme> AuthenticationSchemes { get; protected set; }
         
-        public override string SchemaIdentifier
-        {
-            get { return ScimConstants.Schemas.ServiceProviderConfig; }
-        }
-
         public override int CalculateVersion()
         {
             return new

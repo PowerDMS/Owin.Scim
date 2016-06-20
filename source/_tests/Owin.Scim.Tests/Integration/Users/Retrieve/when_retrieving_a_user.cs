@@ -10,7 +10,7 @@
         {
             Response = await Server
                 .HttpClient
-                .GetAsync("users/" + UserId)
+                .GetAsync("v2/users/" + UserId)
                 .AwaitResponse()
                 .AsTask;
         };

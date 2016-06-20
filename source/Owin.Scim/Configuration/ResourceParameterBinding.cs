@@ -32,16 +32,12 @@
 
         private readonly ScimServerConfiguration _ServerConfiguration;
 
-        private readonly ISchemaTypeFactory _SchemaTypeFactory;
-
         public ResourceParameterBinding(
             ScimServerConfiguration serverConfiguration,
-            HttpParameterDescriptor parameter,
-            ISchemaTypeFactory schemaTypeFactory) 
+            HttpParameterDescriptor parameter) 
             : base(parameter)
         {
             _ServerConfiguration = serverConfiguration;
-            _SchemaTypeFactory = schemaTypeFactory;
         }
 
         public override async Task ExecuteBindingAsync(
@@ -68,7 +64,20 @@
                     ScimErrorType.InvalidValue);
             }
 
-            var schemaType = _SchemaTypeFactory.GetSchemaType(((JArray)schemasValue).ToObject<ISet<string>>());
+            // determine which concrete resource type to instantiate
+            Type schemaType = null;
+            foreach (var schemaBindingRule in _ServerConfiguration.SchemaBindingRules)
+            {
+                if (schemaBindingRule.Predicate(((JArray)schemasValue).ToObject<ISet<string>>(), Descriptor.ParameterType))
+                    schemaType = schemaBindingRule.Target;
+            }
+
+            if (schemaType == null)
+                throw new ScimException(
+                    HttpStatusCode.BadRequest,
+                    "Unsupported schema.",
+                    ScimErrorType.InvalidValue);
+            
             if (!Descriptor.ParameterType.IsAssignableFrom(schemaType))
                 throw new ScimException(
                     HttpStatusCode.InternalServerError,

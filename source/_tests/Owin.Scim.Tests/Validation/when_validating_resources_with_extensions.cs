@@ -17,7 +17,9 @@
     using Scim.Extensions;
     using Scim.Security;
     using Scim.Validation;
-    using Scim.Validation.Users;
+
+    using v2.Model;
+    using v2.Validation;
 
     public class when_validating_resources_with_extensions
     {
@@ -28,11 +30,11 @@
             var passwordManager = A.Fake<IManagePasswords>();
             var validatorFactory = A.Fake<IResourceValidatorFactory>();
 
-            _ExtensionValidator = A.Fake<IResourceExtensionValidator>(b => b.Wrapping(new EnterpriseUserExtensionValidator()));
+            _ExtensionValidator = A.Fake<IResourceExtensionValidator>(b => b.Wrapping(new EnterpriseUser2ExtensionValidator()));
 
             A.CallTo(() => validatorFactory.CreateValidator(A<ScimUser>._))
                 .Returns(
-                    new UserValidator(
+                    new ScimUser2Validator(
                         serverConfiguration,
                         new ResourceExtensionValidators(
                             new []
@@ -45,8 +47,8 @@
 
             _UserValidator = await validatorFactory.CreateValidator(User).AwaitResponse().AsTask;
 
-            User = new ScimUser();
-            User.Extension<EnterpriseUserExtension>().Department = "sales";
+            User = new ScimUser2();
+            User.Extension<EnterpriseUser2Extension>().Department = "sales";
         };
 
         Because of = async () => (await _UserValidator.ValidateCreateAsync(User).AwaitResponse().AsTask)

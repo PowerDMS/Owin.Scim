@@ -8,11 +8,13 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_a_username_conflict : when_creating_a_user
     {
         Establish context = async () =>
         {
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
@@ -20,7 +22,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             // Insert the first user so there's one already in-memory.
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<ScimUser>(UserDto, new JsonMediaTypeFormatter()))
+                .PostAsync("v2/users", new ObjectContent<ScimUser>(UserDto, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
         };

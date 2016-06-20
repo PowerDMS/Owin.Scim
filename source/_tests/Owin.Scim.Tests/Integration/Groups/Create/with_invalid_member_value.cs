@@ -4,11 +4,13 @@
     using Machine.Specifications;
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_invalid_member_value : when_creating_a_group
     {
         Establish context = () =>
         {
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 DisplayName = "hello",
                 ExternalId = "hello",

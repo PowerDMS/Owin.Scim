@@ -7,43 +7,46 @@
 
     using Model.Users;
 
+    using v2.Model;
+
+    [Ignore("ListResponse needs a jsonconverter")]
     public class with_a_filter : when_querying_users
     {
         Establish context = async () =>
         {
             var users = new List<ScimUser>
             {
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Daniel", FamilyName = "Gioulakis" }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Lev", FamilyName = "Myshkin" }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Nastasya", FamilyName = "Barashkova" }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Parfyón", FamilyName = "Rogózhin" }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Iván", FamilyName = "Yepanchín" }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Agláya", FamilyName = "Ivánovna" }
                 },
-                new ScimUser
+                new ScimUser2
                 {
                     UserName = UserNameUtility.GenerateUserName(),
                     Name = new Name { GivenName = "Daniel", FamilyName = "Smith" }
@@ -54,7 +57,7 @@
             {
                 await Server
                     .HttpClient
-                    .PostAsync("users", new ScimObjectContent<ScimUser>(user))
+                    .PostAsync("v2/users", new ScimObjectContent<ScimUser>(user))
                     .AwaitResponse()
                     .AsTask;
             }

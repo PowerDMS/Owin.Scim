@@ -11,12 +11,14 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Model;
     using Model.Users;
 
+    using v2.Model;
+
     public class with_multiple_validation_errors : when_creating_a_user
     {
         Establish context = async () =>
         {
             var userName = UserNameUtility.GenerateUserName();
-            var initialUser = new ScimUser
+            var initialUser = new ScimUser2
             {
                 UserName = userName
             };
@@ -24,11 +26,11 @@ namespace Owin.Scim.Tests.Integration.Users.Create
             // Insert the first user so there's one already in-memory.
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<ScimUser>(initialUser, new JsonMediaTypeFormatter()))
+                .PostAsync("v2/users", new ObjectContent<ScimUser>(initialUser, new JsonMediaTypeFormatter()))
                 .AwaitResponse()
                 .AsTask;
             
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 UserName = userName,
                 PreferredLanguage = "invalidLanguage"

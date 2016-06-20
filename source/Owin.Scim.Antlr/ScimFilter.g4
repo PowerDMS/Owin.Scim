@@ -1,76 +1,49 @@
 grammar ScimFilter;
 
-/** Parser: will organize the tokens provided by the lexer into the tree with sub-trees and also defining the precedence of the operators */
 parse
-    : expression
+    : filter
     ;
 
-expression
-    : expression OR expression    #orExp
-    | expression AND expression   #andExp
-    | NOT '(' expression ')'      #notExp
-    | '(' expression ')'          #braceExp
-	| FIELD '[' expression ']'	  #bracketExp
-    | FIELD PRESENT               #presentExp
-    | FIELD OPERATOR VALUE        #operatorExp
-    ;
+filter
+	: FIELD SP PR                                #presentExp
+	| FIELD SP COMPAREOPERATOR SP VALUE          #operatorExp
+	| NOT? SP* '(' filter ')'                    #braceExp
+	| FIELD '[' valPathFilter ']'                #valPathExp
+	| filter SP AND SP filter                    #andExp
+	| filter SP OR SP filter                     #orExp
+	;										     
+											     
+valPathFilter								     
+	: FIELD SP PR                                #valPathPresentExp
+	| FIELD SP COMPAREOPERATOR SP VALUE          #valPathOperatorExp
+	| NOT? SP* '(' valPathFilter ')'             #valPathBraceExp
+	| valPathFilter SP AND SP valPathFilter      #valPathAndExp
+	| valPathFilter SP OR SP valPathFilter       #valPathOrExp
+	;
+	
+COMPAREOPERATOR : EQ | NE | CO | SW | EW | GT | GE | LT | LE;
 
-/** Lexer: Interpreting character and turn them into tokens which will be organized by the parser in an tree */
-OR
-    : 'or'
-    | 'Or'
-    | 'oR'
-    | 'OR'
-    ;
+EQ : [eE][qQ];
+NE : [nN][eE];
+CO : [cC][oO];
+SW : [sS][wW];
+EW : [eE][wW];
+PR : [pP][rR];
+GT : [gG][tT];
+GE : [gG][eE];
+LT : [lL][tT];
+LE : [lL][eE];
 
-AND
-    : 'and'
-    | 'And'
-    | 'aNd'
-    | 'anD'
-    | 'ANd'
-    | 'aND'
-    | 'AND'
-    ;
+NOT : [nN][oO][tT];
+AND : [aA][nN][dD];
+OR  : [oO][rR];
 
-NOT
-    : 'not'
-    | 'Not'
-    | 'nOt'
-    | 'noT'
-    | 'NOt'
-    | 'nOT'
-    | 'NOT'
-    ;
+SP : ' ';
 
-PRESENT
-    : 'pr'
-    ;
+FIELD : ([a-z] | [A-Z] | [0-9] | '.' | ':' | '_' | '-')+;
 
-OPERATOR
-    : 'eq'
-	| 'ne'
-    | 'co'
-	| 'sw'
-	| 'ew'
-    | 'gt'
-    | 'ge'
-    | 'lt'
-    | 'le'
-    ;
+ESCAPED_QUOTE : '\\"';
 
-FIELD
-    : ([a-z] | [A-Z] | [0-9] | '.' | ':' | '_' | '-')+ //match lower-case, upper-case, number identifier including dots, colons and quotation marks
-    ;
+VALUE : '"'(ESCAPED_QUOTE | ~'"')*'"';
 
-ESCAPED_QUOTE
-    : '\\"'
-    ;
-
-VALUE
-    : '"'(ESCAPED_QUOTE | ~'"')*'"'
-    ;
-
-EXCLUDE
-    : [\b | \t | \r | \n]+ -> skip //skipping backspaces, tabs, carriage returns and newlines
-    ;
+EXCLUDE : [\b | \t | \r | \n]+ -> skip;

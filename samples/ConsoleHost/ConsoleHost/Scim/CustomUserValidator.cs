@@ -9,10 +9,10 @@
     using Owin.Scim.Model;
     using Owin.Scim.Repository;
     using Owin.Scim.Security;
+    using Owin.Scim.v2.Validation;
     using Owin.Scim.Validation;
-    using Owin.Scim.Validation.Users;
 
-    public class CustomUserValidator : UserValidator
+    public class CustomUserValidator : ScimUser2Validator
     {
         public CustomUserValidator(
             ScimServerConfiguration serverConfiguration, 

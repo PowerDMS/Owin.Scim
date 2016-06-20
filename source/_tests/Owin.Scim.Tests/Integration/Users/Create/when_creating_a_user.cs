@@ -7,18 +7,20 @@ namespace Owin.Scim.Tests.Integration.Users.Create
 
     using Model.Users;
 
+    using v2.Model;
+
     public class when_creating_a_user : using_a_scim_server
     {
         Because of = async () =>
         {
             Response = await Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<ScimUser>(UserDto))
+                .PostAsync("v2/users", new ScimObjectContent<ScimUser>(UserDto))
                 .AwaitResponse()
                 .AsTask;
 
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
-                ? await Response.Content.ScimReadAsAsync<ScimUser>().AwaitResponse().AsTask
+                ? await Response.Content.ScimReadAsAsync<ScimUser2>().AwaitResponse().AsTask
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

@@ -14,21 +14,23 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
     using Users;
 
+    using v2.Model;
+
     public class with_patch_custom_group : using_a_scim_server
     {
         Establish context = () =>
         {
-            var existingGroup = new ScimGroup
+            var existingGroup = new ScimGroup2
             {
                 DisplayName = UserNameUtility.GenerateUserName()
             };
 
             Response = Server
                 .HttpClient
-                .PostAsync("groups", new ScimObjectContent<ScimGroup>(existingGroup))
+                .PostAsync("v2/groups", new ScimObjectContent<ScimGroup>(existingGroup))
                 .Result;
 
-            GroupDto = Response.Content.ScimReadAsAsync<ScimGroup>().Result;
+            GroupDto = Response.Content.ScimReadAsAsync<ScimGroup2>().Result;
 
             PatchContent = new StringContent(
                 @"
@@ -66,14 +68,14 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
-                        new HttpMethod("PATCH"), "groups/" + GroupDto.Id)
+                        new HttpMethod("PATCH"), "v2/groups/" + GroupDto.Id)
                     {
                         Content = PatchContent
                     })
                 .Result;
             
             if (Response.StatusCode == HttpStatusCode.OK)
-                UpdatedGroup = Response.Content.ScimReadAsAsync<ScimGroup>().Result;
+                UpdatedGroup = Response.Content.ScimReadAsAsync<ScimGroup2>().Result;
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);

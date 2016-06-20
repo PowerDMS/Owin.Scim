@@ -10,14 +10,17 @@
 
     using Owin.Scim;
     using Owin.Scim.Model.Users;
+    using Owin.Scim.v2;
+    using Owin.Scim.v2.Model;
 
     using Scim;
+    using Scim.v2;
 
     class Program
     {
         static void Main(string[] args)
         {
-            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("http://+:8080"))
+            using (Microsoft.Owin.Hosting.WebApp.Start<CompositionRoot>("http://localhost:8080"))
             {
                 AsyncContext.Run(TestScimApi);
                 Console.ReadLine();
@@ -39,7 +42,7 @@
 
 //            await ExecuteSchemas(client);
 
-            await ExecuteUser(client);
+//            await ExecuteUser(client);
 
 //            await ExecuteCustomResourceType(client);
         }
@@ -48,7 +51,7 @@
         {
             Write("");
             Write("Getting schemas ...");
-            var response = await client.GetAsync("schemas/" + ScimConstants.Schemas.User);
+            var response = await client.GetAsync("v2/schemas/" + ScimConstantsV2.Schemas.User);
             Write(await response.Content.ReadAsStringAsync());
             Write("");
         }
@@ -57,7 +60,7 @@
         {
             Write("");
             Write("Getting resource types ...");
-            var response = await client.GetAsync("resourcetypes");
+            var response = await client.GetAsync("v2/resourcetypes");
             Write(await response.Content.ReadAsStringAsync());
             Write("");
         }
@@ -66,7 +69,7 @@
         {
             Write("");
             Write("Getting service provider configuration ...");
-            var response = await client.GetAsync("serviceproviderconfig");
+            var response = await client.GetAsync("v2/serviceproviderconfig");
             Write(await response.Content.ReadAsStringAsync());
             Write("");
         }
@@ -77,7 +80,7 @@
             Write("Creating custom resource type, tenant ...");
             var response =
                 await
-                    client.PostAsync("tenants",
+                    client.PostAsync("v2/tenants",
                         new ObjectContent<Tenant>(new Tenant { Name = "mytenant" }, new JsonMediaTypeFormatter()));
             Write(await response.Content.ReadAsStringAsync());
             if (response.StatusCode == HttpStatusCode.Created)
@@ -85,7 +88,7 @@
                 var tenant = await response.Content.ReadAsAsync<Tenant>(new[] { new JsonMediaTypeFormatter() });
                 Write("");
                 Write("Getting custom resource type, tenant " + tenant.Id);
-                var json = await client.GetStringAsync("tenants/" + tenant.Id);
+                var json = await client.GetStringAsync("v2/tenants/" + tenant.Id);
                 Write(json);
             }
             Write("");
@@ -97,15 +100,15 @@
             Write("Creating user ...");
             var response =
                 await
-                    client.PostAsync("users",
-                        new ObjectContent<ScimUser>(new ScimUser { UserName = "daniel", NickName = "danny" }, new JsonMediaTypeFormatter()));
+                    client.PostAsync("v2/users",
+                        new ObjectContent<ScimUser>(new ScimUser2 { UserName = "daniel", NickName = "danny" }, new JsonMediaTypeFormatter()));
             Write(await response.Content.ReadAsStringAsync());
             if (response.StatusCode == HttpStatusCode.Created)
             {
-                var user = await response.Content.ReadAsAsync<ScimUser>(new[] { new JsonMediaTypeFormatter() });
+                var user = await response.Content.ReadAsAsync<ScimUser2>(new[] { new JsonMediaTypeFormatter() });
                 Write("");
                 Write("Getting user " + user.Id);
-                var json = await client.GetStringAsync("users/" + user.Id);
+                var json = await client.GetStringAsync("v2/users/" + user.Id);
                 Write(json);
             }
 

@@ -16,6 +16,8 @@
 
     using Scim.Extensions;
 
+    using v2.Model;
+
     public class using_a_scim_server : IAssemblyContext
     {
         private static volatile object _SyncLock = new object();
@@ -50,8 +52,8 @@
                                         "Authentication scheme using the OAuth Bearer Token standard.",
                                         specUri: new Uri("https://tools.ietf.org/html/rfc6750"),
                                         isPrimary: true))
-                                .ModifyResourceType<ScimUser>(ModifyUserResourceType)
-                                .ModifyResourceType<ScimGroup>(ModifyGroupResourceType);
+                                .ModifyResourceType<ScimUser2>(ModifyUserResourceType)
+                                .ModifyResourceType<ScimGroup2>(ModifyGroupResourceType);
                         });
                 });
             }
@@ -66,13 +68,13 @@
         {
         }
 
-        private static void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<ScimUser> builder)
+        private static void ModifyUserResourceType(ScimResourceTypeDefinitionBuilder<ScimUser2> builder)
         {
             // this adds custom schemas, need play with custom validation next
             builder.AddSchemaExtension<MyUserSchema, MyUserSchemaValidator>(MyUserSchema.Schema);
         }
 
-        private static void ModifyGroupResourceType(ScimResourceTypeDefinitionBuilder<ScimGroup> builder)
+        private static void ModifyGroupResourceType(ScimResourceTypeDefinitionBuilder<ScimGroup2> builder)
         {
             // this adds custom schemas, need play with custom validation next
             builder.AddSchemaExtension<MyGroupSchema, MyGroupSchemaValidator>(MyGroupSchema.Schema);

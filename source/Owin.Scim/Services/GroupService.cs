@@ -89,7 +89,7 @@
                         LastModified = groupRecord.Meta.LastModified
                     };
 
-                    _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(typeof(ScimGroup)));
+                    _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(group.GetType()));
 
                     var validator = await _ResourceValidatorFactory.CreateValidator(group);
                     var validationResult = (await validator.ValidateUpdateAsync(group, groupRecord)).ToScimValidationResult();

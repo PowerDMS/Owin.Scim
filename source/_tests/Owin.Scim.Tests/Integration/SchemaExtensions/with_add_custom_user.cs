@@ -12,16 +12,18 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
     using Users;
 
+    using v2.Model;
+
     public class with_add_custom_user : using_a_scim_server
     {
         Establish context = () =>
         {
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
 
-            UserDto.Extension<EnterpriseUserExtension>().Department = "Sales";
+            UserDto.Extension<EnterpriseUser2Extension>().Department = "Sales";
             UserDto.AddExtension(new MyUserSchema
             {
                 Guid = "anything",
@@ -39,13 +41,13 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<ScimUser>(UserDto))
+                .PostAsync("v2/users", new ScimObjectContent<ScimUser>(UserDto))
                 .Result;
 
             var bodyText = Response.Content.ReadAsStringAsync().Result;
             
             CreatedUser = Response.StatusCode == HttpStatusCode.Created
-                ? Response.Content.ScimReadAsAsync<ScimUser>().Result
+                ? Response.Content.ScimReadAsAsync<ScimUser2>().Result
                 : null;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest
@@ -59,8 +61,8 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
         It should_return_enterprise_user = () =>
             CreatedUser
-                .Extension<EnterpriseUserExtension>()
-                .ShouldBeLike(UserDto.Extension<EnterpriseUserExtension>());
+                .Extension<EnterpriseUser2Extension>()
+                .ShouldBeLike(UserDto.Extension<EnterpriseUser2Extension>());
 
         It should_return_custom_schema = () =>
             CreatedUser

@@ -6,6 +6,8 @@
     using Model.Users;
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_a_valid_user_member : when_retrieving_a_group
     {
         /// <summary>
@@ -13,9 +15,9 @@
         /// </summary>
         private Establish context = () =>
         {
-            ExistingUser = CreateUser(new ScimUser {UserName = Users.UserNameUtility.GenerateUserName()});
+            ExistingUser = CreateUser(new ScimUser2 {UserName = Users.UserNameUtility.GenerateUserName()});
 
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 DisplayName = Users.UserNameUtility.GenerateUserName(),
                 Members = new[] {new Member {Value = ExistingUser.Id, Type = "user"},}

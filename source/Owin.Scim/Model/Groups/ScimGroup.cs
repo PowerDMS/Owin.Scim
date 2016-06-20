@@ -6,9 +6,9 @@
 
     using Newtonsoft.Json;
     
-    public class ScimGroup : Resource
+    public abstract class ScimGroup : Resource
     {
-        public ScimGroup()
+        protected ScimGroup()
         {
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute
@@ -18,11 +18,6 @@
              * "/Groups" will set "resourceType" to "Group".
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group);
-        }
-        
-        public override string SchemaIdentifier
-        {
-            get { return ScimConstants.Schemas.Group; }
         }
 
         [JsonProperty("displayName")]

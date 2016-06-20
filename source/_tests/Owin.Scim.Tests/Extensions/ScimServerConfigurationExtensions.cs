@@ -9,6 +9,8 @@
     using NContext.Common;
     using NContext.Extensions;
 
+    using v2.Model;
+
     public static class ScimServerConfigurationExtensions
     {
         public static ScimServerConfiguration WithTypeDefinitions(this ScimServerConfiguration serverConfiguration)
@@ -17,7 +19,8 @@
                 new CompositionContainer(
                     new AggregateCatalog(
                         new AssemblyCatalog(Assembly.GetExecutingAssembly()),
-                        new AssemblyCatalog(Assembly.GetAssembly(typeof(ScimServerConfiguration)))));
+                        new AssemblyCatalog(Assembly.GetAssembly(typeof(ScimServerConfiguration))),
+                        new AssemblyCatalog(Assembly.GetAssembly(typeof(ScimUser2)))));
 
             // discover and register all type definitions
             var owinScimAssembly = Assembly.GetExecutingAssembly();

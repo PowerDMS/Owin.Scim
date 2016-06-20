@@ -305,6 +305,7 @@
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_grouped_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_no_filter.cs" />
+    <Compile Include="Querying\Filtering\not_precedence.cs" />
     <Compile Include="Querying\Filtering\or_brackets_equals_and_contains.cs" />
     <Compile Include="Querying\Filtering\or_present_equals.cs" />
     <Compile Include="Querying\Filtering\startswith.cs" />
@@ -366,6 +367,10 @@
     <Compile Include="Versioning\with_enterprise_users.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\Owin.Scim.v2\Owin.Scim.v2.csproj">
+      <Project>{4b87a51b-70d0-48ad-8dbf-c7256e1cbf44}</Project>
+      <Name>Owin.Scim.v2</Name>
+    </ProjectReference>
     <ProjectReference Include="..\..\Owin.Scim\Owin.Scim.csproj">
       <Project>{5ddb5f75-55ca-47ed-8132-03b757148275}</Project>
       <Name>Owin.Scim</Name>

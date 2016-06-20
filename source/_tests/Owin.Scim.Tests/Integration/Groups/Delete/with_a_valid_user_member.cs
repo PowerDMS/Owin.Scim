@@ -4,6 +4,8 @@
     using Machine.Specifications;
     using Model.Groups;
 
+    using v2.Model;
+
     public class with_a_valid_user_member : when_deleting_a_group
     {
         /// <summary>
@@ -11,12 +13,12 @@
         /// </summary>
         private Establish context = () =>
         {
-            GroupDto = new ScimGroup
+            GroupDto = new ScimGroup2
             {
                 DisplayName = Users.UserNameUtility.GenerateUserName(),
             };
 
-            ExistingGroup = CreateGroup(new ScimGroup {DisplayName = Users.UserNameUtility.GenerateUserName()});
+            ExistingGroup = CreateGroup(new ScimGroup2 {DisplayName = Users.UserNameUtility.GenerateUserName()});
 
             GroupId = ExistingGroup.Id;
         };

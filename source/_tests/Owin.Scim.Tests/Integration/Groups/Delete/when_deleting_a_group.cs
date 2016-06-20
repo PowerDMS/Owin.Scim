@@ -13,7 +13,7 @@ namespace Owin.Scim.Tests.Integration.Groups.Delete
         {
             Response = Server
                 .HttpClient
-                .DeleteAsync("groups/" + GroupId)
+                .DeleteAsync("v2/groups/" + GroupId)
                 .Result;
 
             Error = Response.StatusCode == HttpStatusCode.BadRequest

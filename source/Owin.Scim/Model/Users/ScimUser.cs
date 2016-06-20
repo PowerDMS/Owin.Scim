@@ -7,9 +7,9 @@
 
     using Newtonsoft.Json;
     
-    public class ScimUser : Resource
+    public abstract class ScimUser : Resource
     {
-        public ScimUser()
+        protected ScimUser()
         {
             /* 3.3.1.Resource Types
              * When adding a resource to a specific endpoint, the meta attribute
@@ -20,72 +20,68 @@
              */
             Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User);
         }
-
-        public override string SchemaIdentifier
-        {
-            get { return ScimConstants.Schemas.User; }
-        }
         
-        [JsonProperty(PropertyName = "userName")]
+        [JsonProperty("userName")]
         public string UserName { get; set; }
         
-        [JsonProperty(PropertyName = "name")]
+        [JsonProperty("name")]
         public Name Name { get; set; }
         
-        [JsonProperty(PropertyName = "displayName")]
+        [JsonProperty("displayName")]
         public string DisplayName { get; set; }
         
-        [JsonProperty(PropertyName = "nickName")]
+        [JsonProperty("nickName")]
         public string NickName { get; set; }
         
-        [JsonProperty(PropertyName = "profileUrl")]
+        [JsonProperty("profileUrl")]
         public Uri ProfileUrl { get; set; }
         
-        [JsonProperty(PropertyName = "title")]
+        [JsonProperty("title")]
         public string Title { get; set; }
         
-        [JsonProperty(PropertyName = "userType")]
+        [JsonProperty("userType")]
         public string UserType { get; set; }
         
-        [JsonProperty(PropertyName = "preferredLanguage")]
+        [JsonProperty("preferredLanguage")]
         public string PreferredLanguage { get; set; }
         
-        [JsonProperty(PropertyName = "locale")]
+        [JsonProperty("locale")]
         public string Locale { get; set; }
         
-        [JsonProperty(PropertyName = "timezone")]
+        [JsonProperty("timezone")]
         public string Timezone { get; set; }
         
-        [JsonProperty(PropertyName = "active")]
+        [JsonProperty("active")]
         public bool Active { get; set; }
 
+        [JsonProperty("password")]
         public string Password { get; set; }
         
-        [JsonProperty(PropertyName = "emails")]
+        [JsonProperty("emails")]
         public IEnumerable<Email> Emails { get; set; }
         
-        [JsonProperty(PropertyName = "phoneNumbers")]
+        [JsonProperty("phoneNumbers")]
         public IEnumerable<PhoneNumber> PhoneNumbers { get; set; }
         
-        [JsonProperty(PropertyName = "ims")]
+        [JsonProperty("ims")]
         public IEnumerable<InstantMessagingAddress> Ims { get; set; }
         
-        [JsonProperty(PropertyName = "photos")]
+        [JsonProperty("photos")]
         public IEnumerable<Photo> Photos { get; set; }
         
-        [JsonProperty(PropertyName = "addresses")]
+        [JsonProperty("addresses")]
         public IEnumerable<MailingAddress> Addresses { get; set; }
         
-        [JsonProperty(PropertyName = "groups")]
+        [JsonProperty("groups")]
         public IEnumerable<UserGroup> Groups { get; set; }
         
-        [JsonProperty(PropertyName = "entitlements")]
+        [JsonProperty("entitlements")]
         public IEnumerable<Entitlement> Entitlements { get; set; }
         
-        [JsonProperty(PropertyName = "roles")]
+        [JsonProperty("roles")]
         public IEnumerable<Role> Roles { get; set; }
         
-        [JsonProperty(PropertyName = "x509Certificates")]
+        [JsonProperty("x509Certificates")]
         public IEnumerable<X509Certificate> X509Certificates { get; set; }
         
         public override int CalculateVersion()

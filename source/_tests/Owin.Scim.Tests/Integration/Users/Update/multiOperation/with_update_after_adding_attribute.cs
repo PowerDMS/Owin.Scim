@@ -10,11 +10,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.multiOperation
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_update_after_adding_attribute : when_updating_a_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 DisplayName = "Danny",

@@ -6,11 +6,13 @@ namespace Owin.Scim.Tests.Validation.Users
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_invalid_emails : when_validating_a_user
     {
         Establish ctx = () =>
         {
-            User = new ScimUser
+            User = new ScimUser2
             {
                 UserName = "daniel",
                 Emails = new List<Email>

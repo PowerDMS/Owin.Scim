@@ -16,14 +16,19 @@
         {
         }
 
+        [JsonProperty("resourceType")]
         public string ResourceType { get; set; }
 
+        [JsonProperty("created")]
         public DateTime Created { get; set; }
 
+        [JsonProperty("lastModified")]
         public DateTime LastModified { get; set; }
 
+        [JsonProperty("location")]
         public Uri Location { get; set; }
 
+        [JsonProperty("version")]
         public string Version { get; set; }
     }
 }

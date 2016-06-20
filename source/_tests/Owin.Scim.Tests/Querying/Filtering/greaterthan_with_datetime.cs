@@ -8,14 +8,16 @@
     
     using Model.Users;
 
+    using v2.Model;
+
     public class greaterthan_with_datetime : when_parsing_a_filter_expression<ScimUser>
     {
         Establish context = () =>
         {
             Users = new List<ScimUser>
             {
-                new ScimUser { UserName = "BJensen", Meta = { LastModified = new DateTime(2015, 01, 01, 0, 0, 0, DateTimeKind.Utc) } },
-                new ScimUser { UserName = "ROMalley", Meta = { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
+                new ScimUser2 { UserName = "BJensen", Meta = { LastModified = new DateTime(2015, 01, 01, 0, 0, 0, DateTimeKind.Utc) } },
+                new ScimUser2 { UserName = "ROMalley", Meta = { LastModified = new DateTime(2014, 01, 01, 0, 0, 0, DateTimeKind.Utc) } }
             };
 
             FilterExpression = "meta.lastModified gt \"2014-05-13T04:42:34Z\"";

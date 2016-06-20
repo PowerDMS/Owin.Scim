@@ -4,9 +4,11 @@ namespace Owin.Scim.Tests.Versioning
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_alternate_property_values : when_generating_a_User_etags<ScimUser>
     {
-        Establish ctx = () => User = new ScimUser();
+        Establish ctx = () => User = new ScimUser2();
 
         Because of = () =>
         {

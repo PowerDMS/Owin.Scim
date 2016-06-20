@@ -11,21 +11,23 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
 
     using Users;
 
+    using v2.Model;
+
     public class with_patch_custom_user : using_a_scim_server
     {
         Establish context = () =>
         {
-            var existingUser = new ScimUser
+            var existingUser = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
 
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ScimObjectContent<ScimUser>(existingUser))
+                .PostAsync("v2/users", new ScimObjectContent<ScimUser>(existingUser))
                 .Result;
 
-            UserDto = Response.Content.ScimReadAsAsync<ScimUser>().Result;
+            UserDto = Response.Content.ScimReadAsAsync<ScimUser2>().Result;
 
            
             PatchContent = new StringContent(
@@ -68,14 +70,14 @@ namespace Owin.Scim.Tests.Integration.SchemaExtensions
                 .HttpClient
                 .SendAsync(
                     new HttpRequestMessage(
-                        new HttpMethod("PATCH"), "users/" + UserDto.Id)
+                        new HttpMethod("PATCH"), "v2/users/" + UserDto.Id)
                     {
                         Content = PatchContent
                     })
                 .Result;
             
             if (Response.StatusCode == HttpStatusCode.OK)
-                UpdatedUser = Response.Content.ScimReadAsAsync<ScimUser>().Result;
+                UpdatedUser = Response.Content.ScimReadAsAsync<ScimUser2>().Result;
         };
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);

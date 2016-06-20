@@ -8,7 +8,7 @@
     using System.Reflection;
 
     using Antlr;
-
+    using Antlr4.Runtime.Misc;
     using Antlr4.Runtime.Tree;
 
     using Extensions;
@@ -58,8 +58,8 @@
 
         public override LambdaExpression VisitAndExp(ScimFilterParser.AndExpContext context)
         {
-            var left = Visit(context.expression(0));
-            var right = Visit(context.expression(1));
+            var left = Visit(context.filter(0));
+            var right = Visit(context.filter(1));
 
             var parameter = Expression.Parameter(typeof(TResource));
             var resultBody = Expression.And(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
@@ -69,10 +69,19 @@
 
         public override LambdaExpression VisitBraceExp(ScimFilterParser.BraceExpContext context)
         {
-            return Visit(context.expression());
+            var predicate = Visit(context.filter());
+            if (context.NOT() != null)
+            {
+                var parameter = Expression.Parameter(typeof(TResource));
+                var resultBody = Expression.Not(Expression.Invoke(predicate, parameter));
+
+                return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
+            }
+
+            return predicate;
         }
 
-        public override LambdaExpression VisitBracketExp(ScimFilterParser.BracketExpContext context)
+        public override LambdaExpression VisitValPathExp(ScimFilterParser.ValPathExpContext context)
         {
             // brackets MAY change the field type (TResource) thus, the expression within the brackets 
             // should be visited in context of the new field's type
@@ -99,7 +108,7 @@
                 var argument = Expression.Parameter(typeof(TResource));
                 var childVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(childFilterType);
                 var childVisitor = (IScimFilterVisitor) childVisitorType.CreateInstance();
-                var childLambda = childVisitor.VisitExpression(context.expression()); // Visit the nested filter expression.
+                var childLambda = childVisitor.VisitExpression(context.valPathFilter()); // Visit the nested filter expression.
                 var childLambdaArgument = Expression.TryCatch(
                     Expression.Block(Expression.Property(argument, property)),
                     Expression.Catch(typeof (Exception),
@@ -138,23 +147,23 @@
 
             // TODO: (DG) This is probably incorrect if the property is nested and the same type as its parent.
             // We'll most likely still need a childLambda.
-            return Visit(context.expression());
+            return Visit(context.valPathFilter());
         }
 
-        public override LambdaExpression VisitNotExp(ScimFilterParser.NotExpContext context)
-        {
-            var predicate = Visit(context.expression());
+//        public override LambdaExpression VisitNotExp(ScimFilterParser.NotExpContext context)
+//        {
+//            var predicate = Visit(context.expression());
 
-            var parameter = Expression.Parameter(typeof(TResource));
-            var resultBody = Expression.Not(Expression.Invoke(predicate, parameter));
+//            var parameter = Expression.Parameter(typeof(TResource));
+//            var resultBody = Expression.Not(Expression.Invoke(predicate, parameter));
 
-            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
-        }
+//            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
+//        }
 
         public override LambdaExpression VisitOperatorExp(ScimFilterParser.OperatorExpContext context)
         {
             var propertyNameToken = context.FIELD().GetText();
-            var operatorToken = context.OPERATOR().GetText().ToLower();
+            var operatorToken = context.COMPAREOPERATOR().GetText().ToLower();
             var valueToken = context.VALUE().GetText().Trim('"');
 
             var property = PropertyCache
@@ -218,8 +227,8 @@
 
         public override LambdaExpression VisitOrExp(ScimFilterParser.OrExpContext context)
         {
-            var left = Visit(context.expression(0));
-            var right = Visit(context.expression(1));
+            var left = Visit(context.filter(0));
+            var right = Visit(context.filter(1));
 
             var parameter = Expression.Parameter(typeof(TResource));
             var resultBody = Expression.Or(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
@@ -241,6 +250,136 @@
             if (property == null) throw new Exception("eeeerrrooorrr"); // TODO: (DG) proper error handling
             if (property.GetGetMethod() == null) throw new Exception("error");
             
+            var argument = Expression.Parameter(typeof(TResource));
+            var predicate = Expression.Lambda<Func<TResource, bool>>(
+                Expression.Call(
+                    MethodCache["pr"]
+                    .MakeGenericMethod(typeof(TResource)),
+                        new List<Expression>
+                        {
+                            argument,
+                            Expression.Constant(property)
+                        }),
+                argument);
+
+            return predicate;
+        }
+
+        public override LambdaExpression VisitValPathAndExp([NotNull] ScimFilterParser.ValPathAndExpContext context)
+        {
+            var left = Visit(context.valPathFilter(0));
+            var right = Visit(context.valPathFilter(1));
+
+            var parameter = Expression.Parameter(typeof(TResource));
+            var resultBody = Expression.And(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
+
+            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
+        }
+
+        public override LambdaExpression VisitValPathBraceExp(ScimFilterParser.ValPathBraceExpContext context)
+        {
+            var predicate = Visit(context.valPathFilter());
+            if (context.NOT() != null)
+            {
+                var parameter = Expression.Parameter(typeof(TResource));
+                var resultBody = Expression.Not(Expression.Invoke(predicate, parameter));
+
+                return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
+            }
+
+            return predicate;
+        }
+
+        public override LambdaExpression VisitValPathOperatorExp(ScimFilterParser.ValPathOperatorExpContext context)
+        {
+            var propertyNameToken = context.FIELD().GetText();
+            var operatorToken = context.COMPAREOPERATOR().GetText().ToLower();
+            var valueToken = context.VALUE().GetText().Trim('"');
+
+            var property = PropertyCache
+                .GetOrAdd(
+                    typeof(TResource),
+                    type =>
+                    type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .ToDictionary(pi => pi.Name, pi => pi, StringComparer.OrdinalIgnoreCase))[propertyNameToken];
+
+            if (property == null) throw new Exception("ERROR"); // TODO: (DG) make proper error
+
+            var isEnumerable = property.PropertyType.IsNonStringEnumerable();
+            var argument = Expression.Parameter(typeof(TResource));
+            var left = Expression.TryCatch(
+                Expression.Block(Expression.Property(argument, property)),
+                Expression.Catch(
+                    typeof(NullReferenceException),
+                    Expression.Constant(property.PropertyType.GetDefaultValue(), property.PropertyType))
+                );
+
+            if (isEnumerable &&
+                property.PropertyType.IsGenericType &&
+                typeof(MultiValuedAttribute).IsAssignableFrom(property.PropertyType.GetGenericArguments()[0]))
+            {
+                // we're filtering an enumerable of multivaluedattribute without a sub-attribute
+                // therefore, we default to evaluating the .Value member
+
+                var multiValuedAttributeType = property.PropertyType.GetGenericArguments()[0];
+                var multiValuedAttribute = Expression.Parameter(multiValuedAttributeType);
+                var valueAttribute = multiValuedAttributeType.GetProperty("Value", BindingFlags.Public | BindingFlags.Instance);
+                var valueExpression = Expression.TryCatch(
+                    Expression.Block(Expression.Property(multiValuedAttribute, valueAttribute)),
+                    Expression.Catch(
+                        typeof(NullReferenceException),
+                        Expression.Constant(valueAttribute.PropertyType.GetDefaultValue(), valueAttribute.PropertyType))
+                    );
+
+                var valueLambda = Expression.Lambda(
+                    CreateBinaryExpression(valueExpression, valueAttribute, operatorToken, valueToken),
+                    multiValuedAttribute);
+
+                var anyMethod = MethodCache["any"].MakeGenericMethod(multiValuedAttributeType);
+                var anyPredicate = Expression.TryCatch(
+                        Expression.Block(
+                            Expression.Call(
+                                anyMethod,
+                                new List<Expression>
+                                {
+                                    left,
+                                    valueLambda
+                                })),
+                        Expression.Catch(typeof(ArgumentNullException), Expression.Constant(false)));
+
+                return Expression.Lambda(anyPredicate, argument);
+            }
+
+            return Expression.Lambda<Func<TResource, bool>>(
+                CreateBinaryExpression(left, property, operatorToken, valueToken),
+                argument);
+        }
+
+        public override LambdaExpression VisitValPathOrExp(ScimFilterParser.ValPathOrExpContext context)
+        {
+            var left = Visit(context.valPathFilter(0));
+            var right = Visit(context.valPathFilter(1));
+
+            var parameter = Expression.Parameter(typeof(TResource));
+            var resultBody = Expression.Or(Expression.Invoke(left, parameter), Expression.Invoke(right, parameter));
+
+            return Expression.Lambda<Func<TResource, bool>>(resultBody, parameter);
+        }
+
+        public override LambdaExpression VisitValPathPresentExp(ScimFilterParser.ValPathPresentExpContext context)
+        {
+            var propertyNameToken = context.FIELD().GetText();
+
+            var property = PropertyCache
+                .GetOrAdd(
+                    typeof(TResource),
+                    type =>
+                    type.GetProperties(BindingFlags.Public | BindingFlags.Instance)
+                        .ToDictionary(pi => pi.Name, pi => pi, StringComparer.OrdinalIgnoreCase))[propertyNameToken];
+
+            if (property == null) throw new Exception("eeeerrrooorrr"); // TODO: (DG) proper error handling
+            if (property.GetGetMethod() == null) throw new Exception("error");
+
             var argument = Expression.Parameter(typeof(TResource));
             var predicate = Expression.Lambda<Func<TResource, bool>>(
                 Expression.Call(

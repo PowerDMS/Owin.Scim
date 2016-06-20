@@ -7,6 +7,8 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     using Machine.Specifications;
     using Model.Users;
 
+    using v2.Model;
+
     /// <summary>
     /// my guess is that we want to still allow content-type of json
     /// </summary>
@@ -14,7 +16,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
     {
         Establish context = () =>
         {
-            UserDto = new ScimUser()
+            UserDto = new ScimUser2()
             {
                 UserName = UserNameUtility.GenerateUserName()
             };
@@ -24,7 +26,7 @@ namespace Owin.Scim.Tests.Integration.Users.Create
         {
             Response = Server
                 .HttpClient
-                .PostAsync("users", new ObjectContent<ScimUser>(UserDto, new JsonMediaTypeFormatter()))
+                .PostAsync("v2/users", new ObjectContent<ScimUser>(UserDto, new JsonMediaTypeFormatter()))
                 .Result;
 
             StatusCode = Response.StatusCode;

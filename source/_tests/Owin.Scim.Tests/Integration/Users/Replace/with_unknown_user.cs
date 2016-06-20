@@ -6,12 +6,14 @@
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_unknown_user : when_replacing_a_user
     {
         Establish context = () =>
         {
             UserId = "bogus-user-id";
-            UserDto = new ScimUser
+            UserDto = new ScimUser2
             {
                 Id = UserId,
                 UserName = "bogus-user-name",

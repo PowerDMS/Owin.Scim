@@ -2,27 +2,16 @@
 {
     using System.Collections.Generic;
     using System.Linq;
-    using System.Runtime.Serialization;
 
     using Model;
-    using Model.Users;
 
     using Newtonsoft.Json;
-
-    [KnownType(typeof(ScimUser))]
-    public class ScimListResponse : SchemaBase
+    
+    public abstract class ScimListResponse : SchemaBase
     {
-        public ScimListResponse(IEnumerable<Resource> resources)
+        protected ScimListResponse()
         {
-            Resources = resources == null ? new List<Resource>() : resources.ToList();
-        }
-
-        [JsonConstructor]
-        private ScimListResponse() { }
-
-        public override string SchemaIdentifier
-        {
-            get { return ScimConstants.Messages.ListResponse; }
+            Resources = new List<Resource>();
         }
 
         [JsonProperty("totalResults", Order = 0)]
@@ -32,7 +21,7 @@
         }
         
         [JsonProperty("Resources", Order = 1)]
-        public IEnumerable<Resource> Resources { get; private set; }
+        public IEnumerable<Resource> Resources { get; protected set; }
 
         [JsonProperty("startIndex", Order = 2)]
         public int StartIndex { get; set; }

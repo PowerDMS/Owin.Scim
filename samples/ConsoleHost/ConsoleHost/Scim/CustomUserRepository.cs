@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Net;
     using System.Threading.Tasks;
 
@@ -10,9 +11,11 @@
     using Kernel;
 
     using Owin.Scim.ErrorHandling;
+    using Owin.Scim.Extensions;
     using Owin.Scim.Model.Users;
     using Owin.Scim.Querying;
     using Owin.Scim.Repository;
+    using Owin.Scim.v2.Model;
 
     /// <summary>
     /// This example user repository illustrates how Owin.Scim can make use of external
@@ -42,7 +45,7 @@
             if (userRecord == null)
                 throw new ScimException(HttpStatusCode.BadRequest, "Could not create user.");
 
-            return _Mapper.Map<ScimUser>(userRecord);
+            return _Mapper.Map<ScimUser2>(userRecord);
         }
 
         public async Task<ScimUser> GetUser(string userId)
@@ -53,13 +56,13 @@
 
             // In real-life, don't forget to get the user's groups! i.e. ScimUser.Groups
 
-            return _Mapper.Map<ScimUser>(userRecord);
+            return _Mapper.Map<ScimUser2>(userRecord);
         }
 
         public async Task<ScimUser> UpdateUser(ScimUser user)
         {
             var kernelUser = _Mapper.Map<KernelUser>(user);
-            return _Mapper.Map<ScimUser>(await _UserManager.UpdateUser(kernelUser));
+            return _Mapper.Map<ScimUser2>(await _UserManager.UpdateUser(kernelUser));
         }
 
         public async Task DeleteUser(string userId)
@@ -67,9 +70,12 @@
             await _UserManager.DeleteUser(userId);
         }
 
-        public Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
+        public async Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
         {
-            throw new NotImplementedException();
+            var users = _Mapper.Map<IEnumerable<ScimUser2>>(await _UserManager.GetUsers());
+            var filtered = users.Where(options.Filter.ToPredicate<ScimUser2>()).ToList();
+
+            return filtered;
         }
 
         public Task<bool> IsUserNameAvailable(string userName)

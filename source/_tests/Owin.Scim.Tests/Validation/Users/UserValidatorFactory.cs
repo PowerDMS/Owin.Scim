@@ -12,7 +12,8 @@
 
     using Scim.Security;
     using Scim.Validation;
-    using Scim.Validation.Users;
+
+    using v2.Validation;
 
     public class UserValidatorFactory : IResourceValidatorFactory
     {
@@ -35,9 +36,9 @@
         public virtual Task<IValidator> CreateValidator<TResource>(TResource resource) 
             where TResource : Resource
         {
-            var userValidator = new UserValidator(
+            var userValidator = new ScimUser2Validator(
                 _ServerConfiguration,
-                new ResourceExtensionValidators(new [] { new EnterpriseUserExtensionValidator() }), 
+                new ResourceExtensionValidators(new [] { new EnterpriseUser2ExtensionValidator() }), 
                 _UserRepository,
                 _PasswordManager);
 

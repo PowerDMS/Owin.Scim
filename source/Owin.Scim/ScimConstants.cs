@@ -1,57 +1,34 @@
 ﻿namespace Owin.Scim
 {
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
 
-    public static class ScimConstants
+    public class ScimConstants
     {
-        public static class Owin
+        public static class Hosting
         {
-            public const string BasePath = @"owin.scim:basePath";
+            public const string BasePath = @"hosting:basePath";
 
-            public const string BaseUri = @"owin.scim:baseUri";
+            public const string BaseUri = @"hosting:baseUri";
 
-            public const string Host = @"owin.scim:host";
+            public const string Host = @"hosting:host";
 
-            public const string HttpMethod = @"owin.scim:httpMethod";
+            public const string HttpMethod = @"hosting:httpMethod";
 
-            public const string QueryOptions = @"owin.scim:queryOptions";
+            public const string QueryOptions = @"hosting:queryOptions";
+
+            public const string Version = @"hosting:scimVersion";
         }
 
         public static class Schemas
         {
             public const string Key = @"schemas";
-
-            public const string User = @"urn:ietf:params:scim:schemas:core:2.0:User";
-
-            public const string UserEnterprise = @"urn:ietf:params:scim:schemas:extension:enterprise:2.0:User";
-
-            public const string Group = @"urn:ietf:params:scim:schemas:core:2.0:Group";
-
-            public const string ServiceProviderConfig = @"urn:ietf:params:scim:schemas:core:2.0:ServiceProviderConfig";
-
-            public const string ResourceType = @"urn:ietf:params:scim:schemas:core:2.0:ResourceType";
-
-            public const string Schema = @"urn:ietf:params:scim:schemas:core:2.0:Schema";
-
-            public const string BulkRequest = @"urn:ietf:params:scim:api:messages:2.0:BulkRequest";
-
-            public const string BulkResponse = @"urn:ietf:params:scim:api:messages:2.0:BulkResponse";
         }
 
         public static class Messages
         {
-            public const string UriPrefix = @"urn:ietf:params:scim:api:";
-
-            public const string BulkRequest = @"urn:ietf:params:scim:api:messages:2.0:BulkRequest";
-
-            public const string BulkResponse = @"urn:ietf:params:scim:api:messages:2.0:BulkResponse";
-
             public const string Error = @"urn:ietf:params:scim:api:messages:2.0:Error";
 
             public const string PatchOp = @"urn:ietf:params:scim:api:messages:2.0:PatchOp";
-
-            public const string ListResponse = @"urn:ietf:params:scim:api:messages:2.0:ListResponse";
 
             public const string SearchRequest = @"urn:ietf:params:scim:api:messages:2.0:SearchRequest";
         }
@@ -78,19 +55,6 @@
             public const int BulkMaxPayload = 1048576;
 
             public const int FilterMaxResults = 200;
-        }
-
-        public static class Endpoints
-        {
-            public const string Users = @"users";
-
-            public const string Groups = @"groups";
-
-            public const string ResourceTypes = @"resourcetypes";
-
-            public const string ServiceProviderConfig = @"serviceproviderconfig";
-
-            public const string Schemas = @"schemas";
         }
 
         public static class DataTypes
@@ -210,16 +174,6 @@
                 @"external",
                 @"uri"
             };
-        }
-
-        public static class Maps
-        {
-            public static readonly IReadOnlyDictionary<string, string> EndpointToTypeDictionary =
-                new ReadOnlyDictionary<string, string>(new Dictionary<string, string>
-                {
-                    {Endpoints.Users, ResourceTypes.User},
-                    {Endpoints.Groups, ResourceTypes.Group}
-                });
         }
     }
 }

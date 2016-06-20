@@ -9,11 +9,13 @@ namespace Owin.Scim.Tests.Integration.Users.Update.remove
 
     using Model.Users;
 
+    using v2.Model;
+
     public class with_path_direct_attribute_no_change : when_updating_a_user
     {
         Establish context = () =>
         {
-            UserToUpdate = new ScimUser
+            UserToUpdate = new ScimUser2
             {
                 UserName = UserNameUtility.GenerateUserName(),
                 DisplayName = "Danny",

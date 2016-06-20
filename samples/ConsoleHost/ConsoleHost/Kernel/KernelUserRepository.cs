@@ -2,6 +2,7 @@
 {
     using System;
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -69,6 +70,11 @@
                 _Users
                 .Values
                 .All(u => !CryptographyUtility.CompareBytes(Encoding.UTF8.GetBytes(u.UserName), userNameBytes)));
+        }
+
+        public Task<IEnumerable<KernelUser>> GetUsers()
+        {
+            return Task.FromResult<IEnumerable<KernelUser>>(_Users.Values);
         }
     }
 }
