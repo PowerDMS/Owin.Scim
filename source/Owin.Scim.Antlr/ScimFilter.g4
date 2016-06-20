@@ -10,13 +10,13 @@ filter
 	| NOT? SP* '(' filter ')'		#braceExp
 	| FIELD '[' valPathFilter ']'		#valPathExp
 	| filter SP AND SP filter		#andExp
-	| filter SP OR SP filter		#orExp
+	| filter SP OR SP filter			#orExp
 	;
 
 valPathFilter
 	: FIELD SP PR				#valPathPresentExp
 	| FIELD SP COMPAREOPERATOR SP VALUE	#valPathOperatorExp
-	| NOT? SP* '(' valPathFilter ')'	#valPathBraceExp
+	| NOT? SP* '(' valPathFilter ')'		#valPathBraceExp
 	| valPathFilter SP AND SP valPathFilter	#valPathAndExp
 	| valPathFilter SP OR SP valPathFilter	#valPathOrExp
 	;
