@@ -1,5 +1,5 @@
 # Owin.Scim
-OWIN SCIM 2.0 implementation for .NET >= 4.5.1  
+OWIN SCIM 1.1 & 2.0 implementation for .NET >= 4.5.1  
 [![Build status](https://ci.appveyor.com/api/projects/status/qgblu9mx4f53tvee/branch/master?svg=true)](https://ci.appveyor.com/project/powerdms/owin-scim/branch/master) [![NuGet Pre Release](https://img.shields.io/nuget/vpre/Owin.Scim.svg?maxAge=1800)](https://www.nuget.org/packages/Owin.Scim/)
 
 RFC 7643  
@@ -12,11 +12,21 @@ If you have been evaluating the alpha builds from nuget, we would love to hear f
 
 Latest News!
 ============
-We're excited to announce that Owin.Scim is now actively deployed to Azure AppServices as part of our way to showcase the capabilities of Owin.Scim. You can access all live SCIM endpoints at: http://owin-scim.azurewebsites.net/ (e.g. `http://owin-scim.azurewebsites.net/scim/<endpoint>`)  
+We're excited to announce that Owin.Scim is now actively deployed to Azure AppServices as part of our way to showcase the capabilities of Owin.Scim. You can access all live SCIM endpoints at: http://owin-scim.azurewebsites.net/scim/ (e.g. `http://owin-scim.azurewebsites.net/scim/<version>/<endpoint>`)  
 
-Additionally, thanks to Okta's SCIM 2.0 efforts with creating a set of acceptence tests that may be run using RunScope's services, we can now use these scripts to offer the community confidence that Owin.Scim is a compliant server implementation.  
+####Live Endpoints for Interoperability Testing  
+#####SCIM v2  
+- http://owin-scim.azurewebsites.net/scim/v2/serviceproviderconfig
+- http://owin-scim.azurewebsites.net/scim/v2/schemas
+- http://owin-scim.azurewebsites.net/scim/v2/resourcetypes
+- http://owin-scim.azurewebsites.net/scim/v2/users
+- http://owin-scim.azurewebsites.net/scim/v2/groups
 
-https://www.runscope.com/radar/lxv41thxd6q1/b0c8fbb1-b8e7-4d3d-82b7-6f06c87d6799/history/e6b49f14-b055-4400-ad8d-bc7ca56e241d
+#####SCIM v1   
+- http://owin-scim.azurewebsites.net/scim/v1/serviceproviderconfigs
+- http://owin-scim.azurewebsites.net/scim/v1/schemas
+- http://owin-scim.azurewebsites.net/scim/v1/users
+- http://owin-scim.azurewebsites.net/scim/v1/groups
 
 PROJECT STATUS
 ==============
@@ -66,7 +76,7 @@ The list below doesn't necessarily denote priority or order.
   4. [x] Custom resource types and endpoints
 09. [x] Add endpoint authorization support
 10. [ ] Add endpoint for supporting query-on-root
-11. [ ] Add support for SCIM v1.1
+11. [x] Add support for SCIM v1.1
 12. [ ] Add logging functionality
 13. [ ] Outbound Provisioning (SCIM Event Notification)
   1. [ ] Event Triggers / Handlers
