@@ -12,7 +12,7 @@ If you have been evaluating the alpha builds from nuget, we would love to hear f
 
 Latest News!
 ============
-We're excited to announce that Owin.Scim is now actively deployed to Azure AppServices as part of our way to showcase the capabilities of Owin.Scim. You can access all live SCIM endpoints at: http://owin-scim.azurewebsites.net/ (e.g. `http://owin-scim.azurewebsites.net/scim/v2<endpoint>`)  
+We're excited to announce that Owin.Scim is now actively deployed to Azure AppServices as part of our way to showcase the capabilities of Owin.Scim. You can access all live SCIM endpoints at: http://owin-scim.azurewebsites.net/scim/ (e.g. `http://owin-scim.azurewebsites.net/scim/<version>/<endpoint>`)  
 
 ####Live Endpoints for Interoperability Testing  
 #####SCIM v2  
