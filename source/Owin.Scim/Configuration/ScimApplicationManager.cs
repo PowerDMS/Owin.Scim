@@ -21,6 +21,8 @@
 
     using Endpoints;
 
+    using Extensions;
+
     using Middleware;
 
     using Model;
@@ -42,6 +44,8 @@
 
     public class ScimApplicationManager : IApplicationComponent
     {
+        private const string BuiltInAssemblyNamePrefix = @"Owin.Scim";
+
         private readonly IAppBuilder _AppBuilder;
 
         private readonly IList<Predicate<FileInfo>> _CompositionConstraints;
@@ -94,7 +98,12 @@
             });
 
             // discover and register all type definitions
-            var owinScimAssembly = Assembly.GetExecutingAssembly();
+            var versionedSchemaTypes = new Dictionary<ScimVersion, IList<Type>>
+            {
+                { ScimVersion.One, new List<Type>() },
+                { ScimVersion.Two, new List<Type>() }
+            };
+
             var typeDefinitions = applicationConfiguration.CompositionContainer.GetExportTypesThatImplement<IScimTypeDefinition>();
             foreach (var typeDefinition in typeDefinitions)
             {
@@ -104,15 +113,26 @@
                 {
                     // already have a definition registered for the target type
                     // let's favor non-Owin.Scim definitions over built-in defaults
-                    if (distinctTypeDefinition.Assembly == owinScimAssembly && typeDefinition.Assembly != owinScimAssembly)
+                    if (distinctTypeDefinition.Assembly.FullName.StartsWith(BuiltInAssemblyNamePrefix) &&
+                        !typeDefinition.Assembly.FullName.StartsWith(BuiltInAssemblyNamePrefix))
+                    {
                         serverConfiguration.TypeDefinitionRegistry[typeDefinitionTarget] = typeDefinition;
+                    }
 
                     continue;
                 }
 
                 // register type definition
+                if (typeof(IScimSchemaTypeDefinition).IsAssignableFrom(typeDefinition))
+                {
+                    var targetVersion = typeDefinitionTarget.Namespace.GetScimVersion() ?? serverConfiguration.DefaultScimVersion;
+                    versionedSchemaTypes[targetVersion].Add(typeDefinitionTarget);
+                }
+
                 serverConfiguration.TypeDefinitionRegistry[typeDefinitionTarget] = typeDefinition;
             }
+
+            serverConfiguration.SchemaTypeVersionCache = versionedSchemaTypes;
 
             // instantiate an instance of each type definition and add it to configuration
             // type definitions MAY instantiate new type definitions themselves during attribute definition composition
@@ -274,9 +294,6 @@
 
     internal class ScimHttpControllerSelector : DefaultHttpControllerSelector
     {
-        private static readonly Regex _VersionRegex =
-            new Regex("(?:\\.)(v[0-9]+)(?:\\.)?", RegexOptions.Compiled | RegexOptions.IgnoreCase);
-
         private readonly HttpConfiguration _Configuration;
 
         public ScimHttpControllerSelector(HttpConfiguration configuration) 
@@ -306,11 +323,7 @@
 
             foreach (var controllerType in controllerTypes)
             {
-                string version = string.Empty;
-                var result = _VersionRegex.Match(controllerType.Namespace);
-                if (result.Success)
-                    version = result.Groups[1].Value; // e.g. groups[] -> /v0/, v0
-                
+                string version = controllerType.Namespace.GetScimVersion() ?? string.Empty;
                 var controllerName = controllerType.Name;//.Remove(controllerType.Name.Length - ControllerSuffix.Length);
                 var controllerKey = string.Format(CultureInfo.InvariantCulture, "{0}{1}", version, controllerName);
                 if (!dictionary.Keys.Contains(controllerKey))

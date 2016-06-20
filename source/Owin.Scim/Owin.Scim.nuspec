@@ -31,6 +31,9 @@
     <file src="..\_build\$Configuration$\Owin.Scim.xml" target="lib\net451\" />
     <file src="..\_build\$Configuration$\Owin.Scim.Antlr.dll" target="lib\net451\" />
     <file src="..\_build\$Configuration$\Owin.Scim.Antlr.pdb" target="lib\net451\" />
+    <file src="..\_build\$Configuration$\Owin.Scim.v1.dll" target="lib\net451\" />
+    <file src="..\_build\$Configuration$\Owin.Scim.v1.pdb" target="lib\net451\" />
+    <file src="..\_build\$Configuration$\Owin.Scim.v1.xml" target="lib\net451\" />
     <file src="..\_build\$Configuration$\Owin.Scim.v2.dll" target="lib\net451\" />
     <file src="..\_build\$Configuration$\Owin.Scim.v2.pdb" target="lib\net451\" />
     <file src="..\_build\$Configuration$\Owin.Scim.v2.xml" target="lib\net451\" />

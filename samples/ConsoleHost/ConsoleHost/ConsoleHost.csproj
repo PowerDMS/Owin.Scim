@@ -132,7 +132,7 @@
     <Compile Include="CompositionRoot.cs" />
     <Compile Include="Kernel\KernelUser.cs" />
     <Compile Include="Kernel\KernelUserRepository.cs" />
-    <Compile Include="Scim\CustomResourceTypes.cs" />
+    <Compile Include="Scim\v2\CustomResourceTypes.cs" />
     <Compile Include="Scim\CustomUserDefinition.cs" />
     <Compile Include="Kernel\KernelUserManager.cs" />
     <Compile Include="Scim\CustomUserRepository.cs" />

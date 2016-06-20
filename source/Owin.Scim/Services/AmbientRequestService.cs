@@ -65,7 +65,7 @@
             if (result.Success)
                 return new ScimVersion(result.Groups[1].Value); // e.g. groups[] -> /v0/, v0
 
-            return ScimVersion.Two; // TODO: (DG) Make this a default scimserverconfig setting.
+            return serverConfiguration.DefaultScimVersion;
         }
     }
 }

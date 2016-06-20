@@ -14,6 +14,7 @@
     using Owin.Scim.v2.Model;
 
     using Scim;
+    using Scim.v2;
 
     class Program
     {
@@ -79,7 +80,7 @@
             Write("Creating custom resource type, tenant ...");
             var response =
                 await
-                    client.PostAsync("tenants",
+                    client.PostAsync("v2/tenants",
                         new ObjectContent<Tenant>(new Tenant { Name = "mytenant" }, new JsonMediaTypeFormatter()));
             Write(await response.Content.ReadAsStringAsync());
             if (response.StatusCode == HttpStatusCode.Created)
@@ -87,7 +88,7 @@
                 var tenant = await response.Content.ReadAsAsync<Tenant>(new[] { new JsonMediaTypeFormatter() });
                 Write("");
                 Write("Getting custom resource type, tenant " + tenant.Id);
-                var json = await client.GetStringAsync("tenants/" + tenant.Id);
+                var json = await client.GetStringAsync("v2/tenants/" + tenant.Id);
                 Write(json);
             }
             Write("");

@@ -1,4 +1,4 @@
-﻿namespace ConsoleHost.Scim
+﻿namespace ConsoleHost.Scim.v2
 {
     using System;
     using System.Collections.Generic;
@@ -30,7 +30,7 @@
         public string Name { get; set; }
     }
 
-    [RoutePrefix("tenants")]
+    [RoutePrefix("v2/tenants")]
     public class TenantsController : ScimControllerBase
     {
         private static readonly IDictionary<string, Tenant> _DB = 
@@ -41,7 +41,7 @@
         {
         }
 
-        [Route(Name = "CreateTenant")]
+        [Route]
         public Task<HttpResponseMessage> Post(Tenant tenant)
         {
             tenant.Id = Guid.NewGuid().ToString("N");

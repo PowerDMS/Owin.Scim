@@ -1,8 +1,6 @@
 ﻿namespace Owin.Scim.v1.Services
 {
     using System.Collections.Generic;
-    using System.Net;
-    using System.Threading.Tasks;
 
     using Configuration;
 
@@ -20,13 +18,6 @@
         {
         }
 
-        public override Task<IScimResponse<ScimSchema>> GetSchema(string schemaId)
-        {
-            return Task.FromResult<IScimResponse<ScimSchema>>(
-                new ScimErrorResponse<ScimSchema>(
-                    new ScimError(HttpStatusCode.BadRequest)));
-        }
-
         protected override IReadOnlyDictionary<string, ScimSchema> CreateSchemas()
         {
             var schemas = new Dictionary<string, ScimSchema>();
@@ -39,10 +30,10 @@
                 }
 
                 schemas.Add(
-                    string.Format("{0}:{1}", std.Schema, std.Name),
+                    std.Name,
                     SetResourceVersion(
                         new ScimSchema1(
-                            std.Schema, 
+                            std.Schema + ":" + std.Name, 
                             std.Name, 
                             std.Description, 
                             attributeDefinitions)));

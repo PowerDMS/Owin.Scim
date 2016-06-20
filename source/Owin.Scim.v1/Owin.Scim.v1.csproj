@@ -91,6 +91,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Registry.cs" />
     <Compile Include="ScimConstantsV1.cs" />
+    <Compile Include="Serialization\SingleElementStringConverter.cs" />
     <Compile Include="Services\ScimSchema1Service.cs" />
     <Compile Include="Services\ServiceProviderConfiguration1Service.cs" />
     <Compile Include="Validation\EnterpriseUser1ExtensionValidator.cs" />

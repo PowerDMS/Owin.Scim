@@ -113,6 +113,8 @@
             get { return _ResourceExtensionCache.Value; }
         }
 
+        internal IDictionary<ScimVersion, IList<Type>> SchemaTypeVersionCache { get; set; }
+
         /// <summary>
         /// Gets the type definition registry which is a map of <see cref="Resource"/> 
         /// to its associated <see cref="IScimResourceTypeDefinition"/> type.
@@ -123,6 +125,11 @@
             get { return _TypeDefinitionRegistry; }
         }
 
+        public ScimVersion DefaultScimVersion
+        {
+            get { return ScimVersion.Two; }
+        }
+
         /// <summary>
         /// Gets the <see cref="IScimSchemaTypeDefinition"/>s for the specified <paramref name="version"/>.
         /// </summary>
@@ -130,7 +137,9 @@
         /// <returns>IEnumerable&lt;IScimSchemaTypeDefinition&gt;.</returns>
         public IEnumerable<IScimSchemaTypeDefinition> GetSchemaTypeDefinitions(ScimVersion version)
         {
-            return _TypeDefinitionCache.Values.OfType<IScimSchemaTypeDefinition>(); // TODO: (DG) add versioning
+            return SchemaTypeVersionCache[version]
+                .Select(type => _TypeDefinitionCache[type])
+                .OfType<IScimSchemaTypeDefinition>();
         }
 
         /// <summary>
@@ -140,7 +149,9 @@
         /// <returns>IEnumerable&lt;IScimResourceTypeDefinition&gt;.</returns>
         public IEnumerable<IScimResourceTypeDefinition> GetResourceTypeDefinitions(ScimVersion version)
         {
-            return _TypeDefinitionCache.Values.OfType<IScimResourceTypeDefinition>(); // TODO: (DG) add versioning
+            return SchemaTypeVersionCache[version]
+                .Select(type => _TypeDefinitionCache[type])
+                .OfType<IScimResourceTypeDefinition>();
         }
 
         /// <summary>
@@ -371,7 +382,7 @@
             return rtd.ValidatorType;
         }
 
-        internal void AddTypeDefiniton(ScimVersion version, IScimTypeDefinition scimTypeDefinition)
+        internal void AddTypeDefiniton(IScimTypeDefinition scimTypeDefinition)
         {
             if (_TypeDefinitionCache.ContainsKey(scimTypeDefinition.DefinitionType)) return;
 

@@ -5,13 +5,13 @@
 
     using ErrorHandling;
 
-    public class ScimVersion : IEquatable<ScimVersion>
+    public sealed class ScimVersion : IEquatable<ScimVersion>
     {
         private static readonly ScimVersion _One = new ScimVersion("v1");
 
         private static readonly ScimVersion _Two = new ScimVersion("v2");
 
-        protected internal ScimVersion(string version)
+        internal ScimVersion(string version)
         {
             if (string.IsNullOrWhiteSpace(version))
                 throw new ScimException(HttpStatusCode.InternalServerError, "ScimVersion cannot be null.");
