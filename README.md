@@ -15,6 +15,8 @@ Latest News!
 We're excited to announce that Owin.Scim is now actively deployed to Azure AppServices as part of our way to showcase the capabilities of Owin.Scim. You can access all live SCIM endpoints at: http://owin-scim.azurewebsites.net/scim/ (e.g. `http://owin-scim.azurewebsites.net/scim/<version>/<endpoint>`)  
 
 ####Live Endpoints for Interoperability Testing  
+*NOTE:* The current live implementation is being hosted inside IIS which unfortunately blocks `:` in URL paths if they exist before the `?` query-string delimiter. Therefore, live endpoints for `/schemas/{schemaId}` and `/resourcetypes/{resourceTypeId}` are not accessible, however, they do work. We'll look to host our sample differently in the future.
+
 #####SCIM v2  
 - http://owin-scim.azurewebsites.net/scim/v2/serviceproviderconfig
 - http://owin-scim.azurewebsites.net/scim/v2/schemas
