@@ -31,6 +31,10 @@
         {
             user.Id = Guid.NewGuid().ToString("N");
 
+            var createdDate = DateTime.UtcNow;
+            user.Meta.Created = createdDate;
+            user.Meta.LastModified = createdDate;
+
             _Users.TryAdd(user.Id, user);
 
             return user;
@@ -56,6 +60,7 @@
             if (!_Users.ContainsKey(user.Id))
                 return user;
 
+            user.Meta.LastModified = DateTime.UtcNow;
             _Users[user.Id] = user;
 
             return user;

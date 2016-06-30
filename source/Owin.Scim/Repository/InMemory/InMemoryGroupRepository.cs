@@ -28,6 +28,10 @@
         {
             group.Id = Guid.NewGuid().ToString("N");
 
+            var createdDate = DateTime.UtcNow;
+            group.Meta.Created = createdDate;
+            group.Meta.LastModified = createdDate;
+
             _Groups.Add(group.Id, group);
 
             return group;
@@ -46,6 +50,7 @@
             if (!_Groups.ContainsKey(group.Id))
                 return null;
 
+            group.Meta.LastModified = DateTime.UtcNow;
             _Groups[group.Id] = group;
 
             return group;

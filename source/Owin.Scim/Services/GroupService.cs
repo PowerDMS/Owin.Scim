@@ -1,6 +1,5 @@
 ﻿namespace Owin.Scim.Services
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -52,12 +51,7 @@
             if (!validationResult)
                 return new ScimErrorResponse<ScimGroup>(validationResult.Errors.First());
 
-            var createdDate = DateTime.UtcNow;
-            group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group)
-            {
-                Created = createdDate,
-                LastModified = createdDate
-            };
+            group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group);
             
             var groupRecord = await _GroupRepository.CreateGroup(group);
 
@@ -74,6 +68,12 @@
                     new ScimError(
                         HttpStatusCode.NotFound,
                         detail: ScimErrorDetail.NotFound(groupId)));
+
+            // repository populates meta only if it sets Created and/or LastModified
+            if (userRecord.Meta == null)
+            {
+                userRecord.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group);
+            }
 
             return new ScimDataResponse<ScimGroup>(userRecord);
         }
@@ -103,9 +103,10 @@
                     if (group.Meta.Version.Equals(groupRecord.Meta.Version))
                         return new ScimDataResponse<ScimGroup>(groupRecord);
 
-                    group.Meta.LastModified = DateTime.UtcNow;
-
                     var updatedGroup = await _GroupRepository.UpdateGroup(group);
+
+                    // set version of updated entity returned by repository
+                    SetResourceVersion(updatedGroup);
 
                     return new ScimDataResponse<ScimGroup>(updatedGroup);
                 });
@@ -128,7 +129,16 @@
         public async Task<IScimResponse<IEnumerable<ScimGroup>>> QueryGroups(ScimQueryOptions options)
         {
             var groups = await _GroupRepository.QueryGroups(options) ?? new List<ScimGroup>();
-            groups.ForEach(group => SetResourceVersion(group));
+            groups.ForEach(group =>
+            {
+                // repository populates meta only if it sets Created and/or LastModified
+                if (group.Meta == null)
+                {
+                    group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group);
+                }
+
+                SetResourceVersion(group);
+            });
 
             return new ScimDataResponse<IEnumerable<ScimGroup>>(groups);
         }

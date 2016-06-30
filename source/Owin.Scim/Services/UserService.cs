@@ -1,6 +1,5 @@
 ﻿namespace Owin.Scim.Services
 {
-    using System;
     using System.Collections.Generic;
     using System.Net;
     using System.Linq;
@@ -65,12 +64,7 @@
             if (user.Password != null)
                 user.Password = _PasswordManager.CreateHash(user.Password);
 
-            var createdDate = DateTime.UtcNow;
-            user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
-            {
-                Created = createdDate,
-                LastModified = createdDate
-            };
+            user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User);
 
             var userRecord = await _UserRepository.CreateUser(user);
             if (userRecord == null)
@@ -94,6 +88,12 @@
                         HttpStatusCode.NotFound,
                         detail: ScimErrorDetail.NotFound(userId)));
 
+            // repository populates meta only if it sets Created and/or LastModified
+            if (userRecord.Meta == null)
+            {
+                userRecord.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User);
+            }
+
             SetResourceVersion(userRecord);
 
             return new ScimDataResponse<ScimUser>(userRecord);
@@ -108,7 +108,6 @@
                     user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User)
                     {
                         Created = userRecord.Meta.Created,
-                        LastModified = userRecord.Meta.LastModified
                     };
 
                     _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(user.GetType()));
@@ -140,11 +139,12 @@
 
                     // if both versions are equal, bypass persistence
                     if (user.Meta.Version.Equals(userRecord.Meta.Version))
-                        return new ScimDataResponse<ScimUser>(user);
-
-                    user.Meta.LastModified = DateTime.UtcNow;
+                        return new ScimDataResponse<ScimUser>(userRecord);
 
                     var updatedUser = await _UserRepository.UpdateUser(user);
+
+                    // set version of updated entity returned by repository
+                    SetResourceVersion(updatedUser);
 
                     return new ScimDataResponse<ScimUser>(updatedUser);
                 });
@@ -167,7 +167,16 @@
         public async Task<IScimResponse<IEnumerable<ScimUser>>> QueryUsers(ScimQueryOptions options)
         {
             var users = await _UserRepository.QueryUsers(options) ?? new List<ScimUser>();
-            users.ForEach(user => SetResourceVersion(user));
+            users.ForEach(user =>
+            {
+                // repository populates meta only if it sets Created and/or LastModified
+                if (user.Meta == null)
+                {
+                    user.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.User);
+                }
+
+                SetResourceVersion(user);
+            });
 
             return new ScimDataResponse<IEnumerable<ScimUser>>(users);
         }
