@@ -6,10 +6,10 @@
     using System.Web.Http.ExceptionHandling;
 
     /// <summary>
-    /// This disables WebApi exception handling
+    /// This disables WebApi exception handling, based on a pass-through exception handler:
     /// ref https://www.jayway.com/2016/01/08/improving-error-handling-asp-net-web-api-2-1-owin/
     /// </summary>
-    public class PassthroughExceptionHandler : IExceptionHandler
+    public class OwinScimExceptionHandler : IExceptionHandler
     {
         /// <summary>
         /// 
@@ -17,7 +17,7 @@
         /// <param name="context"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public Task HandleAsync(ExceptionHandlerContext context, CancellationToken cancellationToken)
+        public virtual Task HandleAsync(ExceptionHandlerContext context, CancellationToken cancellationToken)
         {
             var info = ExceptionDispatchInfo.Capture(context.Exception);
             info.Throw();

@@ -8,14 +8,10 @@
     using System.IO;
     using System.Linq;
     using System.Net.Http;
-    using System.Reflection;
-    using System.Text.RegularExpressions;
     using System.Web.Http;
     using System.Web.Http.Controllers;
     using System.Web.Http.ExceptionHandling;
     using System.Web.Http.Dispatcher;
-    using System.Web.Http.Routing;
-
     using DryIoc;
     using DryIoc.WebApi;
 
@@ -265,7 +261,11 @@
             // refer to https://tools.ietf.org/html/rfc7644#section-3.1
             httpConfiguration.Formatters.JsonFormatter.SupportedMediaTypes.Add(new System.Net.Http.Headers.MediaTypeHeaderValue("application/scim+json"));
 
-            httpConfiguration.Services.Replace(typeof(IExceptionHandler), new PassthroughExceptionHandler());
+            // See if user already provided an exception handler
+            if (!(httpConfiguration.Services.GetService(typeof (IExceptionHandler)) is OwinScimExceptionHandler))
+            {
+                httpConfiguration.Services.Replace(typeof(IExceptionHandler), new OwinScimExceptionHandler());
+            }
             httpConfiguration.Services.Replace(typeof(IHttpControllerTypeResolver), new DefaultHttpControllerTypeResolver(IsControllerType));
             httpConfiguration.Services.Replace(typeof(IHttpControllerSelector), new ScimHttpControllerSelector(httpConfiguration));
 
