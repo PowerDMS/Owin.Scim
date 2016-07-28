@@ -68,7 +68,10 @@ namespace Owin.Scim.v2.Endpoints
                     SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
                     SetETagHeader(response, user);
 
-                    user.Groups?.ForEach(userGroup => userGroup.Ref = GetGroupUri(userGroup.Value));
+                    // materialize enumerable
+                    var groups = user.Groups?.ToList();
+                    groups?.ForEach(userGroup => userGroup.Ref = GetGroupUri(GroupsController.RetrieveGroupRouteName, userGroup.Value));
+                    user.Groups = groups;
                 });
         }
 
@@ -93,9 +96,9 @@ namespace Owin.Scim.v2.Endpoints
                 .Let(users => users.ForEach(user => SetMetaLocation(user, RetrieveUserRouteName, new {userId = user.Id})))
                 .Let(users => users.ForEach(user =>
                 {
-                    // materialize ienumerable, otherwise it does not work
+                    // materialize enumerable, otherwise it does not work
                     var groups = user.Groups?.ToList();
-                    groups?.ForEach(ug => ug.Ref = GetGroupUri(ug.Value));
+                    groups?.ForEach(ug => ug.Ref = GetGroupUri(GroupsController.RetrieveGroupRouteName, ug.Value));
                     user.Groups = groups;
                 }))
                 .Bind(
@@ -170,16 +173,6 @@ namespace Owin.Scim.v2.Endpoints
         {
             return (await _UserService.DeleteUser(userId))
                 .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
-        }
-
-        [NonAction]
-        private Uri GetGroupUri(string groupId)
-        {
-            var test = new Uri(
-                Request
-                    .GetUrlHelper()
-                    .Link(GroupsController.RetrieveGroupRouteName, new {groupId = groupId}));
-            return test;
         }
     }
 }

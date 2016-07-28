@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.v1.Endpoints
 {
+    using System.Linq;
     using System.Net;
     using System.Net.Http;
     using System.Threading.Tasks;
@@ -52,6 +53,11 @@
         {
             return (await _GroupService.RetrieveGroup(groupId))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .Let(group =>
+                    group.Members?.ForEach(m =>
+                        m.Ref = m.Type == ScimConstants.ResourceTypes.User
+                            ? GetUserUri(UsersController.RetrieveUserRouteName, m.Value)
+                            : GetGroupUri(RetrieveGroupRouteName, m.Value)))
                 .ToHttpResponseMessage(Request, (group, response) =>
                 {
                     SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
@@ -71,6 +77,16 @@
         {
             return (await _GroupService.QueryGroups(options))
                 .Let(groups => groups.ForEach(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id })))
+                .Let(groups => groups.ForEach(group =>
+                {
+                    // needed to materialize ienumerable, otherwise it did not work
+                    var members = group.Members?.ToList();
+                    members?.ForEach(m =>
+                        m.Ref = m.Type == ScimConstants.ResourceTypes.User
+                            ? GetUserUri(UsersController.RetrieveUserRouteName, m.Value)
+                            : GetGroupUri(RetrieveGroupRouteName, m.Value));
+                    group.Members = members;
+                }))
                 .Bind(
                     groups =>
                     new ScimDataResponse<ScimListResponse>(

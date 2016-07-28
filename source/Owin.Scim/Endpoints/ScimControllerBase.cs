@@ -57,5 +57,25 @@ namespace Owin.Scim.Endpoints
 
             return item;
         }
+
+        [NonAction]
+        protected Uri GetGroupUri(string routeName, string groupId)
+        {
+            var test = new Uri(
+                Request
+                    .GetUrlHelper()
+                    .Link(routeName, new { groupId = groupId }));
+            return test;
+        }
+
+        [NonAction]
+        protected Uri GetUserUri(string routeName, string userId)
+        {
+            var test = new Uri(
+                Request
+                    .GetUrlHelper()
+                    .Link(routeName, new { userId = userId }));
+            return test;
+        }
     }
 }

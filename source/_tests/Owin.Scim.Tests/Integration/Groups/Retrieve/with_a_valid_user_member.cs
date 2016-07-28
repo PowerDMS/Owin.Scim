@@ -1,5 +1,6 @@
 ﻿namespace Owin.Scim.Tests.Integration.Groups.Retrieve
 {
+    using System.Linq;
     using System.Net;
     using Machine.Specifications;
 
@@ -30,7 +31,15 @@
 
         It should_return_ok = () => Response.StatusCode.ShouldEqual(HttpStatusCode.OK);
 
-        It should_return_group_data = () => RetrievedGroup.ShouldBeLike(ExistingGroup);
+        It should_return_group_data = () =>
+        {
+            RetrievedGroup.Members.ShouldNotBeNull();
+            var members = RetrievedGroup.Members.ToList();
+            members.Count.ShouldEqual(1);
+            members[0].Value.ShouldEqual(ExistingUser.Id);
+            members[0].Type.ShouldEqual("User");
+            members[0].Ref.ShouldEqual(ExistingUser.Meta.Location);
+        };
 
         It should_return_header_location = () =>
         {
