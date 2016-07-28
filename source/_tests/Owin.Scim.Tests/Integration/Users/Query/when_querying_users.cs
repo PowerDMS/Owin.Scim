@@ -16,10 +16,12 @@
                 .GetAsync("users/?" + QueryString)
                 .AwaitResponse()
                 .AsTask;
-            
-            ListResponse = Response.StatusCode == HttpStatusCode.OK
-                ? await Response.Content.ScimReadAsAsync<ScimListResponse>().AwaitResponse().AsTask
-                : null;
+
+            var test = await Response.Content.ReadAsStringAsync();
+
+            //ListResponse = Response.StatusCode == HttpStatusCode.OK
+            //    ? await Response.Content.ScimReadAsAsync<ScimListResponse>().AwaitResponse().AsTask
+            //    : null;
         };
 
         protected static string QueryString;

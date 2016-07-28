@@ -216,6 +216,7 @@
     <Compile Include="Integration\Users\Delete\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Delete\with_an_invalid_userid.cs" />
     <Compile Include="Integration\Users\Query\when_querying_users.cs" />
+    <Compile Include="Integration\Users\Query\with_a_filter_and_enterprise_user.cs" />
     <Compile Include="Integration\Users\Query\with_a_filter.cs" />
     <Compile Include="Integration\Users\Replace\when_replacing_a_user.cs" />
     <Compile Include="Integration\Users\Replace\with_unknown_user.cs" />

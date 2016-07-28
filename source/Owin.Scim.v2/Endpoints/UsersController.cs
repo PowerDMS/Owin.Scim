@@ -1,4 +1,6 @@
-﻿namespace Owin.Scim.v2.Endpoints
+﻿using System.Collections.Generic;
+
+namespace Owin.Scim.v2.Endpoints
 {
     using System;
     using System.Linq;
@@ -66,16 +68,7 @@
                     SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
                     SetETagHeader(response, user);
 
-                    if (user.Groups != null)
-                    {
-                        foreach (var userGroup in user.Groups)
-                        {
-                            userGroup.Ref = new Uri(
-                                Request
-                                    .GetUrlHelper()
-                                    .Link(GroupsController.RetrieveGroupRouteName, new { groupId = userGroup.Value }));
-                        }
-                    }
+                    user.Groups?.ForEach(userGroup => userGroup.Ref = GetGroupUri(userGroup.Value));
                 });
         }
 
@@ -97,15 +90,22 @@
         private async Task<HttpResponseMessage> Query(ScimQueryOptions options)
         {
             return (await _UserService.QueryUsers(options))
-                .Let(users => users.ForEach(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id })))
+                .Let(users => users.ForEach(user => SetMetaLocation(user, RetrieveUserRouteName, new {userId = user.Id})))
+                .Let(users => users.ForEach(user =>
+                {
+                    // materialize ienumerable, otherwise it does not work
+                    var groups = user.Groups?.ToList();
+                    groups?.ForEach(ug => ug.Ref = GetGroupUri(ug.Value));
+                    user.Groups = groups;
+                }))
                 .Bind(
-                    users => 
-                    new ScimDataResponse<ScimListResponse>(
-                        new ScimListResponse2(users)
-                        {
-                            StartIndex = options.StartIndex,
-                            ItemsPerPage = options.Count
-                        }))
+                    users =>
+                        new ScimDataResponse<ScimListResponse>(
+                            new ScimListResponse2(users)
+                            {
+                                StartIndex = options.StartIndex,
+                                ItemsPerPage = options.Count
+                            }))
                 .ToHttpResponseMessage(Request);
         }
 
@@ -170,6 +170,16 @@
         {
             return (await _UserService.DeleteUser(userId))
                 .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
+        }
+
+        [NonAction]
+        private Uri GetGroupUri(string groupId)
+        {
+            var test = new Uri(
+                Request
+                    .GetUrlHelper()
+                    .Link(GroupsController.RetrieveGroupRouteName, new {groupId = groupId}));
+            return test;
         }
     }
 }
