@@ -78,9 +78,22 @@
             return new ScimDataResponse<ScimGroup>(userRecord);
         }
 
+        /// <summary>
+        /// Override if you which for UpdateGroup not to use RetrieveGroup to get the committed state
+        /// of the group. For example, if RetrieveGroup returns a list of Members that is filtered
+        /// based on the login user view rights.
+        /// </summary>
+        /// <param name="groupId"></param>
+        /// <returns></returns>
+        public virtual Task<IScimResponse<ScimGroup>> RetrieveGroupForUpdate(string groupId)
+        {
+            return RetrieveGroup(groupId);
+        }
+
+
         public async Task<IScimResponse<ScimGroup>> UpdateGroup(ScimGroup group)
         {
-            return await (await RetrieveGroup(group.Id))
+            return await (await RetrieveGroupForUpdate(group.Id))
                 .BindAsync<ScimGroup, ScimGroup>(async groupRecord =>
                 {
                     group.Meta = new ResourceMetadata(ScimConstants.ResourceTypes.Group)

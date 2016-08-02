@@ -15,6 +15,8 @@
 
         Task<IScimResponse<ScimGroup>> RetrieveGroup(string groupId);
 
+        Task<IScimResponse<ScimGroup>> RetrieveGroupForUpdate(string groupId);
+
         Task<IScimResponse<ScimGroup>> UpdateGroup(ScimGroup group);
 
         Task<IScimResponse<Unit>> DeleteGroup(string groupId);
