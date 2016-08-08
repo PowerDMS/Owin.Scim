@@ -126,7 +126,7 @@
                     .ToHttpResponseMessage(Request);
             }
 
-            return (await (await _GroupService.RetrieveGroupForUpdate(groupId))
+            return (await (await _GroupService.RetrieveGroup(groupId))
                 .Bind(group =>
                 {
                     try
