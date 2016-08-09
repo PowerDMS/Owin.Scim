@@ -51,7 +51,7 @@
             _ResourceValidatorFactory = resourceValidatorFactory;
         }
 
-        public async Task<IScimResponse<ScimUser>> CreateUser(ScimUser user)
+        public virtual async Task<IScimResponse<ScimUser>> CreateUser(ScimUser user)
         {
             _CanonicalizationService.Canonicalize(user, ServerConfiguration.GetScimTypeDefinition(user.GetType()));
 
@@ -79,7 +79,7 @@
             return new ScimDataResponse<ScimUser>(userRecord);
         }
 
-        public async Task<IScimResponse<ScimUser>> RetrieveUser(string userId)
+        public virtual async Task<IScimResponse<ScimUser>> RetrieveUser(string userId)
         {
             var userRecord = await _UserRepository.GetUser(userId);
             if (userRecord == null)
@@ -99,7 +99,7 @@
             return new ScimDataResponse<ScimUser>(userRecord);
         }
 
-        public async Task<IScimResponse<ScimUser>> UpdateUser(ScimUser user)
+        public virtual async Task<IScimResponse<ScimUser>> UpdateUser(ScimUser user)
         {
             return await (await RetrieveUser(user.Id))
                 .BindAsync<ScimUser, ScimUser>(async userRecord =>
@@ -150,7 +150,7 @@
                 });
         }
 
-        public async Task<IScimResponse<Unit>> DeleteUser(string userId)
+        public virtual async Task<IScimResponse<Unit>> DeleteUser(string userId)
         {
             var exists = await _UserRepository.UserExists(userId);
             if (!exists)
@@ -164,7 +164,7 @@
             return new ScimDataResponse<Unit>(default(Unit));
         }
 
-        public async Task<IScimResponse<IEnumerable<ScimUser>>> QueryUsers(ScimQueryOptions options)
+        public virtual async Task<IScimResponse<IEnumerable<ScimUser>>> QueryUsers(ScimQueryOptions options)
         {
             var users = await _UserRepository.QueryUsers(options) ?? new List<ScimUser>();
             users.ForEach(user =>

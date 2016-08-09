@@ -41,7 +41,7 @@
             _CanonicalizationService = canonicalizationService;
         }
 
-        public async Task<IScimResponse<ScimGroup>> CreateGroup(ScimGroup group)
+        public virtual async Task<IScimResponse<ScimGroup>> CreateGroup(ScimGroup group)
         {
             _CanonicalizationService.Canonicalize(group, ServerConfiguration.GetScimTypeDefinition(group.GetType()));
 
@@ -60,7 +60,7 @@
             return new ScimDataResponse<ScimGroup>(groupRecord);
         }
 
-        public async Task<IScimResponse<ScimGroup>> RetrieveGroup(string groupId)
+        public virtual async Task<IScimResponse<ScimGroup>> RetrieveGroup(string groupId)
         {
             var userRecord = SetResourceVersion(await _GroupRepository.GetGroup(groupId));
             if (userRecord == null)
@@ -78,7 +78,7 @@
             return new ScimDataResponse<ScimGroup>(userRecord);
         }
 
-        public async Task<IScimResponse<ScimGroup>> UpdateGroup(ScimGroup group)
+        public virtual async Task<IScimResponse<ScimGroup>> UpdateGroup(ScimGroup group)
         {
             return await (await RetrieveGroup(group.Id))
                 .BindAsync<ScimGroup, ScimGroup>(async groupRecord =>
@@ -112,7 +112,7 @@
                 });
         }
 
-        public async Task<IScimResponse<Unit>> DeleteGroup(string groupId)
+        public virtual async Task<IScimResponse<Unit>> DeleteGroup(string groupId)
         {
             var groupExists = await _GroupRepository.GroupExists(groupId);
             if (!groupExists)
@@ -126,7 +126,7 @@
             return new ScimDataResponse<Unit>(default(Unit));
         }
 
-        public async Task<IScimResponse<IEnumerable<ScimGroup>>> QueryGroups(ScimQueryOptions options)
+        public virtual async Task<IScimResponse<IEnumerable<ScimGroup>>> QueryGroups(ScimQueryOptions options)
         {
             var groups = await _GroupRepository.QueryGroups(options) ?? new List<ScimGroup>();
             groups.ForEach(group =>
