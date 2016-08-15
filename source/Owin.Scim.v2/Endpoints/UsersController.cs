@@ -63,15 +63,11 @@ namespace Owin.Scim.v2.Endpoints
         {
             return (await _UserService.RetrieveUser(userId))
                 .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
+                .Let(PopulateUserGroupRef)
                 .ToHttpResponseMessage(Request, (user, response) =>
                 {
                     SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
                     SetETagHeader(response, user);
-
-                    // materialize enumerable
-                    var groups = user.Groups?.ToList();
-                    groups?.ForEach(userGroup => userGroup.Ref = GetGroupUri(GroupsController.RetrieveGroupRouteName, userGroup.Value));
-                    user.Groups = groups;
                 });
         }
 
@@ -94,13 +90,7 @@ namespace Owin.Scim.v2.Endpoints
         {
             return (await _UserService.QueryUsers(options))
                 .Let(users => users.ForEach(user => SetMetaLocation(user, RetrieveUserRouteName, new {userId = user.Id})))
-                .Let(users => users.ForEach(user =>
-                {
-                    // materialize enumerable, otherwise it does not work
-                    var groups = user.Groups?.ToList();
-                    groups?.ForEach(ug => ug.Ref = GetGroupUri(GroupsController.RetrieveGroupRouteName, ug.Value));
-                    user.Groups = groups;
-                }))
+                .Let(users => users.ForEach(PopulateUserGroupRef))
                 .Bind(
                     users =>
                         new ScimDataResponse<ScimListResponse>(
@@ -146,6 +136,7 @@ namespace Owin.Scim.v2.Endpoints
                 })
                 .BindAsync(user => _UserService.UpdateUser(user)))
                 .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
+                .Let(PopulateUserGroupRef)
                 .ToHttpResponseMessage(Request, (user, response) =>
                 {
                     SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
@@ -161,6 +152,7 @@ namespace Owin.Scim.v2.Endpoints
 
             return (await _UserService.UpdateUser(userDto))
                 .Let(user => SetMetaLocation(user, RetrieveUserRouteName, new { userId = user.Id }))
+                .Let(PopulateUserGroupRef)
                 .ToHttpResponseMessage(Request, (user, response) =>
                 {
                     SetContentLocationHeader(response, RetrieveUserRouteName, new { userId = user.Id });
@@ -173,6 +165,14 @@ namespace Owin.Scim.v2.Endpoints
         {
             return (await _UserService.DeleteUser(userId))
                 .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
+        }
+
+        private void PopulateUserGroupRef(ScimUser user)
+        {
+            // materialize enumerable, otherwise it does not work
+            var groups = user.Groups?.ToList();
+            groups?.ForEach(ug => ug.Ref = GetGroupUri(GroupsController.RetrieveGroupRouteName, ug.Value));
+            user.Groups = groups;
         }
     }
 }

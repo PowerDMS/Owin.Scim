@@ -45,6 +45,7 @@
         {
             return (await _GroupService.CreateGroup(groupDto))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .Let(PopulateMemberRef)
                 .ToHttpResponseMessage(Request, (group, response) =>
                 {
                     response.StatusCode = HttpStatusCode.Created;
@@ -59,11 +60,7 @@
         {
             return (await _GroupService.RetrieveGroup(groupId))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new {groupId = group.Id}))
-                .Let(group =>
-                    group.Members?.ForEach(m =>
-                        m.Ref = m.Type == ScimConstants.ResourceTypes.User
-                            ? GetUserUri(UsersController.RetrieveUserRouteName, m.Value)
-                            : GetGroupUri(RetrieveGroupRouteName, m.Value)))
+                .Let(PopulateMemberRef)
                 .ToHttpResponseMessage(Request, (group, response) =>
                 {
                     SetContentLocationHeader(response, RetrieveGroupRouteName, new {groupId = group.Id});
@@ -90,16 +87,7 @@
         {
             return (await _GroupService.QueryGroups(options))
                 .Let(groups => groups.ForEach(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id })))
-                .Let(groups => groups.ForEach(group =>
-                {
-                    // needed to materialize ienumerable, otherwise it did not work
-                    var members = group.Members?.ToList();
-                    members?.ForEach(m =>
-                        m.Ref = m.Type == ScimConstants.ResourceTypes.User
-                            ? GetUserUri(UsersController.RetrieveUserRouteName, m.Value)
-                            : GetGroupUri(RetrieveGroupRouteName, m.Value));
-                    group.Members = members;
-                }))
+                .Let(groups => groups.ForEach(PopulateMemberRef))
                 .Bind(
                     groups =>
                     new ScimDataResponse<ScimListResponse>(
@@ -145,6 +133,7 @@
                 })
                 .BindAsync(group => _GroupService.UpdateGroup(group)))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .Let(PopulateMemberRef)
                 .ToHttpResponseMessage(Request, (group, response) =>
                 {
                     SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
@@ -160,6 +149,7 @@
 
             return (await _GroupService.UpdateGroup(groupDto))
                 .Let(group => SetMetaLocation(group, RetrieveGroupRouteName, new { groupId = group.Id }))
+                .Let(PopulateMemberRef)
                 .ToHttpResponseMessage(Request, (group, response) =>
                 {
                     SetContentLocationHeader(response, RetrieveGroupRouteName, new { groupId = group.Id });
@@ -172,6 +162,17 @@
         {
             return (await _GroupService.DeleteGroup(groupId))
                 .ToHttpResponseMessage(Request, HttpStatusCode.NoContent);
+        }
+
+        private void PopulateMemberRef(ScimGroup group)
+        {
+            // needed to materialize ienumerable, otherwise it did not work
+            var members = group.Members?.ToList();
+            members?.ForEach(m =>
+                m.Ref = m.Type == ScimConstants.ResourceTypes.User
+                    ? GetUserUri(UsersController.RetrieveUserRouteName, m.Value)
+                    : GetGroupUri(RetrieveGroupRouteName, m.Value));
+            group.Members = members;
         }
     }
 }
