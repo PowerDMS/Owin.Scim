@@ -1,4 +1,6 @@
-﻿namespace Owin.Scim.Tests.Integration.Users.Query
+﻿using Owin.Scim.v2.Model;
+
+namespace Owin.Scim.Tests.Integration.Users.Query
 {
     using System.Net;
     using System.Net.Http;
@@ -13,15 +15,15 @@
         {
             Response = await Server
                 .HttpClient
-                .GetAsync("users/?" + QueryString)
+                .GetAsync("v2/users/?" + QueryString)
                 .AwaitResponse()
                 .AsTask;
 
-            var test = await Response.Content.ReadAsStringAsync();
+            var stResp = await Response.Content.ReadAsStringAsync();
 
-            //ListResponse = Response.StatusCode == HttpStatusCode.OK
-            //    ? await Response.Content.ScimReadAsAsync<ScimListResponse>().AwaitResponse().AsTask
-            //    : null;
+            ListResponse = Response.StatusCode == HttpStatusCode.OK
+                ? await Response.Content.ScimReadAsAsync<ScimListResponse2>().AwaitResponse().AsTask
+                : null;
         };
 
         protected static string QueryString;

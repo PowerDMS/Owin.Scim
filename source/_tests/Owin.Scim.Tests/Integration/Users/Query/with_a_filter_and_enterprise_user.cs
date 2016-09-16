@@ -9,7 +9,7 @@
 
     using v2.Model;
 
-    [Ignore("Need to figure out if full namespace is supported with filter")]
+    [Ignore("Not getting the right users")]
     public class with_a_filter_and_enterprise_user : when_querying_users
     {
         Establish context = async () =>
@@ -53,10 +53,11 @@
                 }
             };
 
+            users[1].Extension<EnterpriseUser2Extension>().Department = "Development";
+            users[3].Extension<EnterpriseUser2Extension>().Department = "Development";
+
             foreach (var user in users)
             {
-                user.Extension<EnterpriseUser2Extension>().Department = "Development";
-
                 await Server
                     .HttpClient
                     .PostAsync("v2/users", new ScimObjectContent<ScimUser>(user))
@@ -67,6 +68,6 @@
             QueryString = "filter=urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:Department eq \"Development\"";
         };
 
-        It should_return_users_which_satisfy_the_filter = () => ListResponse.Resources.Count().ShouldEqual(7);
+        It should_return_users_which_satisfy_the_filter = () => ListResponse.Resources.Count().ShouldEqual(2);
     }
 }

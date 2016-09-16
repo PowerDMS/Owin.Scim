@@ -9,7 +9,6 @@
 
     using v2.Model;
 
-    [Ignore("ListResponse needs a jsonconverter")]
     public class with_a_filter : when_querying_groups
     {
         Establish context = async () =>

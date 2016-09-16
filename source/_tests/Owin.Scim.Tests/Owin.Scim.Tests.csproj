@@ -138,6 +138,7 @@
     <Compile Include="Integration\Groups\GroupNameUtility.cs" />
     <Compile Include="Integration\Groups\Query\when_querying_groups.cs" />
     <Compile Include="Integration\Groups\Query\with_a_filter.cs" />
+    <Compile Include="Integration\ResourceTypes\when_retrieving_resource_types_error.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchema.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchemaValidator.cs" />
     <Compile Include="Integration\SchemaExtensions\MyUserSchema.cs" />
@@ -216,6 +217,8 @@
     <Compile Include="Integration\Users\Delete\with_an_existing_userid.cs" />
     <Compile Include="Integration\Users\Delete\with_an_invalid_userid.cs" />
     <Compile Include="Integration\Users\Query\when_querying_users.cs" />
+    <Compile Include="Integration\Users\Query\with_a_filter_and_schema_extension.cs" />
+    <Compile Include="Integration\Users\Query\with_a_filter_on_multi_attribute.cs" />
     <Compile Include="Integration\Users\Query\with_a_filter_and_enterprise_user.cs" />
     <Compile Include="Integration\Users\Query\with_a_filter.cs" />
     <Compile Include="Integration\Users\Replace\when_replacing_a_user.cs" />

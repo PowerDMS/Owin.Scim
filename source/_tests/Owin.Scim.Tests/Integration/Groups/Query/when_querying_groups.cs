@@ -1,4 +1,6 @@
-﻿namespace Owin.Scim.Tests.Integration.Groups.Query
+﻿using Owin.Scim.v2.Model;
+
+namespace Owin.Scim.Tests.Integration.Groups.Query
 {
     using System.Net;
     using System.Net.Http;
@@ -13,12 +15,12 @@
         {
             Response = await Server
                 .HttpClient
-                .GetAsync("groups/?" + QueryString)
+                .GetAsync("v2/groups/?" + QueryString)
                 .AwaitResponse()
                 .AsTask;
             
             ListResponse = Response.StatusCode == HttpStatusCode.OK
-                ? await Response.Content.ScimReadAsAsync<ScimListResponse>().AwaitResponse().AsTask
+                ? await Response.Content.ScimReadAsAsync<ScimListResponse2>().AwaitResponse().AsTask
                 : null;
         };
 
