@@ -100,7 +100,7 @@
                     SetResourceVersion(group);
 
                     // if both versions are equal, bypass persistence
-                    if (group.Meta.Version.Equals(groupRecord.Meta.Version))
+                    if (string.Equals(group.Meta.Version, groupRecord.Meta.Version))
                         return new ScimDataResponse<ScimGroup>(groupRecord);
 
                     var updatedGroup = await _GroupRepository.UpdateGroup(group);
