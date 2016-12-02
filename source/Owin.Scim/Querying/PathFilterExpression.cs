@@ -4,19 +4,34 @@
 
     public class PathFilterExpression : IEquatable<PathFilterExpression>
     {
-        public PathFilterExpression(string path, string filter)
+        private string _pathDivider;
+        public PathFilterExpression(string path, string filter, string pathDivider = ".")
         {
             Path = path;
             Filter = filter;
+            _pathDivider = pathDivider;
         }
 
         public string Path { get; private set; }
 
         public string Filter { get; private set; }
 
-        public static PathFilterExpression CreatePathOnly(string path)
+        public string PathDivider
         {
-            return new PathFilterExpression(path, null);
+            get
+            {
+                if (string.IsNullOrEmpty(Path))
+                {
+                    return string.Empty;
+                }
+
+                return _pathDivider ?? string.Empty;
+            }
+        }
+
+        public static PathFilterExpression CreatePathOnly(string path, string pathDivider = ".")
+        {
+            return new PathFilterExpression(path, null, pathDivider);
         }
 
         public static PathFilterExpression CreateFilterOnly(string filter)
@@ -28,7 +43,7 @@
         {
             if (ReferenceEquals(null, other)) return false;
             if (ReferenceEquals(this, other)) return true;
-            return string.Equals(Path, other.Path) && string.Equals(Filter, other.Filter);
+            return string.Equals(Path, other.Path) && string.Equals(Filter, other.Filter)/* && string.Equals(PathDivider, other.PathDivider)*/;
         }
 
         public override bool Equals(object obj)

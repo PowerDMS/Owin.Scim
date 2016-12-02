@@ -171,7 +171,7 @@
                     var possibleExtensionSchema = expressionBuilder.ToString() + currentChar;
                     if (_ResourceExtensionSchemas.Contains(possibleExtensionSchema))
                     {
-                        _Paths.Add(new PathFilterExpression(possibleExtensionSchema, null));
+                        _Paths.Add(new PathFilterExpression(possibleExtensionSchema, null, ":"));
 
                         // reset, we're starting at a new path
                         expressionBuilder.Clear();
@@ -250,15 +250,13 @@
                     {
                         if (expression.Filter == null)
                         {
-                            return index == 0
-                                ? expression.Path
-                                : '.' + expression.Path;
+                            return expression.Path + expression.PathDivider;
                         }
 
                         return expression.Path == null
                             ? expression.Filter
                             : expression.Path + '[' + expression.Filter + ']';
-                    }));
+                    })).TrimEnd(':', '.');
         }
     }
 }
