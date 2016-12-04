@@ -137,6 +137,7 @@
     <Compile Include="Integration\Groups\Query\when_querying_groups.cs" />
     <Compile Include="Integration\Groups\Query\with_a_filter.cs" />
     <Compile Include="Integration\ResourceTypes\when_retrieving_resource_types_error.cs" />
+    <Compile Include="Integration\ResourceTypes\when_retrieving_resource_type_by_name.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchema.cs" />
     <Compile Include="Integration\SchemaExtensions\MyGroupSchemaValidator.cs" />
     <Compile Include="Integration\SchemaExtensions\MyUserSchema.cs" />
@@ -305,6 +306,7 @@
     <Compile Include="Querying\Filtering\Normalization\with_complex_attribute_no_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_multiple_groups_and_period_within_value_path.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_resource_extension_attribute.cs" />
+    <Compile Include="Querying\Filtering\Normalization\with_resource_extension_attribute_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_and_grouped_filter.cs" />
     <Compile Include="Querying\Filtering\Normalization\with_terminal_attribute_no_filter.cs" />

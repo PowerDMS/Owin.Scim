@@ -10,5 +10,7 @@
 
         It should_contain = () => ScimFilter.Paths.ShouldContainOnly(
             new PathFilterExpression(null, "displayName eq \"Daniel\""));
+
+        It should_equal = () => ScimFilter.NormalizedFilterExpression.ShouldEqual("displayName eq \"Daniel\"");
     }
 }

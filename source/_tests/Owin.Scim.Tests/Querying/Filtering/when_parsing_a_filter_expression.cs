@@ -1,4 +1,7 @@
-﻿namespace Owin.Scim.Tests.Querying.Filtering
+﻿using Owin.Scim.Configuration;
+using Owin.Scim.Tests.Extensions;
+
+namespace Owin.Scim.Tests.Querying.Filtering
 {
     using System;
     using System.Collections.Generic;
@@ -22,7 +25,7 @@
                 new AntlrInputStream(
                     new ScimFilter(ResourceExtensionSchemas, FilterExpression)));
             var parser = new ScimFilterParser(new CommonTokenStream(lexer));
-            var filterVisitor = new ScimFilterVisitor<TResource>();
+            var filterVisitor = new ScimFilterVisitor<TResource>(new ScimServerConfiguration().WithTypeDefinitions());
 
             Predicate = filterVisitor.Visit(parser.parse()).Compile().AsFunc<ScimUser, bool>();
         };

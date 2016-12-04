@@ -11,5 +11,7 @@
         It show_throw_exception = () => ScimFilter.Paths.ShouldContainOnly(
             new PathFilterExpression("name", null),
             new PathFilterExpression("familyName", null));
+
+        It should_equal = () => ScimFilter.NormalizedFilterExpression.ShouldEqual("name.familyName");
     }
 }

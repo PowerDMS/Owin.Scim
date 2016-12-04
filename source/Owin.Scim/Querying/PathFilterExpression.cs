@@ -4,8 +4,9 @@
 
     public class PathFilterExpression : IEquatable<PathFilterExpression>
     {
-        private string _pathDivider;
-        public PathFilterExpression(string path, string filter, string pathDivider = ".")
+        private char _pathDivider;
+
+        public PathFilterExpression(string path, string filter, char pathDivider = '.')
         {
             Path = path;
             Filter = filter;
@@ -16,20 +17,20 @@
 
         public string Filter { get; private set; }
 
-        public string PathDivider
+        public char PathDivider
         {
             get
             {
                 if (string.IsNullOrEmpty(Path))
                 {
-                    return string.Empty;
+                    return char.MinValue;
                 }
 
-                return _pathDivider ?? string.Empty;
+                return _pathDivider;
             }
         }
 
-        public static PathFilterExpression CreatePathOnly(string path, string pathDivider = ".")
+        public static PathFilterExpression CreatePathOnly(string path, char pathDivider = '.')
         {
             return new PathFilterExpression(path, null, pathDivider);
         }

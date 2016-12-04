@@ -9,7 +9,6 @@
 
     using v2.Model;
 
-    [Ignore("Not getting the right users")]
     public class with_a_filter_and_enterprise_user : when_querying_users
     {
         Establish context = async () =>

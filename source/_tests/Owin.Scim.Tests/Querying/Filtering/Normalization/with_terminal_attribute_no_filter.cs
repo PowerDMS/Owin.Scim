@@ -10,5 +10,7 @@
 
         It show_throw_exception = () => ScimFilter.Paths.ShouldContainOnly(
             new PathFilterExpression("displayName", null));
+
+        It should_equal = () => ScimFilter.NormalizedFilterExpression.ShouldEqual("displayName");
     }
 }

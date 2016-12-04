@@ -11,5 +11,7 @@
         It should_contain = () => ScimFilter.Paths.ShouldContainOnly(
             new PathFilterExpression("emails", "type eq \"work\""),
             new PathFilterExpression("value", null));
+
+        It should_equal = () => ScimFilter.NormalizedFilterExpression.ShouldEqual("emails[type eq \"work\"].value");
     }
 }

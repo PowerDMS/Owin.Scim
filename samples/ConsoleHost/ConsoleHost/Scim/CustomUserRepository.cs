@@ -1,6 +1,5 @@
 ﻿namespace ConsoleHost.Scim
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Net;
@@ -10,6 +9,7 @@
 
     using Kernel;
 
+    using Owin.Scim.Configuration;
     using Owin.Scim.ErrorHandling;
     using Owin.Scim.Extensions;
     using Owin.Scim.Model.Users;
@@ -29,10 +29,14 @@
 
         private readonly KernelUserManager _UserManager;
 
+        private readonly ScimServerConfiguration _scimServerConfiguration;
+
         public CustomUserRepository(
+            ScimServerConfiguration scimServerConfiguration,
             IMapper mapper,
             KernelUserManager userManager)
         {
+            _scimServerConfiguration = scimServerConfiguration;
             _Mapper = mapper;
             _UserManager = userManager;
         }
@@ -73,7 +77,7 @@
         public async Task<IEnumerable<ScimUser>> QueryUsers(ScimQueryOptions options)
         {
             var users = _Mapper.Map<IEnumerable<ScimUser2>>(await _UserManager.GetUsers());
-            var filtered = users.Where(options.Filter.ToPredicate<ScimUser2>()).ToList();
+            var filtered = users.Where(options.Filter.ToPredicate<ScimUser2>(_scimServerConfiguration)).ToList();
 
             return filtered;
         }
