@@ -32,7 +32,12 @@
 
             queryOptions.Filter = collection.Get("filter")
                 .ToMaybe()
-                .Bind(filter => new ScimFilter(configuration.ResourceExtensionSchemas.Keys, filter).Paths.MaybeSingle())
+                .Bind(filter =>
+                      {
+                          var scimFilter = new ScimFilter(configuration.ResourceExtensionSchemas.Keys, filter);
+
+                          return PathFilterExpression.CreateFilterOnly(scimFilter.NormalizedFilterExpression).ToMaybe();
+                      })
                 .FromMaybe(null);
 
             queryOptions.SortBy = collection.Get("sortBy");

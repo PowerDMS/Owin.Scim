@@ -150,7 +150,7 @@
             {
                 foreach (var kvp in resource.ExtensionSerialization)
                 {
-                    var extensionType = _ServerConfiguration.GetResourceExtensionType(objectType, kvp.Key);
+                    var extensionType = FindExtensionType(instance.GetType(), kvp.Key);
                     if (extensionType == null)
                         continue; // This is either a readOnly attribute or an unknown/unsupported extension
 
@@ -163,6 +163,27 @@
             }
 
             return resource;
+        }
+
+        private Type FindExtensionType(Type resourceType, string extensionSchemaIdentifier)
+        {
+            Type extensionType = null;
+
+            if (resourceType != null)
+            {
+                extensionType = _ServerConfiguration.GetResourceExtensionType(resourceType, extensionSchemaIdentifier);
+
+                while (extensionType == null && resourceType != typeof(Resource))
+                {
+                    if (resourceType != null)
+                    {
+                        resourceType = resourceType.BaseType;
+                        extensionType = _ServerConfiguration.GetResourceExtensionType(resourceType, extensionSchemaIdentifier);
+                    }
+                }
+            }
+
+            return extensionType;
         }
     }
 }

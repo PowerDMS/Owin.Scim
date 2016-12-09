@@ -11,7 +11,6 @@ namespace Owin.Scim.Tests.Integration.Users.Query
 
     using v2.Model;
 
-    [Ignore("Not getting the right users")]
     public class with_a_filter_and_schema_extension : when_querying_users
     {
         Establish context = async () =>

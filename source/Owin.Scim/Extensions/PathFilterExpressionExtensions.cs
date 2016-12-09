@@ -3,18 +3,19 @@
     using System;
     using System.Linq.Expressions;
     using System.Reflection;
-    
+
     using Antlr4.Runtime;
 
     using NContext.Common;
 
     using Querying;
 
+    using Owin.Scim.Configuration;
     using Owin.Scim.Antlr;
 
     public static class PathFilterExpressionExtensions
     {
-        public static Func<T, bool> ToPredicate<T>(this PathFilterExpression filterExpression)
+        public static Func<T, bool> ToPredicate<T>(this PathFilterExpression filterExpression, ScimServerConfiguration scimServerConfiguration)
         {
             if (filterExpression == null)
                 return user => true;
@@ -38,7 +39,7 @@
 
             // create a visitor for the type of enumerable generic argument
             var filterVisitorType = typeof(ScimFilterVisitor<>).MakeGenericType(declaryingType);
-            var filterVisitor = (IScimFilterVisitor)filterVisitorType.CreateInstance();
+            var filterVisitor = (IScimFilterVisitor)filterVisitorType.CreateInstance(scimServerConfiguration);
             var filterDelegateExpression = filterVisitor.VisitExpression(parser.parse());
 
             if (filterExpression.Path == null)

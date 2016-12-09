@@ -11,5 +11,8 @@
         It should_contain = () => ScimFilter.Paths.ShouldContainOnly(
             new PathFilterExpression("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User", null),
             new PathFilterExpression("employeeNumber", null));
+
+        It should_equal = () =>
+                ScimFilter.NormalizedFilterExpression.ShouldEqual("urn:ietf:params:scim:schemas:extension:enterprise:2.0:User:employeeNumber");
     }
 }

@@ -138,7 +138,7 @@
                     SetResourceVersion(user);
 
                     // if both versions are equal, bypass persistence
-                    if (user.Meta.Version.Equals(userRecord.Meta.Version))
+                    if (string.Equals(user.Meta.Version, userRecord.Meta.Version))
                         return new ScimDataResponse<ScimUser>(userRecord);
 
                     var updatedUser = await _UserRepository.UpdateUser(user);

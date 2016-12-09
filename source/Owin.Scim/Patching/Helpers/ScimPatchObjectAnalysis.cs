@@ -261,7 +261,7 @@
                         // create a visitor for the type of enumerable generic argument
                         var enumerableType = attemptedProperty.PropertyType.GetGenericArguments()[0];
                         var filterVisitorType = typeof (ScimFilterVisitor<>).MakeGenericType(enumerableType);
-                        var filterVisitor = (IScimFilterVisitor) filterVisitorType.CreateInstance();
+                        var filterVisitor = (IScimFilterVisitor) filterVisitorType.CreateInstance(_ServerConfiguration);
                         predicate = filterVisitor.VisitExpression(parser.parse()).Compile();
                     }
                     catch (Exception)

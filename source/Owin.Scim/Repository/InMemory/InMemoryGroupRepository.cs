@@ -10,6 +10,7 @@
     using Model.Groups;
     using Model.Users;
 
+    using Owin.Scim.Configuration;
     using Querying;
 
     /// <summary>
@@ -18,10 +19,12 @@
     public class InMemoryGroupRepository : IGroupRepository
     {
         private readonly IDictionary<string, ScimGroup> _Groups;
+        private readonly ScimServerConfiguration _scimServerConfiguration;
 
-        public InMemoryGroupRepository()
+        public InMemoryGroupRepository(ScimServerConfiguration scimServerConfiguration)
         {
             _Groups = new Dictionary<string, ScimGroup>();
+            _scimServerConfiguration = scimServerConfiguration;
         }
 
         public async Task<ScimGroup> CreateGroup(ScimGroup group)
@@ -69,7 +72,7 @@
         {
             var groups = _Groups.Values.AsEnumerable();
             if (options.Filter != null)
-                groups = groups.Where(options.Filter.ToPredicate<ScimGroup>()).ToList();
+                groups = groups.Where(options.Filter.ToPredicate<ScimGroup>(_scimServerConfiguration)).ToList();
 
             // TODO: (DG) sorting
             if (options.SortBy != null)

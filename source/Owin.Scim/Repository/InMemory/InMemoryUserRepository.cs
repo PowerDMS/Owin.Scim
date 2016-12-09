@@ -12,7 +12,7 @@
     using Model.Users;
 
     using NContext.Security.Cryptography;
-
+    using Owin.Scim.Configuration;
     using Querying;
 
     public class InMemoryUserRepository : IUserRepository
@@ -21,10 +21,13 @@
 
         private readonly ConcurrentDictionary<string, ScimUser> _Users;
 
-        public InMemoryUserRepository(IGroupRepository groupRepository)
+        private readonly ScimServerConfiguration _scimServerConfiguration;
+
+        public InMemoryUserRepository(ScimServerConfiguration scimServerConfiguration, IGroupRepository groupRepository)
         {
             _GroupRepository = groupRepository;
             _Users = new ConcurrentDictionary<string, ScimUser>();
+            _scimServerConfiguration = scimServerConfiguration;
         }
 
         public async Task<ScimUser> CreateUser(ScimUser user)
@@ -78,7 +81,7 @@
         {
             var users = _Users.Values.AsEnumerable();
             if (options.Filter != null)
-                users = users.Where(options.Filter.ToPredicate<ScimUser>()).ToList();
+                users = users.Where(options.Filter.ToPredicate<ScimUser>(_scimServerConfiguration)).ToList();
             
             // TODO: (DG) sorting
             if (options.SortBy != null)

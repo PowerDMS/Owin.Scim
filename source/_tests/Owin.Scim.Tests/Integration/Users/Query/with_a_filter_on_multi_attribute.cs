@@ -9,7 +9,6 @@
 
     using v2.Model;
 
-    [Ignore("Causes exception")]
     public class with_a_filter_on_multi_attribute : when_querying_users
     {
         Establish context = async () =>

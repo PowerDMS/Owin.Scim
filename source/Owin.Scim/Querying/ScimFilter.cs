@@ -171,7 +171,7 @@
                     var possibleExtensionSchema = expressionBuilder.ToString() + currentChar;
                     if (_ResourceExtensionSchemas.Contains(possibleExtensionSchema))
                     {
-                        _Paths.Add(new PathFilterExpression(possibleExtensionSchema, null));
+                        _Paths.Add(new PathFilterExpression(possibleExtensionSchema, null, ':'));
 
                         // reset, we're starting at a new path
                         expressionBuilder.Clear();
@@ -244,21 +244,27 @@
             }
 
             // normalize the filter expression by reversing our logic above
+            ISet<char> usedPathDividers = new HashSet<char>();
             _NormalizedFilterExpression = 
                 string.Concat(
-                    _Paths.Select((expression, index) =>
+                    _Paths.Select(expression =>
                     {
                         if (expression.Filter == null)
                         {
-                            return index == 0
-                                ? expression.Path
-                                : '.' + expression.Path;
+                            usedPathDividers.Add(expression.PathDivider);
+
+                            return expression.Path + expression.PathDivider;
                         }
 
-                        return expression.Path == null
-                            ? expression.Filter
-                            : expression.Path + '[' + expression.Filter + ']';
-                    }));
+                        if (expression.Path == null)
+                        {
+                            return expression.Filter;
+                        }
+
+                        usedPathDividers.Add(expression.PathDivider);
+
+                        return expression.Path + '[' + expression.Filter + ']' + expression.PathDivider;
+                    })).TrimEnd(usedPathDividers.ToArray());
         }
     }
 }

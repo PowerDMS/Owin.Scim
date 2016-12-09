@@ -10,5 +10,9 @@
 
         It should_contain = () => ScimFilter.Paths.ShouldContainOnly(
             new PathFilterExpression(null, "userType eq \"Employee\" and (emails co \"example.com\" or emails[value co \"example.org\"])"));
+
+        It should_equal = () =>
+                ScimFilter.NormalizedFilterExpression.ShouldEqual(
+                              "userType eq \"Employee\" and (emails co \"example.com\" or emails[value co \"example.org\"])");
     }
 }

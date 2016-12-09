@@ -5,22 +5,26 @@ parse
     ;
 
 filter
-	: FIELD SP PR                                #presentExp
-	| FIELD SP COMPAREOPERATOR SP VALUE          #operatorExp
+	: attrPath SP PR                             #presentExp
+	| attrPath SP COMPAREOPERATOR SP VALUE       #operatorExp
 	| NOT? SP* '(' filter ')'                    #braceExp
-	| FIELD '[' valPathFilter ']'                #valPathExp
+	| attrPath '[' valPathFilter ']'             #valPathExp
 	| filter SP AND SP filter                    #andExp
 	| filter SP OR SP filter                     #orExp
 	;										     
 											     
 valPathFilter								     
-	: FIELD SP PR                                #valPathPresentExp
-	| FIELD SP COMPAREOPERATOR SP VALUE          #valPathOperatorExp
+	: attrPath SP PR                             #valPathPresentExp
+	| attrPath SP COMPAREOPERATOR SP VALUE       #valPathOperatorExp
 	| NOT? SP* '(' valPathFilter ')'             #valPathBraceExp
 	| valPathFilter SP AND SP valPathFilter      #valPathAndExp
 	| valPathFilter SP OR SP valPathFilter       #valPathOrExp
 	;
 	
+attrPath 
+	: (SCHEMA)? ATTRNAME ('.' ATTRNAME)?
+	;
+
 COMPAREOPERATOR : EQ | NE | CO | SW | EW | GT | GE | LT | LE;
 
 EQ : [eE][qQ];
@@ -40,10 +44,18 @@ OR  : [oO][rR];
 
 SP : ' ';
 
-FIELD : ([a-z] | [A-Z] | [0-9] | '.' | ':' | '_' | '-')+;
+SCHEMA : 'urn:' (SEGMENT ':')+;
+
+ATTRNAME : ALPHA (ALPHA | DIGIT | '_' | '-')+;
+
+fragment SEGMENT : (ALPHA | DIGIT | '_' | '-' | '.')+;
+
+fragment DIGIT : [0-9];
+
+fragment ALPHA : [a-z] | [A-Z];
 
 ESCAPED_QUOTE : '\\"';
 
-VALUE : '"'(ESCAPED_QUOTE | ~'"')*'"';
+VALUE : '"'(ESCAPED_QUOTE | ~'"')*'"' | 'true' | 'false' | 'null' | DIGIT+('.'DIGIT+)?;
 
 EXCLUDE : [\b | \t | \r | \n]+ -> skip;

@@ -2,8 +2,6 @@
 {
     using System;
     using System.Collections;
-    using System.Reflection;
-
     using Extensions;
 
     public class FilterHelpers
@@ -29,14 +27,15 @@
             return haystack.IndexOf(needle, StringComparison.OrdinalIgnoreCase) > -1;
         }
 
-        public static bool IsPresent<TResource>(TResource resource, PropertyInfo property)
+        public static bool IsPresent<T>(T value)
         {
-            if (resource == null || property == null) return false;
+            if (value == null)
+            {
+                return false;
+            }
 
-            var value = property.GetValue(resource);
-            if (value == null) return false;
+            Type valueType = typeof(T);
 
-            var valueType = value.GetType();
             if (valueType == typeof(string))
             {
                 return !string.IsNullOrWhiteSpace(value as string);
