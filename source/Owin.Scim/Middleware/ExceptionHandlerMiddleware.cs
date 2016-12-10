@@ -49,35 +49,98 @@
             }
             catch (Exception ex)
             {
-                var responseException = ex as ScimException;
-
+                ScimException responseException = FindScimException(ex);
                 context.Response.Headers["Content-Type"] = "application/scim+json; charset=utf-8";
+                ScimError scimError;
+                int statusCode;
 
                 if (responseException != null)
                 {
-                    context.Response.StatusCode = (int)responseException.ScimError.Status;
-                    context.Response.Write(
-                        Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(responseException.ScimError,
-                            _SerializationSettings)));
+                    statusCode = (int)responseException.ScimError.Status;
+                    scimError = responseException.ScimError;
                 }
                 else
                 {
-                    context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
-
+                    Exception realException = GetFirstRealException(ex);
+                    statusCode = (int)HttpStatusCode.InternalServerError;
+                    scimError = new ScimError(HttpStatusCode.InternalServerError,
+                        detail:
 #if DEBUG
-                    Byte[] responseBody = Encoding.UTF8.GetBytes(
-                        JsonConvert.SerializeObject(
-                            new ScimError(HttpStatusCode.InternalServerError,
-                                detail: String.Format("{0}{1}{2}", ex.Message, Environment.NewLine, ex.StackTrace))
-                            , _SerializationSettings));
+                        realException.ToString()
 #else
-                Byte[] responseBody = Encoding.UTF8.GetBytes(
-                    JsonConvert.SerializeObject(new ScimError(HttpStatusCode.InternalServerError, detail: ex.Message)
-                        , _SerializationSettings));
+                        realException.Message
 #endif
-                    context.Response.Write(responseBody);
+                    );
+                }
+
+                context.Response.StatusCode = statusCode;
+                context.Response.Write(Encoding.UTF8.GetBytes(JsonConvert.SerializeObject(scimError, _SerializationSettings)));
+            }
+        }
+
+        private static ScimException FindScimException(Exception exception)
+        {
+            var scimException = exception as ScimException;
+
+            if (scimException == null)
+            {
+                var aggregateException = exception as AggregateException;
+
+                if (aggregateException != null)
+                {
+                    foreach (var innerException in aggregateException.Flatten().InnerExceptions)
+                    {
+                        scimException = IterateForScimException(innerException);
+
+                        if (scimException != null)
+                        {
+                            return scimException;
+                        }
+                    }
                 }
             }
+
+            return scimException ?? IterateForScimException(exception);
+        }
+
+        private static ScimException IterateForScimException(Exception exception)
+        {
+            ScimException scimException = null;
+
+            if (exception != null)
+            {
+                scimException = exception as ScimException;
+
+                if (scimException == null)
+                {
+                    do
+                    {
+                        scimException = exception.InnerException as ScimException;
+                        exception = exception.InnerException;
+                    }
+                    while (scimException == null && exception != null);
+                }
+            }
+
+            return scimException;
+        }
+
+        private static Exception GetFirstRealException(Exception exception)
+        {
+            Exception realException = exception;
+            var aggregateException = realException as AggregateException;
+
+            if (aggregateException != null)
+            {
+                realException = aggregateException.Flatten().InnerException; // take first real exception
+
+                while (realException != null && realException.InnerException != null)
+                {
+                    realException = realException.InnerException;
+                }
+            }
+
+            return realException ?? exception;
         }
     }
 }

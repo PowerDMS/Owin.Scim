@@ -75,7 +75,8 @@
   </Target>
   <Import Project="..\..\Packages\Antlr4.4.5.3\build\Antlr4.targets" Condition="Exists('..\..\Packages\Antlr4.4.5.3\build\Antlr4.targets')" />
   <PropertyGroup>
-    <PostBuildEvent>del $(ProjectDir)..\_build\$(ConfigurationName)\$(ProjectName).*</PostBuildEvent>
+    <PostBuildEvent>
+    </PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
