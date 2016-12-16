@@ -202,7 +202,7 @@
                 if (currentChar == '.' && 
                     !isPathOnly &&
                     !possibleResourceExtension &&
-                    boundaryStack.Peek() != '"')
+                    (!boundaryStack.Any() || boundaryStack.Peek() != '"'))
                 {
                     // we are in a filter expression but not a string literal (valuePath)
                     // (e.g. userType ne \"Employee\" and not (emails co \"example.com\" or emails.value co \"example.org\")
