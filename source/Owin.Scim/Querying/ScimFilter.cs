@@ -9,7 +9,7 @@
     // TODO: (DG) Add support for fully-qualified URNs
     public class ScimFilter
     {
-        private readonly char[] _schemaSpecialCharacters = { ':', '.', '_', '-' };
+        private static readonly HashSet<char> _schemaSpecialCharacters = new HashSet<char> { ':', '.', '_', '-' };
 
         private readonly ISet<string> _ResourceExtensionSchemas;
 
@@ -277,7 +277,7 @@
                     })).TrimEnd(usedPathDividers.ToArray());
         }
 
-        private bool StillInsideSchema(char currentChar)
+        private static bool StillInsideSchema(char currentChar)
         {
             return char.IsLetterOrDigit(currentChar) || _schemaSpecialCharacters.Contains(currentChar);
         }
