@@ -9,6 +9,8 @@
     // TODO: (DG) Add support for fully-qualified URNs
     public class ScimFilter
     {
+        private static readonly HashSet<char> _schemaSpecialCharacters = new HashSet<char> { ':', '.', '_', '-' };
+
         private readonly ISet<string> _ResourceExtensionSchemas;
 
         private readonly IList<PathFilterExpression> _Paths;
@@ -39,6 +41,8 @@
 
         private void ProcessFilter(string filterExpression)
         {
+            #region Explanantion
+
             /*
             This processing of a SCIM filter adds support for both search query filters and patch path filters.
             See: https://tools.ietf.org/html/rfc7644#section-3.4.2
@@ -62,6 +66,8 @@
             In the below code, we look to differentiate a '.' from a path after a filter expression and one
             that's used before a potential filter expression.
             */
+
+            #endregion
             filterExpression = filterExpression.Trim(' ');
             var expressionBuilder = new StringBuilder();
             var boundaryStack = new Stack<char>();
@@ -187,12 +193,16 @@
 
                         continue;
                     }
+
+                    possibleResourceExtension = StillInsideSchema(currentChar);
                 }
 
                 // determine whether we need to replace an inner filter expression '.' with a bracket grouping
+                // but we need to skip '.' in schema (e.g. extension schema)
                 if (currentChar == '.' && 
                     !isPathOnly &&
-                    boundaryStack.Peek() != '"')
+                    !possibleResourceExtension &&
+                    (!boundaryStack.Any() || boundaryStack.Peek() != '"'))
                 {
                     // we are in a filter expression but not a string literal (valuePath)
                     // (e.g. userType ne \"Employee\" and not (emails co \"example.com\" or emails.value co \"example.org\")
@@ -265,6 +275,11 @@
 
                         return expression.Path + '[' + expression.Filter + ']' + expression.PathDivider;
                     })).TrimEnd(usedPathDividers.ToArray());
+        }
+
+        private static bool StillInsideSchema(char currentChar)
+        {
+            return char.IsLetterOrDigit(currentChar) || _schemaSpecialCharacters.Contains(currentChar);
         }
     }
 }
