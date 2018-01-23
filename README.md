@@ -38,51 +38,51 @@ Roadmap
 -------
 The list below doesn't necessarily denote priority or order.
 
-01. [ ] Finish users endpoints
-  1. [x] Create  
-  2. [x] Retrieve  
-  3. [x] Replace  
-  4. [ ] Update (Patch) (in progress - cleanup code)
-    1. [x] Add  
-    2. [x] Replace  
-    3. [x] Remove  
-  5. [x] Delete  
-  6. [x] Query
-02. [x] Schema extensions
-03. [x] Add SCIM server configuration endpoints
-  1. [x] /ServiceProviderConfig
-  2. [x] /Schemas
-  3. [x] /ResourceTypes
-04. [x] Add support for mutability rule-processing.
-05. [ ] Add support for bulk processing
-06. [ ] Add groups endpoints
-  1. [x] Create
-  2. [x] Retrieve
-  3. [x] Replace
-  4. [ ] Update (Patch)  (in progress - cleanup code)
-    1. [x] Add
-    2. [x] Replace
-    3. [x] Remove
-  5. [x] Delete  
-  6. [x] Query
-07. [ ] Add support for querying
-  1. [x] Filtering
-  2. [ ] Sorting (in design)
-  3. [ ] Ordering (in design)
-  4. [ ] Pagination (in design)
-  5. [ ] Projection (in progress - currently only works with top-level attributes / non-urn qualified references)
-08. [x] SCIM Extensiblity
-  1. [x] Canonicalization  
-  2. [x] Validation  
-  3. [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
-  4. [x] Custom resource types and endpoints
-09. [x] Add endpoint authorization support
-10. [ ] Add endpoint for supporting query-on-root
-11. [x] Add support for SCIM v1.1
-12. [ ] Add logging functionality
-13. [ ] Outbound Provisioning (SCIM Event Notification)
-  1. [ ] Event Triggers / Handlers
-  2. [ ] Client Subscription Management
+- [ ] Finish users endpoints
+  - [x] Create  
+  - [x] Retrieve  
+  - [x] Replace  
+  - [ ] Update (Patch) (in progress - cleanup code)
+    - [x] Add  
+    - [x] Replace  
+    - [x] Remove  
+  - [x] Delete  
+  - [x] Query
+- [x] Schema extensions
+- [x] Add SCIM server configuration endpoints
+  - [x] /ServiceProviderConfig
+  - [x] /Schemas
+  - [x] /ResourceTypes
+- [x] Add support for mutability rule-processing.
+- [ ] Add support for bulk processing
+- [ ] Add groups endpoints
+  - [x] Create
+  - [x] Retrieve
+  - [x] Replace
+  - [ ] Update (Patch)  (in progress - cleanup code)
+    - [x] Add
+    - [x] Replace
+    - [x] Remove
+  - [x] Delete  
+  - [x] Query
+- [ ] Add support for querying
+  - [x] Filtering
+  - [ ] Sorting (in design)
+  - [ ] Ordering (in design)
+  - [ ] Pagination (in design)
+  - [ ] Projection (in progress - currently only works with top-level attributes / non-urn qualified references)
+- [x] SCIM Extensiblity
+  - [x] Canonicalization  
+  - [x] Validation  
+  - [x] Attribute Behavior (mutability, caseExact, returned, uniqueness, etc)
+  - [x] Custom resource types and endpoints
+- [x] Add endpoint authorization support
+- [ ] Add endpoint for supporting query-on-root
+- [x] Add support for SCIM v1.1
+- [ ] Add logging functionality
+- [ ] Outbound Provisioning (SCIM Event Notification)
+  - [ ] Event Triggers / Handlers
+  - [ ] Client Subscription Management
 
 Getting Started
 ===============
