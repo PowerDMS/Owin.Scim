@@ -54,8 +54,10 @@ fragment DIGIT : [0-9];
 
 fragment ALPHA : [a-z] | [A-Z];
 
+fragment DATETIME: (ALPHA | DIGIT | '_' | '-' | '.'  | ':')+;
+
 ESCAPED_QUOTE : '\\"';
 
-VALUE : '"'(ESCAPED_QUOTE | ~'"')*'"' | 'true' | 'false' | 'null' | DIGIT+('.'DIGIT+)?;
+VALUE : '"'(ESCAPED_QUOTE | ~'"')*'"' | 'true' | 'false' | 'null' | DIGIT+('.'DIGIT+)? | DATETIME+('.'DATETIME+)?;
 
 EXCLUDE : [\b | \t | \r | \n]+ -> skip;
