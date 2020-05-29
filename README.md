@@ -42,7 +42,7 @@ The list below doesn't necessarily denote priority or order.
   - [x] Create  
   - [x] Retrieve  
   - [x] Replace  
-  - [ ] Update (Patch) (in progress - cleanup code)
+  - [x] Update (Patch) (in progress - cleanup code)
     - [x] Add  
     - [x] Replace  
     - [x] Remove  
