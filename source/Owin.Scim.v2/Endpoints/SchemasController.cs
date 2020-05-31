@@ -2,12 +2,12 @@
 {
     using System.Net.Http;
     using System.Threading.Tasks;
-    using System.Web.Http;
 
     using Configuration;
 
     using Extensions;
-
+    using Owin.Scim.Querying;
+    using Owin.Scim.v2.Model;
     using Scim.Endpoints;
     using Scim.Services;
 
@@ -31,9 +31,16 @@
         public async Task<HttpResponseMessage> GetSchemas(string schemaId = null)
         {
             if (string.IsNullOrWhiteSpace(schemaId))
+            {
                 return (await _SchemaService.GetSchemas())
                     .Let(schemata => SetMetaLocations(schemata, GetSchemasRouteName, schema => new { schemaId = schema.Id }))
+                    .Bind(
+                        schemata =>
+                            new ScimDataResponse<ScimListResponse>(
+                                new ScimListResponse2(schemata)
+                                ))
                     .ToHttpResponseMessage(Request);
+            }
 
             return (await _SchemaService.GetSchema(schemaId))
                 .Let(schema => SetMetaLocation(schema, GetSchemasRouteName, new { schemaId = schema.Id }))

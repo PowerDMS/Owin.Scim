@@ -10,25 +10,20 @@ email me:  daniel.gioulakis [at] powerdms [dot] com
 
 If you have been evaluating the alpha builds from nuget, we would love to hear feedback from you. Please reach out and share how your experience has been working with Owin.Scim. Any issues and feature requests are welcome. Help us shape Owin.Scim into the best fully-featured and compliant open-source SCIM server!
 
-Latest News!
-============
-We're excited to announce that Owin.Scim is now actively deployed to Azure AppServices as part of our way to showcase the capabilities of Owin.Scim. You can access all live SCIM endpoints at: http://owin-scim.azurewebsites.net/scim/ (e.g. `http://owin-scim.azurewebsites.net/scim/<version>/<endpoint>`)  
-
-#### Live Endpoints for Interoperability Testing  
-*NOTE:* The current live implementation is being hosted inside IIS which unfortunately blocks `:` in URL paths if they exist before the `?` query-string delimiter. Therefore, live endpoints for `/schemas/{schemaId}` and `/resourcetypes/{resourceTypeId}` are not accessible, however, they do work. We'll look to host our sample differently in the future.
+Endpoints Implemented.
 
 ##### SCIM v2  
-- http://owin-scim.azurewebsites.net/scim/v2/serviceproviderconfig
-- http://owin-scim.azurewebsites.net/scim/v2/schemas
-- http://owin-scim.azurewebsites.net/scim/v2/resourcetypes
-- http://owin-scim.azurewebsites.net/scim/v2/users
-- http://owin-scim.azurewebsites.net/scim/v2/groups
+- /scim/v2/ServiceProviderConfig
+- /scim/v2/Schemas
+- /scim/v2/ResourceTypes
+- /scim/v2/Users
+- /scim/v2/Groups
 
 ##### SCIM v1   
-- http://owin-scim.azurewebsites.net/scim/v1/serviceproviderconfigs
-- http://owin-scim.azurewebsites.net/scim/v1/schemas
-- http://owin-scim.azurewebsites.net/scim/v1/users
-- http://owin-scim.azurewebsites.net/scim/v1/groups
+- /scim/v1/ServiceProviderConfigs
+- /scim/v1/Schemas
+- /scim/v1/Users
+- /scim/v1/Groups
 
 PROJECT STATUS
 ==============
@@ -42,7 +37,7 @@ The list below doesn't necessarily denote priority or order.
   - [x] Create  
   - [x] Retrieve  
   - [x] Replace  
-  - [ ] Update (Patch) (in progress - cleanup code)
+  - [x] Update (Patch) (in progress - cleanup code)
     - [x] Add  
     - [x] Replace  
     - [x] Remove  
